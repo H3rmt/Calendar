@@ -1,0 +1,9 @@
+alle tage in nem JSON man kann sich presets bauen wie z.B. nen Stundenplan oder Arbeit wo mann wie nen Kalender Termine schreiben kann 
+mit Woche und dann 10 min weiße und dann wiederholungen
+und dann kann man errinerungen setzen auf nächste oder übernächste Vorkommnisse von diesem Event 
+und man kann auch Erledigungen mich wichtigkeiten versehen und reminder festlegen
+man hat dann auch ne Übersicht über alle Termine mit bestimmter wichtigkeit in der nächsten Zeit
+man kann auch einfach nur notes an die gewissen tage legen und mann sieht dann in ner woche welche Termine man hatt 
+und was man bis da erledigen soll
+man kann auch reminder für die Termine machen
+
