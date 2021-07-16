@@ -46,7 +46,7 @@ fun initConstants() {
 		val default = "{\n" +
 				"  \"ui\": \"Nimbus\",\n" +
 				"  \"language\": \"en\",\n" +
-				"  \"debug\": \"true\",\n" +
+				"  \"debug\": \"false\",\n" +
 				"  \"printstacktrace\": \"true\",\n" +
 				"  \"fontFamily\": \"Tahoma\",\n" +
 				"  \"printlogs\": \"true\",\n" +

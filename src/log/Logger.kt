@@ -36,7 +36,7 @@ fun initLogger() {
 		if(getConfig(Configs.debug))
 			fileHandler.level = Level.ALL
 		else
-			fileHandler.level = Level.INFO
+			fileHandler.level = Level.CONFIG
 		it.addHandler(fileHandler)
 	}
 }

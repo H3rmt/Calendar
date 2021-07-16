@@ -61,7 +61,7 @@ class Fonts {
 				return it
 			}
 		} catch (e: NullPointerException) {
-			log("$font was not found", LogType.LOW)
+			log("$font was not found", LogType.WARNING)
 			return Font("Arial", 2, 14)
 		}
 	}

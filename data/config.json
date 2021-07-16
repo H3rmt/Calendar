@@ -1,7 +1,7 @@
 {
   "ui": "Nimbus",
   "language": "en",
-  "debug": "true",
+  "debug": "false",
   "printstacktrace": "true",
   "fontFamily": "Tahoma",
   "printlogs": "true",
