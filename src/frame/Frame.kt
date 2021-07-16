@@ -1,5 +1,6 @@
 package frame
 
+
 import log.getLangString
 import java.awt.Dimension
 import javax.swing.JFrame
@@ -7,6 +8,8 @@ import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.WindowConstants
+
+import tornadofx.*
 
 val frame: JFrame = JFrame("Calendar")
 
@@ -36,6 +39,7 @@ fun frameInit() {
 
 	frame.jMenuBar = menubar
 
-	frame.isVisible = true
+	//frame.isVisible = true
 	frame.setSize(300, 200)
+
 }

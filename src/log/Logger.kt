@@ -2,6 +2,7 @@ package log
 
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -93,8 +94,8 @@ class SimpleFormatter: Formatter() {
 	private val format: String = getConfig(Configs.logformat)
 
 	override fun format(record: LogRecord): String {
-		val zdt = ZonedDateTime.ofInstant(
-			record.instant, ZoneId.systemDefault()
+		val zdt = ZonedDateTime.ofInstant (
+			Instant.ofEpochMilli(record.millis), ZoneId.systemDefault()
 		)
 
 		var source: String?
