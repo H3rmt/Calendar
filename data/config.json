@@ -1,9 +1,8 @@
 {
-  "ui": "Nimbus",
   "language": "en",
   "debug": "false",
   "printstacktrace": "true",
   "fontFamily": "Tahoma",
   "printlogs": "true",
-  "logformat": "\"[%1$tF %1$tT] |%4$-7s %5$s %n\"" 
+  "logformat": "\"[%1$tF %1$tT] |%4$-10s %5$s %n\""
 }

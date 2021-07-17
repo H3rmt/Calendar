@@ -15,3 +15,4 @@ Calendar.iml
 # Kotlin lib
 lib/Kotlin
 jdk-8u201-windows-x64.exe
+*.lck

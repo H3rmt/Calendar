@@ -131,20 +131,6 @@ class Exit(private val text: String): Exception(text) {
 	}
 }
 
-/**
- * sets the general UI LookAndFeels
- *
- * @see UIManager
- */
-fun setUIManager() {
-	for(info in UIManager.getInstalledLookAndFeels()) {
-		if(info.name.equals(getConfig<String>(Configs.ui))) {
-			UIManager.setLookAndFeel(info.className)
-			log("UI set to ${info.className}", LogType.IMPORTANT)
-			break
-		}
-	}
-}
 
 /**
  * only log.getConfigs in this Congfig enum are loaded from config.json
@@ -152,7 +138,7 @@ fun setUIManager() {
  * have to be all lowercase
  */
 enum class Configs {
-	language, ui, debug, printlogs, logformat, printstacktrace, fontfamily,
+	language, debug, printlogs, logformat, printstacktrace, fontfamily,
 }
 
 fun getlogfile(): String = "Calendar.log"

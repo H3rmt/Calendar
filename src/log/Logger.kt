@@ -2,10 +2,8 @@ package log
 
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.util.*
 import java.util.logging.ConsoleHandler
 import java.util.logging.FileHandler
 import java.util.logging.Formatter
@@ -92,12 +90,10 @@ enum class LogType {
  */
 class SimpleFormatter: Formatter() {
 	private val format: String = getConfig(Configs.logformat)
+	private val dat = Date()
 
 	override fun format(record: LogRecord): String {
-		val zdt = ZonedDateTime.ofInstant (
-			Instant.ofEpochMilli(record.millis), ZoneId.systemDefault()
-		)
-
+		dat.time = record.millis
 		var source: String?
 		if(record.sourceClassName != null) {
 			source = record.sourceClassName
@@ -107,10 +103,8 @@ class SimpleFormatter: Formatter() {
 		} else {
 			source = record.loggerName
 		}
-
 		val message = formatMessage(record)
 		var throwable = ""
-
 		if(record.thrown != null) {
 			val sw = StringWriter()
 			val pw = PrintWriter(sw)
@@ -119,10 +113,9 @@ class SimpleFormatter: Formatter() {
 			pw.close()
 			throwable = sw.toString()
 		}
-
 		return String.format(
 			format,
-			zdt,
+			dat,
 			source,
 			record.loggerName,
 			record.level.localizedName,
