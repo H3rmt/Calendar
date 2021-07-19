@@ -1,7 +1,7 @@
 import frame.frameInit
-import log.initConstants
-import log.initLogger
-import log.log
+import logic.initConstants
+import logic.initLogger
+import logic.log
 
 fun main(args: Array<String>) {
 	log("starting Calendar: ${args.toSet()}")

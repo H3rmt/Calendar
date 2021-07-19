@@ -1,4 +1,4 @@
-package log
+package logic
 
 import com.google.gson.stream.JsonReader
 import java.io.File

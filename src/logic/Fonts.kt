@@ -1,4 +1,4 @@
-package log
+package logic
 
 import java.awt.Font
 import java.io.File

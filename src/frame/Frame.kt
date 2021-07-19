@@ -1,50 +1,30 @@
 package frame
 
 
-import frame.Styles
 import javafx.geometry.Pos
+import javafx.scene.paint.Color
+import javafx.scene.text.TextAlignment
 import javafx.stage.Stage
-import log.getLangString
-import tornadofx.*
-import java.awt.Dimension
-import javax.swing.JFrame
-import javax.swing.JMenu
-import javax.swing.JMenuBar
-import javax.swing.JMenuItem
-import javax.swing.WindowConstants
+import logic.getLangString
+import tornadofx.App
+import tornadofx.action
+import tornadofx.addClass
+import tornadofx.borderpane
+import tornadofx.checkmenuitem
+import tornadofx.contextmenu
+import tornadofx.customitem
+import tornadofx.hbox
+import tornadofx.item
+import tornadofx.label
+import tornadofx.launch
+import tornadofx.menu
+import tornadofx.menubar
+import tornadofx.reloadStylesheetsOnFocus
+import tornadofx.separator
+import tornadofx.style
+import tornadofx.useMaxWidth
+import tornadofx.vbox
 
-val frame: JFrame = JFrame("Calendar")
-
-val menubar: JMenuBar = JMenuBar()
-
-val optionsmenu: JMenu = JMenu(getLangString("options"))
-val optionsmenurefresh: JMenuItem = JMenuItem(getLangString("refresh"))
-
-val viewmenu: JMenu = JMenu(getLangString("view"))
-val viewmenushow: JMenu = JMenu(getLangString("show"))
-val viewmenushowitems = listOf(JMenuItem(getLangString("show calendar")), JMenuItem(getLangString("show reminders")))
-
-fun frameInitold() {
-	frame.setLocationRelativeTo(null)
-	frame.defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
-	frame.isVisible = false
-	frame.maximumSize = Dimension(500, 500)
-	frame.minimumSize = Dimension(100, 100)
-
-	optionsmenu.add(optionsmenurefresh)
-	menubar.add(optionsmenu)
-
-	for(item in viewmenushowitems)
-		viewmenushow.add(item)
-	viewmenu.add(viewmenushow)
-	menubar.add(viewmenu)
-
-	frame.jMenuBar = menubar
-
-	//frame.isVisible = true
-	frame.setSize(300, 200)
-
-}
 
 class Application: App(MainView::class, Styles::class) {
 	init {
@@ -62,17 +42,66 @@ fun frameInit() {
 	launch<Application>()
 }
 
-class MainView: View("Calendar") {
-	override val root = hbox(spacing = 12, alignment = Pos.CENTER) {
-		label(title) {
-			addClass(Styles.header)
-		}
-
-		button {
-			text = "hi"
-			action {
-				println("ff")
+class MainView: tornadofx.View("Calendar") {
+	override val root = borderpane {
+		top = menubar {
+			menu(getLangString("options")) {
+				item(getLangString("reload")) {
+					action {
+					}
+				}
+				separator()
+				item(getLangString("quit")) {
+					action {
+					}
+				}
 			}
+			menu(getLangString("view")) {
+				menu(getLangString("show")) {
+					customitem {
+						hbox(spacing = 15) {
+							label(getLangString("Show Looooooooong Text")) {
+								addClass(Styles.menubaritemname)
+							}
+							label(getLangString("Strg + T")) {
+								addClass(Styles.menubaritemshortcut)
+							}
+						}
+					}
+
+					customitem {
+						hbox {
+							addClass(Styles.menubaritem)
+							label(getLangString("Show Calendar")) {
+								addClass(Styles.menubaritemname)
+							}
+							label(getLangString("Strg + C")) {
+								addClass(Styles.menubaritemshortcut)
+							}
+						}
+					}
+					customitem {
+						hbox(spacing = 15, alignment = Pos.CENTER_RIGHT) {
+							label(getLangString("Show Reminder")) {
+								addClass(Styles.menubaritemname)
+							}
+							label(getLangString("Strg + R")) {
+								addClass(Styles.menubaritemshortcut)
+							}
+						}
+					}
+
+				}
+			}
+			menu(getLangString("help")) {
+				item(getLangString("reminder")) {
+					action {
+					}
+				}
+			}
+		}
+		center = label(titleProperty) {
+
 		}
 	}
 }

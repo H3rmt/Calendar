@@ -1,4 +1,4 @@
-package log
+package logic
 
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
@@ -10,7 +10,6 @@ import java.io.File
 import java.io.FileReader
 import java.io.Reader
 import java.io.StringReader
-import javax.swing.UIManager
 
 
 private val gson: Gson =
@@ -44,7 +43,6 @@ fun initConstants() {
 	if(! file.exists()) {
 		file.createNewFile()
 		val default = "{\n" +
-				"  \"ui\": \"Nimbus\",\n" +
 				"  \"language\": \"en\",\n" +
 				"  \"debug\": \"false\",\n" +
 				"  \"printstacktrace\": \"true\",\n" +

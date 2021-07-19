@@ -1,4 +1,4 @@
-package log
+package logic
 
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -52,7 +52,8 @@ fun log(message: Any, type: LogType = LogType.NORMAL) {
 	logger?.let {
 		when(type) {
 			LogType.LOW -> it.log(Level.CONFIG, message.toString())
-			LogType.NORMAL, LogType.IMPORTANT -> it.log(Level.INFO, message.toString())
+			LogType.NORMAL -> it.log(Level.INFO, message.toString())
+			LogType.IMPORTANT -> it.log(Important(), message.toString())
 			LogType.WARNING -> it.log(Level.WARNING, message.toString())
 			LogType.ERROR -> it.log(Level.SEVERE, message.toString())
 		}
@@ -79,6 +80,10 @@ enum class LogType {
 	IMPORTANT,
 	WARNING,
 	ERROR,
+}
+
+class Important : Level("IMPORTANT",850) {
+
 }
 
 /**
