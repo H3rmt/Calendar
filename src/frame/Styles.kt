@@ -4,6 +4,7 @@ import javafx.geometry.Pos
 import javafx.scene.text.FontWeight
 import tornadofx.*
 import javafx.scene.paint.Color
+import javafx.scene.paint.Paint
 
 
 class Styles : Stylesheet() {
@@ -11,10 +12,11 @@ class Styles : Stylesheet() {
 		val menubaritemshortcut by cssclass()
 		val menubaritemname by cssclass()
 		val menubaritem by cssclass()
+		val menubaritembox by cssclass()
 	}
 	init {
 		menubaritemshortcut {
-			fontSize = 10.px
+			fontSize = 9.px
 			textFill = Color.GRAY
 			fontWeight = FontWeight.THIN
 			backgroundColor += Color.AZURE
@@ -29,8 +31,13 @@ class Styles : Stylesheet() {
 
 		menubaritem {
 			spacing = 10.px
-			alignment = Pos.CENTER_RIGHT
 			backgroundColor += Color.RED
+		}
+
+		menubaritembox {
+			backgroundColor += Color.AQUA
+			prefWidth = 100.px
+			alignment = Pos.TOP_RIGHT
 		}
 	}
 }

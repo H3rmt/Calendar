@@ -3,6 +3,8 @@ package logic
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import java.util.logging.ConsoleHandler
 import java.util.logging.FileHandler
@@ -95,10 +97,11 @@ class Important : Level("IMPORTANT",850) {
  */
 class SimpleFormatter: Formatter() {
 	private val format: String = getConfig(Configs.logformat)
-	private val dat = Date()
 
 	override fun format(record: LogRecord): String {
-		dat.time = record.millis
+		val zdt = ZonedDateTime.ofInstant(
+			record.instant, ZoneId.systemDefault()
+		)
 		var source: String?
 		if(record.sourceClassName != null) {
 			source = record.sourceClassName
@@ -120,7 +123,7 @@ class SimpleFormatter: Formatter() {
 		}
 		return String.format(
 			format,
-			dat,
+			zdt,
 			source,
 			record.loggerName,
 			record.level.localizedName,
