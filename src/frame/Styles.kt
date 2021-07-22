@@ -1,6 +1,7 @@
 package frame
 
 import javafx.geometry.Pos
+import javafx.scene.layout.Priority
 import javafx.scene.text.FontWeight
 import tornadofx.*
 import javafx.scene.paint.Color
@@ -19,25 +20,26 @@ class Styles : Stylesheet() {
 			fontSize = 9.px
 			textFill = Color.GRAY
 			fontWeight = FontWeight.THIN
-			backgroundColor += Color.AZURE
+			//backgroundColor += Color.AZURE
 		}
 
 		menubaritemname {
 			fontSize = 12.px
 			textFill = Color.BLACK
 			fontWeight = FontWeight.NORMAL
-			backgroundColor += Color.BEIGE
+			//backgroundColor += Color.BEIGE
 		}
 
 		menubaritem {
 			spacing = 10.px
-			backgroundColor += Color.RED
+			//backgroundColor += Color.RED
 		}
 
 		menubaritembox {
-			backgroundColor += Color.AQUA
-			prefWidth = 100.px
-			alignment = Pos.TOP_RIGHT
+			//backgroundColor += Color.AQUA
+			alignment = Pos.CENTER
+			maxWidth = 600.px
+			prefWidth = 160.px
 		}
 	}
 }

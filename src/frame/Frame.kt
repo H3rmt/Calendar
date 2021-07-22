@@ -1,28 +1,27 @@
 package frame
 
 
-import javafx.geometry.Pos
-import javafx.scene.layout.GridPane
 import javafx.scene.layout.Priority
 import javafx.stage.Stage
 import logic.getLangString
 import tornadofx.App
+import tornadofx.Dimension
 import tornadofx.action
 import tornadofx.addClass
 import tornadofx.borderpane
-import tornadofx.constraintsForColumn
 import tornadofx.customitem
 import tornadofx.gridpane
-import tornadofx.hbox
+import tornadofx.gridpaneConstraints
+import tornadofx.hgrow
 import tornadofx.item
 import tornadofx.label
 import tornadofx.launch
 import tornadofx.menu
 import tornadofx.menubar
+import tornadofx.px
 import tornadofx.reloadStylesheetsOnFocus
 import tornadofx.row
 import tornadofx.separator
-import tornadofx.vgrow
 
 
 class Application: App(MainView::class, Styles::class) {
@@ -58,46 +57,95 @@ class MainView: tornadofx.View("Calendar") {
 			menu(getLangString("view")) {
 				menu(getLangString("show")) {
 					customitem {
-						hbox() {
+						addClass(Styles.menubaritem)
+						gridpane {
 							addClass(Styles.menubaritembox)
-							label(getLangString("Show Looooooooong Text")) {
-								addClass(Styles.menubaritemname)
-							}
-							label("Strg + T") {
-								addClass(Styles.menubaritemshortcut)
+							row {
+								label(getLangString("Show Reminder")) {
+									addClass(Styles.menubaritemname)
+									gridpaneConstraints {
+										columnIndex = 2
+										hgrow = Priority.SOMETIMES
+									}
+								}
+								label("") {
+									gridpaneConstraints {
+										columnIndex = 1
+										hgrow = Priority.ALWAYS
+										minWidth = 10.0
+										maxWidth = 200.0
+									}
+								}
+								label("Strg + R") {
+									addClass(Styles.menubaritemshortcut)
+									gridpaneConstraints {
+										columnIndex = 0
+										hgrow = Priority.ALWAYS
+									}
+								}
 							}
 						}
 					}
 					customitem {
 						addClass(Styles.menubaritem)
 						gridpane {
+							addClass(Styles.menubaritembox)
 							row {
-								minHeight= 10.0
-								vgrow= Priority.NEVER
-							}
-							alignment = Pos.CENTER
-							maxWidth = 400.0
-							prefWidth = 120.0
-							label(getLangString("Show Calendar")) {
-								addClass(Styles.menubaritemname)
-							}
-							label("Strg + C") {
-								addClass(Styles.menubaritemshortcut)
+								label(getLangString("Show Calendar")) {
+									addClass(Styles.menubaritemname)
+									gridpaneConstraints {
+										columnIndex = 0
+										hgrow = Priority.SOMETIMES
+									}
+								}
+								label {
+									gridpaneConstraints {
+										columnIndex = 1
+										hgrow = Priority.ALWAYS
+										minWidth = 10.0
+										maxWidth = 200.0
+									}
+								}
+								label("Strg + C") {
+									addClass(Styles.menubaritemshortcut)
+									gridpaneConstraints {
+										columnIndex = 2
+										hgrow = Priority.ALWAYS
+									}
+								}
 							}
 						}
 					}
 					customitem {
-						hbox {
+						addClass(Styles.menubaritem)
+						gridpane {
 							addClass(Styles.menubaritembox)
-							label(getLangString("Show Reminder")) {
-								addClass(Styles.menubaritemname)
-							}
-							label("Strg + R") {
-								addClass(Styles.menubaritemshortcut)
+							row {
+								label(getLangString("Show Some Long Name")) {
+									addClass(Styles.menubaritemname)
+									gridpaneConstraints {
+										columnIndex = 0
+										hgrow = Priority.NEVER
+									}
+								}
+								label {
+									gridpaneConstraints {
+										columnIndex = 1
+										hgrow = Priority.ALWAYS
+										minWidth = 10.0
+										maxWidth = 200.0
+									}
+								}
+								label("Strg + N") {
+									addClass(Styles.menubaritemshortcut)
+									gridpaneConstraints {
+										columnIndex = 2
+										hgrow = Priority.ALWAYS
+									}
+								}
 							}
 						}
 					}
-
 				}
 			}
 			menu(getLangString("help")) {
