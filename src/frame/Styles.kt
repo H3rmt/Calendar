@@ -1,45 +1,33 @@
 package frame
 
-import javafx.geometry.Pos
-import javafx.scene.layout.Priority
 import javafx.scene.text.FontWeight
 import tornadofx.*
 import javafx.scene.paint.Color
-import javafx.scene.paint.Paint
 
 
 class Styles : Stylesheet() {
-	companion object {
-		val menubaritemshortcut by cssclass()
-		val menubaritemname by cssclass()
-		val menubaritem by cssclass()
-		val menubaritembox by cssclass()
+	object Menubar {
+		val itemshortcut by cssclass()
+		val itemname by cssclass()
+		val gridpane by cssclass()
 	}
+
 	init {
-		menubaritemshortcut {
+		Menubar.itemshortcut {
 			fontSize = 9.px
-			textFill = Color.GRAY
 			fontWeight = FontWeight.THIN
-			//backgroundColor += Color.AZURE
+			textFill = Color.DARKGRAY
 		}
 
-		menubaritemname {
+		Menubar.itemname {
 			fontSize = 12.px
-			textFill = Color.BLACK
 			fontWeight = FontWeight.NORMAL
-			//backgroundColor += Color.BEIGE
+			textFill = Color.BLACK
 		}
 
-		menubaritem {
-			spacing = 10.px
-			//backgroundColor += Color.RED
-		}
-
-		menubaritembox {
-			//backgroundColor += Color.AQUA
-			alignment = Pos.CENTER
-			maxWidth = 600.px
-			prefWidth = 160.px
+		Menubar.gridpane {
+			prefWidth = 0.px
+			maxWidth = 300.px
 		}
 	}
 }
