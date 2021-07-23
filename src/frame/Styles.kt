@@ -12,6 +12,10 @@ class Styles : Stylesheet() {
 		val gridpane by cssclass()
 	}
 
+	object CalendarView {
+		val title by cssclass()
+	}
+
 	init {
 		Menubar.itemshortcut {
 			fontSize = 9.px
@@ -28,6 +32,12 @@ class Styles : Stylesheet() {
 		Menubar.gridpane {
 			prefWidth = 0.px
 			maxWidth = 300.px
+		}
+
+		CalendarView.title {
+			fontSize = 26.px
+			fontWeight = FontWeight.BOLD
+			textFill = Color.BLACK
 		}
 	}
 }
