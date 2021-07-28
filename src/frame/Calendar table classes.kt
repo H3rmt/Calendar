@@ -1,19 +1,23 @@
 package frame
 
+import java.time.ZonedDateTime
+
 
 class Week {
-	val Monday: Day? = null
-	val Tuesday: Day? = Day()
-	val Wednesday: Day? = Day()
-	val Thursday: Day? = Day()
-	val Friday: Day? = Day()
-	val Saturday: Day? = Day()
-	val Sunday: Day? = Day()
+	var Monday: Day? = null
+	var Tuesday: Day? = null
+	var Wednesday: Day? = null
+	var Thursday: Day? = null
+	var Friday: Day? = null
+	var Saturday: Day? = null
+	var Sunday: Day? = null
 }
 
-class Day {
+class Day(_time: ZonedDateTime) {
+
+	val time: ZonedDateTime = _time
 
 	override fun toString(): String {
-		return "hilul"
+		return "${time.dayOfMonth}:${time.dayOfWeek}"
 	}
 }

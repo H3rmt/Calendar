@@ -50,6 +50,7 @@ class Application: App(MainView::class, Styles::class) {
 }
 
 fun frameInit() {
+	main()
 	launch<Application>()
 }
 
@@ -286,10 +287,6 @@ class MainView: tornadofx.View("Calendar") {
 							}
 						}
 
-						val items = listOf(
-							Week(), Week(), Week(), Week(), Week(), Week(),
-						).asObservable()
-
 						label {
 							style {
 								backgroundColor += Color.BLACK
@@ -300,7 +297,7 @@ class MainView: tornadofx.View("Calendar") {
 							useMaxWidth = true
 						}
 
-						tableview(items) {
+						tableview(currentmonth) {
 							columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
 							readonlyColumn(getLangString("Monday"), Week::Monday) {
 								style {
