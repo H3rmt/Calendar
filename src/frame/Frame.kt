@@ -260,7 +260,7 @@ class MainView: tornadofx.View("Calendar") {
 			tab("Calender") {
 				isClosable = false
 				stackpane {
-					padding = insets(4)
+					padding = insets(6)
 					vbox {
 						style {
 							borderColor += box(Color.TRANSPARENT)
@@ -271,7 +271,7 @@ class MainView: tornadofx.View("Calendar") {
 							alignment = Pos.CENTER
 							spacing = 40.0
 							style {
-								minHeight = 40.px
+								minHeight = 50.px
 								maxHeight = 50.px
 								backgroundColor += Color.DODGERBLUE
 							}
@@ -302,7 +302,6 @@ class MainView: tornadofx.View("Calendar") {
 
 						tableview(items) {
 							columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
-
 							readonlyColumn(getLangString("Monday"), Week::Monday) {
 								style {
 									prefHeight = 40.px

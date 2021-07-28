@@ -33,7 +33,9 @@ class Styles : Stylesheet() {
 			prefWidth = 0.px
 			maxWidth = 300.px
 		}
+	}
 
+	init {
 		CalendarView.title {
 			fontSize = 26.px
 			fontWeight = FontWeight.BOLD

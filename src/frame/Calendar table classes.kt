@@ -1,5 +1,6 @@
 package frame
 
+
 class Week {
 	val Monday: Day? = null
 	val Tuesday: Day? = Day()
