@@ -1,11 +1,15 @@
 package frame
 
-import javafx.scene.text.FontWeight
-import tornadofx.*
 import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
+import tornadofx.Stylesheet
+import tornadofx.box
+import tornadofx.c
+import tornadofx.cssclass
+import tornadofx.px
 
 
-class Styles : Stylesheet() {
+class Styles: Stylesheet() {
 	object Menubar {
 		val itemshortcut by cssclass()
 		val itemname by cssclass()
@@ -14,6 +18,9 @@ class Styles : Stylesheet() {
 
 	object CalendarView {
 		val title by cssclass()
+		val column by cssclass()
+		val table by cssclass()
+		val tablecell by cssclass()
 	}
 
 	init {
@@ -40,6 +47,18 @@ class Styles : Stylesheet() {
 			fontSize = 26.px
 			fontWeight = FontWeight.BOLD
 			textFill = Color.BLACK
+		}
+
+		CalendarView.table {
+			focusColor = Color.TRANSPARENT
+		}
+
+		CalendarView.column {
+			prefHeight = 45.px
+		}
+
+		CalendarView.tablecell {
+
 		}
 	}
 }

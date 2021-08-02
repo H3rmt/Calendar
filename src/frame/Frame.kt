@@ -1,22 +1,25 @@
 package frame
 
 
+import javafx.event.EventHandler
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
+import javafx.scene.Node
+import javafx.scene.control.TableCell
+import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-
+import javafx.util.Callback
 import logic.getLangString
-
 import tornadofx.App
 import tornadofx.action
 import tornadofx.addClass
-import tornadofx.asObservable
 import tornadofx.borderpane
 import tornadofx.box
 import tornadofx.button
+import tornadofx.column
 import tornadofx.customitem
 import tornadofx.gridpane
 import tornadofx.gridpaneConstraints
@@ -28,7 +31,6 @@ import tornadofx.menu
 import tornadofx.menubar
 import tornadofx.pane
 import tornadofx.px
-import tornadofx.readonlyColumn
 import tornadofx.separator
 import tornadofx.stackpane
 import tornadofx.style
@@ -37,6 +39,7 @@ import tornadofx.tableview
 import tornadofx.tabpane
 import tornadofx.useMaxWidth
 import tornadofx.vbox
+
 
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
 
@@ -298,37 +301,83 @@ class MainView: tornadofx.View("Calendar") {
 						}
 
 						tableview(currentmonth) {
+							addClass(Styles.CalendarView.table)
+
+							isTableMenuButtonVisible = true
 							columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
-							readonlyColumn(getLangString("Monday"), Week::Monday) {
-								style {
-									prefHeight = 40.px
+
+							fun createGraphics(day: Day?): Node? {
+								if(day == null)
+									return null
+								val graphicContainer = vbox {
+									label(day.time.toString()) {
+										style(append = true) {
+											borderColor += box(Color.GOLD,Color.AQUA,Color.BROWN,Color.BLUE)
+											borderRadius += box(4.px)
+										}
+									}
 								}
-								isSortable = false
-								isReorderable = false
+								return graphicContainer
 							}
-							readonlyColumn(getLangString("Tuesday"), Week::Tuesday) {
-								isSortable = false
-								isReorderable = false
+
+							fun cellfactory(): Callback<TableColumn<Week, Day?>, TableCell<Week, Day?>> {
+								return Callback<TableColumn<Week, Day?>, TableCell<Week, Day?>> {
+									val cell: TableCell<Week, Day?> = TableCell()
+									cell.itemProperty().addListener {_, _, day2 ->
+										createGraphics(day2)?.let {
+											cell.graphic = it
+										}
+									}
+									cell.addClass(Styles.CalendarView.tablecell)
+									cell.onMouseEntered = EventHandler {
+										println(it)
+									}
+									return@Callback cell
+								}
 							}
-							readonlyColumn(getLangString("Wednesday"), Week::Wednesday) {
+
+							column(getLangString("Monday"), Week::Monday) {
+								addClass(Styles.CalendarView.column)
 								isSortable = false
 								isReorderable = false
+								cellFactory = cellfactory()
+
 							}
-							readonlyColumn(getLangString("Thursday"), Week::Thursday) {
+							column(getLangString("Tuesday"), Week::Tuesday) {
+								addClass(Styles.CalendarView.column)
 								isSortable = false
 								isReorderable = false
+								cellFactory = cellfactory()
 							}
-							readonlyColumn(getLangString("Friday"), Week::Friday) {
+							column(getLangString("Wednesday"), Week::Wednesday) {
+								addClass(Styles.CalendarView.column)
 								isSortable = false
 								isReorderable = false
+								cellFactory = cellfactory()
 							}
-							readonlyColumn(getLangString("Saturday"), Week::Saturday) {
+							column(getLangString("Thursday"), Week::Thursday) {
+								addClass(Styles.CalendarView.column)
 								isSortable = false
 								isReorderable = false
+								cellFactory = cellfactory()
 							}
-							readonlyColumn(getLangString("Sunday"), Week::Sunday) {
+							column(getLangString("Friday"), Week::Friday) {
+								addClass(Styles.CalendarView.column)
 								isSortable = false
 								isReorderable = false
+								cellFactory = cellfactory()
+							}
+							column(getLangString("Saturday"), Week::Saturday) {
+								addClass(Styles.CalendarView.column)
+								isSortable = false
+								isReorderable = false
+								cellFactory = cellfactory()
+							}
+							column(getLangString("Sunday"), Week::Sunday) {
+								addClass(Styles.CalendarView.column)
+								isSortable = false
+								isReorderable = false
+								cellFactory = cellfactory()
 							}
 						}
 					}

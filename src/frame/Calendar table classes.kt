@@ -18,6 +18,6 @@ class Day(_time: ZonedDateTime) {
 	val time: ZonedDateTime = _time
 
 	override fun toString(): String {
-		return "${time.dayOfMonth}:${time.dayOfWeek}"
+		return "${time.dayOfMonth}"//:${time.dayOfWeek}"
 	}
 }

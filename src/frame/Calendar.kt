@@ -22,6 +22,9 @@ fun main() {
 fun GetMonth(month: Int): MutableList<Week> {
 	var Time: ZonedDateTime = now.withMonth(month).withDayOfMonth(1)
 
+	val dayoffset = Time.dayOfWeek.value
+	Time = Time.minusDays((dayoffset-1).toLong())
+
 	val weeks: MutableList<Week> = mutableListOf()
 
 	do {
@@ -41,10 +44,10 @@ fun GetMonth(month: Int): MutableList<Week> {
 			println("day ${Time.dayOfMonth}: ${Time.dayOfWeek}")
 
 			Time = Time.plusDays(1)
-		} while(Time.dayOfWeek.value != 1 && Time.dayOfMonth > 1)
+		} while(Time.dayOfWeek.value != 1)
 
 		weeks.add(weeks.size, newWeek)
-	} while(Time.dayOfMonth > 1)
+	} while(Time.month.value == month && Time.dayOfMonth > 1)
 
 	return weeks
 }
