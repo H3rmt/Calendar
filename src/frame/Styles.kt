@@ -21,6 +21,9 @@ class Styles: Stylesheet() {
 		val column by cssclass()
 		val table by cssclass()
 		val tablecell by cssclass()
+		val hoveredtablecell by cssclass()
+		val tablecellpane by cssclass()
+		val hoveredtablecellpane by cssclass()
 	}
 
 	init {
@@ -51,6 +54,11 @@ class Styles: Stylesheet() {
 
 		CalendarView.table {
 			focusColor = Color.TRANSPARENT
+			prefHeight = 340.px
+
+			selected {
+				backgroundColor += c(230, 230, 230)
+			}
 		}
 
 		CalendarView.column {
@@ -58,7 +66,25 @@ class Styles: Stylesheet() {
 		}
 
 		CalendarView.tablecell {
-
+			prefHeight = 45.px
+			borderColor += box(Color.LIGHTGRAY)
+			borderWidth += box(0.px, 1.px, 1.px, 0.px)
 		}
+
+		CalendarView.hoveredtablecell {
+			prefHeight = 66.px
+		}
+
+		CalendarView.tablecellpane {
+			padding = box(5.px)
+		}
+
+		CalendarView.hoveredtablecellpane {
+			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
+			borderRadius += box(6.px)
+			borderWidth += box(2.px)
+		}
+
+
 	}
 }

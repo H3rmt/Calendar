@@ -2,6 +2,7 @@
   <configuration default="false" name="Unnamed" type="JetRunConfigurationType" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="StartKt" />
     <module name="Calendar" />
+    <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
