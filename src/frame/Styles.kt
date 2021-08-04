@@ -18,8 +18,10 @@ class Styles: Stylesheet() {
 
 	object CalendarView {
 		val title by cssclass()
+		val titlebuttons by cssclass()
 		val column by cssclass()
 		val table by cssclass()
+		val disabledtablecell by cssclass()
 		val tablecell by cssclass()
 		val hoveredtablecell by cssclass()
 		val tablecellpane by cssclass()
@@ -52,17 +54,40 @@ class Styles: Stylesheet() {
 			textFill = Color.BLACK
 		}
 
+		CalendarView.titlebuttons {
+			focusColor = Color.BLACK
+		}
+
 		CalendarView.table {
 			focusColor = Color.TRANSPARENT
-			prefHeight = 340.px
 
 			selected {
-				backgroundColor += c(230, 230, 230)
+				backgroundColor += c(232, 232, 232)
+			}
+
+			scrollBar {
+				prefWidth = 0.px
+				prefHeight = 0.px
+
+				decrementArrow {
+					prefWidth = 0.px
+					prefHeight = 0.px
+				}
+				incrementArrow {
+					prefWidth = 0.px
+					prefHeight = 0.px
+				}
 			}
 		}
 
 		CalendarView.column {
+			prefHeight = 40.px
+		}
+
+		CalendarView.disabledtablecell {
 			prefHeight = 45.px
+			borderColor += box(Color.ORANGE)
+			borderWidth += box(0.px, 0.px, 0.px, 0.px)
 		}
 
 		CalendarView.tablecell {
@@ -72,7 +97,7 @@ class Styles: Stylesheet() {
 		}
 
 		CalendarView.hoveredtablecell {
-			prefHeight = 66.px
+			//prefHeight = 66.px // Done by timeline animation
 		}
 
 		CalendarView.tablecellpane {
@@ -84,7 +109,6 @@ class Styles: Stylesheet() {
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
 		}
-
 
 	}
 }

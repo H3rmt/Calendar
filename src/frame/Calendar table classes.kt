@@ -4,13 +4,15 @@ import java.time.ZonedDateTime
 
 
 class Week {
-	var Monday: Day? = null
-	var Tuesday: Day? = null
-	var Wednesday: Day? = null
-	var Thursday: Day? = null
-	var Friday: Day? = null
-	var Saturday: Day? = null
-	var Sunday: Day? = null
+	lateinit var Monday: Day
+	lateinit var  Tuesday: Day
+	lateinit var  Wednesday: Day
+	lateinit var  Thursday: Day
+	lateinit var  Friday: Day
+	lateinit var  Saturday: Day
+	lateinit var  Sunday: Day
+
+	var self: Week = this
 }
 
 class Day(_time: ZonedDateTime) {
