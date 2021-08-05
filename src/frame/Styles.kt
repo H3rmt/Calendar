@@ -1,6 +1,7 @@
 package frame
 
 import javafx.scene.paint.Color
+import javafx.scene.paint.Paint
 import javafx.scene.text.FontWeight
 import tornadofx.Stylesheet
 import tornadofx.box
@@ -26,6 +27,8 @@ class Styles: Stylesheet() {
 		val hoveredtablecell by cssclass()
 		val tablecellpane by cssclass()
 		val hoveredtablecellpane by cssclass()
+
+		val celllabel by cssclass()
 	}
 
 	init {
@@ -91,23 +94,38 @@ class Styles: Stylesheet() {
 		}
 
 		CalendarView.tablecell {
-			prefHeight = 45.px
-			borderColor += box(Color.LIGHTGRAY)
-			borderWidth += box(0.px, 1.px, 1.px, 0.px)
+			prefHeight = 46.px
+			backgroundColor += Color.WHITE
+			padding = box(2.px,2.px,1.px,2.px)
+
+			borderColor += box(Color.TRANSPARENT)
 		}
 
 		CalendarView.hoveredtablecell {
 			//prefHeight = 66.px // Done by timeline animation
+			//backgroundColor += c(245, 245, 245, .4)
 		}
 
 		CalendarView.tablecellpane {
-			padding = box(5.px)
+			//padding = box(10.px)
+
+			borderColor += box(Color.LIGHTGRAY)
+			borderWidth += box(1.px)
+			borderRadius += box(6.px)
 		}
 
 		CalendarView.hoveredtablecellpane {
 			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
+		}
+
+		CalendarView.celllabel {
+			fontSize = 14.px
+			fontWeight = FontWeight.BOLD
+			textFill = Color.BLACK
+
+			padding = box(4.px,0.px,0.px,0.px)
 		}
 
 	}

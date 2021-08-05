@@ -14,6 +14,7 @@ import javafx.scene.control.TabPane
 import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
+import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.util.Callback
@@ -23,6 +24,7 @@ import tornadofx.action
 import tornadofx.addClass
 import tornadofx.box
 import tornadofx.button
+import tornadofx.circle
 import tornadofx.column
 import tornadofx.getChildList
 import tornadofx.hbox
@@ -50,6 +52,13 @@ fun main() {
 	val data = GetMonth(now.month.value)
 	currentmonth.clear()
 	currentmonth.addAll(data)
+
+//	val fout = FileOutputStream("")
+//	val dout = DataOutputStream(fout)
+
+//	fout.close()
+//	dout.close()
+
 }
 
 
@@ -75,8 +84,6 @@ fun GetMonth(month: Int): MutableList<Week> {
 				DayOfWeek.SUNDAY -> newWeek.Sunday = Day(Time.plusHours(0))
 				else -> continue
 			}
-			//println("day ${Time.dayOfMonth}: ${Time.dayOfWeek}")
-
 			Time = Time.plusDays(1)
 		} while(Time.dayOfWeek.value != 1)
 
@@ -86,11 +93,41 @@ fun GetMonth(month: Int): MutableList<Week> {
 	return weeks
 }
 
-fun createGraphics(day: Any?): Pane? {
-	if(day == null)
+fun createGraphics(celldata: Any?, graphic: Node): Pane? {
+	if(celldata == null)
 		return null
-	val graphicContainer = Pane().pane {
+	val graphicContainer = graphic.vbox {
 		addClass(Styles.CalendarView.tablecellpane)
+		style(append = true) {
+			alignment = Pos.TOP_CENTER
+		}
+
+		label {
+			addClass(Styles.CalendarView.celllabel)
+			if(celldata is Day) {
+				text = celldata.toString()
+			}
+		}
+
+		if(celldata is Day) {
+			hbox {
+				style(append = true) {
+					padding = box(4.px)
+					spacing = 5.px
+					alignment = Pos.CENTER
+				}
+				circle(radius = 5.0) {
+					style(append = true) {
+						fill = Color.RED
+					}
+				}
+				circle(radius = 5.0) {
+					style(append = true) {
+						baseColor = Color.RED
+					}
+				}
+			}
+		}
 	}
 	return graphicContainer
 }
@@ -100,54 +137,65 @@ fun <T> cellfactory(): Callback<TableColumn<Week, T>, TableCell<Week, T>> {
 	return Callback<TableColumn<Week, T>, TableCell<Week, T>> {
 		val cell: TableCell<Week, T> = TableCell()
 
+		val open = Timeline()
+		val close = Timeline()
+
 		cell.itemProperty().addListener {_, _, day2 ->
-			createGraphics(day2)?.let {
+			createGraphics(day2, cell)?.also {it ->
 				cell.graphic = it
 				cell.addClass(Styles.CalendarView.tablecell)
+
+				open.keyFrames.clear()
+				close.keyFrames.clear()
+
+				val circles = it.getChildList()?.filterIsInstance<HBox>()?.let {
+					if (it.isNotEmpty())
+						return@let it[0].getChildList()
+					else
+						return@let listOf()
+				} ?: listOf()
+
+				val openvalues = arrayOf( // duration,height,opacity
+					arrayOf(0.0, 46, 1.0),
+					arrayOf(20.0, 56, 0.5),
+					arrayOf(80.0, 80, 0.2),
+					arrayOf(100.0, 90, 0.0)
+				)
+
+				val closevalues = arrayOf( // duration,height,opacity
+					arrayOf(100.0, 46, 1.0),
+					arrayOf(80.0, 56, 0.5),
+					arrayOf(20.0, 80, 0.2),
+					arrayOf(0.0, 90, 0.0)
+				)
+
+				for(value in openvalues) {
+					val keyvalues = mutableListOf<KeyValue>()
+					keyvalues.add(KeyValue(cell.minHeightProperty(), value[1] as Number))
+					for(circle in circles) {
+						keyvalues.add(KeyValue(circle.opacityProperty(), value[2] as Double))
+					}
+					open.keyFrames.add(
+						KeyFrame(
+							Duration(value[0] as Double), *keyvalues.toTypedArray()
+						)
+					)
+				}
+
+				for(value in closevalues) {
+					val keyvalues = mutableListOf<KeyValue>()
+					keyvalues.add(KeyValue(cell.minHeightProperty(), value[1] as Number))
+					for(circle in circles) {
+						keyvalues.add(KeyValue(circle.opacityProperty(), value[2] as Double))
+					}
+					close.keyFrames.add(
+						KeyFrame(
+							Duration(value[0] as Double), *keyvalues.toTypedArray()
+						)
+					)
+				}
 			}
 		}
-
-		val open = Timeline()
-		open.keyFrames.clear()
-		open.keyFrames.addAll(
-			KeyFrame(
-				Duration(0.0),
-				KeyValue(cell.minHeightProperty(), 45),
-			),
-			KeyFrame(
-				Duration(20.0),
-				KeyValue(cell.minHeightProperty(), 55),
-			),
-			KeyFrame(
-				Duration(80.0),
-				KeyValue(cell.minHeightProperty(), 80),
-			),
-			KeyFrame(
-				Duration(100.0),
-				KeyValue(cell.minHeightProperty(), 90),
-			)
-		)
-
-		val close = Timeline()
-		close.keyFrames.clear()
-		close.keyFrames.addAll(
-			KeyFrame(
-				Duration(0.0),
-				KeyValue(cell.minHeightProperty(), 90),
-			),
-			KeyFrame(
-				Duration(20.0),
-				KeyValue(cell.minHeightProperty(), 80),
-			),
-			KeyFrame(
-				Duration(80.0),
-				KeyValue(cell.minHeightProperty(), 55),
-			),
-			KeyFrame(
-				Duration(100.0),
-				KeyValue(cell.minHeightProperty(), 45),
-			),
-		)
 
 		cell.onMouseEntered = EventHandler {
 			(it.target as Node).getChildList()?.get(0)?.addClass(Styles.CalendarView.hoveredtablecellpane)
@@ -168,7 +216,7 @@ fun createcalendartab(pane: TabPane): Tab {
 		isClosable = false
 		stackpane {
 			style(append = true) {
-				maxHeight = 430.px
+				maxHeight = 435.px
 			}
 			padding = insets(6)
 			vbox {
