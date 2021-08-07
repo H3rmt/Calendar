@@ -1,13 +1,13 @@
 {
-  "en": {
-    "options": "Options",
-    "reload": "Reload",
-    "save": "Save",
-    "quit": "Quit",
-    "view": "View",
-    "show": "Show",
-    "calendar": "Calendar",
-    "reminder": "Reminder",
-    "help": "Help"
-  }
+	"en": {
+		"options": "Options",
+		"reload": "Reload",
+		"save": "Save",
+		"quit": "Quit",
+		"view": "View",
+		"show": "Show",
+		"calendar": "Calendar",
+		"reminder": "Reminder",
+		"help": "Help"
+	}
 }

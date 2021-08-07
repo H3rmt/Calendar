@@ -11,16 +11,16 @@ class Week {
 	lateinit var Friday: Day
 	lateinit var Saturday: Day
 	lateinit var Sunday: Day
-
+	
 	var self: Week = this
 }
 
 class Day(_time: ZonedDateTime) {
-
+	
 	val time: ZonedDateTime = _time
-
+	
 	var appointments: List<Appointment> = listOf()
-
+	
 	override fun toString(): String {
 		return "${time.dayOfMonth}"//:${time.dayOfWeek}"
 	}

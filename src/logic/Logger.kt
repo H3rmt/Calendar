@@ -5,7 +5,6 @@ import java.io.StringWriter
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
 import java.util.logging.ConsoleHandler
 import java.util.logging.FileHandler
 import java.util.logging.Formatter
@@ -18,20 +17,20 @@ var logger: Logger? = null
 
 fun initLogger() {
 	val formatter = SimpleFormatter()
-
+	
 	logger = Logger.getLogger("")
-
+	
 	logger?.let {
 		it.removeHandler(it.handlers[0])  // remove ConsoleHandler
 		it.level = Level.ALL
-
+		
 		if(getConfig(Configs.printlogs)) {
 			val consoleHandler = ConsoleHandler()
 			consoleHandler.level = Level.INFO
 			consoleHandler.formatter = formatter
 			it.addHandler(consoleHandler)
 		}
-
+		
 		val fileHandler = FileHandler(getlogfile())
 		fileHandler.formatter = formatter
 		if(getConfig(Configs.debug))
@@ -84,7 +83,7 @@ enum class LogType {
 	ERROR,
 }
 
-class Important : Level("IMPORTANT",850) {
+class Important: Level("IMPORTANT", 850) {
 
 }
 
@@ -97,7 +96,7 @@ class Important : Level("IMPORTANT",850) {
  */
 class SimpleFormatter: Formatter() {
 	private val format: String = getConfig(Configs.logformat)
-
+	
 	override fun format(record: LogRecord): String {
 		val zdt = ZonedDateTime.ofInstant(
 			record.instant, ZoneId.systemDefault()

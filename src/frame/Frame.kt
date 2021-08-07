@@ -1,26 +1,11 @@
 package frame
 
 
-import javafx.scene.control.MenuBar
-import javafx.scene.layout.BorderPane
-import javafx.scene.layout.Priority
-import javafx.stage.Stage
+import javafx.scene.control.*
+import javafx.scene.layout.*
+import javafx.stage.*
 import logic.getLangString
-import tornadofx.App
-import tornadofx.action
-import tornadofx.addClass
-import tornadofx.borderpane
-import tornadofx.customitem
-import tornadofx.gridpane
-import tornadofx.gridpaneConstraints
-import tornadofx.label
-import tornadofx.launch
-import tornadofx.menu
-import tornadofx.menubar
-import tornadofx.px
-import tornadofx.separator
-import tornadofx.style
-import tornadofx.tabpane
+import tornadofx.*
 
 
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
@@ -76,7 +61,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 						addClass(Styles.Menubar.itemshortcut)
 						gridpaneConstraints {
 							columnIndex = 2
-
+							
 							hGrow = Priority.SOMETIMES
 						}
 					}
@@ -107,7 +92,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 						addClass(Styles.Menubar.itemshortcut)
 						gridpaneConstraints {
 							columnIndex = 2
-
+							
 							hGrow = Priority.SOMETIMES
 						}
 					}
@@ -139,7 +124,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 						addClass(Styles.Menubar.itemshortcut)
 						gridpaneConstraints {
 							columnIndex = 2
-
+							
 							hGrow = Priority.SOMETIMES
 						}
 					}
@@ -174,7 +159,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 							addClass(Styles.Menubar.itemshortcut)
 							gridpaneConstraints {
 								columnIndex = 2
-
+								
 								hGrow = Priority.SOMETIMES
 							}
 						}

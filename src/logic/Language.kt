@@ -5,12 +5,12 @@ import java.io.File
 import java.io.FileReader
 
 class Language(private val language: Availablelanguages) {
-
+	
 	/**
 	 * linking a String to a translated String
 	 */
 	var translations: Map<String, String>
-
+	
 	/**
 	 * creates json file if it didn't exist
 	 *
@@ -21,15 +21,16 @@ class Language(private val language: Availablelanguages) {
 	 */
 	init {
 		val file = File(getlanguagefile())
-		if(! file.exists()) {
+		if(!file.exists()) {
 			file.createNewFile()
 			val default = "{\n\n}"
 			file.writeText(default)
 		}
-		val alltranslations: Map<String, Map<String, String>> = getJson().fromJson(JsonReader(FileReader(getlanguagefile())), Map::class.java)
+		val alltranslations: Map<String, Map<String, String>> =
+			getJson().fromJson(JsonReader(FileReader(getlanguagefile())), Map::class.java)
 		translations = alltranslations[language.toString()] ?: mapOf()
 	}
-
+	
 	/**
 	 * finds the corresponding translated String to a
 	 * String
@@ -42,15 +43,15 @@ class Language(private val language: Availablelanguages) {
 	 */
 	fun get(translation: String): String {
 		try {
-			translations[translation.trim().lowercase()] !!.let {
+			translations[translation.trim().lowercase()]!!.let {
 				return it
 			}
-		} catch (e: NullPointerException) {
+		} catch(e: NullPointerException) {
 			log("${translation.trim().lowercase()} was not found (lang=$language)", LogType.WARNING)
 			return translation
 		}
 	}
-
+	
 	/**
 	 * all different types of available Languages
 	 *
@@ -63,5 +64,5 @@ class Language(private val language: Availablelanguages) {
 		de,
 		fr,
 	}
-
+	
 }

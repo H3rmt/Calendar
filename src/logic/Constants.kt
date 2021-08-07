@@ -12,8 +12,7 @@ import java.io.Reader
 import java.io.StringReader
 
 
-private val gson: Gson =
-	GsonBuilder().setPrettyPrinting().setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create()
+private val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create()
 
 /**
  * general JSON reader and writer
@@ -40,7 +39,7 @@ var configs: MutableMap<Configs, String> = mutableMapOf()
 
 fun initConstants() {
 	val file = File(getconfigfile())
-	if(! file.exists()) {
+	if(!file.exists()) {
 		file.createNewFile()
 		val default = "{\n" +
 				"  \"language\": \"en\",\n" +
@@ -52,25 +51,25 @@ fun initConstants() {
 				"}"
 		file.writeText(default)
 	}
-
+	
 	try {
 		val load: Map<String, String> = getJson().fromJson(getJsonReader(FileReader(getconfigfile())), Map::class.java)
 		load.forEach {
 			try {
 				configs[getJson().fromJson(getJsonReader(StringReader(it.key.trim().lowercase())), Configs::class.java)] = it
 					.value.trim()
-			} catch (e: NullPointerException) {
+			} catch(e: NullPointerException) {
 				log("Unknown config key: $it Code: g294n3")
 			}
 		}
-	} catch (e: NullPointerException) {
+	} catch(e: NullPointerException) {
 		log("Config File missing $e Code: 5e928h")
 		throw Exit("5e928h")
-	} catch (e: JsonSyntaxException) {
+	} catch(e: JsonSyntaxException) {
 		log("JSON invalid ${e.message}  Code: iu2sj2")
 		throw Exit("iu2sj2")
 	}
-
+	
 	language = Language(getConfig(Configs.language))
 	fonts = Fonts()
 }
@@ -92,10 +91,10 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 	if(configs[conf] != null)
 		try {
 			return getJson().fromJson(getJsonReader(StringReader(configs[conf] ?: "")), T::class.java)
-		} catch (e: java.lang.NullPointerException) {
+		} catch(e: java.lang.NullPointerException) {
 			log("Invalid Config value: $conf")
 			throw Exit("k23d1f")
-		} catch (e: JsonSyntaxException) {
+		} catch(e: JsonSyntaxException) {
 			log("Invalid Json Syntax: $conf  | ${e.message} ")
 			throw Exit("gf30ik")
 		}
@@ -116,14 +115,14 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
  * @see Exception
  */
 class Exit(private val text: String): Exception(text) {
-
+	
 	override fun fillInStackTrace(): Throwable {
 		return if(getConfig(Configs.printstacktrace))
 			super.fillInStackTrace()
 		else
 			this
 	}
-
+	
 	override fun toString(): String {
 		return "Exception | ErrorCode: $text"
 	}
