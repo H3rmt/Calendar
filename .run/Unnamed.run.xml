@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Main" type="JetRunConfigurationType">
+  <configuration default="false" name="Main" type="JetRunConfigurationType" singleton="false">
     <option name="MAIN_CLASS_NAME" value="StartKt" />
     <module name="Calendar" />
     <shortenClasspath name="NONE" />
