@@ -1,10 +1,10 @@
-import frame.createLoading
 import frame.frameInit
 import logic.LogType
 import logic.configs
 import logic.initCofigs
 import logic.initLogger
 import logic.log
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
 	log("starting Calendar: ${args.toSet()}", LogType.IMPORTANT)
@@ -13,5 +13,5 @@ fun main(args: Array<String>) {
 	initLogger()
 	log("starting Frame", LogType.IMPORTANT)
 	frameInit()
-	log("finished Frame", LogType.IMPORTANT)
+	exitProcess(1)
 }

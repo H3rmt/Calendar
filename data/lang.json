@@ -8,6 +8,16 @@
 		"show": "Show",
 		"calendar": "Calendar",
 		"reminder": "Reminder",
-		"help": "Help"
+		"help": "Help",
+		"preferences": "Preferences",
+		"show reminder":  "Show Reminder",
+		"show calendar":  "Show Calendar",
+		"monday":  "Monday",
+		"tuesday":  "Tuesday",
+		"wednesday":  "Wednesday",
+		"thursday":  "Thursday",
+		"friday":  "Friday",
+		"saturday":  "Saturday",
+		"sunday":  "Sunday"
 	}
 }

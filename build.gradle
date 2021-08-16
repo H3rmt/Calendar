@@ -21,11 +21,5 @@ dependencies {
 
 javafx {
     version = "11"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
-}
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+    modules = ['javafx.controls', 'javafx.fxml']
 }
