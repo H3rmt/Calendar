@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="Calendar:test" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="org.example" external.system.module.type="sourceSet" external.system.module.version="1.0-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="kotlin-language" name="Kotlin">
+      <configuration version="4" platform="JVM 1.8" allPlatforms="JVM [1.8]" useProjectSettings="false">
+        <compilerSettings>
+          <option name="additionalArguments" value="-Xallow-no-source-files" />
+        </compilerSettings>
+        <compilerArguments>
+          <option name="destination" value="$MODULE_DIR$/../../build/classes/kotlin/test" />
+          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/no.tornado/tornadofx/1.7.20/6987fca136c08884e12a43e55eeb3cdf404d1177/tornadofx-1.7.20.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.7/69d9503ea0a40ee16f0bcdac7e3eaf83d0fa914a/gson-2.8.7.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.5.21/6b3de2a43405a65502728047db37a98a0c7e72f0/kotlin-stdlib-jdk8-1.5.21.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-fxml/11/d5ff9262ef49d166db658d15f37e3ecff38fde4b/javafx-fxml-11-win.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-controls/11/af8d24de44e16a19ae959028eb23a48c145fb682/javafx-controls-11-win.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-controls/11/58d961774262ec972bf304e16c154a8e18c2050b/javafx-controls-11.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/11/9345c7ea43dbcc73a62eca5332717b4ce617e6c6/javafx-graphics-11-win.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/11/a736dd079047ec0b72b8c4970842a5c5e0c19f2f/javafx-graphics-11.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/11/ad3a4acfaa28b484d30c40c1f009445cc3f6e68b/javafx-base-11-win.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/11/9fcd3e8e3227ec97bf503f7991fad1f3b14d005/javafx-base-11.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.glassfish/javax.json/1.1.2/a507518970d55e9de24665af06d70aae91b4aaa1/javax.json-1.1.2.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.3.61/2e07c9a84c9e118efb70eede7e579fd663932122/kotlin-reflect-1.3.61.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.5.21/f059658740a4b3a3461aba9681457615332bae1c/kotlin-stdlib-jdk7-1.5.21.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.5.21/2f537cad7e9eeb9da73738c8812e1e4cf9b62e4e/kotlin-stdlib-1.5.21.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/javax.json/javax.json-api/1.1.2/b38c52a6e180359108bd5e35dbeec7d1be45c535/javax.json-api-1.1.2.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar;C:/Users/Enrico Stemmer/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.5.21/cc8bf3586fd2ebcf234058b9440bb406e62dfacb/kotlin-stdlib-common-1.5.21.jar" />
+          <option name="noStdlib" value="true" />
+          <option name="noReflect" value="true" />
+          <option name="moduleName" value="Calendar" />
+          <option name="friendPaths">
+            <array>
+              <option value="$MODULE_DIR$/../../build/classes/java/main" />
+              <option value="$MODULE_DIR$/../../build/classes/kotlin/main" />
+              <option value="$MODULE_DIR$/../../build/libs/Calendar-1.0-SNAPSHOT.jar" />
+            </array>
+          </option>
+          <option name="languageVersion" value="1.5" />
+          <option name="apiVersion" value="1.5" />
+          <option name="pluginOptions">
+            <array />
+          </option>
+          <option name="pluginClasspaths">
+            <array>
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm/1.5.30-RC/4e442ad9669888a21d6183eae7fcc38ff0bcd2f1/kotlin-scripting-jvm-1.5.30-RC.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-common/1.5.30-RC/1d9632b4924b755f281f630cf2b54cb15bc3d80/kotlin-scripting-common-1.5.30-RC.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.5.0/d8cebccdcddd029022aa8646a5a953ff88b13ac8/kotlinx-coroutines-core-jvm-1.5.0.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.5.0/65fbc439df2e4aad1f3769762d54534f1b564090/kotlin-stdlib-jdk8-1.5.0.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.5.0/f61904618ea7be07a66e0545ffe8dc2c70a19b77/kotlin-stdlib-jdk7-1.5.0.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.5.30-RC/dd23741884d3d030f21cc9db12936a2690b322e0/kotlin-stdlib-1.5.30-RC.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.5.30-RC/a85b7cb33ad571a90ba625845a9a554dae22ee33/kotlin-stdlib-common-1.5.30-RC.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/1.5.30-RC/2b713d878d0123f4c2e306ac835b653de2486fb5/kotlin-script-runtime-1.5.30-RC.jar" />
+            </array>
+          </option>
+          <option name="errors">
+            <ArgumentParseErrors />
+          </option>
+        </compilerArguments>
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager">
+    <output-test url="file://$MODULE_DIR$/../../out/test/classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../src/test" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="Calendar.main" />
+    <orderEntry type="library" name="Gradle: no.tornado:tornadofx:1.7.20" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.7" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.21" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-fxml:win:11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-controls:11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-controls:win:11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-graphics:11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-graphics:win:11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-base:11" level="project" />
+    <orderEntry type="library" name="Gradle: org.openjfx:javafx-base:win:11" level="project" />
+    <orderEntry type="library" name="Gradle: org.glassfish:javax.json:1.1.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.3.61" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.21" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.5.21" level="project" />
+    <orderEntry type="library" name="Gradle: javax.json:javax.json-api:1.1.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.5.21" level="project" />
+  </component>
+  <component name="TestModuleProperties" production-module="Calendar.main" />
+</module>

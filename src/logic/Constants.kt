@@ -37,9 +37,20 @@ fun getJsonReader(reader: Reader): JsonReader {
  */
 var configs: MutableMap<Configs, String> = mutableMapOf()
 
+/**
+ * must be the first method called to read from data files
+ * like fonts or language
+ *
+ * @see getconfigfile
+ * @see getdatadirectory
+ */
 fun initConstants() {
 	val file = File(getconfigfile())
 	if(!file.exists()) {
+		if(getdatadirectory() != "") {
+			val dir = File(getdatadirectory())
+			dir.mkdirs()
+		}
 		file.createNewFile()
 		val default = "{\n" +
 				"  \"language\": \"en\",\n" +
@@ -140,11 +151,13 @@ enum class Configs {
 
 fun getlogfile(): String = "Calendar.log"
 
-fun getlanguagefile(): String = "data/lang.json"
+fun getdatadirectory(): String = "data"
 
-fun getconfigfile(): String = "data/config.json"
+fun getlanguagefile(): String = getdatadirectory() + "/lang.json"
 
-fun getfontfile(): String = "data/fonts.json"
+fun getconfigfile(): String = getdatadirectory() + "/config.json"
+
+fun getfontfile(): String = getdatadirectory() + "/fonts.json"
 
 lateinit var language: Language
 
