@@ -4,31 +4,41 @@ package frame
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.stage.*
+import logic.LogType
 import logic.getLangString
+import logic.log
 import tornadofx.*
 
 
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
+
+/**
+ * BLOCKING
+ */
+fun frameInit() {
+	createLoading()
+	main()
+	launch<Application>()
+}
 
 class Application: App(MainView::class, Styles::class) {
 	override fun start(stage: Stage) {
 		stage.height = 550.0
 		stage.width = 700.0
 		super.start(stage)
+		removeLoading()
 	}
-}
-
-fun frameInit() {
-	main()
-	launch<Application>()
 }
 
 class MainView: tornadofx.View("Calendar") {
 	override val root = borderpane {
 		top = createmenubar(this)
+		log("created menubar", LogType.IMPORTANT)
 		center = tabpane {
 			createcalendartab(this@tabpane)
+			log("created calendartab")
 		}
+		log("created tabpane", LogType.IMPORTANT)
 	}
 }
 

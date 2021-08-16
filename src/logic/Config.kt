@@ -44,7 +44,7 @@ var configs: MutableMap<Configs, String> = mutableMapOf()
  * @see getconfigfile
  * @see getdatadirectory
  */
-fun initConstants() {
+fun initCofigs() {
 	val file = File(getconfigfile())
 	if(!file.exists()) {
 		if(getdatadirectory() != "") {
@@ -58,7 +58,7 @@ fun initConstants() {
 				"  \"printstacktrace\": \"true\",\n" +
 				"  \"fontFamily\": \"Tahoma\",\n" +
 				"  \"printlogs\": \"true\",\n" +
-				"  \"logformat\": \"\\\"[%1\$tF %1\$tT] |%4\$-7s %5\$s %n\\\"\" \n" +
+				"  \"logformat\": \"\\\"[%1\$tF %1\$tT] |%4\$-10s %5\$s %n\\\"\" \n" +
 				"}"
 		file.writeText(default)
 	}

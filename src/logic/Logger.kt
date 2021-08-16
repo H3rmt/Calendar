@@ -83,9 +83,7 @@ enum class LogType {
 	ERROR,
 }
 
-class Important: Level("IMPORTANT", 850) {
-
-}
+class Important: Level("IMPORTANT", 850)
 
 /**
  * full copy of the log.SimpleFormatter

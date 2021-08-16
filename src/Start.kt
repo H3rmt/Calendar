@@ -1,11 +1,17 @@
+import frame.createLoading
 import frame.frameInit
-import logic.initConstants
+import logic.LogType
+import logic.configs
+import logic.initCofigs
 import logic.initLogger
 import logic.log
 
 fun main(args: Array<String>) {
-	log("starting Calendar: ${args.toSet()}")
-	initConstants()
+	log("starting Calendar: ${args.toSet()}", LogType.IMPORTANT)
+	initCofigs()
+	log("read Configs:$configs", LogType.IMPORTANT)
 	initLogger()
+	log("starting Frame", LogType.IMPORTANT)
 	frameInit()
+	log("finished Frame", LogType.IMPORTANT)
 }
