@@ -1,28 +1,37 @@
 package calendar
 
+import javafx.animation.*
 import java.time.ZonedDateTime
 
 
-class Week {
-	lateinit var Monday: Day
-	lateinit var Tuesday: Day
-	lateinit var Wednesday: Day
-	lateinit var Thursday: Day
-	lateinit var Friday: Day
-	lateinit var Saturday: Day
-	lateinit var Sunday: Day
+class Week(Monday: Day, Tuesday: Day, Wednesday: Day, Thursday: Day, Friday: Day, Saturday: Day, Sunday: Day): Celldisplay {
+	var Monday: Day = Monday
+	var Tuesday: Day = Tuesday
+	var Wednesday: Day = Wednesday
+	var Thursday: Day = Thursday
+	var Friday: Day = Friday
+	var Saturday: Day = Saturday
+	var Sunday: Day = Sunday
 	
-	var self: Week = this
+	var general = this
+	
+	val alldays = arrayOf(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
 }
 
-class Day(_time: ZonedDateTime) {
+interface Celldisplay {
+}
+
+class Day(_time: ZonedDateTime): Celldisplay {
 	
 	val time: ZonedDateTime = _time
 	
-	var appointments: List<Appointment> = listOf()
+	val appointments: MutableList<Appointment> = mutableListOf()
+	
+	val appointmentopenanimations: MutableList<PathTransition> = mutableListOf()
+	val appointmentcloseanimations: MutableList<PathTransition> = mutableListOf()
 	
 	override fun toString(): String {
-		return "${time.dayOfMonth}"//:${time.dayOfWeek}"
+		return "${time.dayOfMonth}:${time.dayOfWeek}"
 	}
 }
 

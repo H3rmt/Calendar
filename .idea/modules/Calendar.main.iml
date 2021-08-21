@@ -44,6 +44,7 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/frame" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/logic" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../src/calendar" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

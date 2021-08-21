@@ -1,5 +1,6 @@
 package frame
 
+import javafx.geometry.*
 import javafx.scene.paint.*
 import javafx.scene.text.*
 import tornadofx.*
@@ -15,15 +16,17 @@ class Styles: Stylesheet() {
 	object CalendarView {
 		val title by cssclass()
 		val titlebuttons by cssclass()
-		val column by cssclass()
+		
 		val table by cssclass()
-		val disabledtablecell by cssclass()
+		val tableitem by cssclass()
+		
 		val tablecell by cssclass()
 		val hoveredtablecell by cssclass()
-		val tablecellpane by cssclass()
-		val hoveredtablecellpane by cssclass()
+		
+		val tableheader by cssclass()
 		
 		val celllabel by cssclass()
+		val cellheaderlabel by cssclass()
 	}
 	
 	init {
@@ -54,73 +57,56 @@ class Styles: Stylesheet() {
 		
 		CalendarView.titlebuttons {
 			focusColor = Color.BLACK
+			fontWeight = FontWeight.BOLD
 		}
 		
 		CalendarView.table {
-			focusColor = Color.TRANSPARENT
+			prefHeight = Int.MAX_VALUE.px
+		}
+		
+		CalendarView.tableitem {
+			alignment = Pos.CENTER
+			prefWidth = Int.MAX_VALUE.px
 			
-			selected {
-				backgroundColor += c(232, 232, 232)
-			}
-			
-			scrollBar {
-				prefWidth = 0.px
-				prefHeight = 0.px
-				
-				decrementArrow {
-					prefWidth = 0.px
-					prefHeight = 0.px
-				}
-				incrementArrow {
-					prefWidth = 0.px
-					prefHeight = 0.px
-				}
-			}
+			padding = box(2.px)
 		}
 		
-		CalendarView.column {
-			prefHeight = 40.px
-		}
-		
-		CalendarView.disabledtablecell {
-			prefHeight = 45.px
-			borderColor += box(Color.ORANGE)
-			borderWidth += box(0.px, 0.px, 0.px, 0.px)
-		}
-		
-		CalendarView.tablecell {
-			prefHeight = 46.px
-			backgroundColor += Color.WHITE
-			padding = box(2.px, 2.px, 1.px, 2.px)
-			
-			borderColor += box(Color.TRANSPARENT)
-		}
-		
-		CalendarView.hoveredtablecell {
-			//prefHeight = 66.px // Done by timeline animation
-			//backgroundColor += c(245, 245, 245, .4)
-		}
-		
-		CalendarView.tablecellpane {
-			//padding = box(10.px)
+		CalendarView.tableheader {
+			prefHeight = 30.px
+			minHeight = 25.px
 			
 			borderColor += box(Color.LIGHTGRAY)
 			borderWidth += box(1.px)
-			borderRadius += box(6.px)
+			borderRadius += box(10.px, 10.px, 0.px, 0.px)
 		}
 		
-		CalendarView.hoveredtablecellpane {
-			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
+		CalendarView.tablecell {
+			prefHeight = 45.px
+			
+			borderColor += box(c(0.827451, 0.827451, 0.827451, 0.4))
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
+		}
+		
+		CalendarView.hoveredtablecell {
+			// Done by timeline animation
+			// prefHeight = 65.px
+			
+			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
+			borderRadius += box(12.px)
+			borderWidth += box(2.px)
+		}
+		
+		CalendarView.cellheaderlabel {
+			fontSize = 12.px
+			fontWeight = FontWeight.BOLD
 		}
 		
 		CalendarView.celllabel {
 			fontSize = 14.px
 			fontWeight = FontWeight.BOLD
-			textFill = Color.BLACK
 			
-			padding = box(4.px, 0.px, 0.px, 0.px)
+			padding = box(3.px, 0.px, 0.px, 0.px)
 		}
 		
 	}

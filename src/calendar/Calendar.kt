@@ -1,63 +1,65 @@
 package calendar
 
-import frame.currentmonth
-import java.time.DayOfWeek
+import javafx.beans.property.*
+import javafx.collections.*
+import logic.getLangString
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import kotlin.random.Random
 
 
 val now: ZonedDateTime = ZonedDateTime.now(ZoneId.systemDefault())
 
-fun main() {
-	val data = GetMonth(now.month.value)
+// -1 because clone and setMonth(true) is used for init
+var calendardisplay: ZonedDateTime = now.minusMonths(1)
+
+val currentmonth: ObservableList<Week> = FXCollections.observableArrayList()
+val currentmonthName: SimpleStringProperty = SimpleStringProperty()
+
+
+/**
+ * called by buttons in calendar tab
+ */
+fun setMonth(right: Boolean) {
+	calendardisplay = if(right) {
+		calendardisplay.plusMonths(1)
+	} else {
+		calendardisplay.plusMonths(-1)
+	}
+	currentmonthName.set(getLangString(calendardisplay.month.name))
+	if(calendardisplay.year != now.year)
+		currentmonthName.value += "  " + calendardisplay.year
+	
+	val data = getMonth(calendardisplay)
 	currentmonth.clear()
 	currentmonth.addAll(data)
-
-//	val fout = FileOutputStream("")
-//	val dout = DataOutputStream(fout)
-
-//	fout.close()
-//	dout.close()
-
 }
 
 
-fun GetMonth(month: Int): MutableList<Week> {
-	var Time: ZonedDateTime = now.withMonth(month).withDayOfMonth(1)
+fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
+	var time: ZonedDateTime = monthtime.withDayOfMonth(1)
 	
-	val dayoffset = Time.dayOfWeek.value
-	Time = Time.minusDays((dayoffset - 1).toLong())
+	val dayoffset = time.dayOfWeek.value
+	time = time.minusDays((dayoffset - 1).toLong())
 	
 	val weeks: MutableList<Week> = mutableListOf()
 	
 	do {
-		val newWeek = Week()
-		
+		val days: MutableList<Day> = mutableListOf()
 		do {
-			when(Time.dayOfWeek) {
-				DayOfWeek.MONDAY -> newWeek.Monday = Day(Time.plusHours(0))
-				DayOfWeek.TUESDAY -> newWeek.Tuesday = Day(Time.plusHours(0))
-				DayOfWeek.WEDNESDAY -> newWeek.Wednesday = Day(Time.plusHours(0))
-				DayOfWeek.THURSDAY -> newWeek.Thursday = Day(Time.plusHours(0))
-				DayOfWeek.FRIDAY -> newWeek.Friday = Day(Time.plusHours(0))
-				DayOfWeek.SATURDAY -> newWeek.Saturday = Day(Time.plusHours(0))
-				DayOfWeek.SUNDAY -> newWeek.Sunday = Day(Time.plusHours(0))
-				else -> continue
+			days.add(Day(time))
+			time = time.plusDays(1)
+			
+			if(Random.nextBoolean()) {
+				for(num in 0..Random.nextInt(0, 4)) {
+					days[days.size - 1].appointments.add(Appointment("", Types.School))
+				}
 			}
-			Time = Time.plusDays(1)
-		} while(Time.dayOfWeek.value != 1)
-		
-		newWeek.Friday.appointments = listOf(
-			Appointment("Arb", Types.Work),
-			Appointment("School", Types.School),
-			Appointment("School", Types.School),
-			Appointment("Arb 3", Types.Work)
-		)
-		newWeek.Saturday.appointments = listOf(Appointment("Arb 2", Types.Work), Appointment("Arb 3", Types.Work))
-		newWeek.Thursday.appointments = listOf(Appointment("Mathe", Types.School))
-		
-		weeks.add(weeks.size, newWeek)
-	} while(Time.month.value == month && Time.dayOfMonth > 1)
+			
+		} while(time.dayOfWeek.value != 1)
+		val week = Week(days[0], days[1], days[2], days[3], days[4], days[5], days[6])
+		weeks.add(week)
+	} while(time.month == monthtime.month && time.dayOfMonth > 1)
 	
 	return weeks
 }

@@ -1,7 +1,7 @@
 package frame
 
 
-import calendar.main
+import calendar.setMonth
 import javafx.application.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
@@ -19,11 +19,11 @@ import tornadofx.*
  */
 fun frameInit() {
 	createLoading()
-	main()
-	launch<Application>()
+	setMonth(true)
+	Application.launch(Window::class.java)
 }
 
-class Application: App(MainView::class, Styles::class) {
+class Window: App(MainView::class, Styles::class) {
 	override fun start(stage: Stage) {
 		stage.height = 550.0
 		stage.width = 700.0

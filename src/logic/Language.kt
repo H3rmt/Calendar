@@ -9,7 +9,7 @@ class Language(private val language: Availablelanguages) {
 	/**
 	 * linking a String to a translated String
 	 */
-	var translations: Map<String, String>
+	private var translations: Map<String, String>
 	
 	/**
 	 * creates json file if it didn't exist
