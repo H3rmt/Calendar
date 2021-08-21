@@ -34,7 +34,8 @@ val closevalues = arrayOf( // duration, cell height, taskpane height
 	arrayOf(0.0, 90, 55)
 )
 
-fun createGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, closetimeline: Timeline): VBox {
+fun createGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, closetimeline: Timeline): Array<Any?> {
+	val animations: Array<MutableList<PathTransition>> = arrayOf(mutableListOf(), mutableListOf())
 	val graphicContainer = source.vbox {
 		addClass(Styles.CalendarView.tableitem)
 		addClass(Styles.CalendarView.tablecell)
@@ -45,7 +46,6 @@ fun createGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, clos
 			}
 			val pane = pane {
 				style {
-					//backgroundColor += Color.RED
 					prefHeight = 10.px
 				}
 				
@@ -69,24 +69,22 @@ fun createGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, clos
 				}
 			}
 			
+			generateAppointmentsGraphic(data, pane, animations)
+			
 			pane.widthProperty().addListener { _ ->
 				if(data.appointments.isEmpty())
 					return@addListener
 				
-				val animations = generateAppointmentsGraphic(data, pane)
-				data.appointmentopenanimations.clear()
-				data.appointmentopenanimations.addAll(animations[0])
-				data.appointmentcloseanimations.clear()
-				data.appointmentcloseanimations.addAll(animations[1])
+				generateAppointmentsGraphic(data, pane, animations)
 			}
 			add(pane)
 		}
 	}
 	
-	return graphicContainer
+	return arrayOf(graphicContainer, animations[0], animations[1])
 }
 
-fun generateAppointmentsGraphic(day: Day, pane: Pane): Array<MutableList<PathTransition>> {
+fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<PathTransition>>) {
 	pane.clear()
 	
 	val xcords = mutableListOf<Double>()
@@ -149,7 +147,10 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane): Array<MutableList<PathTra
 		)
 		closeTransitions.add(PathTransition(Duration(200.0), closepath, pane.getChildList()?.get(index)))
 	}
-	return arrayOf(openTransitions, closeTransitions)
+	animations[0].clear()
+	animations[0].addAll(openTransitions)
+	animations[1].clear()
+	animations[1].addAll(closeTransitions)
 }
 
 val colormap: Map<Types, Color> = mapOf(
@@ -277,9 +278,20 @@ fun createcalendartab(pane: TabPane): Tab {
 								
 								val cells = mutableListOf<VBox>()
 								
-								cells.add(createGraphics(week.general, this@hbox, opentimeline, closetimeline))
+								cells.add(createGraphics(week.general, this@hbox, opentimeline, closetimeline)[0] as VBox)
+								
+								val openappointmentopenanimations: MutableList<MutableList<PathTransition>> = mutableListOf()
+								val closeappointmentopenanimations: MutableList<MutableList<PathTransition>> = mutableListOf()
+								
+								
 								week.alldays.forEach {
-									cells.add(createGraphics(it, this@hbox, opentimeline, closetimeline))
+									val tmp = createGraphics(it, this@hbox, opentimeline, closetimeline)
+									cells.add(tmp[0] as VBox)
+									
+									@Suppress("UNCHECKED_CAST")
+									openappointmentopenanimations.add(tmp[1] as MutableList<PathTransition>)
+									@Suppress("UNCHECKED_CAST")
+									closeappointmentopenanimations.add(tmp[2] as MutableList<PathTransition>)
 								}
 								
 								cells.forEach {
@@ -292,14 +304,14 @@ fun createcalendartab(pane: TabPane): Tab {
 								}
 								
 								onMouseEntered = EventHandler {
-									week.alldays.forEach { it.appointmentopenanimations.forEach { animation -> animation.play() } }
+									openappointmentopenanimations.forEach { it.forEach { animation -> animation.play() } }
 									opentimeline.play()
 								}
 								
 								onMouseExited = EventHandler {
-									week.alldays.forEach { it.appointmentopenanimations.forEach { animation -> animation.stop() } }
+									openappointmentopenanimations.forEach { it.forEach { animation -> animation.stop() } }
 									opentimeline.stop()
-									week.alldays.forEach { it.appointmentcloseanimations.forEach { animation -> animation.play() } }
+									closeappointmentopenanimations.forEach { it.forEach { animation -> animation.play() } }
 									closetimeline.play()
 								}
 								

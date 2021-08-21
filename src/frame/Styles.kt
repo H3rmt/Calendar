@@ -93,7 +93,7 @@ class Styles: Stylesheet() {
 			// prefHeight = 65.px
 			
 			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
-			borderRadius += box(12.px)
+			borderRadius += box(6.px)
 			borderWidth += box(2.px)
 		}
 		

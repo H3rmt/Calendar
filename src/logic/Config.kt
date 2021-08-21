@@ -87,7 +87,7 @@ fun initCofigs() {
 
 /**
  * returns a configuration in Config enum specified in config.json
- * casted to given type
+ * cast to given type
  *
  * log.getConfig<ConfigType>(log.Configs.<config>)
  *

@@ -71,7 +71,7 @@ fun log(message: Any, type: LogType = LogType.NORMAL) {
  *
  * NORMAL : Normal logs 🤷‍;
  *
- * WARNING : warnings something went wrong, but didnt break the programm
+ * WARNING : warnings something went wrong, but didn't break the programm
  *
  * ERROR : errors 🤷;
  */

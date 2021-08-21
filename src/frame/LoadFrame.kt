@@ -35,7 +35,7 @@ fun createLoading() {
 }
 
 fun removeLoading() {
-	loadingScreen.dispatchEvent(WindowEvent(loadingScreen, WindowEvent.WINDOW_CLOSING));
+	loadingScreen.dispatchEvent(WindowEvent(loadingScreen, WindowEvent.WINDOW_CLOSING))
 	thread.interrupt()
 }
 
