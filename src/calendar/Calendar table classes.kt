@@ -1,5 +1,6 @@
 package calendar
 
+import javafx.scene.paint.*
 import java.time.ZonedDateTime
 
 
@@ -28,5 +29,13 @@ class Appointment(val _description: String, val _type: Types) {
 }
 
 enum class Types {
-	Work, School
+	Work,
+	School;
+	
+	fun getColor(): Paint {
+		return when(this) {
+			Work -> Color.GOLD
+			School -> Color.GREEN
+		}
+	}
 }

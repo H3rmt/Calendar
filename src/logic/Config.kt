@@ -5,7 +5,6 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.google.gson.stream.JsonReader
-import java.awt.Font
 import java.io.File
 import java.io.FileReader
 import java.io.Reader
@@ -56,33 +55,34 @@ fun initCofigs() {
 				"  \"language\": \"en\",\n" +
 				"  \"debug\": \"false\",\n" +
 				"  \"printstacktrace\": \"true\",\n" +
-				"  \"fontFamily\": \"Tahoma\",\n" +
 				"  \"printlogs\": \"true\",\n" +
 				"  \"logformat\": \"\\\"[%1\$tF %1\$tT] |%4\$-10s %5\$s %n\\\"\" \n" +
 				"}"
 		file.writeText(default)
+		log("created default config:${getconfigfile()}", LogType.WARNING)
 	}
 	
 	try {
 		val load: Map<String, String> = getJson().fromJson(getJsonReader(FileReader(getconfigfile())), Map::class.java)
 		load.forEach {
 			try {
-				configs[getJson().fromJson(getJsonReader(StringReader(it.key.trim().lowercase())), Configs::class.java)] = it
+				configs[getJson().fromJson(getJsonReader(StringReader(it.key.trim())), Configs::class.java)] = it
 					.value.trim()
 			} catch(e: NullPointerException) {
-				log("Unknown config key: $it Code: g294n3")
+				log("Unknown config key: $it Code: g294n3", LogType.WARNING)
 			}
 		}
 	} catch(e: NullPointerException) {
-		log("Config File missing $e Code: 5e928h")
+		log("Config File missing $e Code: 5e928h", LogType.ERROR)
 		throw Exit("5e928h")
 	} catch(e: JsonSyntaxException) {
-		log("JSON invalid ${e.message}  Code: iu2sj2")
+		log("JSON invalid ${e.message}  Code: iu2sj2", LogType.ERROR)
 		throw Exit("iu2sj2")
 	}
 	
 	language = Language(getConfig(Configs.language))
-	fonts = Fonts()
+	
+	stacktrace = getConfig(Configs.printstacktrace)
 }
 
 /**
@@ -116,6 +116,13 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 }
 
 /**
+ * is set to true at beginning of programm to prevent
+ * stackoverflow if error produced bevore loading configuration
+ * checks for stacktrace
+ */
+var stacktrace = true
+
+/**
  * Custom Exception with Custom error code
  *
  * StackTrace can be disabled in config
@@ -128,10 +135,11 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 class Exit(private val text: String): Exception(text) {
 	
 	override fun fillInStackTrace(): Throwable {
-		return if(getConfig(Configs.printstacktrace))
+		return if(stacktrace)
 			super.fillInStackTrace()
 		else
 			this
+		
 	}
 	
 	override fun toString(): String {
@@ -141,12 +149,12 @@ class Exit(private val text: String): Exception(text) {
 
 
 /**
- * only log.getConfigs in this Congfig enum are loaded from config.json
+ * only Configs in this Config enum are loaded from config.json
  *
  * have to be all lowercase
  */
 enum class Configs {
-	language, debug, printlogs, logformat, printstacktrace, fontfamily,
+	language, debug, printlogs, logformat, printstacktrace,
 }
 
 fun getlogfile(): String = "Calendar.log"
@@ -157,8 +165,6 @@ fun getlanguagefile(): String = getdatadirectory() + "/lang.json"
 
 fun getconfigfile(): String = getdatadirectory() + "/config.json"
 
-fun getfontfile(): String = getdatadirectory() + "/fonts.json"
-
 lateinit var language: Language
 
 /**
@@ -168,16 +174,4 @@ lateinit var language: Language
  */
 fun getLangString(str: String): String {
 	return language.get(str)
-}
-
-
-lateinit var fonts: Fonts
-
-/**
- * returns the default Font for UI
- *
- * @see Font
- */
-fun getDisplayFont(type: Fonts.Fonttype): Font {
-	return fonts.get(type)
 }

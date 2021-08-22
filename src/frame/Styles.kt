@@ -24,9 +24,11 @@ class Styles: Stylesheet() {
 		val hoveredtablecell by cssclass()
 		
 		val tableheader by cssclass()
+		val selectedcolumn by cssclass()
 		
 		val celllabel by cssclass()
 		val cellheaderlabel by cssclass()
+		val cellappointlabel by cssclass()
 	}
 	
 	init {
@@ -80,18 +82,19 @@ class Styles: Stylesheet() {
 			borderRadius += box(10.px, 10.px, 0.px, 0.px)
 		}
 		
+		CalendarView.selectedcolumn {
+			backgroundColor += c(0.95, 0.95, 0.95)
+		}
+		
 		CalendarView.tablecell {
 			prefHeight = 45.px
 			
-			borderColor += box(c(0.827451, 0.827451, 0.827451, 0.4))
+			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
 		}
 		
 		CalendarView.hoveredtablecell {
-			// Done by timeline animation
-			// prefHeight = 65.px
-			
 			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
@@ -109,5 +112,8 @@ class Styles: Stylesheet() {
 			padding = box(3.px, 0.px, 0.px, 0.px)
 		}
 		
+		CalendarView.cellappointlabel {
+			fontSize = 10.px
+		}
 	}
 }
