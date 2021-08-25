@@ -2,12 +2,13 @@ package frame
 
 
 import calendar.setMonth
+import com.sun.javafx.application.LauncherImpl
 import javafx.application.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.stage.*
-import logic.Exit
 import logic.LogType
+import logic.Warning
 import logic.getLangString
 import logic.log
 import tornadofx.*
@@ -21,36 +22,46 @@ import tornadofx.*
 fun frameInit() {
 	createLoading()
 	setMonth(true)
-	try {
-		Application.launch(Window::class.java)
-	} catch(e: RuntimeException) {
+	
+	DefaultErrorHandler.filter = { it.consume(); throw Warning("wgwe2") }
+	
+	LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
+}
+
+class PreloaderWindow: Preloader() {
+	override fun start(primaryStage: Stage) {
 	}
 }
 
 class Window: App(MainView::class, Styles::class) {
-	
 	override fun start(stage: Stage) {
 		stage.height = 600.0
 		stage.width = 700.0
 		super.start(stage)
 		removeLoading()
 	}
+	
+	override fun stop() {
+		try {
+			println("viwe:" + super.primaryView)
+			super.stop()
+		} catch(e: Exception) {
+			e.printStackTrace()
+			// Exception happens because stop methods searches main view
+			// no view -> new get generated -> same error as in startup
+		}
+	}
 }
 
 class MainView: View("Calendar") {
 	override val root = borderpane {
-		try {
-			top = createmenubar(this)
-			log("created menubar", LogType.IMPORTANT)
-			center = tabpane {
-				createcalendartab(this@tabpane)
-				log("created calendartab")
-			}
-			log("created tabpane", LogType.IMPORTANT)
-		} catch(e: Exception) {
-			log("Frame error", LogType.WARNING)
-			throw Exit("444444",e)
+		top = createmenubar(this)
+		log("created menubar", LogType.IMPORTANT)
+		center = tabpane {
+			createcalendartab(this@tabpane)
+			log("created calendartab")
 		}
+		log("created tabpane", LogType.IMPORTANT)
 	}
 }
 

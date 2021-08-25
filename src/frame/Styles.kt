@@ -77,9 +77,9 @@ class Styles: Stylesheet() {
 			prefHeight = 30.px
 			minHeight = 25.px
 			
-			borderColor += box(Color.LIGHTGRAY)
-			borderWidth += box(1.px)
+			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
 			borderRadius += box(10.px, 10.px, 0.px, 0.px)
+			borderWidth += box(2.px)
 		}
 		
 		CalendarView.selectedcolumn {

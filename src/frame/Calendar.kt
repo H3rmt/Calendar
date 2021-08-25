@@ -12,11 +12,15 @@ import javafx.collections.*
 import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
+import javafx.scene.image.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.shape.*
 import javafx.util.*
+import logic.log
 import tornadofx.*
+import java.io.FileInputStream
+
 
 
 fun createcalendartab(pane: TabPane): Tab {
@@ -231,14 +235,43 @@ fun createGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, clos
 		addClass(Styles.CalendarView.tablecell)
 		
 		if(data is Day) {
-			label(data.time.dayOfMonth.toString()) {
-				addClass(Styles.CalendarView.celllabel)
+			hbox(alignment = Pos.CENTER) {
+				imageview {
+					style {
+						minWidth = 15.px
+						maxWidth = minWidth
+						minHeight = 15.px
+						maxHeight = minHeight
+					}
+					try {
+						image = Image(FileInputStream("img/note.png"), 15.0, 15.0, true, true)
+					} catch(e: IllegalArgumentException) {
+						log(e)
+					}
+				}
+				label(data.time.dayOfMonth.toString()) {
+					addClass(Styles.CalendarView.celllabel)
+				}
+				imageview {
+					style {
+						minWidth = 15.px
+						maxWidth = minWidth
+						minHeight = 15.px
+						maxHeight = minHeight
+					}
+					try {
+						image = Image(FileInputStream("img/note.png"), 15.0, 15.0, true, true)
+					} catch(e: IllegalArgumentException) {
+						log(e)
+					}
+				}
 			}
+			
+			// appointments
 			val pane = pane {
 				style {
 					prefHeight = 10.px
 				}
-				
 			}
 			
 			val openvalues = arrayOf( // duration, taskpane height
@@ -350,7 +383,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 		openpath.elements.add(
 			CubicCurveTo(
 				xcords[index], vtopmargin, hleftmargin * 1.8, vtopmargin * 1.8, hleftmargin, ycords[index]
-			)
+			),
 		)
 		openTransitions.add(PathTransition(Duration(300.0), openpath, circle))
 		

@@ -11,6 +11,7 @@ import kotlin.random.Random
 val now: ZonedDateTime = ZonedDateTime.now(ZoneId.systemDefault())
 
 // -1 because clone and setMonth(true) is used for init
+// and clone now
 var calendardisplay: ZonedDateTime = now.minusMonths(1)
 
 val currentmonth: ObservableList<Week> = FXCollections.observableArrayList()

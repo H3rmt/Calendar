@@ -1,6 +1,6 @@
 {
 	"Language": "en",
-	"Debug": false,
+	"Debug": true,
 	"Printstacktrace": true,
 	"Printlogs": true,
 	"Lul": true,
