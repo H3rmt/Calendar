@@ -34,7 +34,7 @@ fun getJsonReader(reader: Reader): JsonReader {
  *
  * @see Configs
  */
-var configs: MutableMap<Configs, String> = mutableMapOf()
+var configs: MutableMap<Configs, Any> = mutableMapOf()
 
 /**
  * must be the first method called to read from data files
@@ -53,9 +53,9 @@ fun initCofigs() {
 		file.createNewFile()
 		val default = "{\n" +
 				"  \"language\": \"en\",\n" +
-				"  \"debug\": \"false\",\n" +
-				"  \"printstacktrace\": \"true\",\n" +
-				"  \"printlogs\": \"true\",\n" +
+				"  \"debug\": false,\n" +
+				"  \"printstacktrace\": true,\n" +
+				"  \"printlogs\": true,\n" +
 				"  \"logformat\": \"\\\"[%1\$tF %1\$tT] |%4\$-10s %5\$s %n\\\"\" \n" +
 				"}"
 		file.writeText(default)
@@ -63,26 +63,26 @@ fun initCofigs() {
 	}
 	
 	try {
-		val load: Map<String, String> = getJson().fromJson(getJsonReader(FileReader(getconfigfile())), Map::class.java)
+		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(getconfigfile())), Map::class.java)
 		load.forEach {
 			try {
-				configs[getJson().fromJson(getJsonReader(StringReader(it.key.trim())), Configs::class.java)] = it
-					.value.trim()
+				configs[getJson().fromJson(getJsonReader(StringReader(it.key.trim().capitalize())), Configs::class.java)] = it.value
 			} catch(e: NullPointerException) {
-				log("Unknown config key: $it Code: g294n3", LogType.WARNING)
+				log("Unknown config key: ${it.key}", LogType.WARNING)
+				//throw Warning("g294n3")
 			}
 		}
 	} catch(e: NullPointerException) {
-		log("Config File missing $e Code: 5e928h", LogType.ERROR)
-		throw Exit("5e928h")
+		log("Config File missing", LogType.ERROR)
+		throw Exit("5e928h", e)
 	} catch(e: JsonSyntaxException) {
-		log("JSON invalid ${e.message}  Code: iu2sj2", LogType.ERROR)
-		throw Exit("iu2sj2")
+		log("JSON invalid in Configfile", LogType.ERROR)
+		throw Exit("iu2sj2", e)
 	}
 	
-	language = Language(getConfig(Configs.language))
+	language = Language(getConfig(Configs.Language))
 	
-	stacktrace = getConfig(Configs.printstacktrace)
+	stacktrace = getConfig(Configs.Printstacktrace)
 }
 
 /**
@@ -93,26 +93,29 @@ fun initCofigs() {
  *
  * ConfigType = Int / String / Boolean / Enum element
  *
+ * enums get cast automatically from String,
+ * other types throw errors if type doesn't match
+ *
  * config = Enum Element
  *
  * @see Configs
  * @see configs
  */
 inline fun <reified T: Any> getConfig(conf: Configs): T {
-	if(configs[conf] != null)
+	configs[conf]?.let {
 		try {
-			return getJson().fromJson(getJsonReader(StringReader(configs[conf] ?: "")), T::class.java)
-		} catch(e: java.lang.NullPointerException) {
-			log("Invalid Config value: $conf")
+			return if(T::class.java.isEnum) {
+				getJson().fromJson(getJsonReader(StringReader(it as String)), T::class.java)
+			} else {
+				it as T
+			}
+		} catch(e: ClassCastException) {
+			log("Invalid Config value: $conf requested Type: ${T::class.simpleName}  value Type: ${it::class.simpleName}")
 			throw Exit("k23d1f")
-		} catch(e: JsonSyntaxException) {
-			log("Invalid Json Syntax: $conf  | ${e.message} ")
-			throw Exit("gf30ik")
 		}
-	else {
-		log("Missing Config option: $conf")
-		throw Exit("j21ka1")
 	}
+	log("Missing Config option: $conf")
+	throw Exit("j21ka1")
 }
 
 /**
@@ -128,11 +131,38 @@ var stacktrace = true
  * StackTrace can be disabled in config
  *
  * create:
- * log.Exit("g21k3m")
+ * Exit("g21k3m");
+ * Exit("g21k3m", e)
  *
  * @see Exception
  */
-class Exit(private val text: String): Exception(text) {
+class Exit(private val code: String, private val exception: Exception? = null): Exception(code) {
+	
+	override fun fillInStackTrace(): Throwable {
+		return if(stacktrace)
+			super.fillInStackTrace()
+		else
+			this
+	}
+	
+	override fun toString(): String {
+		return "Exception <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
+	}
+}
+
+
+
+/**
+ * Custom RuntimeException with Custom error code
+ *
+ * StackTrace can be disabled in config
+ *
+ * create:
+ * Warning("g294n3")
+ *
+ * @see RuntimeException
+ */
+class Warning(private val code: String): RuntimeException(code) {
 	
 	override fun fillInStackTrace(): Throwable {
 		return if(stacktrace)
@@ -143,18 +173,16 @@ class Exit(private val text: String): Exception(text) {
 	}
 	
 	override fun toString(): String {
-		return "Exception | ErrorCode: $text"
+		return "Warning | WarningCode: $code"
 	}
 }
 
 
 /**
  * only Configs in this Config enum are loaded from config.json
- *
- * have to be all lowercase
  */
 enum class Configs {
-	language, debug, printlogs, logformat, printstacktrace,
+	Language, Debug, Printlogs, Logformat, Printstacktrace,
 }
 
 fun getlogfile(): String = "Calendar.log"

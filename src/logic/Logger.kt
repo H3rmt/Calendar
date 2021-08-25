@@ -24,7 +24,7 @@ fun initLogger() {
 		it.removeHandler(it.handlers[0])  // remove ConsoleHandler
 		it.level = Level.ALL
 		
-		if(getConfig(Configs.printlogs)) {
+		if(getConfig(Configs.Printlogs)) {
 			val consoleHandler = ConsoleHandler()
 			consoleHandler.level = Level.INFO
 			consoleHandler.formatter = formatter
@@ -33,7 +33,7 @@ fun initLogger() {
 		
 		val fileHandler = FileHandler(getlogfile())
 		fileHandler.formatter = formatter
-		if(getConfig(Configs.debug))
+		if(getConfig(Configs.Debug))
 			fileHandler.level = Level.ALL
 		else
 			fileHandler.level = Level.CONFIG
@@ -58,7 +58,8 @@ fun log(message: Any, type: LogType = LogType.NORMAL) {
 			LogType.WARNING -> it.log(Level.WARNING, message.toString())
 			LogType.ERROR -> it.log(Level.SEVERE, message.toString())
 		}
-		return
+		if(type != LogType.ERROR)
+			return
 	}
 	println("${LocalDateTime.now()} | $type  $message")
 }
@@ -93,7 +94,7 @@ class Important: Level("IMPORTANT", 850)
  * @see Formatter
  */
 class SimpleFormatter: Formatter() {
-	private val format: String = getConfig(Configs.logformat)
+	private val format: String = getConfig(Configs.Logformat)
 	
 	override fun format(record: LogRecord): String {
 		val zdt = ZonedDateTime.ofInstant(

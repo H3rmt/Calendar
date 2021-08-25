@@ -6,6 +6,7 @@ import javafx.application.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.stage.*
+import logic.Exit
 import logic.LogType
 import logic.getLangString
 import logic.log
@@ -20,27 +21,36 @@ import tornadofx.*
 fun frameInit() {
 	createLoading()
 	setMonth(true)
-	Application.launch(Window::class.java)
+	try {
+		Application.launch(Window::class.java)
+	} catch(e: RuntimeException) {
+	}
 }
 
 class Window: App(MainView::class, Styles::class) {
+	
 	override fun start(stage: Stage) {
-		stage.height = 550.0
+		stage.height = 600.0
 		stage.width = 700.0
 		super.start(stage)
 		removeLoading()
 	}
 }
 
-class MainView: tornadofx.View("Calendar") {
+class MainView: View("Calendar") {
 	override val root = borderpane {
-		top = createmenubar(this)
-		log("created menubar", LogType.IMPORTANT)
-		center = tabpane {
-			createcalendartab(this@tabpane)
-			log("created calendartab")
+		try {
+			top = createmenubar(this)
+			log("created menubar", LogType.IMPORTANT)
+			center = tabpane {
+				createcalendartab(this@tabpane)
+				log("created calendartab")
+			}
+			log("created tabpane", LogType.IMPORTANT)
+		} catch(e: Exception) {
+			log("Frame error", LogType.WARNING)
+			throw Exit("444444",e)
 		}
-		log("created tabpane", LogType.IMPORTANT)
 	}
 }
 
