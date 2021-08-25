@@ -1,0 +1,65 @@
+-------------------------ERRORS-------------------------------
+--------------------------------------------------------------
+
+Code: <Errorcode>
+    <origin file path> line: <line number>
+    <Error Message logged> (<Exception>,<Option>,...)
+
+    <Description>
+
+
+Code: 5e928h
+    src/logic/Config line:78
+    Config Files missing <Exception>
+
+    config.json file missing
+    must be there and contain all constants,
+    or anywhere in program errors will occur
+
+    Normally this doesn't happen, because a file
+    with default values is generated at program startup
+    if this file is missing
+
+
+Code: iu2sj2
+    src/logic/Config line:81
+    JSON invalid in Configfile
+
+    some format issues with JSON file
+
+
+Code: j21ka1
+    src/logic/Config line:62
+    Missing Config option: <Option>
+
+    configuration was not defined inconfig.json file
+    either it got changed by some 5Head or I forgot
+    to add the option to the default configuration
+    values that are filled if the file is missing
+
+
+Code: k23d1f
+    src/logic/Config line:108
+    Invalid Config value: <Option> requested Type: <Type>  value Type: <Type>
+
+    configuration could not be cast to Type requested
+    from getConfig<Type>() function
+    config.json file contains invalid value for config
+
+
+
+-----------------------WARNINGS-------------------------------
+--------------------------------------------------------------
+
+Code: <Exceptioncode>
+    <origin file path> line: <line number>
+    <Exception Message logged> (<Option>,...)
+
+    <Description>
+
+
+Code: g294n3
+    src/logic/Config line:73
+
+    unknown Key was found in conf.json
+    all keys most be defined in Cofigs Enum
