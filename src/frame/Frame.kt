@@ -7,11 +7,14 @@ import javafx.application.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.stage.*
+import logic.Exit
 import logic.LogType
-import logic.Warning
 import logic.getLangString
 import logic.log
 import tornadofx.*
+import java.io.PrintWriter
+import java.io.StringWriter
+
 
 
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
@@ -23,7 +26,19 @@ fun frameInit() {
 	createLoading()
 	setMonth(true)
 	
-	DefaultErrorHandler.filter = { it.consume(); throw Warning("wgwe2") }
+	
+	DefaultErrorHandler.filter = {
+		var error = it.error
+		if(it.error::class != Exit::class)
+			error = Exit("frame exception", it.error as Exception)
+		
+		val writer = StringWriter()
+		error.printStackTrace(PrintWriter(writer))
+		log(writer, LogType.ERROR)
+		
+		// uncomment if errorpopup should be disabled TODO(Release)
+		it.consume()
+	}
 	
 	LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
@@ -41,16 +56,6 @@ class Window: App(MainView::class, Styles::class) {
 		removeLoading()
 	}
 	
-	override fun stop() {
-		try {
-			println("viwe:" + super.primaryView)
-			super.stop()
-		} catch(e: Exception) {
-			e.printStackTrace()
-			// Exception happens because stop methods searches main view
-			// no view -> new get generated -> same error as in startup
-		}
-	}
 }
 
 class MainView: View("Calendar") {

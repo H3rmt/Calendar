@@ -87,7 +87,7 @@ class Styles: Stylesheet() {
 		}
 		
 		CalendarView.tablecell {
-			prefHeight = 45.px
+			prefHeight = 40.px
 			
 			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
 			borderRadius += box(6.px)
@@ -109,7 +109,8 @@ class Styles: Stylesheet() {
 			fontSize = 14.px
 			fontWeight = FontWeight.BOLD
 			
-			padding = box(3.px, 0.px, 0.px, 0.px)
+			prefWidth = Int.MAX_VALUE.px
+			alignment = Pos.CENTER
 		}
 		
 		CalendarView.cellappointlabel {

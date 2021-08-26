@@ -58,7 +58,7 @@ fun log(message: Any, type: LogType = LogType.NORMAL) {
 			LogType.WARNING -> it.log(Level.WARNING, message.toString())
 			LogType.ERROR -> it.log(Level.SEVERE, message.toString())
 		}
-		if(type != LogType.ERROR)
+		//if(type != LogType.ERROR)
 			return
 	}
 	println("${LocalDateTime.now()} | $type  $message")

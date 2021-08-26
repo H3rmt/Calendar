@@ -5,7 +5,9 @@ import javafx.collections.*
 import logic.getLangString
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.IsoFields
 import kotlin.random.Random
+
 
 
 val now: ZonedDateTime = ZonedDateTime.now(ZoneId.systemDefault())
@@ -58,7 +60,10 @@ fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 			}
 			
 		} while(time.dayOfWeek.value != 1)
-		val week = Week(days[0], days[1], days[2], days[3], days[4], days[5], days[6])
+		
+		val weekOfYear: Int = time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+		
+		val week = Week(days[0], days[1], days[2], days[3], days[4], days[5], days[6], weekOfYear)
 		weeks.add(week)
 	} while(time.month == monthtime.month && time.dayOfMonth > 1)
 	

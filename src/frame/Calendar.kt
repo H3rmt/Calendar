@@ -17,7 +17,8 @@ import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.shape.*
 import javafx.util.*
-import logic.log
+import logic.Configs
+import logic.getConfig
 import tornadofx.*
 import java.io.FileInputStream
 
@@ -78,6 +79,7 @@ fun createcalendartab(pane: TabPane): Tab {
 					useMaxWidth = true
 				}
 				
+				// Table view
 				vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarView.table)
 					style(append = true) {
@@ -145,14 +147,14 @@ fun createcalendartab(pane: TabPane): Tab {
 								
 								val cells = mutableListOf<VBox>()
 								
-								cells.add(createGraphics(week.general, this@hbox, opentimeline, closetimeline)[0] as VBox)
+								cells.add(createCellGraphics(week.general, this@hbox, opentimeline, closetimeline)[0] as VBox)
 								
 								val openappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
 								val closeappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
 								
 								
 								week.alldays.forEach {
-									val tmp = createGraphics(it, this@hbox, opentimeline, closetimeline)
+									val tmp = createCellGraphics(it, this@hbox, opentimeline, closetimeline)
 									cells.add(tmp[0] as VBox)
 									
 									@Suppress("UNCHECKED_CAST")
@@ -170,19 +172,32 @@ fun createcalendartab(pane: TabPane): Tab {
 									}
 								}
 								
+								var openprep = false
+								
 								onMouseEntered = EventHandler {
 									if(selectedindex.value != index) {
-										openappointmentopenanimations.forEach { it.forEach { animation -> animation.play() } }
-										opentimeline.play()
+										openprep = true
+										Thread {
+											Thread.sleep(getConfig<Double>(Configs.Animationdelay).toLong())
+											if(openprep) {
+												openprep = false
+												openappointmentopenanimations.forEach { it.forEach { animation -> animation.play() } }
+												opentimeline.play()
+											}
+										}.start()
 									}
 								}
 								
 								onMouseExited = EventHandler {
 									if(selectedindex.value != index) {
-										openappointmentopenanimations.forEach { it.forEach { animation -> animation.stop() } }
-										opentimeline.stop()
-										closeappointmentopenanimations.forEach { it.forEach { animation -> animation.play() } }
-										closetimeline.play()
+										if(openprep)
+											openprep = false
+										else {
+											openappointmentopenanimations.forEach { it.forEach { animation -> animation.stop() } }
+											opentimeline.stop()
+											closeappointmentopenanimations.forEach { it.forEach { animation -> animation.play() } }
+											closetimeline.play()
+										}
 									}
 								}
 								
@@ -197,7 +212,7 @@ fun createcalendartab(pane: TabPane): Tab {
 								selectedindex.addListener(ChangeListener { _, old, new ->
 									if(new != index) {
 										removeClass(Styles.CalendarView.selectedcolumn)
-										if(old == index) {
+										if(old == index && new != -1) {
 											onMouseExited.handle(null)
 										}
 									}
@@ -214,7 +229,7 @@ fun createcalendartab(pane: TabPane): Tab {
 				}
 			}
 			
-			// used to shadow the overflow from actual tap
+			// used to shadow the overflow from tab
 			pane {
 				isMouseTransparent = true
 				style {
@@ -227,43 +242,37 @@ fun createcalendartab(pane: TabPane): Tab {
 	}
 }
 
-
-fun createGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, closetimeline: Timeline): Array<Any?> {
+fun createCellGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, closetimeline: Timeline): Array<Any?> {
 	val animations: Array<MutableList<Animation>> = arrayOf(mutableListOf(), mutableListOf())
 	val graphicContainer = source.vbox {
 		addClass(Styles.CalendarView.tableitem)
 		addClass(Styles.CalendarView.tablecell)
 		
 		if(data is Day) {
-			hbox(alignment = Pos.CENTER) {
-				imageview {
-					style {
-						minWidth = 15.px
-						maxWidth = minWidth
-						minHeight = 15.px
-						maxHeight = minHeight
-					}
-					try {
-						image = Image(FileInputStream("img/note.png"), 15.0, 15.0, true, true)
-					} catch(e: IllegalArgumentException) {
-						log(e)
-					}
+			gridpane {
+				style {
+					prefWidth = Int.MAX_VALUE.px
+					padding = box(3.px, 3.px, 0.px, 3.px)
 				}
+				imageview {
+					gridpaneConstraints {
+						columnRowIndex(0, 0)
+					}
+					image = Image(FileInputStream("img/remind.png"))
+				}
+				
 				label(data.time.dayOfMonth.toString()) {
+					gridpaneConstraints {
+						columnRowIndex(1, 0)
+					}
 					addClass(Styles.CalendarView.celllabel)
 				}
+				
 				imageview {
-					style {
-						minWidth = 15.px
-						maxWidth = minWidth
-						minHeight = 15.px
-						maxHeight = minHeight
+					gridpaneConstraints {
+						columnRowIndex(2, 0)
 					}
-					try {
-						image = Image(FileInputStream("img/note.png"), 15.0, 15.0, true, true)
-					} catch(e: IllegalArgumentException) {
-						log(e)
-					}
+					image = Image(FileInputStream("img/note.png"))
 				}
 			}
 			
@@ -274,43 +283,54 @@ fun createGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, clos
 				}
 			}
 			
-			val openvalues = arrayOf( // duration, taskpane height
-				arrayOf(0.0, 10.0),
-				arrayOf(40.0, 30.0),
-				arrayOf(160.0, 40.0),
-				arrayOf(200.0, 55.0)
-			)
+			opentimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 10)))
+			opentimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 55)))
 			
-			val closevalues = arrayOf( // duration, taskpane height
-				arrayOf(200.0, 10.0),
-				arrayOf(160.0, 30.0),
-				arrayOf(40.0, 40.0),
-				arrayOf(0.0, 55.0)
-			)
-			
-			pane.let {
-				for(value in openvalues) {
-					opentimeline.keyFrames.add(
-						KeyFrame(Duration(value[0]), KeyValue(it.minHeightProperty(), value[1].toInt()))
-					)
-				}
-				
-				for(value in closevalues) {
-					closetimeline.keyFrames.add(
-						KeyFrame(Duration(value[0]), KeyValue(it.minHeightProperty(), value[1].toInt()))
-					)
-				}
-			}
+			closetimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 55)))
+			closetimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 10)))
 			
 			generateAppointmentsGraphic(data, pane, animations)
 			
 			pane.widthProperty().addListener { _ ->
 				if(data.appointments.isEmpty())
 					return@addListener
-				
 				generateAppointmentsGraphic(data, pane, animations)
 			}
-			add(pane)
+			
+		} else if(data is Week) {
+			gridpane {
+				style {
+					prefWidth = Int.MAX_VALUE.px
+					padding = box(3.px, 3.px, 0.px, 3.px)
+				}
+				
+				label(data.WeekofYear.toString()) {
+					gridpaneConstraints {
+						columnRowIndex(1, 0)
+					}
+					addClass(Styles.CalendarView.celllabel)
+				}
+				
+				imageview {
+					gridpaneConstraints {
+						columnRowIndex(2, 0)
+					}
+					image = Image(FileInputStream("img/note.png"))
+				}
+			}
+			
+			val pane = pane {
+				style {
+					prefHeight = 10.px
+				}
+			}
+			
+			opentimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 10)))
+			opentimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 55)))
+			
+			closetimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 55)))
+			closetimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 10)))
+			
 		}
 	}
 	
@@ -385,12 +405,12 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 				xcords[index], vtopmargin, hleftmargin * 1.8, vtopmargin * 1.8, hleftmargin, ycords[index]
 			),
 		)
-		openTransitions.add(PathTransition(Duration(300.0), openpath, circle))
+		openTransitions.add(PathTransition(Duration(getConfig(Configs.Animationspeed)), openpath, circle))
 		
 		val openfadeTransition = Timeline(
 			KeyFrame(Duration(0.0), KeyValue(label?.opacityProperty(), 0.0)),
-			KeyFrame(Duration(150.0), KeyValue(label?.opacityProperty(), 0.0)),
-			KeyFrame(Duration(300.0), KeyValue(label?.opacityProperty(), 1.0))
+			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3 * 2), KeyValue(label?.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label?.opacityProperty(), 1.0))
 		)
 		openTransitions.add(openfadeTransition)
 		
@@ -401,12 +421,12 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 				hleftmargin, ycords[index], xcords[index], ycords[index], xcords[index], vtopmargin
 			)
 		)
-		closeTransitions.add(PathTransition(Duration(200.0), closepath, circle))
+		closeTransitions.add(PathTransition(Duration(getConfig(Configs.Animationspeed)), closepath, circle))
 		
 		val closefadeTransition = Timeline(
 			KeyFrame(Duration(0.0), KeyValue(label?.opacityProperty(), 1.0)),
-			KeyFrame(Duration(100.0), KeyValue(label?.opacityProperty(), 0.0)),
-			KeyFrame(Duration(300.0), KeyValue(label?.opacityProperty(), 0.0))
+			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3), KeyValue(label?.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label?.opacityProperty(), 0.0))
 		)
 		closeTransitions.add(closefadeTransition)
 	}

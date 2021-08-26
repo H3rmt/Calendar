@@ -9,6 +9,8 @@ import java.io.File
 import java.io.FileReader
 import java.io.Reader
 import java.io.StringReader
+import kotlin.collections.set
+import kotlin.reflect.typeOf
 
 
 private val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create()
@@ -69,7 +71,7 @@ fun initCofigs() {
 				configs[getJson().fromJson(getJsonReader(StringReader(it.key.trim().capitalize())), Configs::class.java)] = it.value
 			} catch(e: NullPointerException) {
 				log("Unknown config key: ${it.key}", LogType.WARNING)
-				//throw Warning("g294n3")
+				//Warning("g294n3")
 			}
 		}
 	} catch(e: NullPointerException) {
@@ -89,7 +91,7 @@ fun initCofigs() {
  * returns a configuration in Config enum specified in config.json
  * cast to given type
  *
- * log.getConfig<ConfigType>(log.Configs.<config>)
+ * getConfig<ConfigType>(Configs.<config>)
  *
  * ConfigType = Int / String / Boolean / Enum element
  *
@@ -101,20 +103,31 @@ fun initCofigs() {
  * @see Configs
  * @see configs
  */
+@OptIn(ExperimentalStdlibApi::class)
 inline fun <reified T: Any> getConfig(conf: Configs): T {
 	configs[conf]?.let {
 		try {
-			return if(T::class.java.isEnum) {
-				getJson().fromJson(getJsonReader(StringReader(it as String)), T::class.java)
-			} else {
-				it as T
+			try {
+				return if(T::class.java.isEnum) {
+					getJson().fromJson(getJsonReader(StringReader(it as String)), T::class.java)
+				} else {
+					it as T
+				}
+			} catch(e: ClassCastException) {
+				log("Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}", LogType.WARNING)
+				//TODO Warning
+				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
+					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.WARNING)
+					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
+				} else
+					throw e
 			}
-		} catch(e: ClassCastException) {
-			log("Invalid Config value: $conf requested Type: ${T::class.simpleName}  value Type: ${it::class.simpleName}")
-			throw Exit("k23d1f")
+		} catch(e1: ClassCastException) {
+			log("Gson could not cast value: ${it::class.simpleName} to requested: ${T::class.simpleName}", LogType.WARNING)
+			throw Exit("k23d1f", e1)
 		}
 	}
-	log("Missing Config option: $conf")
+	log("Missing Config option: $conf", LogType.WARNING)
 	throw Exit("j21ka1")
 }
 
@@ -135,9 +148,10 @@ var stacktrace = true
  * Exit("g21k3m", e)
  *
  * @see Exception
+ *
+ * @throws Exception
  */
 class Exit(private val code: String, private val exception: Exception? = null): Exception(code) {
-	
 	override fun fillInStackTrace(): Throwable {
 		return if(stacktrace)
 			super.fillInStackTrace()
@@ -151,38 +165,11 @@ class Exit(private val code: String, private val exception: Exception? = null): 
 }
 
 
-
-/**
- * Custom RuntimeException with Custom error code
- *
- * StackTrace can be disabled in config
- *
- * create:
- * Warning("g294n3")
- *
- * @see RuntimeException
- */
-class Warning(private val code: String): RuntimeException(code) {
-	
-	override fun fillInStackTrace(): Throwable {
-		return if(stacktrace)
-			super.fillInStackTrace()
-		else
-			this
-		
-	}
-	
-	override fun toString(): String {
-		return "Warning | WarningCode: $code"
-	}
-}
-
-
 /**
  * only Configs in this Config enum are loaded from config.json
  */
 enum class Configs {
-	Language, Debug, Printlogs, Logformat, Printstacktrace,
+	Language, Debug, Printlogs, Logformat, Printstacktrace, Animationspeed, Animationdelay
 }
 
 fun getlogfile(): String = "Calendar.log"
@@ -196,7 +183,7 @@ fun getconfigfile(): String = getdatadirectory() + "/config.json"
 lateinit var language: Language
 
 /**
- * returns a String that was translated into the general log.Language
+ * returns a String that was translated into the general Language
  *
  * @see Language
  */

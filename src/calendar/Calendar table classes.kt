@@ -6,7 +6,7 @@ import java.time.ZonedDateTime
 
 interface Celldisplay
 
-class Week(Monday: Day, Tuesday: Day, Wednesday: Day, Thursday: Day, Friday: Day, Saturday: Day, Sunday: Day): Celldisplay {
+class Week(Monday: Day, Tuesday: Day, Wednesday: Day, Thursday: Day, Friday: Day, Saturday: Day, Sunday: Day,val WeekofYear: Int): Celldisplay {
 	
 	var general = this
 	

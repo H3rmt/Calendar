@@ -37,7 +37,7 @@ Code: j21ka1
     to add the option to the default configuration
     values that are filled if the file is missing
 
-
+/* TODO Warning
 Code: k23d1f
     src/logic/Config line:108
     Invalid Config value: <Option> requested Type: <Type>  value Type: <Type>
@@ -45,7 +45,7 @@ Code: k23d1f
     configuration could not be cast to Type requested
     from getConfig<Type>() function
     config.json file contains invalid value for config
-
+*/
 
 
 -----------------------WARNINGS-------------------------------
