@@ -30,7 +30,7 @@ fun createcalendartab(pane: TabPane): Tab {
 		
 		stackpane {
 			style(append = true) {
-				maxHeight = 500.px
+				//maxHeight = 500.px
 				padding = box(6.px)
 			}
 			
@@ -147,14 +147,15 @@ fun createcalendartab(pane: TabPane): Tab {
 								
 								val cells = mutableListOf<VBox>()
 								
-								cells.add(createCellGraphics(week.general, this@hbox, opentimeline, closetimeline)[0] as VBox)
+								val expand = SimpleDoubleProperty(0.0)
+								
+								cells.add(createCellGraphics(week.general, this@hbox, opentimeline, closetimeline, expand)[0] as VBox)
 								
 								val openappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
 								val closeappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
 								
-								
 								week.alldays.forEach {
-									val tmp = createCellGraphics(it, this@hbox, opentimeline, closetimeline)
+									val tmp = createCellGraphics(it, this@hbox, opentimeline, closetimeline, expand)
 									cells.add(tmp[0] as VBox)
 									
 									@Suppress("UNCHECKED_CAST")
@@ -163,12 +164,16 @@ fun createcalendartab(pane: TabPane): Tab {
 									closeappointmentopenanimations.add(tmp[2] as MutableList<Animation>)
 								}
 								
-								cells.forEach {
-									it.onMouseEntered = EventHandler { _ ->
-										it.addClass(Styles.CalendarView.hoveredtablecell)
+								val hoveredcell = SimpleIntegerProperty(-1)
+								
+								for((cellindex, cell) in cells.withIndex()) {
+									cell.onMouseEntered = EventHandler {
+										cell.addClass(Styles.CalendarView.hoveredtablecell)
+										hoveredcell.value = cellindex
 									}
-									it.onMouseExited = EventHandler { _ ->
-										it.removeClass(Styles.CalendarView.hoveredtablecell)
+									cell.onMouseExited = EventHandler {
+										cell.removeClass(Styles.CalendarView.hoveredtablecell)
+										hoveredcell.value = -1
 									}
 								}
 								
@@ -205,8 +210,15 @@ fun createcalendartab(pane: TabPane): Tab {
 									if(selectedindex.value != index) {
 										selectedindex.value = index
 										addClass(Styles.CalendarView.selectedcolumn)
-									} else
+									} else {
 										selectedindex.value = -1
+										removeClass(Styles.CalendarView.selectedcolumn)
+									}
+									if(it.clickCount > 1) {
+										val newtab = createweektab(pane, week, week.alldays.getOrNull(hoveredcell.value - 1))
+										pane.selectionModel.select(newtab)
+										// TODO check if opened
+									}
 								}
 								
 								selectedindex.addListener(ChangeListener { _, old, new ->
@@ -242,7 +254,13 @@ fun createcalendartab(pane: TabPane): Tab {
 	}
 }
 
-fun createCellGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, closetimeline: Timeline): Array<Any?> {
+fun createCellGraphics(
+	data: Celldisplay,
+	source: HBox,
+	opentimeline: Timeline,
+	closetimeline: Timeline,
+	expand: SimpleDoubleProperty
+): Array<Any?> {
 	val animations: Array<MutableList<Animation>> = arrayOf(mutableListOf(), mutableListOf())
 	val graphicContainer = source.vbox {
 		addClass(Styles.CalendarView.tableitem)
@@ -276,27 +294,6 @@ fun createCellGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, 
 				}
 			}
 			
-			// appointments
-			val pane = pane {
-				style {
-					prefHeight = 10.px
-				}
-			}
-			
-			opentimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 10)))
-			opentimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 55)))
-			
-			closetimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 55)))
-			closetimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 10)))
-			
-			generateAppointmentsGraphic(data, pane, animations)
-			
-			pane.widthProperty().addListener { _ ->
-				if(data.appointments.isEmpty())
-					return@addListener
-				generateAppointmentsGraphic(data, pane, animations)
-			}
-			
 		} else if(data is Week) {
 			gridpane {
 				style {
@@ -318,55 +315,93 @@ fun createCellGraphics(data: Celldisplay, source: HBox, opentimeline: Timeline, 
 					image = Image(FileInputStream("img/note.png"))
 				}
 			}
-			
-			val pane = pane {
-				style {
-					prefHeight = 10.px
-				}
+		}
+		
+		// appointments
+		val pane = pane {
+			style {
+				prefHeight = 10.px
 			}
-			
-			opentimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 10)))
-			opentimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 55)))
-			
-			closetimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 55)))
-			closetimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 10)))
-			
+		}
+		
+		val thisexpandheight = if(data is Day) generateAppointmentsGraphic(data, pane, animations)
+		else if(data is Week) generateWeekGraphic(data, pane, animations) else 0.0
+		
+		if(expand.value < thisexpandheight)
+			expand.value = thisexpandheight
+		
+		var open = KeyValue(pane.minHeightProperty(), expand.value)
+		var closeframe = KeyFrame(Duration(0.0), open)
+		var openframe = KeyFrame(Duration(getConfig(Configs.Animationspeed)), open)
+		
+		expand.addListener(ChangeListener { _, _, new: Number ->
+			opentimeline.keyFrames.remove(openframe)
+			closetimeline.keyFrames.remove(closeframe)
+			open = KeyValue(pane.minHeightProperty(), new)
+			closeframe = KeyFrame(Duration(0.0), open)
+			openframe = KeyFrame(Duration(getConfig(Configs.Animationspeed)), open)
+			opentimeline.keyFrames.add(openframe)
+			closetimeline.keyFrames.add(closeframe)
+		})
+		
+		opentimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 10)))
+		opentimeline.keyFrames.add(openframe)
+		
+		closetimeline.keyFrames.add(closeframe)
+		closetimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 10)))
+		
+		pane.widthProperty().addListener { _ ->
+			if(data is Day) {
+				if(data.appointments.isEmpty())
+					return@addListener
+				generateAppointmentsGraphic(data, pane, animations)
+			} else if(data is Week)
+				generateWeekGraphic(data, pane, animations)
 		}
 	}
 	
 	return arrayOf(graphicContainer, animations[0], animations[1])
 }
 
-fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<Animation>>) {
+fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<Animation>>): Double {
+	return 10.0
+}
+
+val spacing = 4.0
+val circlewidth = 8.0
+
+val vtopmargin = 4.0
+val hleftmargin = 8.0
+
+fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<Animation>>): Double {
 	pane.clear()
 	
-	val width = pane.width.toInt().toDouble()
-	val spacing = 5
-	val circlewidth = 8
+	// make width even because ,5 pixel are not supported <-(AI said this)
+	val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
 	
-	val vtopmargin = 4.0
-	val hleftmargin = 8.0
+	val topspacing: Double = maxOf(2.0, minOf(spacing, (((width - spacing) / day.appointments.size) / 3)))
+	val topcirclewidth: Double = topspacing * 2
 	
 	val xcords = mutableListOf<Double>()
 	
 	if(day.appointments.size % 2 == 0) {
 		for(index in 0 until day.appointments.size / 2) {
-			xcords.add((width / 2) + ((spacing / 2) + (index * (circlewidth + spacing)) + circlewidth / 2))
-			xcords.add((width / 2) + ((spacing / 2) + (index * (circlewidth + spacing)) + circlewidth / 2) * -1)
+			xcords.add((width / 2) + ((topspacing / 2) + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
+			xcords.add((width / 2) - ((topspacing / 2) + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
 		}
 	} else {
 		xcords.add(width / 2)
 		for(index in 0 until (day.appointments.size - 1) / 2) {
-			xcords.add((width / 2) + ((circlewidth / 2) + spacing + (index * (circlewidth + spacing)) + circlewidth / 2))
-			xcords.add((width / 2) + ((circlewidth / 2) + spacing + (index * (circlewidth + spacing)) + circlewidth / 2) * -1)
+			xcords.add((width / 2) + ((topcirclewidth / 2) + topspacing + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
+			xcords.add((width / 2) - ((topcirclewidth / 2) + topspacing + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
 		}
 	}
 	
-	// else from middle to center
+	// better animation because vertical are sorted from top to bottom
 	xcords.sortDescending()
 	
 	for((index, appointment) in day.appointments.withIndex()) {
-		pane.circle(radius = circlewidth / 2) {
+		pane.circle(radius = topcirclewidth / 2) {
 			fill = appointment._type.getColor()
 			centerY = vtopmargin
 			centerX = xcords[index]
@@ -435,4 +470,6 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	animations[0].addAll(openTransitions)
 	animations[1].clear()
 	animations[1].addAll(closeTransitions)
+	
+	return (ycords.getOrNull(ycords.lastIndex) ?: 0.0) + vtopmargin * 2
 }

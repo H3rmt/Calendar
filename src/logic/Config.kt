@@ -58,7 +58,9 @@ fun initCofigs() {
 				"  \"debug\": false,\n" +
 				"  \"printstacktrace\": true,\n" +
 				"  \"printlogs\": true,\n" +
-				"  \"logformat\": \"\\\"[%1\$tF %1\$tT] |%4\$-10s %5\$s %n\\\"\" \n" +
+				"  \"logformat\": \"[%1\$tF %1\$tT] |%4\$-10s %5\$s %n\", \n" +
+				"  \"Animationspeed\": 300,\n" +
+				"  \"Animationdelay\": 80\n" +
 				"}"
 		file.writeText(default)
 		log("created default config:${getconfigfile()}", LogType.WARNING)

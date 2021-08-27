@@ -14,5 +14,6 @@ fun main(args: Array<String>) {
 	initLogger()
 	log("starting Frame", LogType.IMPORTANT)
 	frameInit()
+	log("exiting Frame", LogType.IMPORTANT)
 	exitProcess(1)
 }

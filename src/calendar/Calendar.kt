@@ -54,7 +54,7 @@ fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 			time = time.plusDays(1)
 			
 			if(Random.nextBoolean()) {
-				for(num in 0..Random.nextInt(0, 4)) {
+				for(num in 0..Random.nextInt(0, 8)) {
 					days[days.size - 1].appointments.add(Appointment("Arbeit Text ttttt", Types.School))
 				}
 			}
@@ -63,8 +63,9 @@ fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 		
 		val weekOfYear: Int = time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 		
-		val week = Week(days[0], days[1], days[2], days[3], days[4], days[5], days[6], weekOfYear)
+		val week = Week(time.minusDays(7),days[0], days[1], days[2], days[3], days[4], days[5], days[6], weekOfYear)
 		weeks.add(week)
+		//return weeks
 	} while(time.month == monthtime.month && time.dayOfMonth > 1)
 	
 	return weeks

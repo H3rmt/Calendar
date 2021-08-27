@@ -29,8 +29,8 @@ fun frameInit() {
 	
 	DefaultErrorHandler.filter = {
 		var error = it.error
-		if(it.error::class != Exit::class)
-			error = Exit("frame exception", it.error as Exception)
+		//if(it.error::class != Exit::class)
+		//	error = Exit("frame exception", it.error as Exception)
 		
 		val writer = StringWriter()
 		error.printStackTrace(PrintWriter(writer))
