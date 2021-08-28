@@ -21,6 +21,7 @@ class Styles: Stylesheet() {
 		val tableitem by cssclass()
 		
 		val tablecell by cssclass()
+		val disabledtablecell by cssclass()
 		val hoveredtablecell by cssclass()
 		
 		val tableheader by cssclass()
@@ -84,6 +85,12 @@ class Styles: Stylesheet() {
 		
 		CalendarView.selectedcolumn {
 			backgroundColor += c(0.95, 0.95, 0.95)
+			backgroundRadius += box(6.px)
+		}
+		
+		CalendarView.disabledtablecell {
+			backgroundColor += c(0.88, 0.88, 0.9)
+			backgroundRadius += box(6.px)
 		}
 		
 		CalendarView.tablecell {

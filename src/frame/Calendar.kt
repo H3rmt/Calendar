@@ -254,6 +254,8 @@ fun createcalendartab(pane: TabPane): Tab {
 	}
 }
 
+val detailspaneminHeight = 10
+
 fun createCellGraphics(
 	data: Celldisplay,
 	source: HBox,
@@ -267,6 +269,10 @@ fun createCellGraphics(
 		addClass(Styles.CalendarView.tablecell)
 		
 		if(data is Day) {
+			
+			if(!data.partofmonth)
+				addClass(Styles.CalendarView.disabledtablecell)
+			
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px
@@ -319,8 +325,12 @@ fun createCellGraphics(
 		
 		// appointments
 		val pane = pane {
-			style {
-				prefHeight = 10.px
+			style(append = true) {
+				// backgroundColor += Color.RED
+				// must be deactivated because style gets reset
+				// when any (mouse)events happen
+				//prefHeight = detailspaneminHeight.px
+				//minHeight = detailspaneminHeight.px
 			}
 		}
 		
@@ -344,11 +354,16 @@ fun createCellGraphics(
 			closetimeline.keyFrames.add(closeframe)
 		})
 		
-		opentimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), 10)))
+		opentimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), detailspaneminHeight)))
 		opentimeline.keyFrames.add(openframe)
 		
 		closetimeline.keyFrames.add(closeframe)
-		closetimeline.keyFrames.add(KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(pane.minHeightProperty(), 10)))
+		closetimeline.keyFrames.add(
+			KeyFrame(
+				Duration(getConfig(Configs.Animationspeed)),
+				KeyValue(pane.minHeightProperty(), detailspaneminHeight)
+			)
+		)
 		
 		pane.widthProperty().addListener { _ ->
 			if(data is Day) {

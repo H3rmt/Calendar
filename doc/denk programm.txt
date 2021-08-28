@@ -6,3 +6,5 @@ man hat dann auch ne Übersicht, über alle Termine mit bestimmter wichtigkeit i
 und was man bis da erledigen soll
 man kann auch reminder für die Termine machen
 
+limit appointments to 10 per day displayed in Calendar
+

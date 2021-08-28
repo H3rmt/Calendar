@@ -20,6 +20,16 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 				label {
 					text = day.toString()
 				}
+				for(app in week.getallappointmentssort()) {
+					label(app.key.toString()) {
+					
+					}
+					for(ap in app.value) {
+						label {
+							text = ap._description
+						}
+					}
+				}
 			}
 			
 			// used to shadow the overflow from tab
