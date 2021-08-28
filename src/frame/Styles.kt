@@ -47,7 +47,6 @@ class Styles: Stylesheet() {
 		}
 		
 		Menubar.gridpane {
-			prefWidth = 0.px
 			maxWidth = 300.px
 		}
 	}

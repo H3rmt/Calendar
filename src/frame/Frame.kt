@@ -7,13 +7,15 @@ import javafx.application.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.stage.*
-import logic.Exit
 import logic.LogType
 import logic.getLangString
 import logic.log
 import tornadofx.*
+import java.awt.Desktop
+import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.net.URI
 
 
 
@@ -73,203 +75,89 @@ class MainView: View("Calendar") {
 fun createmenubar(pane: BorderPane): MenuBar {
 	return pane.menubar {
 		menu(getLangString("options")) {
-			val itemwidth = 120.px
-			customitem {
-				gridpane {
-					addClass(Styles.Menubar.gridpane)
-					style(append = true) {
-						prefWidth = itemwidth
-					}
-					label(getLangString("Reload")) {
-						addClass(Styles.Menubar.itemname)
-						gridpaneConstraints {
-							columnIndex = 0
-						}
-					}
-					label {
-						gridpaneConstraints {
-							columnIndex = 1
-							hGrow = Priority.ALWAYS
-						}
-						style(append = true) {
-							prefWidth = 10.px
-						}
-					}
-					label("F5") {
-						addClass(Styles.Menubar.itemshortcut)
-						gridpaneConstraints {
-							columnIndex = 2
-							
-							hGrow = Priority.SOMETIMES
-						}
-					}
+			createMenugroup(
+				createmenuitem(this@menu, "Reload", "F5") { println("Reload") },
+				createmenuitem(this@menu, "Preferences", "Strg + ,") { println("Preferences") },
+				run { separator(); return@run null },
+				createmenuitem(this@menu, "Quit", "Strg + Q") {
+					log("exiting Program via quit", LogType.IMPORTANT)
+					Platform.exit()
 				}
-			}
-			customitem {
-				gridpane {
-					addClass(Styles.Menubar.gridpane)
-					style(append = true) {
-						prefWidth = itemwidth
-					}
-					label(getLangString("Preferences")) {
-						addClass(Styles.Menubar.itemname)
-						gridpaneConstraints {
-							columnIndex = 0
-						}
-					}
-					label {
-						gridpaneConstraints {
-							columnIndex = 1
-							hGrow = Priority.ALWAYS
-						}
-						style(append = true) {
-							prefWidth = 10.px
-						}
-					}
-					label("Strg + ,") {
-						addClass(Styles.Menubar.itemshortcut)
-						gridpaneConstraints {
-							columnIndex = 2
-							
-							hGrow = Priority.SOMETIMES
-						}
-					}
-				}
-			}
-			separator()
-			customitem {
-				gridpane {
-					addClass(Styles.Menubar.gridpane)
-					style(append = true) {
-						prefWidth = itemwidth
-					}
-					label(getLangString("Quit")) {
-						addClass(Styles.Menubar.itemname)
-						gridpaneConstraints {
-							columnIndex = 0
-						}
-					}
-					label {
-						gridpaneConstraints {
-							columnIndex = 1
-							hGrow = Priority.ALWAYS
-						}
-						style(append = true) {
-							prefWidth = 10.px
-						}
-					}
-					label("Strg + Q") {
-						addClass(Styles.Menubar.itemshortcut)
-						gridpaneConstraints {
-							columnIndex = 2
-							
-							hGrow = Priority.SOMETIMES
-						}
-					}
-				}
-			}
+			)
 		}
-		menu(getLangString("view")) {
-			menu(getLangString("show")) {
-				val itemwidth = 170.px
-				customitem {
-					gridpane {
-						addClass(Styles.Menubar.gridpane)
-						style(append = true) {
-							prefWidth = itemwidth
-						}
-						label(getLangString("Show Reminder")) {
-							addClass(Styles.Menubar.itemname)
-							gridpaneConstraints {
-								columnIndex = 0
-							}
-						}
-						label {
-							gridpaneConstraints {
-								columnIndex = 1
-								hGrow = Priority.ALWAYS
-							}
-							style(append = true) {
-								prefWidth = 10.px
-							}
-						}
-						label("Strg + Shift + R") {
-							addClass(Styles.Menubar.itemshortcut)
-							gridpaneConstraints {
-								columnIndex = 2
-								
-								hGrow = Priority.SOMETIMES
-							}
-						}
-					}
-				}
-				customitem {
-					gridpane {
-						addClass(Styles.Menubar.gridpane)
-						style(append = true) {
-							prefWidth = itemwidth
-						}
-						label(getLangString("Show Calendar")) {
-							addClass(Styles.Menubar.itemname)
-							gridpaneConstraints {
-								columnIndex = 0
-							}
-						}
-						label {
-							gridpaneConstraints {
-								columnIndex = 1
-								hGrow = Priority.ALWAYS
-							}
-							style(append = true) {
-								prefWidth = 10.px
-							}
-						}
-						label("Strg + Shift + C") {
-							addClass(Styles.Menubar.itemshortcut)
-							gridpaneConstraints {
-								columnIndex = 2
-								hGrow = Priority.SOMETIMES
-							}
-						}
-					}
-				}
-			}
+		menu(getLangString("show")) {
+			createMenugroup(
+				createmenuitem(this@menu, "Show Reminder", "Strg + Shift + R") { println("Show Reminder") },
+				createmenuitem(this@menu, "Show Calendar", "Strg + Shift + C") { println("Show Calendar") }
+			)
 		}
 		menu(getLangString("help")) {
-			val itemwidth = 80.px
-			customitem {
-				gridpane {
-					addClass(Styles.Menubar.gridpane)
-					style(append = true) {
-						prefWidth = itemwidth
+			createMenugroup(
+				createmenuitem(this@menu, "Github", "") {
+					log("Open Github", LogType.IMPORTANT)
+					try {
+						Desktop.getDesktop().browse(URI("https://google.com"))
+					} catch(e: IOException) {
+						log("failed to open browser", LogType.WARNING)
 					}
-					label(getLangString("help")) {
-						addClass(Styles.Menubar.itemname)
-						gridpaneConstraints {
-							columnIndex = 0
-						}
+				},
+				run { separator(); return@run null },
+				createmenuitem(this@menu, "Help", "") { println("Help") }
+			)
+		}
+	}
+}
+
+fun createMenugroup(vararg panes: GridPane?) {
+	var maxWidth = 10.0
+	val items = panes.filterNotNull()
+	val changed = mutableListOf<GridPane>()
+	items.forEach { item ->
+		item.apply {
+			widthProperty().addListener(ChangeListener { _, _, newwidth ->
+				if(!changed.contains(this))
+					changed.add(this)
+				if(newwidth.toDouble() > maxWidth)
+					maxWidth = newwidth.toDouble()
+				if(changed.size == items.size)
+					items.forEach {
+						it.prefWidth = maxWidth
 					}
-					label {
-						gridpaneConstraints {
-							columnIndex = 1
-							hGrow = Priority.ALWAYS
-						}
-						style(append = true) {
-							prefWidth = 10.px
-						}
-					}
-					label("Strg + H") {
-						addClass(Styles.Menubar.itemshortcut)
-						gridpaneConstraints {
-							columnIndex = 2
-							hGrow = Priority.SOMETIMES
-						}
+			})
+		}
+	}
+}
+
+fun createmenuitem(menu: Menu, name: String, shortcut: String, action: () -> Unit): GridPane? {
+	var grid: GridPane? = null
+	menu.customitem {
+		grid = gridpane {
+			addClass(Styles.Menubar.gridpane)
+			
+			label(getLangString(name)) {
+				addClass(Styles.Menubar.itemname)
+				gridpaneConstraints {
+					columnRowIndex(0, 0)
+				}
+			}
+			label {
+				gridpaneConstraints {
+					columnRowIndex(1, 0)
+					hGrow = Priority.ALWAYS
+					style {
+						minWidth = 15.px
 					}
 				}
 			}
-			action {
-				println("HELP")
+			label(shortcut) {
+				addClass(Styles.Menubar.itemshortcut)
+				gridpaneConstraints {
+					columnRowIndex(2, 0)
+				}
 			}
 		}
+		action(action)
 	}
+	
+	return grid
 }
