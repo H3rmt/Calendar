@@ -23,7 +23,6 @@ import tornadofx.*
 import java.io.FileInputStream
 
 
-
 fun createcalendartab(pane: TabPane): Tab {
 	return pane.tab("Calender") {
 		isClosable = false
@@ -41,6 +40,7 @@ fun createcalendartab(pane: TabPane): Tab {
 					borderWidth += box(5.px)
 				}
 				
+				// Top bar
 				hbox {
 					alignment = Pos.CENTER
 					spacing = 40.0
@@ -149,10 +149,16 @@ fun createcalendartab(pane: TabPane): Tab {
 								
 								val expand = SimpleDoubleProperty(0.0)
 								
-								cells.add(createCellGraphics(week.general, this@hbox, opentimeline, closetimeline, expand)[0] as VBox)
-								
 								val openappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
 								val closeappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
+								
+								
+								val temp = createCellGraphics(week.general, this@hbox, opentimeline, closetimeline, expand)
+								cells.add(temp[0] as VBox)
+								@Suppress("UNCHECKED_CAST")
+								openappointmentopenanimations.add(temp[1] as MutableList<Animation>)
+								@Suppress("UNCHECKED_CAST")
+								closeappointmentopenanimations.add(temp[2] as MutableList<Animation>)
 								
 								week.alldays.forEach {
 									val tmp = createCellGraphics(it, this@hbox, opentimeline, closetimeline, expand)
@@ -269,7 +275,6 @@ fun createCellGraphics(
 		addClass(Styles.CalendarView.tablecell)
 		
 		if(data is Day) {
-			
 			if(!data.partofmonth)
 				addClass(Styles.CalendarView.disabledtablecell)
 			
@@ -323,13 +328,13 @@ fun createCellGraphics(
 			}
 		}
 		
-		// appointments
+		// appointments / weekdetails
 		val pane = pane {
 			style(append = true) {
-				// backgroundColor += Color.RED
+				//backgroundColor += Color.RED
 				// must be deactivated because style gets reset
 				// when any (mouse)events happen
-				//prefHeight = detailspaneminHeight.px
+				prefHeight = detailspaneminHeight.px
 				//minHeight = detailspaneminHeight.px
 			}
 		}
@@ -378,15 +383,69 @@ fun createCellGraphics(
 	return arrayOf(graphicContainer, animations[0], animations[1])
 }
 
-fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<Animation>>): Double {
-	return 10.0
-}
 
 val spacing = 4.0
 val circlewidth = 8.0
 
 val vtopmargin = 4.0
 val hleftmargin = 8.0
+
+fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<Animation>>): Double {
+	pane.clear()
+	
+	// make width even because ,5 pixel are not supported <-(AI said this)
+	val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
+	
+	val ycords = mutableListOf<Double>()
+	for(index in 0 until week.getallappointmentssort().size) {
+		ycords.add(hleftmargin + index * (spacing * 2 + circlewidth))
+	}
+	
+	for((index, appointmententry) in week.getallappointmentssort().entries.withIndex()) {
+		pane.hbox(alignment = Pos.CENTER_LEFT, spacing = spacing) {
+			circle(radius = circlewidth / 2) {
+				fill = appointmententry.key.getColor()
+			}
+			label("${appointmententry.value.size}:${appointmententry.key}") {
+				addClass(Styles.CalendarView.cellappointtypelabel)
+				maxWidth = width - hleftmargin - circlewidth
+				ellipsisString = ".."
+				textOverrun = OverrunStyle.ELLIPSIS
+			}
+			
+			translateX = circlewidth / 2
+			translateY = ycords[index] - circlewidth
+			opacity = 0.0
+		}
+	}
+	
+	val openTransitions = mutableListOf<Animation>()
+	val closeTransitions = mutableListOf<Animation>()
+	
+	for(label in pane.getChildList()?.filterIsInstance<HBox>()!!) {
+		val openfadeTransition = Timeline(
+			KeyFrame(Duration(0.0), KeyValue(label.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3 * 2), KeyValue(label.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label.opacityProperty(), 1.0))
+		)
+		openTransitions.add(openfadeTransition)
+		
+		val closefadeTransition = Timeline(
+			KeyFrame(Duration(0.0), KeyValue(label.opacityProperty(), 1.0)),
+			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3), KeyValue(label.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label.opacityProperty(), 0.0))
+		)
+		closeTransitions.add(closefadeTransition)
+	}
+	
+	animations[0].clear()
+	animations[0].addAll(openTransitions)
+	animations[1].clear()
+	animations[1].addAll(closeTransitions)
+	
+	return (ycords.getOrNull(ycords.lastIndex) ?: 0.0) + vtopmargin * 2
+	
+}
 
 fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<Animation>>): Double {
 	pane.clear()
@@ -425,7 +484,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	val ycords = mutableListOf<Double>()
 	for(index in 0 until day.appointments.size) {
-		ycords.add(8.0 + index * (spacing + circlewidth))
+		ycords.add(hleftmargin + index * (spacing + circlewidth))
 	}
 	
 	for((index, appointment) in day.appointments.withIndex()) {

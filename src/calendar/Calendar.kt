@@ -56,7 +56,7 @@ fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 			
 			if(Random.nextBoolean()) {
 				for(num in 0..Random.nextInt(0, 10)) {
-					days[days.size - 1].appointments.add(Appointment("Arbeit Text ttttt", Types.School))
+					days[days.size - 1].appointments.add(Appointment("Löng Text", Types.values().random()))
 				}
 			}
 			

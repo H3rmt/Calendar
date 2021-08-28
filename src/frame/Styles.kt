@@ -30,6 +30,7 @@ class Styles: Stylesheet() {
 		val celllabel by cssclass()
 		val cellheaderlabel by cssclass()
 		val cellappointlabel by cssclass()
+		val cellappointtypelabel by cssclass()
 	}
 	
 	init {
@@ -122,6 +123,10 @@ class Styles: Stylesheet() {
 		
 		CalendarView.cellappointlabel {
 			fontSize = 10.px
+		}
+		
+		CalendarView.cellappointtypelabel {
+			fontSize = 12.px
 		}
 	}
 }
