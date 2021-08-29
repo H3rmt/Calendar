@@ -260,7 +260,7 @@ fun createcalendartab(pane: TabPane): Tab {
 	}
 }
 
-val detailspaneminHeight = 10
+val detailspaneminHeight = 8
 
 fun createCellGraphics(
 	data: Celldisplay,

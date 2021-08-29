@@ -8,17 +8,24 @@ import logic.getLangString
 import logic.initCofigs
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.FileReader
 import java.io.StringReader
-import java.nio.charset.Charset
 import java.security.SecureRandom
+import java.security.spec.KeySpec
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.LocalDate
+import java.time.Month
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.IsoFields
 import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
-import kotlin.random.Random
+import javax.crypto.spec.PBEKeySpec
+import javax.crypto.spec.SecretKeySpec
 
 
 
@@ -32,10 +39,15 @@ val currentmonth: ObservableList<Week> = FXCollections.observableArrayList()
 val currentmonthName: SimpleStringProperty = SimpleStringProperty()
 
 // https://www.baeldung.com/java-aes-encryption-decryption
-fun generateKey(): SecretKey {
-	val keyGenerator = KeyGenerator.getInstance("AES")
-	keyGenerator.init(256)
-	return keyGenerator.generateKey()
+
+fun getKeyFromPassword(password: String): SecretKey {
+	val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+	val spec: KeySpec = PBEKeySpec(
+		password.toCharArray(),
+		byteArrayOf(2, -127, 65, -67, -17, 65, 67, 36, -17, 65, -67, -17, -65, -67, -17, -65, -67, 20, 19),
+		65536, 256
+	)
+	return SecretKeySpec(factory.generateSecret(spec).encoded, "AES")
 }
 
 fun generateIv(): IvParameterSpec {
@@ -57,14 +69,14 @@ fun encrypt(algorithm: String, input: ByteArray, key: SecretKey, iv: IvParameter
 }
 
 
-fun main() {
+fun maino() {
 	initCofigs()
 	setMonth(true)
 	
 	val save = getJson().toJson(currentmonth)
 	println(save)
 	
-	val key: SecretKey = generateKey()
+	val key: SecretKey = getKeyFromPassword("lulpswrd")
 	val ivParameterSpec: IvParameterSpec = generateIv()
 	val algorithm = "AES/CBC/PKCS5Padding"
 	val cipherText = encrypt(algorithm, save.toByteArray(), key, ivParameterSpec)
@@ -104,6 +116,77 @@ fun setMonth(right: Boolean) {
 	currentmonth.addAll(data)
 }
 
+fun main() {
+	prepareAppointments()
+	println(preparedsingleAppointments)
+	println(preparedweeklyAppointments)
+}
+
+// Year: { Month: { WeekDay: Appointments } }
+val preparedsingleAppointments: MutableMap<Int, MutableMap<Month, MutableMap<DayOfWeek, MutableList<Appointment>>>> = mutableMapOf()
+
+// Day: { Appointments }
+val preparedweeklyAppointments: MutableMap<DayOfWeek, MutableList<Appointment>> = mutableMapOf()
+
+fun createAppointment(appointment: Map<String, Any>): Appointment? {
+	try {
+		if(appointment.containsKey("day") && appointment.containsKey("start") &&
+			appointment.containsKey("duration") && appointment.containsKey("type") &&
+			appointment.containsKey("title") && appointment.containsKey("description")
+		) {
+			return Appointment(
+				appointment["day"] as String, (appointment["start"] as Double).toLong(),
+				(appointment["duration"] as Double).toLong(), appointment["type"] as String,
+				appointment["title"] as String, Types.valueOf(appointment["type"] as String)
+			)
+		}
+	} catch(e: Exception) {
+		println(e)
+	}
+	return null
+}
+
+fun prepareAppointments() {
+	val read: Map<String, ArrayList<Map<String, Any>>> = getJson().fromJson(getJsonReader(FileReader("data/test.json")), Map::class.java)
+	
+	read.forEach { (t, u) ->
+		when(t) {
+			"single Appointments" -> {
+				u.forEach {
+					val appointment = createAppointment(it)
+					appointment?.apply {
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneId.systemDefault())
+						
+						val offset: ZoneOffset = ZoneId.systemDefault().rules.getOffset(Instant.ofEpochSecond(start * 60))
+						start -= time.atStartOfDay().toLocalTime().toEpochSecond(time, offset) / 60
+						
+						if(!preparedsingleAppointments.containsKey(time.year))
+							preparedsingleAppointments[time.year] = mutableMapOf()
+						if(!preparedsingleAppointments[time.year]!!.containsKey(time.month))
+							preparedsingleAppointments[time.year]!![time.month] = mutableMapOf()
+						if(!preparedsingleAppointments[time.year]!![time.month]!!.containsKey(time.dayOfWeek))
+							preparedsingleAppointments[time.year]!![time.month]!![time.dayOfWeek] = mutableListOf()
+						
+						preparedsingleAppointments[time.year]!![time.month]!![time.dayOfWeek]!!.add(this)
+					}
+				}
+			}
+			"Week Appointments" -> {
+				// preparedweeklyAppointments
+				u.forEach {
+					val appointment = createAppointment(it)
+					appointment?.apply {
+						if(!preparedweeklyAppointments.containsKey(DayOfWeek.valueOf(day)))
+							preparedweeklyAppointments[DayOfWeek.valueOf(day)] = mutableListOf()
+						
+						preparedweeklyAppointments[DayOfWeek.valueOf(day)]!!.add(this)
+					}
+				}
+			}
+		}
+	}
+}
+
 
 fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 	var time: ZonedDateTime = monthtime.withDayOfMonth(1)
@@ -119,13 +202,6 @@ fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 		do {
 			days.add(Day(time, time.month == month))
 			time = time.plusDays(1)
-			
-			if(Random.nextBoolean()) {
-				for(num in 0..Random.nextInt(0, 10)) {
-					days[days.size - 1].appointments.add(Appointment("Löng Text", Types.values().random()))
-				}
-			}
-			
 		} while(time.dayOfWeek.value != 1)
 		
 		val weekOfYear: Int = time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)

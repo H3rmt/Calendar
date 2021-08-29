@@ -6,6 +6,7 @@ import logic.Configs
 import logic.getConfig
 import logic.getLangString
 import java.time.ZonedDateTime
+import kotlin.reflect.full.memberProperties
 
 
 interface Celldisplay
@@ -71,7 +72,21 @@ class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 	}
 }
 
-class Appointment(_description: String, _type: Types) {
+class Appointment(_day: String, _start: Long, _duration: Long, _title: String, _description: String, _type: Types) {
+	
+	@Expose
+	// stored in minutes instead of milliseconds (60000 to 1)
+	var day = _day
+	
+	@Expose
+	var start = _start
+	
+	@Expose
+	// stored in minutes instead of seconds (60 to 1)
+	val duration = _duration
+	
+	@Expose
+	val title = _title
 	
 	@Expose
 	val description = _description
@@ -79,17 +94,22 @@ class Appointment(_description: String, _type: Types) {
 	@Expose
 	val type = _type
 	
+	override fun toString(): String {
+		var s = "Appointment{"
+		this::class.memberProperties.forEach { s += it.name + ":" + it.getter.call(this) + " " }
+		return "$s}"
+	}
 }
 
 enum class Types {
 	Work,
-	Private,
+	Sport,
 	School;
 	
 	fun getColor(): Paint {
 		return when(this) {
 			Work -> Color.BLUE
-			Private -> Color.BLACK
+			Sport -> Color.BLACK
 			School -> Color.RED
 		}
 	}

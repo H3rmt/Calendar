@@ -1,0 +1,47 @@
+{
+	"single Appointments": [
+		{
+			"day": "Monday",
+			"start": 27171330,
+			"duration": 19500,
+			"type": "School",
+			"title": "Work",
+			"description": "Very important"
+		},
+		{
+			"day": "Tuesday",
+			"start": 27171900,
+			"duration": 11500,
+			"type": "Work",
+			"title": "Work",
+			"description": "Less important"
+		},
+		{
+			"day": "Saturday",
+			"start": 27171300,
+			"duration": 19500,
+			"type": "Sport",
+			"title": "Leichtathletik",
+			"description": "Important"
+		}
+	],
+	"Week Appointments": [
+		{
+			"start and duration measured in": "minutes because seconds are irrelevant",
+			"day": "MONDAY",
+			"start": 420,
+			"duration": 120,
+			"type": "Work",
+			"title": "Work",
+			"description": "Very Important"
+		},
+		{
+			"day": "TUESDAY",
+			"start": 560,
+			"duration": 350,
+			"type": "Sport",
+			"title": "Leichtathletik",
+			"description": "Very Important"
+		}
+	]
+}
