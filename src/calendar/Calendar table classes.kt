@@ -1,6 +1,9 @@
 package calendar
 
+import com.google.gson.annotations.Expose
 import javafx.scene.paint.*
+import logic.Configs
+import logic.getConfig
 import logic.getLangString
 import java.time.ZonedDateTime
 
@@ -23,6 +26,7 @@ class Week(
 	
 	var general = this
 	
+	@Expose
 	val alldays = arrayOf(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday)
 	
 	fun getallappointments(): List<Appointment> {
@@ -36,9 +40,9 @@ class Week(
 	fun getallappointmentssort(): Map<Types, List<Appointment>> {
 		val list = mutableMapOf<Types, MutableList<Appointment>>()
 		for(appointment in getallappointments()) {
-			if(list[appointment._type] == null)
-				list[appointment._type] = mutableListOf()
-			list[appointment._type]!!.add(appointment)
+			if(list[appointment.type] == null)
+				list[appointment.type] = mutableListOf()
+			list[appointment.type]!!.add(appointment)
 		}
 		return list
 	}
@@ -48,19 +52,33 @@ class Week(
 	}
 }
 
-class Day(_time: ZonedDateTime, val partofmonth: Boolean): Celldisplay {
+class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 	
 	val time: ZonedDateTime = _time
 	
+	@Expose
+	val partofmonth: Boolean = _partofmonth
+	
+	@Expose
 	val appointments: MutableList<Appointment> = mutableListOf()
+	
+	fun getappointmentslimit(): List<Appointment> {
+		return appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
+	}
 	
 	override fun toString(): String {
 		return "${time.dayOfMonth}:${time.dayOfWeek}"
 	}
 }
 
-class Appointment(val _description: String, val _type: Types) {
-
+class Appointment(_description: String, _type: Types) {
+	
+	@Expose
+	val description = _description
+	
+	@Expose
+	val type = _type
+	
 }
 
 enum class Types {

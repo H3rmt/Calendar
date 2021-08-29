@@ -5,5 +5,7 @@
 	"printlogs": true,
 	"logformat": "[%1$tF %1$tT] |%4$-10s %5$s %n",
 	"Animationspeed": 300,
-	"Animationdelay": 120
+	"Animationdelay": 120,
+	"MaxDayAppointments": 8,
+	"lul": true
 }

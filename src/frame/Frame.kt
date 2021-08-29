@@ -7,7 +7,10 @@ import javafx.application.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.stage.*
+import logic.Configs
+import logic.Exit
 import logic.LogType
+import logic.getConfig
 import logic.getLangString
 import logic.log
 import tornadofx.*
@@ -28,14 +31,29 @@ fun frameInit() {
 	createLoading()
 	setMonth(true)
 	
-	
+	/**
+	 * this looks pretty weird, but it essentially
+	 * creates a stacktrace with the head of an Exit
+	 * and the StackTrace of the actual exception
+	 *
+	 * /*
+	 * if it is not an Exit(custom Exception) then
+	 * Exit<errorocode> -> Exception is added at the beginning
+	 * */
+	 *
+	 * @see Exit
+	 */
 	DefaultErrorHandler.filter = {
-		var error = it.error
-		//if(it.error::class != Exit::class)
-		//	error = Exit("frame exception", it.error as Exception)
-		
 		val writer = StringWriter()
-		error.printStackTrace(PrintWriter(writer))
+		
+		//if(it.error::class != Exit::class) {
+		writer.append("Exit <ErrorCode: Frame Exception> -> ")
+		//}
+		
+		if(getConfig(Configs.Printstacktrace))
+			it.error.printStackTrace(PrintWriter(writer))
+		else
+			writer.append(it.error.toString())
 		log(writer, LogType.ERROR)
 		
 		// uncomment if errorpopup should be disabled TODO(Release)
@@ -65,6 +83,7 @@ class MainView: View("Calendar") {
 		top = createmenubar(this)
 		log("created menubar", LogType.IMPORTANT)
 		center = tabpane {
+			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
 			createcalendartab(this@tabpane)
 			log("created calendartab")
 		}
@@ -76,8 +95,8 @@ fun createmenubar(pane: BorderPane): MenuBar {
 	return pane.menubar {
 		menu(getLangString("options")) {
 			createMenugroup(
-				createmenuitem(this@menu, "Reload", "F5") { println("Reload") },
-				createmenuitem(this@menu, "Preferences", "Strg + ,") { println("Preferences") },
+				createmenuitem(this@menu, "Reload", "F5") { log("Reload") },
+				createmenuitem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
 				run { separator(); return@run null },
 				createmenuitem(this@menu, "Quit", "Strg + Q") {
 					log("exiting Program via quit", LogType.IMPORTANT)
@@ -87,8 +106,8 @@ fun createmenubar(pane: BorderPane): MenuBar {
 		}
 		menu(getLangString("show")) {
 			createMenugroup(
-				createmenuitem(this@menu, "Show Reminder", "Strg + Shift + R") { println("Show Reminder") },
-				createmenuitem(this@menu, "Show Calendar", "Strg + Shift + C") { println("Show Calendar") }
+				createmenuitem(this@menu, "Show Reminder", "Strg + Shift + R") { log("Show Reminder") },
+				createmenuitem(this@menu, "Show Calendar", "Strg + Shift + C") { log("Show Calendar") }
 			)
 		}
 		menu(getLangString("help")) {
@@ -96,13 +115,13 @@ fun createmenubar(pane: BorderPane): MenuBar {
 				createmenuitem(this@menu, "Github", "") {
 					log("Open Github", LogType.IMPORTANT)
 					try {
-						Desktop.getDesktop().browse(URI("https://google.com"))
+						Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
 					} catch(e: IOException) {
 						log("failed to open browser", LogType.WARNING)
 					}
 				},
 				run { separator(); return@run null },
-				createmenuitem(this@menu, "Help", "") { println("Help") }
+				createmenuitem(this@menu, "Help", "") { log("Help") }
 			)
 		}
 	}

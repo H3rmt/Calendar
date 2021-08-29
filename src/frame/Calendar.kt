@@ -398,7 +398,7 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	
 	val ycords = mutableListOf<Double>()
 	for(index in 0 until week.getallappointmentssort().size) {
-		ycords.add(hleftmargin + index * (spacing * 2 + circlewidth))
+		ycords.add(vtopmargin + index * (spacing * 2 + circlewidth))
 	}
 	
 	for((index, appointmententry) in week.getallappointmentssort().entries.withIndex()) {
@@ -450,22 +450,25 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<Animation>>): Double {
 	pane.clear()
 	
+	val appointments = day.getappointmentslimit()
+	val limited = appointments.size != day.appointments.size
+	
 	// make width even because ,5 pixel are not supported <-(AI said this)
 	val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
 	
-	val topspacing: Double = maxOf(2.0, minOf(spacing, (((width - spacing) / day.appointments.size) / 3)))
+	val topspacing: Double = maxOf(2.0, minOf(spacing, (((width - spacing) / appointments.size) / 3)))
 	val topcirclewidth: Double = topspacing * 2
 	
 	val xcords = mutableListOf<Double>()
 	
-	if(day.appointments.size % 2 == 0) {
-		for(index in 0 until day.appointments.size / 2) {
+	if(appointments.size % 2 == 0) {
+		for(index in 0 until appointments.size / 2) {
 			xcords.add((width / 2) + ((topspacing / 2) + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
 			xcords.add((width / 2) - ((topspacing / 2) + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
 		}
 	} else {
 		xcords.add(width / 2)
-		for(index in 0 until (day.appointments.size - 1) / 2) {
+		for(index in 0 until (appointments.size - 1) / 2) {
 			xcords.add((width / 2) + ((topcirclewidth / 2) + topspacing + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
 			xcords.add((width / 2) - ((topcirclewidth / 2) + topspacing + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
 		}
@@ -474,27 +477,44 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	// better animation because vertical are sorted from top to bottom
 	xcords.sortDescending()
 	
-	for((index, appointment) in day.appointments.withIndex()) {
+	for((index, appointment) in appointments.withIndex()) {
 		pane.circle(radius = topcirclewidth / 2) {
-			fill = appointment._type.getColor()
+			fill = appointment.type.getColor()
 			centerY = vtopmargin
 			centerX = xcords[index]
 		}
 	}
 	
 	val ycords = mutableListOf<Double>()
-	for(index in 0 until day.appointments.size) {
-		ycords.add(hleftmargin + index * (spacing + circlewidth))
+	for(index in appointments.indices) {
+		ycords.add(vtopmargin + index * (spacing + circlewidth))
 	}
 	
-	for((index, appointment) in day.appointments.withIndex()) {
-		pane.label(appointment._description) {
+	if(limited) {
+		ycords.add(vtopmargin + ycords.size * (spacing + circlewidth))
+	}
+	
+	for((index, appointment) in appointments.withIndex()) {
+		pane.label(appointment.description) {
 			addClass(Styles.CalendarView.cellappointlabel)
 			translateX = hleftmargin + circlewidth
 			translateY = ycords[index] - circlewidth / 1.1
-			maxWidth = width - hleftmargin - circlewidth
 			opacity = 0.0
 			
+			maxWidth = width - hleftmargin - circlewidth
+			ellipsisString = ".."
+			textOverrun = OverrunStyle.ELLIPSIS
+		}
+	}
+	
+	if(limited) {
+		pane.label("...........") {
+			addClass(Styles.CalendarView.cellappointtypelabel)
+			translateX = hleftmargin
+			translateY = ycords[ycords.size - 1] - circlewidth / 1.1
+			opacity = 0.0
+			
+			maxWidth = width - hleftmargin
 			ellipsisString = ".."
 			textOverrun = OverrunStyle.ELLIPSIS
 		}
@@ -503,7 +523,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	val openTransitions = mutableListOf<Animation>()
 	val closeTransitions = mutableListOf<Animation>()
 	
-	for(index in 0 until day.appointments.size) {
+	for(index in appointments.indices) {
 		val circle = pane.getChildList()?.filterIsInstance<Circle>()?.get(index)
 		val label = pane.getChildList()?.filterIsInstance<Label>()?.get(index)
 		
@@ -531,6 +551,23 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 			)
 		)
 		closeTransitions.add(PathTransition(Duration(getConfig(Configs.Animationspeed)), closepath, circle))
+		
+		val closefadeTransition = Timeline(
+			KeyFrame(Duration(0.0), KeyValue(label?.opacityProperty(), 1.0)),
+			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3), KeyValue(label?.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label?.opacityProperty(), 0.0))
+		)
+		closeTransitions.add(closefadeTransition)
+	}
+	
+	if(limited) {
+		val label = pane.getChildList()?.filterIsInstance<Label>()?.last()
+		val openfadeTransition = Timeline(
+			KeyFrame(Duration(0.0), KeyValue(label?.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3 * 2), KeyValue(label?.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label?.opacityProperty(), 1.0))
+		)
+		openTransitions.add(openfadeTransition)
 		
 		val closefadeTransition = Timeline(
 			KeyFrame(Duration(0.0), KeyValue(label?.opacityProperty(), 1.0)),

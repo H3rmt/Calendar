@@ -26,7 +26,7 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 					}
 					for(ap in app.value) {
 						label {
-							text = ap._description
+							text = ap.description
 						}
 					}
 				}

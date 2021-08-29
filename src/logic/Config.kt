@@ -1,19 +1,23 @@
 package logic
 
 import com.google.gson.FieldNamingPolicy
+import com.google.gson.FieldNamingStrategy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.google.gson.stream.JsonReader
 import java.io.File
 import java.io.FileReader
+import java.io.PrintWriter
 import java.io.Reader
 import java.io.StringReader
+import java.io.StringWriter
 import kotlin.collections.set
 import kotlin.reflect.typeOf
 
 
-private val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create()
+private val gson: Gson = GsonBuilder()/*.setPrettyPrinting()*/.setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+	.excludeFieldsWithoutExposeAnnotation().setFieldNamingStrategy(FieldNamingStrategy { return@FieldNamingStrategy it.name }).create()
 
 /**
  * general JSON reader and writer
@@ -60,7 +64,8 @@ fun initCofigs() {
 				"  \"printlogs\": true,\n" +
 				"  \"logformat\": \"[%1\$tF %1\$tT] |%4\$-10s %5\$s %n\", \n" +
 				"  \"Animationspeed\": 300,\n" +
-				"  \"Animationdelay\": 80\n" +
+				"  \"Animationdelay\": 80,\n" +
+				"  \"MaxDayAppointments\": 8\n" +
 				"}"
 		file.writeText(default)
 		log("created default config:${getconfigfile()}", LogType.WARNING)
@@ -73,7 +78,7 @@ fun initCofigs() {
 				configs[getJson().fromJson(getJsonReader(StringReader(it.key.trim().capitalize())), Configs::class.java)] = it.value
 			} catch(e: NullPointerException) {
 				log("Unknown config key: ${it.key}", LogType.WARNING)
-				//Warning("g294n3")
+				Warning("g294n3", e)
 			}
 		}
 	} catch(e: NullPointerException) {
@@ -117,7 +122,7 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 				}
 			} catch(e: ClassCastException) {
 				log("Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}", LogType.WARNING)
-				//TODO Warning
+				Warning("TODO()", e)
 				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
 					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.WARNING)
 					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
@@ -154,6 +159,7 @@ var stacktrace = true
  * @throws Exception
  */
 class Exit(private val code: String, private val exception: Exception? = null): Exception(code) {
+	
 	override fun fillInStackTrace(): Throwable {
 		return if(stacktrace)
 			super.fillInStackTrace()
@@ -162,16 +168,30 @@ class Exit(private val code: String, private val exception: Exception? = null): 
 	}
 	
 	override fun toString(): String {
-		return "Exception <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
+		return "Exit <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
 	}
 }
 
+fun Warning(code: String, exception: Exception) {
+	try {
+		throw Exit(code, exception)
+	} catch(e: Exit) {
+		val writer = StringWriter()
+		
+		if(getConfig(Configs.Printstacktrace))
+			e.printStackTrace(PrintWriter(writer))
+		else
+			writer.append(e.toString())
+		
+		log(writer, LogType.ERROR)
+	}
+}
 
 /**
  * only Configs in this Config enum are loaded from config.json
  */
 enum class Configs {
-	Language, Debug, Printlogs, Logformat, Printstacktrace, Animationspeed, Animationdelay
+	Language, Debug, Printlogs, Logformat, Printstacktrace, Animationspeed, Animationdelay, MaxDayAppointments
 }
 
 fun getlogfile(): String = "Calendar.log"
