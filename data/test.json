@@ -42,6 +42,14 @@
 			"type": "Sport",
 			"title": "Leichtathletik",
 			"description": "Very Important"
+		},
+		{
+			"day": "TUESDAY",
+			"start": 860,
+			"duration": 150,
+			"type": "School",
+			"title": "Maths",
+			"description": "ne"
 		}
 	]
 }

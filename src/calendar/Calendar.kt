@@ -2,6 +2,7 @@ package calendar
 
 import javafx.beans.property.*
 import javafx.collections.*
+import logic.Warning
 import logic.getJson
 import logic.getJsonReader
 import logic.getLangString
@@ -118,6 +119,7 @@ fun setMonth(right: Boolean) {
 
 fun main() {
 	prepareAppointments()
+	initCofigs()
 	println(preparedsingleAppointments)
 	println(preparedweeklyAppointments)
 }
@@ -141,7 +143,7 @@ fun createAppointment(appointment: Map<String, Any>): Appointment? {
 			)
 		}
 	} catch(e: Exception) {
-		println(e)
+		Warning("TODO", e)
 	}
 	return null
 }
@@ -149,10 +151,10 @@ fun createAppointment(appointment: Map<String, Any>): Appointment? {
 fun prepareAppointments() {
 	val read: Map<String, ArrayList<Map<String, Any>>> = getJson().fromJson(getJsonReader(FileReader("data/test.json")), Map::class.java)
 	
-	read.forEach { (t, u) ->
-		when(t) {
+	read.forEach { (name, list) ->
+		when(name) {
 			"single Appointments" -> {
-				u.forEach {
+				list.forEach {
 					val appointment = createAppointment(it)
 					appointment?.apply {
 						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneId.systemDefault())
@@ -172,14 +174,20 @@ fun prepareAppointments() {
 				}
 			}
 			"Week Appointments" -> {
-				// preparedweeklyAppointments
-				u.forEach {
+				list.forEach {
 					val appointment = createAppointment(it)
 					appointment?.apply {
+						try {
+							DayOfWeek.valueOf(day)
+						} catch(e: IllegalArgumentException) {
+							Warning("TODO", e)
+							return@apply
+						}
 						if(!preparedweeklyAppointments.containsKey(DayOfWeek.valueOf(day)))
 							preparedweeklyAppointments[DayOfWeek.valueOf(day)] = mutableListOf()
 						
 						preparedweeklyAppointments[DayOfWeek.valueOf(day)]!!.add(this)
+						
 					}
 				}
 			}
@@ -207,6 +215,7 @@ fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 		val weekOfYear: Int = time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 		
 		val week = Week(time.minusDays(7), days[0], days[1], days[2], days[3], days[4], days[5], days[6], weekOfYear)
+		week.addAppointments(preparedweeklyAppointments)
 		weeks.add(week)
 		//return weeks
 	} while(time.month == monthtime.month && time.dayOfMonth > 1)

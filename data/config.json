@@ -3,9 +3,22 @@
 	"debug": false,
 	"printstacktrace": true,
 	"printlogs": true,
-	"logformat": "[%1$tF %1$tT] |%4$-10s %5$s %n",
+	"logformat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
 	"Animationspeed": 300,
 	"Animationdelay": 120,
 	"MaxDayAppointments": 8,
-	"lul": true
+	"Appointmenttypes": [
+		{
+			"name": "Work",
+			"color": "#0000ff"
+		},
+		{
+			"name": "Sport",
+			"color": "#000000"
+		},
+		{
+			"name": "School",
+			"color": "ORANGE"
+		}
+	]
 }

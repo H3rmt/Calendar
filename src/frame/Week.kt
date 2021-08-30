@@ -4,6 +4,7 @@ import calendar.Day
 import calendar.Week
 import javafx.scene.control.*
 import javafx.scene.paint.*
+import javafx.scene.text.*
 import tornadofx.*
 
 fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
@@ -17,12 +18,23 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 			}
 			
 			vbox {
-				label {
-					text = day.toString()
+				style {
+					borderColor += box(Color.TRANSPARENT)
+					borderWidth += box(5.px)
+					borderRadius += box(10.px)
+				}
+				label(day.toString()) {
+					style {
+						fontSize = 18.px
+						fontWeight = FontWeight.BOLD
+					}
 				}
 				for(app in week.getallappointmentssort()) {
-					label(app.key.toString()) {
-					
+					label(app.key.name) {
+						style {
+							fontSize = 14.px
+							fontWeight = FontWeight.BOLD
+						}
 					}
 					for(ap in app.value) {
 						label {

@@ -1,5 +1,6 @@
 package logic
 
+import calendar.Types
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.FieldNamingStrategy
 import com.google.gson.Gson
@@ -57,16 +58,6 @@ fun initCofigs() {
 			dir.mkdirs()
 		}
 		file.createNewFile()
-		val default = "{\n" +
-				"  \"language\": \"en\",\n" +
-				"  \"debug\": false,\n" +
-				"  \"printstacktrace\": true,\n" +
-				"  \"printlogs\": true,\n" +
-				"  \"logformat\": \"[%1\$tF %1\$tT] |%4\$-10s %5\$s %n\", \n" +
-				"  \"Animationspeed\": 300,\n" +
-				"  \"Animationdelay\": 80,\n" +
-				"  \"MaxDayAppointments\": 8\n" +
-				"}"
 		file.writeText(default)
 		log("created default config:${getconfigfile()}", LogType.WARNING)
 	}
@@ -80,6 +71,7 @@ fun initCofigs() {
 				log("Unknown config key: ${it.key}", LogType.WARNING)
 				Warning("g294n3", e)
 			}
+			log("Loaded Config ${it.key}: ${it.value}", LogType.LOW)
 		}
 	} catch(e: NullPointerException) {
 		log("Config File missing", LogType.ERROR)
@@ -90,8 +82,13 @@ fun initCofigs() {
 	}
 	
 	language = Language(getConfig(Configs.Language))
+	log("loaded language $language", LogType.LOW)
 	
 	stacktrace = getConfig(Configs.Printstacktrace)
+	log("set stacktrace $stacktrace", LogType.LOW)
+	
+	Types.createTypes(getConfig(Configs.Appointmenttypes))
+	log("loaded Types ${Types.getTypes()}", LogType.LOW)
 }
 
 /**
@@ -191,7 +188,8 @@ fun Warning(code: String, exception: Exception) {
  * only Configs in this Config enum are loaded from config.json
  */
 enum class Configs {
-	Language, Debug, Printlogs, Logformat, Printstacktrace, Animationspeed, Animationdelay, MaxDayAppointments
+	Language, Debug, Printlogs, Logformat, Printstacktrace,
+	Animationspeed, Animationdelay, MaxDayAppointments, Appointmenttypes
 }
 
 fun getlogfile(): String = "Calendar.log"
@@ -210,5 +208,30 @@ lateinit var language: Language
  * @see Language
  */
 fun getLangString(str: String): String {
-	return language.get(str)
+	return language[str]
 }
+
+const val default = "{\n" +
+		"\t\"Language\": \"en\",\n" +
+		"\t\"debug\": false,\n" +
+		"\t\"printstacktrace\": true,\n" +
+		"\t\"printlogs\": true,\n" +
+		"\t\"logformat\": \"[%1\$tF %1\$tT] |%3\$-10s %4\$s %n\",\n" +
+		"\t\"Animationspeed\": 300,\n" +
+		"\t\"Animationdelay\": 120,\n" +
+		"\t\"MaxDayAppointments\": 8,\n" +
+		"\t\"Appointmenttypes\": [\n" +
+		"\t\t{\n" +
+		"\t\t\t\"name\": \"Work\",\n" +
+		"\t\t\t\"color\": \"BLUE\"\n" +
+		"\t\t},\n" +
+		"\t\t{\n" +
+		"\t\t\t\"name\": \"Sport\",\n" +
+		"\t\t\t\"color\": \"BLACK\"\n" +
+		"\t\t},\n" +
+		"\t\t{\n" +
+		"\t\t\t\"name\": \"School\",\n" +
+		"\t\t\t\"color\": \"RED\"\n" +
+		"\t\t}\n" +
+		"\t]\n" +
+		"}"

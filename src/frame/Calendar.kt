@@ -38,6 +38,7 @@ fun createcalendartab(pane: TabPane): Tab {
 				style {
 					borderColor += box(Color.TRANSPARENT)
 					borderWidth += box(5.px)
+					borderRadius += box(10.px)
 				}
 				
 				// Top bar
@@ -160,7 +161,7 @@ fun createcalendartab(pane: TabPane): Tab {
 								@Suppress("UNCHECKED_CAST")
 								closeappointmentopenanimations.add(temp[2] as MutableList<Animation>)
 								
-								week.alldays.forEach {
+								week.alldays.values.forEach {
 									val tmp = createCellGraphics(it, this@hbox, opentimeline, closetimeline, expand)
 									cells.add(tmp[0] as VBox)
 									
@@ -221,7 +222,8 @@ fun createcalendartab(pane: TabPane): Tab {
 										removeClass(Styles.CalendarView.selectedcolumn)
 									}
 									if(it.clickCount > 1) {
-										val newtab = createweektab(pane, week, week.alldays.getOrNull(hoveredcell.value - 1))
+										val newtab =
+											createweektab(pane, week, week.alldays.values.toTypedArray().getOrNull(hoveredcell.value - 1))
 										pane.selectionModel.select(newtab)
 										// TODO check if opened
 									}
@@ -260,7 +262,7 @@ fun createcalendartab(pane: TabPane): Tab {
 	}
 }
 
-val detailspaneminHeight = 8
+const val detailspaneminHeight = 8
 
 fun createCellGraphics(
 	data: Celldisplay,
@@ -384,11 +386,11 @@ fun createCellGraphics(
 }
 
 
-val spacing = 4.0
-val circlewidth = 8.0
+const val spacing = 4.0
+const val circlewidth = 8.0
 
-val vtopmargin = 4.0
-val hleftmargin = 8.0
+const val vtopmargin = 4.0
+const val hleftmargin = 8.0
 
 fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<Animation>>): Double {
 	pane.clear()
@@ -404,9 +406,9 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	for((index, appointmententry) in week.getallappointmentssort().entries.withIndex()) {
 		pane.hbox(alignment = Pos.CENTER_LEFT, spacing = spacing) {
 			circle(radius = circlewidth / 2) {
-				fill = appointmententry.key.getColor()
+				fill = appointmententry.key.color
 			}
-			label("${appointmententry.value.size}:${appointmententry.key}") {
+			label("${appointmententry.value.size}:${appointmententry.key.name}") {
 				addClass(Styles.CalendarView.cellappointtypelabel)
 				maxWidth = width - hleftmargin - circlewidth
 				ellipsisString = ".."
@@ -479,7 +481,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	for((index, appointment) in appointments.withIndex()) {
 		pane.circle(radius = topcirclewidth / 2) {
-			fill = appointment.type.getColor()
+			fill = appointment.type.color
 			centerY = vtopmargin
 			centerX = xcords[index]
 		}

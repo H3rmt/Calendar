@@ -1,8 +1,5 @@
 package logic
 
-import java.io.PrintWriter
-import java.io.StringWriter
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.logging.ConsoleHandler
@@ -13,31 +10,37 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 
 
+
 var logger: Logger? = null
 
+lateinit var consoleHandler: ConsoleHandler
+lateinit var fileHandler: FileHandler
+
+fun updateLogger() {
+	fileHandler.level = if(getConfig(Configs.Debug)) Level.ALL else Level.CONFIG
+	consoleHandler.formatter = SimpleFormatter(getConfig(Configs.Logformat))
+	fileHandler.formatter = consoleHandler.formatter
+	if(!getConfig<Boolean>(Configs.Printlogs)) {
+		logger?.removeHandler(consoleHandler)
+	}
+}
+
 fun initLogger() {
-	val formatter = SimpleFormatter()
-	
 	logger = Logger.getLogger("")
-	
-	logger?.let {
-		it.removeHandler(it.handlers[0])  // remove ConsoleHandler
-		it.level = Level.ALL
-		
-		if(getConfig(Configs.Printlogs)) {
-			val consoleHandler = ConsoleHandler()
-			consoleHandler.level = Level.INFO
-			consoleHandler.formatter = formatter
-			it.addHandler(consoleHandler)
+	logger?.apply {
+		for(handler in handlers) {
+			removeHandler(handler)  // remove predefined ConsoleHandler
 		}
+		level = Level.ALL
 		
-		val fileHandler = FileHandler(getlogfile())
-		fileHandler.formatter = formatter
-		if(getConfig(Configs.Debug))
-			fileHandler.level = Level.ALL
-		else
-			fileHandler.level = Level.CONFIG
-		it.addHandler(fileHandler)
+		consoleHandler = ConsoleHandler()
+		consoleHandler.formatter = SimpleFormatter("[%1\$tF %1\$tT] |%3\$-10s %4\$s %n")
+		addHandler(consoleHandler)
+		
+		fileHandler = FileHandler(getlogfile())
+		fileHandler.formatter = SimpleFormatter("[%1\$tF %1\$tT] |%3\$-10s %4\$s %n")
+		fileHandler.level = Level.ALL
+		addHandler(fileHandler)
 	}
 }
 
@@ -50,18 +53,26 @@ fun initLogger() {
  * @see LogType
  */
 fun log(message: Any, type: LogType = LogType.NORMAL) {
-	logger?.let {
+	logger?.apply {
+		val caller: StackWalker.StackFrame =
+			StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { s -> s.skip(1).findFirst() }.get()
+		var callerstr = caller.declaringClass.simpleName.ifBlank { caller.declaringClass.name.replaceBefore('.', "").substring(1) }
+		callerstr += "." + caller.methodName + "(" + caller.fileName + ":" + caller.lineNumber + ")"
 		when(type) {
-			LogType.LOW -> it.log(Level.CONFIG, message.toString())
-			LogType.NORMAL -> it.log(Level.INFO, message.toString())
-			LogType.IMPORTANT -> it.log(Important(), message.toString())
-			LogType.WARNING -> it.log(Level.WARNING, message.toString())
-			LogType.ERROR -> it.log(Level.SEVERE, message.toString())
+			LogType.LOW -> log(Log(Level.CONFIG, message.toString(), callerstr))
+			LogType.NORMAL -> log(Log(Level.INFO, message.toString(), callerstr))
+			LogType.IMPORTANT -> log(Log(Important(), message.toString(), callerstr))
+			LogType.WARNING -> log(Log(Level.WARNING, message.toString(), callerstr))
+			LogType.ERROR -> log(Log(Level.SEVERE, message.toString(), callerstr))
 		}
-		//if(type != LogType.ERROR)
-			return
 	}
-	println("${LocalDateTime.now()} | $type  $message")
+	return
+}
+
+class Log(level: Level, msg: String, private val caller: String): LogRecord(level, msg) {
+	override fun getSourceClassName(): String {
+		return caller
+	}
 }
 
 
@@ -93,40 +104,11 @@ class Important: Level("IMPORTANT", 850)
  *
  * @see Formatter
  */
-class SimpleFormatter: Formatter() {
-	private val format: String = getConfig(Configs.Logformat)
-	
+class SimpleFormatter(private val format: String): Formatter() {
 	override fun format(record: LogRecord): String {
-		val zdt = ZonedDateTime.ofInstant(
-			record.instant, ZoneId.systemDefault()
-		)
-		var source: String?
-		if(record.sourceClassName != null) {
-			source = record.sourceClassName
-			if(record.sourceMethodName != null) {
-				source += " " + record.sourceMethodName
-			}
-		} else {
-			source = record.loggerName
-		}
+		val zdt = ZonedDateTime.ofInstant(record.instant, ZoneId.systemDefault())
+		val source: String = record.sourceClassName
 		val message = formatMessage(record)
-		var throwable = ""
-		if(record.thrown != null) {
-			val sw = StringWriter()
-			val pw = PrintWriter(sw)
-			pw.println()
-			record.thrown.printStackTrace(pw)
-			pw.close()
-			throwable = sw.toString()
-		}
-		return String.format(
-			format,
-			zdt,
-			source,
-			record.loggerName,
-			record.level.localizedName,
-			message,
-			throwable
-		)
+		return String.format(format, zdt, source, record.level.name, message)
 	}
 }

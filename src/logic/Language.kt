@@ -41,7 +41,7 @@ class Language(private val language: Availablelanguages) {
 	 *
 	 * @see translations
 	 */
-	fun get(translation: String): String {
+	operator fun get(translation: String): String {
 		try {
 			translations[translation.trim().lowercase()]!!.let {
 				return it
@@ -50,6 +50,10 @@ class Language(private val language: Availablelanguages) {
 			log("${translation.trim().lowercase()} was not found (lang=$language)", LogType.WARNING)
 			return translation
 		}
+	}
+	
+	override fun toString(): String {
+		return "Language: $language loaded ${translations.size} Translations"
 	}
 	
 	/**

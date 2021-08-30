@@ -32,7 +32,7 @@ Code: j21ka1
     src/logic/Config line:62
     Missing Config option: <Option>
 
-    configuration was not defined inconfig.json file
+    configuration was not defined in config.json file
     either it got changed by some 5Head or I forgot
     to add the option to the default configuration
     values that are filled if the file is missing
@@ -62,4 +62,4 @@ Code: g294n3
     src/logic/Config line:73
 
     unknown Key was found in conf.json
-    all keys most be defined in Cofigs Enum
+    all keys most be defined in Configs Enum
