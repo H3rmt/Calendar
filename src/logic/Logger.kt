@@ -36,11 +36,14 @@ fun initLogger() {
 		consoleHandler = ConsoleHandler()
 		consoleHandler.formatter = SimpleFormatter("[%1\$tF %1\$tT] |%3\$-10s %4\$s %n")
 		addHandler(consoleHandler)
+		log("added console Handler")
 		
 		fileHandler = FileHandler(getlogfile())
 		fileHandler.formatter = SimpleFormatter("[%1\$tF %1\$tT] |%3\$-10s %4\$s %n")
 		fileHandler.level = Level.ALL
 		addHandler(fileHandler)
+		fileHandler.publish(LogRecord(Level.INFO, "Logging start"))
+		log("added file Handler")
 	}
 }
 
@@ -59,11 +62,11 @@ fun log(message: Any, type: LogType = LogType.NORMAL) {
 		var callerstr = caller.declaringClass.simpleName.ifBlank { caller.declaringClass.name.replaceBefore('.', "").substring(1) }
 		callerstr += "." + caller.methodName + "(" + caller.fileName + ":" + caller.lineNumber + ")"
 		when(type) {
-			LogType.LOW -> log(Log(Level.CONFIG, message.toString(), callerstr))
-			LogType.NORMAL -> log(Log(Level.INFO, message.toString(), callerstr))
-			LogType.IMPORTANT -> log(Log(Important(), message.toString(), callerstr))
-			LogType.WARNING -> log(Log(Level.WARNING, message.toString(), callerstr))
-			LogType.ERROR -> log(Log(Level.SEVERE, message.toString(), callerstr))
+			LogType.LOW -> log(Log(Level.CONFIG, "$message\t\t\t\t\t\t", callerstr))
+			LogType.NORMAL -> log(Log(Level.INFO, "$message\t\t\t\t\t\t", callerstr))
+			LogType.IMPORTANT -> log(Log(Important(), "$message\t\t\t\t\t\t", callerstr))
+			LogType.WARNING -> log(Log(Level.WARNING, "$message\t\t\t\t\t\t", callerstr))
+			LogType.ERROR -> log(Log(Level.SEVERE, "$message\t\t\t\t\t\t", callerstr))
 		}
 	}
 	return
@@ -107,7 +110,7 @@ class Important: Level("IMPORTANT", 850)
 class SimpleFormatter(private val format: String): Formatter() {
 	override fun format(record: LogRecord): String {
 		val zdt = ZonedDateTime.ofInstant(record.instant, ZoneId.systemDefault())
-		val source: String = record.sourceClassName
+		val source: String = record.sourceClassName ?: ""
 		val message = formatMessage(record)
 		return String.format(format, zdt, source, record.level.name, message)
 	}
