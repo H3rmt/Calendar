@@ -48,17 +48,18 @@ fun initLogger() {
 }
 
 /**
- * adds a log.log to the logList, so it gets logged later on
+ * adds a log message with a Logtype to the java Logger
  *
- * @param message gets written in the log.log; doesn't necessarily have to be a string
- * @param type if this is higher or equal to the current loglevel than this log.log will be accepted
+ * @param message gets send to the logger; doesn't have to be a string
+ * @param type gets translated to java loglevels
  *
  * @see LogType
  */
 fun log(message: Any, type: LogType = LogType.NORMAL) {
 	logger?.apply {
-		val caller: StackWalker.StackFrame =
-			StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { s -> s.skip(1).findFirst() }.get()
+		val callerlist: List<StackWalker.StackFrame> =
+			StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }
+		val caller = callerlist.filter { it.declaringClass.simpleName != "LoggerKt" }.get(0)
 		var callerstr = caller.declaringClass.simpleName.ifBlank { caller.declaringClass.name.replaceBefore('.', "").substring(1) }
 		callerstr += "." + caller.methodName + "(" + caller.fileName + ":" + caller.lineNumber + ")"
 		when(type) {

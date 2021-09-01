@@ -3,9 +3,9 @@ package frame
 import calendar.Celldisplay
 import calendar.Day
 import calendar.Week
+import calendar.changeMonth
 import calendar.currentmonth
 import calendar.currentmonthName
-import calendar.setMonth
 import javafx.animation.*
 import javafx.beans.property.*
 import javafx.collections.*
@@ -18,12 +18,15 @@ import javafx.scene.paint.*
 import javafx.scene.shape.*
 import javafx.util.*
 import logic.Configs
+import logic.LogType
 import logic.getConfig
+import logic.log
 import tornadofx.*
 import java.io.FileInputStream
 
 
 fun createcalendartab(pane: TabPane): Tab {
+	log("creating calendar tab", LogType.IMPORTANT)
 	return pane.tab("Calender") {
 		isClosable = false
 		
@@ -41,6 +44,7 @@ fun createcalendartab(pane: TabPane): Tab {
 					borderRadius += box(10.px)
 				}
 				
+				log("creating top bar", LogType.LOW)
 				// Top bar
 				hbox {
 					alignment = Pos.CENTER
@@ -53,7 +57,7 @@ fun createcalendartab(pane: TabPane): Tab {
 					button("<") {
 						addClass(Styles.CalendarView.titlebuttons)
 						action {
-							setMonth(false)
+							changeMonth(false)
 						}
 					}
 					label(currentmonthName) {
@@ -64,7 +68,7 @@ fun createcalendartab(pane: TabPane): Tab {
 					button(">") {
 						addClass(Styles.CalendarView.titlebuttons)
 						action {
-							setMonth(true)
+							changeMonth(true)
 						}
 					}
 				}
@@ -80,6 +84,7 @@ fun createcalendartab(pane: TabPane): Tab {
 					useMaxWidth = true
 				}
 				
+				log("creating table view", LogType.LOW)
 				// Table view
 				vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarView.table)
@@ -137,6 +142,8 @@ fun createcalendartab(pane: TabPane): Tab {
 						children.removeAll(columnlist)
 						columnlist.clear()
 						
+						log("updated table view", LogType.LOW)
+						
 						val selectedindex = SimpleIntegerProperty(-1)
 						
 						for((index, week) in list.withIndex()) {
@@ -154,7 +161,7 @@ fun createcalendartab(pane: TabPane): Tab {
 								val closeappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
 								
 								
-								val temp = createCellGraphics(week.general, this@hbox, opentimeline, closetimeline, expand)
+								val temp = createCellGraphics(week, this@hbox, opentimeline, closetimeline, expand)
 								cells.add(temp[0] as VBox)
 								@Suppress("UNCHECKED_CAST")
 								openappointmentopenanimations.add(temp[1] as MutableList<Animation>)
@@ -222,6 +229,11 @@ fun createcalendartab(pane: TabPane): Tab {
 										removeClass(Styles.CalendarView.selectedcolumn)
 									}
 									if(it.clickCount > 1) {
+										log(
+											"click week: $week   day:${
+												week.alldays.values.toTypedArray().getOrNull(hoveredcell.value - 1)
+											}", LogType.LOW
+										)
 										val newtab =
 											createweektab(pane, week, week.alldays.values.toTypedArray().getOrNull(hoveredcell.value - 1))
 										pane.selectionModel.select(newtab)

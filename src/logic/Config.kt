@@ -66,12 +66,14 @@ fun initCofigs() {
 		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(getconfigfile())), Map::class.java)
 		load.forEach {
 			try {
-				configs[getJson().fromJson(getJsonReader(StringReader(it.key.trim().capitalize())), Configs::class.java)] = it.value
+				configs[getJson().fromJson(
+					getJsonReader(StringReader(it.key.trim().replaceFirstChar { c -> c.titlecaseChar() })),
+					Configs::class.java
+				)] = it.value
 			} catch(e: NullPointerException) {
-				log("Unknown config key: ${it.key}", LogType.WARNING)
-				Warning("g294n3", e)
+				Warning("g294n3", e, "Unknown config key: ${it.key}")
 			}
-			log("Loaded Config ${it.key}: ${it.value}", LogType.LOW)
+			log("loaded Config ${it.key}: ${it.value}", LogType.LOW)
 		}
 	} catch(e: NullPointerException) {
 		log("Config File missing", LogType.ERROR)
@@ -118,13 +120,12 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 					it as T
 				}
 			} catch(e: ClassCastException) {
-				log("Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}", LogType.WARNING)
-				Warning("TODO()", e)
+				Warning("ik49dk", e, "Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}")
 				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
-					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.WARNING)
+					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.LOW)
 					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
 				} else
-					throw e
+					throw Exit("k23d1f", e)
 			}
 		} catch(e1: ClassCastException) {
 			log("Gson could not cast value: ${it::class.simpleName} to requested: ${T::class.simpleName}", LogType.WARNING)
@@ -144,6 +145,8 @@ var stacktrace = true
 
 /**
  * Custom Exception with Custom error code
+ *
+ * all codes listed in doc/error
  *
  * StackTrace can be disabled in config
  *
@@ -169,13 +172,29 @@ class Exit(private val code: String, private val exception: Exception? = null): 
 	}
 }
 
-fun Warning(code: String, exception: Exception) {
+/**
+ * Custom Warning with Custom error code
+ * (doesn't stop the code)
+ *
+ * all codes listed in doc/error
+ *
+ * StackTrace can be disabled in config
+ *
+ * create:
+ * Warning("k23d1f");
+ * Warning("k23d1f", e)
+ *
+ * @see Exception
+ *
+ */
+fun Warning(code: String, exception: Exception, log: Any) {
+	log(log, LogType.WARNING)
 	try {
 		throw Exit(code, exception)
 	} catch(e: Exit) {
 		val writer = StringWriter()
 		
-		if(getConfig(Configs.Printstacktrace))
+		if(stacktrace)
 			e.printStackTrace(PrintWriter(writer))
 		else
 			writer.append(e.toString())

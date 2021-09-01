@@ -5,10 +5,13 @@ import calendar.Week
 import javafx.scene.control.*
 import javafx.scene.paint.*
 import javafx.scene.text.*
+import logic.LogType
+import logic.log
 import tornadofx.*
 
 fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
-	return pane.tab(week.toString()) {
+	log("creating week tab", LogType.IMPORTANT)
+	return pane.tab(week.toDate()) {
 		isClosable = true
 		
 		stackpane {
@@ -38,7 +41,7 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 					}
 					for(ap in app.value) {
 						label {
-							text = ap.description
+							text = ap.toString()
 						}
 					}
 				}

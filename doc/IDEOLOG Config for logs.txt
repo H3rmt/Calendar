@@ -9,11 +9,11 @@ Time format:  yyyy-MM-dd HH:mm:ss
 Time capture group:  1
 Severity capture group:  1
 Category capture group:  1
-Apply meassage pattern to all message lines:  false
+Apply message pattern to all message lines:  false
 
 
 Pattern:  ^\[[^\]]*\] \|SEVERE *.*
-             Higlight line
+             Highlight line
              Bold
 Foreground:  FF0C05
 Background:  2D0008
@@ -21,32 +21,32 @@ Show on stripe:  true
 
 
 Pattern:  ^\[[^\]]*\] \|WARNING *.*
-             Higlight line
+             Highlight line
              Bold
 Foreground:  FF7410
 Show on stripe:  true
 
 
 Pattern:  ^\[[^\]]*\] \|IMPORTANT *.*
-             Higlight line
+             Highlight line
 Foreground:  1BFF18
 Show on stripe:  true
 
 
 Pattern:  ^\[[^\]]*\] \|IMPORTANT *.*
-             Higlight line
+             Highlight line
 Foreground:  1BFF18
 Show on stripe:  true
 
 
 Pattern:  ^\[[^\]]*\] \|INFO *.*
-             Higlight line
+             Highlight line
 Foreground:  A3F8FF
 Show on stripe:  true
 
 
 Pattern:  ^\[[^\]]*\] \|CONFIG *.*
-             Higlight line
+             Highlight line
 Foreground:  7C8385
 Show on stripe:  true
 

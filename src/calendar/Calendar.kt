@@ -2,11 +2,13 @@ package calendar
 
 import javafx.beans.property.*
 import javafx.collections.*
+import logic.LogType
 import logic.Warning
 import logic.getJson
 import logic.getJsonReader
 import logic.getLangString
 import logic.initCofigs
+import logic.log
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.FileReader
@@ -72,7 +74,6 @@ fun encrypt(algorithm: String, input: ByteArray, key: SecretKey, iv: IvParameter
 
 fun maino() {
 	initCofigs()
-	setMonth(true)
 	
 	val save = getJson().toJson(currentmonth)
 	println(save)
@@ -102,7 +103,7 @@ fun maino() {
 /**
  * called by buttons in calendar tab
  */
-fun setMonth(right: Boolean) {
+fun changeMonth(right: Boolean) {
 	calendardisplay = if(right) {
 		calendardisplay.plusMonths(1)
 	} else {
@@ -111,39 +112,36 @@ fun setMonth(right: Boolean) {
 	currentmonthName.set(getLangString(calendardisplay.month.name))
 	if(calendardisplay.year != now.year)
 		currentmonthName.value += "  " + calendardisplay.year
+	log("changing Month to ${calendardisplay.month.name}")
 	
 	val data = getMonth(calendardisplay)
 	currentmonth.clear()
 	currentmonth.addAll(data)
 }
 
-fun main() {
-	prepareAppointments()
-	initCofigs()
-	println(preparedsingleAppointments)
-	println(preparedweeklyAppointments)
-}
-
-// Year: { Month: { WeekDay: Appointments } }
-val preparedsingleAppointments: MutableMap<Int, MutableMap<Month, MutableMap<DayOfWeek, MutableList<Appointment>>>> = mutableMapOf()
+// Year: { Month: { day of month: Appointments } }
+val preparedsingleAppointments: MutableMap<Int, MutableMap<Month, MutableMap<Int, MutableList<Appointment>>>> = mutableMapOf()
 
 // Day: { Appointments }
 val preparedweeklyAppointments: MutableMap<DayOfWeek, MutableList<Appointment>> = mutableMapOf()
 
-fun createAppointment(appointment: Map<String, Any>): Appointment? {
+fun createAppointment(appointment: Map<String, Any>, day: Boolean): Appointment? {
 	try {
-		if(appointment.containsKey("day") && appointment.containsKey("start") &&
-			appointment.containsKey("duration") && appointment.containsKey("type") &&
-			appointment.containsKey("title") && appointment.containsKey("description")
-		) {
-			return Appointment(
-				appointment["day"] as String, (appointment["start"] as Double).toLong(),
+		return if(day) {
+			Appointment(
+				DayOfWeek.valueOf((appointment["day"] as String).uppercase()), (appointment["start"] as Double).toLong(),
+				(appointment["duration"] as Double).toLong(), appointment["type"] as String,
+				appointment["title"] as String, Types.valueOf(appointment["type"] as String)
+			)
+		} else {
+			Appointment(
+				DayOfWeek.SATURDAY, (appointment["start"] as Double).toLong(),
 				(appointment["duration"] as Double).toLong(), appointment["type"] as String,
 				appointment["title"] as String, Types.valueOf(appointment["type"] as String)
 			)
 		}
 	} catch(e: Exception) {
-		Warning("TODO", e)
+		Warning("an35f7", e, "Exception creating Appointment from map:$appointment")
 	}
 	return null
 }
@@ -154,40 +152,38 @@ fun prepareAppointments() {
 	read.forEach { (name, list) ->
 		when(name) {
 			"single Appointments" -> {
+				log("reading single Appointments: $list", LogType.LOW)
 				list.forEach {
-					val appointment = createAppointment(it)
+					val appointment = createAppointment(it, false)
 					appointment?.apply {
 						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneId.systemDefault())
 						
 						val offset: ZoneOffset = ZoneId.systemDefault().rules.getOffset(Instant.ofEpochSecond(start * 60))
 						start -= time.atStartOfDay().toLocalTime().toEpochSecond(time, offset) / 60
+						day = time.dayOfWeek
 						
 						if(!preparedsingleAppointments.containsKey(time.year))
 							preparedsingleAppointments[time.year] = mutableMapOf()
 						if(!preparedsingleAppointments[time.year]!!.containsKey(time.month))
 							preparedsingleAppointments[time.year]!![time.month] = mutableMapOf()
-						if(!preparedsingleAppointments[time.year]!![time.month]!!.containsKey(time.dayOfWeek))
-							preparedsingleAppointments[time.year]!![time.month]!![time.dayOfWeek] = mutableListOf()
+						if(!preparedsingleAppointments[time.year]!![time.month]!!.containsKey(time.dayOfMonth))
+							preparedsingleAppointments[time.year]!![time.month]!![time.dayOfMonth] = mutableListOf()
 						
-						preparedsingleAppointments[time.year]!![time.month]!![time.dayOfWeek]!!.add(this)
+						preparedsingleAppointments[time.year]!![time.month]!![time.dayOfMonth]!!.add(this)
+						log("loaded single Appointment: $this", LogType.LOW)
 					}
 				}
 			}
 			"Week Appointments" -> {
+				log("reading Week Appointments: $list", LogType.LOW)
 				list.forEach {
-					val appointment = createAppointment(it)
+					val appointment = createAppointment(it, true)
 					appointment?.apply {
-						try {
-							DayOfWeek.valueOf(day)
-						} catch(e: IllegalArgumentException) {
-							Warning("TODO", e)
-							return@apply
-						}
-						if(!preparedweeklyAppointments.containsKey(DayOfWeek.valueOf(day)))
-							preparedweeklyAppointments[DayOfWeek.valueOf(day)] = mutableListOf()
+						if(!preparedweeklyAppointments.containsKey(day))
+							preparedweeklyAppointments[day] = mutableListOf()
 						
-						preparedweeklyAppointments[DayOfWeek.valueOf(day)]!!.add(this)
-						
+						preparedweeklyAppointments[day]!!.add(this)
+						log("loaded single Appointment: $this", LogType.LOW)
 					}
 				}
 			}
@@ -197,6 +193,7 @@ fun prepareAppointments() {
 
 
 fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
+	log("generating Month", LogType.LOW)
 	var time: ZonedDateTime = monthtime.withDayOfMonth(1)
 	val month = time.month
 	
@@ -208,16 +205,30 @@ fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 	do {
 		val days: MutableList<Day> = mutableListOf()
 		do {
-			days.add(Day(time, time.month == month))
+			val day = Day(time, time.month == month)
+			val appointments =
+				preparedsingleAppointments[time.year]?.get(time.month)?.get(time.dayOfMonth) ?: mutableListOf()
+			day.appointments.addAll(appointments)
+			
+			days.add(day)
 			time = time.plusDays(1)
 		} while(time.dayOfWeek.value != 1)
 		
-		val weekOfYear: Int = time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
-		
-		val week = Week(time.minusDays(7), days[0], days[1], days[2], days[3], days[4], days[5], days[6], weekOfYear)
+		val week = Week(
+			time.minusDays(7),
+			days[0],
+			days[1],
+			days[2],
+			days[3],
+			days[4],
+			days[5],
+			days[6],
+			time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+		)
 		week.addAppointments(preparedweeklyAppointments)
+		
+		log("added week: $week", LogType.LOW)
 		weeks.add(week)
-		//return weeks
 	} while(time.month == monthtime.month && time.dayOfMonth > 1)
 	
 	return weeks

@@ -47,7 +47,7 @@ class Language(private val language: Availablelanguages) {
 				return it
 			}
 		} catch(e: NullPointerException) {
-			log("${translation.trim().lowercase()} was not found (lang=$language)", LogType.WARNING)
+			log("translation for ${translation.trim().lowercase()} was not found (lang=$language)", LogType.WARNING)
 			return translation
 		}
 	}

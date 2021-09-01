@@ -3,9 +3,11 @@ package calendar
 import com.google.gson.annotations.Expose
 import javafx.scene.paint.*
 import logic.Configs
+import logic.LogType
 import logic.Warning
 import logic.getConfig
 import logic.getLangString
+import logic.log
 import java.time.DayOfWeek
 import java.time.DayOfWeek.FRIDAY
 import java.time.DayOfWeek.MONDAY
@@ -32,9 +34,7 @@ class Week(
 	val WeekofYear: Int
 ): Celldisplay {
 	
-	private val time: ZonedDateTime = _time
-	
-	var general = this
+	val time: ZonedDateTime = _time
 	
 	@Expose
 	val alldays: Map<DayOfWeek, Day> = mapOf(
@@ -65,7 +65,7 @@ class Week(
 		return list
 	}
 	
-	override fun toString(): String {
+	fun toDate(): String {
 		return "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
 	}
 	
@@ -73,6 +73,12 @@ class Week(
 		for(day in appointmentslist) {
 			alldays[day.key]?.appointments?.addAll(day.value)
 		}
+	}
+	
+	override fun toString(): String {
+		var s = "${this::class.simpleName}{"
+		this::class.memberProperties.forEach { s += it.name + ":" + it.getter.call(this) + " " }
+		return "$s}"
 	}
 }
 
@@ -91,22 +97,24 @@ class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 	}
 	
 	override fun toString(): String {
-		return "${time.dayOfMonth}:${time.dayOfWeek}"
+		var s = "${this::class.simpleName}{"
+		this::class.memberProperties.forEach { s += it.name + ":" + it.getter.call(this) + " " }
+		return "$s}"
 	}
 }
 
-class Appointment(_day: String, _start: Long, _duration: Long, _title: String, _description: String, _type: Types) {
+class Appointment(_day: DayOfWeek, _start: Long, _duration: Long, _title: String, _description: String, _type: Types) {
 	
 	@Expose
-	val day = _day
+	var day = _day
 	
 	@Expose
-	// stored in minutes instead of milliseconds (60 to 1)
 	var start = _start
+	// stored in minutes instead of milliseconds (60 to 1)
 	
 	@Expose
-	// stored in minutes instead of seconds (60 to 1)
 	val duration = _duration
+	// stored in minutes instead of seconds (60 to 1)
 	
 	@Expose
 	val title = _title
@@ -156,7 +164,7 @@ class Types(_name: String, _color: Color) {
 					return Types(type["name"]!!, Color.valueOf(type["color"]!!))
 				}
 			} catch(e: Exception) {
-				Warning("TODO", e)
+				Warning("o2wi35", e, "Exception creating Type from map:$type")
 			}
 			return null
 		}
@@ -166,6 +174,7 @@ class Types(_name: String, _color: Color) {
 				val type = createType(it)
 				type?.apply {
 					types.add(this)
+					log("added type $type", LogType.LOW)
 				}
 			}
 		}

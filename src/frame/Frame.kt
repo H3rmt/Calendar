@@ -1,7 +1,7 @@
 package frame
 
 
-import calendar.setMonth
+import calendar.changeMonth
 import com.sun.javafx.application.LauncherImpl
 import javafx.application.*
 import javafx.scene.control.*
@@ -29,7 +29,9 @@ import java.net.URI
  */
 fun frameInit() {
 	createLoading()
-	setMonth(true)
+	log("created loading", LogType.NORMAL)
+	
+	changeMonth(true)
 	
 	/**
 	 * this looks pretty weird, but it essentially
@@ -60,6 +62,7 @@ fun frameInit() {
 		it.consume()
 	}
 	
+	log("launching Application", LogType.IMPORTANT)
 	LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
 
@@ -74,6 +77,7 @@ class Window: App(MainView::class, Styles::class) {
 		stage.width = 700.0
 		super.start(stage)
 		removeLoading()
+		log("started Frame", LogType.NORMAL)
 	}
 	
 }
@@ -85,7 +89,6 @@ class MainView: View("Calendar") {
 		center = tabpane {
 			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
 			createcalendartab(this@tabpane)
-			log("created calendartab")
 		}
 		log("created tabpane", LogType.IMPORTANT)
 	}
@@ -128,6 +131,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 }
 
 fun createMenugroup(vararg panes: GridPane?) {
+	log("creating Menugroup with ${panes.size} elements", LogType.LOW)
 	var maxWidth = 10.0
 	val items = panes.filterNotNull()
 	val changed = mutableListOf<GridPane>()
@@ -148,6 +152,7 @@ fun createMenugroup(vararg panes: GridPane?) {
 }
 
 fun createmenuitem(menu: Menu, name: String, shortcut: String, action: () -> Unit): GridPane? {
+	log("creating menuitem: $name $shortcut", LogType.LOW)
 	var grid: GridPane? = null
 	menu.customitem {
 		grid = gridpane {

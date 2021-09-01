@@ -19,8 +19,9 @@ fun main(args: Array<String>) {
 	initCofigs()
 	log("read Configs:$configs", LogType.IMPORTANT)
 	
-	log("Updated Logger with config data\n", LogType.IMPORTANT)
+	log("Updating Logger with config data\n", LogType.IMPORTANT)
 	updateLogger()
+	log("Updated Logger", LogType.IMPORTANT)
 	
 	log("preparing Appointments", LogType.IMPORTANT)
 	prepareAppointments()
