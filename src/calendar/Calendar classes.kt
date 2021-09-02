@@ -17,6 +17,7 @@ import java.time.DayOfWeek.THURSDAY
 import java.time.DayOfWeek.TUESDAY
 import java.time.DayOfWeek.WEDNESDAY
 import java.time.ZonedDateTime
+import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 
 
@@ -35,6 +36,9 @@ class Week(
 ): Celldisplay {
 	
 	val time: ZonedDateTime = _time
+	
+	@Expose
+	val notes: MutableList<Note> = mutableListOf()
 	
 	@Expose
 	val alldays: Map<DayOfWeek, Day> = mapOf(
@@ -76,11 +80,13 @@ class Week(
 	}
 	
 	override fun toString(): String {
-		var s = "${this::class.simpleName}{"
-		this::class.memberProperties.forEach { s += it.name + ":" + it.getter.call(this) + " " }
+		var s = "$notes | ${this::class.simpleName}{"
+		this::class.memberProperties.filter { it.visibility != KVisibility.PRIVATE }
+			.forEach { s += it.name + ":" + it.getter.call(this) + " " }
 		return "$s}"
 	}
 }
+
 
 class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 	
@@ -92,6 +98,9 @@ class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 	@Expose
 	val appointments: MutableList<Appointment> = mutableListOf()
 	
+	@Expose
+	val notes: MutableList<Note> = mutableListOf()
+	
 	fun getappointmentslimit(): List<Appointment> {
 		return appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
 	}
@@ -102,6 +111,7 @@ class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 		return "$s}"
 	}
 }
+
 
 class Appointment(_day: DayOfWeek, _start: Long, _duration: Long, _title: String, _description: String, _type: Types) {
 	
@@ -132,15 +142,32 @@ class Appointment(_day: DayOfWeek, _start: Long, _duration: Long, _title: String
 	}
 }
 
+
+class Note(_start: Long, _text: String, _type: Types) {
+	
+	@Expose
+	var start = _start
+	// stored in minutes instead of milliseconds (60 to 1)
+	
+	@Expose
+	val text = _text
+	
+	@Expose
+	val type = _type
+	
+	override fun toString(): String {
+		return "$start -text- $type"
+	}
+}
+
+
 class Types(_name: String, _color: Color) {
 	
 	val name: String = _name
 	val color: Color = _color
 	
 	override fun toString(): String {
-		var s = "${this::class.simpleName}{"
-		this::class.memberProperties.forEach { s += it.name + ":" + it.getter.call(this) + " " }
-		return "$s}"
+		return name
 	}
 	
 	companion object {

@@ -17,17 +17,17 @@ class Language(private val language: Availablelanguages) {
 	 * reads JSON from file and stores different Strings
 	 * in translations Map
 	 *
-	 * @see translations
+	 * @see Language.translations
 	 */
 	init {
-		val file = File(getlanguagefile())
+		val file = File(ConfigFiles.languagefile)
 		if(!file.exists()) {
 			file.createNewFile()
 			val default = "{\n\n}"
 			file.writeText(default)
 		}
 		val alltranslations: Map<String, Map<String, String>> =
-			getJson().fromJson(JsonReader(FileReader(getlanguagefile())), Map::class.java)
+			getJson().fromJson(JsonReader(FileReader(ConfigFiles.languagefile)), Map::class.java)
 		translations = alltranslations[language.toString()] ?: mapOf()
 	}
 	

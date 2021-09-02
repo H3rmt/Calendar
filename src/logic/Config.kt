@@ -47,23 +47,23 @@ var configs: MutableMap<Configs, Any> = mutableMapOf()
  * must be the first method called to read from data files
  * like fonts or language
  *
- * @see getconfigfile
- * @see getdatadirectory
+ * @see ConfigFiles.getconfigfile
+ * @see ConfigFiles.getdatadirectory
  */
 fun initCofigs() {
-	val file = File(getconfigfile())
+	val file = File(ConfigFiles.configfile)
 	if(!file.exists()) {
-		if(getdatadirectory() != "") {
-			val dir = File(getdatadirectory())
+		if(ConfigFiles.datadirectory.isNotEmpty()) {
+			val dir = File(ConfigFiles.datadirectory)
 			dir.mkdirs()
 		}
 		file.createNewFile()
 		file.writeText(default)
-		log("created default config:${getconfigfile()}", LogType.WARNING)
+		log("created default config:${ConfigFiles.configfile}", LogType.WARNING)
 	}
 	
 	try {
-		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(getconfigfile())), Map::class.java)
+		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(ConfigFiles.configfile)), Map::class.java)
 		load.forEach {
 			try {
 				configs[getJson().fromJson(
@@ -211,13 +211,19 @@ enum class Configs {
 	Animationspeed, Animationdelay, MaxDayAppointments, Appointmenttypes
 }
 
-fun getlogfile(): String = "Calendar.log"
-
-fun getdatadirectory(): String = "data"
-
-fun getlanguagefile(): String = getdatadirectory() + "/lang.json"
-
-fun getconfigfile(): String = getdatadirectory() + "/config.json"
+object ConfigFiles {
+	val logfile = "Calendar.log"
+	
+	val datadirectory = "data"
+	
+	val languagefile = "$datadirectory/lang.json"
+	
+	val configfile = "$datadirectory/config.json"
+	
+	val appointmentsfile = "$datadirectory/appointments.json"
+	
+	val notesfile = "$datadirectory/notes/August.json"
+}
 
 lateinit var language: Language
 

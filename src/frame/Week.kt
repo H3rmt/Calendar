@@ -26,7 +26,7 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 					borderWidth += box(5.px)
 					borderRadius += box(10.px)
 				}
-				label(day.toString()) {
+				label(week.toString()) {
 					style {
 						fontSize = 18.px
 						fontWeight = FontWeight.BOLD

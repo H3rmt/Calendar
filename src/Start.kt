@@ -1,5 +1,8 @@
+import calendar.preapareNotes
 import calendar.prepareAppointments
+import calendar.prepareddayNotes
 import calendar.preparedsingleAppointments
+import calendar.preparedweekNotes
 import calendar.preparedweeklyAppointments
 import frame.frameInit
 import logic.LogType
@@ -25,8 +28,9 @@ fun main(args: Array<String>) {
 	
 	log("preparing Appointments", LogType.IMPORTANT)
 	prepareAppointments()
-	log("prepared week Appointments $preparedweeklyAppointments", LogType.NORMAL)
-	log("prepared single Appointments $preparedsingleAppointments", LogType.NORMAL)
+	
+	log("preparing Notes", LogType.IMPORTANT)
+	preapareNotes()
 	
 	log("starting Frame", LogType.IMPORTANT)
 	frameInit()

@@ -23,6 +23,7 @@ class Styles: Stylesheet() {
 		val tablecell by cssclass()
 		val disabledtablecell by cssclass()
 		val hoveredtablecell by cssclass()
+		val markedtablecell by cssclass()
 		
 		val tableheader by cssclass()
 		val selectedcolumn by cssclass()
@@ -76,7 +77,7 @@ class Styles: Stylesheet() {
 		
 		CalendarView.tableheader {
 			prefHeight = 30.px
-			minHeight = 25.px
+			minHeight = prefHeight
 			
 			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
 			borderRadius += box(10.px, 10.px, 0.px, 0.px)
@@ -84,27 +85,35 @@ class Styles: Stylesheet() {
 		}
 		
 		CalendarView.selectedcolumn {
-			backgroundColor += c(0.95, 0.95, 0.95)
-			backgroundRadius += box(6.px)
-		}
-		
-		CalendarView.disabledtablecell {
-			backgroundColor += c(0.88, 0.88, 0.9)
+			backgroundColor += c(0.94, 0.94, 0.94)
 			backgroundRadius += box(6.px)
 		}
 		
 		CalendarView.tablecell {
-			prefHeight = 40.px
+			prefHeight = 39.px
 			
 			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
+			
+			backgroundColor += c(0.92, 0.92, 0.94)
+			backgroundRadius += box(6.px)
+		}
+		
+		CalendarView.disabledtablecell {
+			backgroundColor += c(0.98, 0.98, 0.98)
+			backgroundRadius += box(6.px)
 		}
 		
 		CalendarView.hoveredtablecell {
 			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
+		}
+		
+		CalendarView.markedtablecell {
+			backgroundRadius += box(6.px)
+			backgroundColor += c(160, 160, 190)
 		}
 		
 		CalendarView.cellheaderlabel {

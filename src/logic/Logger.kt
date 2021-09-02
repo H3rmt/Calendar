@@ -38,7 +38,7 @@ fun initLogger() {
 		addHandler(consoleHandler)
 		log("added console Handler")
 		
-		fileHandler = FileHandler(getlogfile())
+		fileHandler = FileHandler(ConfigFiles.logfile)
 		fileHandler.formatter = SimpleFormatter("[%1\$tF %1\$tT] |%3\$-10s %4\$s %n")
 		fileHandler.level = Level.ALL
 		addHandler(fileHandler)
@@ -59,7 +59,7 @@ fun log(message: Any, type: LogType = LogType.NORMAL) {
 	logger?.apply {
 		val callerlist: List<StackWalker.StackFrame> =
 			StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }
-		val caller = callerlist.filter { it.declaringClass.simpleName != "LoggerKt" }.get(0)
+		val caller = callerlist.filter { it.declaringClass.simpleName != "LoggerKt" }[0]
 		var callerstr = caller.declaringClass.simpleName.ifBlank { caller.declaringClass.name.replaceBefore('.', "").substring(1) }
 		callerstr += "." + caller.methodName + "(" + caller.fileName + ":" + caller.lineNumber + ")"
 		when(type) {

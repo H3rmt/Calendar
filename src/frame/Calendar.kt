@@ -6,6 +6,7 @@ import calendar.Week
 import calendar.changeMonth
 import calendar.currentmonth
 import calendar.currentmonthName
+import calendar.now
 import javafx.animation.*
 import javafx.beans.property.*
 import javafx.collections.*
@@ -86,7 +87,7 @@ fun createcalendartab(pane: TabPane): Tab {
 				
 				log("creating table view", LogType.LOW)
 				// Table view
-				vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
+				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarView.table)
 					style(append = true) {
 						backgroundColor += Color.WHITE
@@ -150,6 +151,8 @@ fun createcalendartab(pane: TabPane): Tab {
 							hbox(spacing = 5.0, alignment = Pos.CENTER) {
 								columnlist.add(this@hbox)
 								
+								padding = Insets(3.0)
+								
 								val opentimeline = Timeline()
 								val closetimeline = Timeline()
 								
@@ -171,6 +174,9 @@ fun createcalendartab(pane: TabPane): Tab {
 								week.alldays.values.forEach {
 									val tmp = createCellGraphics(it, this@hbox, opentimeline, closetimeline, expand)
 									cells.add(tmp[0] as VBox)
+									
+									if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
+										(tmp[0] as VBox).addClass(Styles.CalendarView.markedtablecell)
 									
 									@Suppress("UNCHECKED_CAST")
 									openappointmentopenanimations.add(tmp[1] as MutableList<Animation>)
@@ -320,6 +326,7 @@ fun createCellGraphics(
 			}
 			
 		} else if(data is Week) {
+			addClass(Styles.CalendarView.disabledtablecell)
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px

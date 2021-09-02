@@ -2,6 +2,7 @@ package calendar
 
 import javafx.beans.property.*
 import javafx.collections.*
+import logic.ConfigFiles
 import logic.LogType
 import logic.Warning
 import logic.getJson
@@ -29,7 +30,6 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
-
 
 
 val now: ZonedDateTime = ZonedDateTime.now(ZoneId.systemDefault())
@@ -99,7 +99,6 @@ fun maino() {
 }
 
 
-
 /**
  * called by buttons in calendar tab
  */
@@ -125,6 +124,13 @@ val preparedsingleAppointments: MutableMap<Int, MutableMap<Month, MutableMap<Int
 // Day: { Appointments }
 val preparedweeklyAppointments: MutableMap<DayOfWeek, MutableList<Appointment>> = mutableMapOf()
 
+// Year: { Month: { day of month: Appointments } }
+val prepareddayNotes: MutableMap<Int, MutableMap<Month, MutableMap<Int, MutableList<Note>>>> = mutableMapOf()
+
+// Year: { Week of year: Appointments }
+val preparedweekNotes: MutableMap<Int, MutableMap<Int, MutableList<Note>>> = mutableMapOf()
+
+
 fun createAppointment(appointment: Map<String, Any>, day: Boolean): Appointment? {
 	try {
 		return if(day) {
@@ -146,8 +152,10 @@ fun createAppointment(appointment: Map<String, Any>, day: Boolean): Appointment?
 	return null
 }
 
+
 fun prepareAppointments() {
-	val read: Map<String, ArrayList<Map<String, Any>>> = getJson().fromJson(getJsonReader(FileReader("data/test.json")), Map::class.java)
+	val read: Map<String, ArrayList<Map<String, Any>>> =
+		getJson().fromJson(getJsonReader(FileReader(ConfigFiles.appointmentsfile)), Map::class.java)
 	
 	read.forEach { (name, list) ->
 		when(name) {
@@ -189,6 +197,71 @@ fun prepareAppointments() {
 			}
 		}
 	}
+	log("prepared week Appointments $preparedweeklyAppointments", LogType.NORMAL)
+	log("prepared single Appointments $preparedsingleAppointments", LogType.NORMAL)
+}
+
+
+fun createNote(note: Map<String, Any>): Note? {
+	try {
+		return Note(
+			(note["start"] as Double).toLong(),
+			note["text"] as String,
+			Types.valueOf(note["type"] as String)
+		)
+	} catch(e: Exception) {
+		Warning("an35f7", e, "Exception creating Note from map:$note")
+	}
+	return null
+}
+
+
+fun preapareNotes() {
+	val read: Map<String, ArrayList<Map<String, Any>>> =
+		getJson().fromJson(getJsonReader(FileReader(ConfigFiles.notesfile)), Map::class.java)
+	
+	read.forEach { (name, list) ->
+		when(name) {
+			"Day Notes" -> {
+				log("reading Day Notes", LogType.LOW)
+				list.forEach {
+					val note = createNote(it)
+					note?.apply {
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneId.systemDefault())
+						
+						if(!prepareddayNotes.containsKey(time.year))
+							prepareddayNotes[time.year] = mutableMapOf()
+						if(!prepareddayNotes[time.year]!!.containsKey(time.month))
+							prepareddayNotes[time.year]!![time.month] = mutableMapOf()
+						if(!prepareddayNotes[time.year]!![time.month]!!.containsKey(time.dayOfMonth))
+							prepareddayNotes[time.year]!![time.month]!![time.dayOfMonth] = mutableListOf()
+						
+						prepareddayNotes[time.year]!![time.month]!![time.dayOfMonth]!!.add(this)
+						log("loaded Day Note: $this", LogType.LOW)
+					}
+				}
+			}
+			"Week Notes" -> {
+				log("reading Week Notes", LogType.LOW)
+				list.forEach {
+					val note = createNote(it)
+					note?.apply {
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneId.systemDefault())
+						
+						if(!preparedweekNotes.containsKey(time.year))
+							preparedweekNotes[time.year] = mutableMapOf()
+						if(!preparedweekNotes[time.year]!!.containsKey(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)))
+							preparedweekNotes[time.year]!![time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)] = mutableListOf()
+						
+						preparedweekNotes[time.year]!![time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]!!.add(this)
+						log("loaded week Note: $this", LogType.LOW)
+					}
+				}
+			}
+		}
+	}
+	log("prepared week Notes $preparedweekNotes", LogType.NORMAL)
+	log("prepared day Notes $prepareddayNotes", LogType.NORMAL)
 }
 
 
@@ -206,9 +279,8 @@ fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 		val days: MutableList<Day> = mutableListOf()
 		do {
 			val day = Day(time, time.month == month)
-			val appointments =
-				preparedsingleAppointments[time.year]?.get(time.month)?.get(time.dayOfMonth) ?: mutableListOf()
-			day.appointments.addAll(appointments)
+			day.appointments.addAll(preparedsingleAppointments[time.year]?.get(time.month)?.get(time.dayOfMonth) ?: listOf())
+			day.notes.addAll(prepareddayNotes[time.year]?.get(time.month)?.get(time.dayOfMonth) ?: listOf())
 			
 			days.add(day)
 			time = time.plusDays(1)
@@ -223,9 +295,10 @@ fun getMonth(monthtime: ZonedDateTime): MutableList<Week> {
 			days[4],
 			days[5],
 			days[6],
-			time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+			time.minusDays(7).get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 		)
 		week.addAppointments(preparedweeklyAppointments)
+		week.notes.addAll(preparedweekNotes[time.year]?.get(week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)) ?: listOf())
 		
 		log("added week: $week", LogType.LOW)
 		weeks.add(week)
