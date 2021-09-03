@@ -17,7 +17,7 @@ class Language(private val language: Availablelanguages) {
 	 * reads JSON from file and stores different Strings
 	 * in translations Map
 	 *
-	 * @see Language.translations
+	 * @see translations
 	 */
 	init {
 		val file = File(ConfigFiles.languagefile)
@@ -28,7 +28,7 @@ class Language(private val language: Availablelanguages) {
 		}
 		val alltranslations: Map<String, Map<String, String>> =
 			getJson().fromJson(JsonReader(FileReader(ConfigFiles.languagefile)), Map::class.java)
-		translations = alltranslations[language.toString()] ?: mapOf()
+		translations = alltranslations["$language"] ?: mapOf()
 	}
 	
 	/**
@@ -52,9 +52,7 @@ class Language(private val language: Availablelanguages) {
 		}
 	}
 	
-	override fun toString(): String {
-		return "Language: $language loaded ${translations.size} Translations"
-	}
+	override fun toString(): String = "Language: $language loaded ${translations.size} Translations"
 	
 	/**
 	 * all different types of available Languages

@@ -206,7 +206,7 @@ fun createcalendartab(pane: TabPane): Tab {
 											Thread.sleep(getConfig<Double>(Configs.Animationdelay).toLong())
 											if(openprep) {
 												openprep = false
-												openappointmentopenanimations.forEach { it.forEach { animation -> animation.play() } }
+												openappointmentopenanimations.forEach { it.forEach(Animation::play) }
 												opentimeline.play()
 											}
 										}.start()
@@ -218,9 +218,9 @@ fun createcalendartab(pane: TabPane): Tab {
 										if(openprep)
 											openprep = false
 										else {
-											openappointmentopenanimations.forEach { it.forEach { animation -> animation.stop() } }
+											openappointmentopenanimations.forEach { it.forEach(Animation::stop) }
 											opentimeline.stop()
-											closeappointmentopenanimations.forEach { it.forEach { animation -> animation.play() } }
+											closeappointmentopenanimations.forEach { it.forEach(Animation::play) }
 											closetimeline.play()
 										}
 									}
@@ -240,10 +240,12 @@ fun createcalendartab(pane: TabPane): Tab {
 												week.alldays.values.toTypedArray().getOrNull(hoveredcell.value - 1)
 											}", LogType.LOW
 										)
-										val newtab =
-											createweektab(pane, week, week.alldays.values.toTypedArray().getOrNull(hoveredcell.value - 1))
-										pane.selectionModel.select(newtab)
-										// TODO check if opened
+										Tabmanager.openTab(
+											"Week${week.toDate()}/${week.time.year}",
+											::createweektab,
+											week,
+											week.alldays.values.toTypedArray().getOrNull(hoveredcell.value - 1)
+										)
 									}
 								}
 								
@@ -308,6 +310,9 @@ fun createCellGraphics(
 						columnRowIndex(0, 0)
 					}
 					image = Image(FileInputStream("img/remind.png"))
+					onMouseClicked = EventHandler {
+						it.consume()
+					}
 				}
 				
 				label(data.time.dayOfMonth.toString()) {
@@ -322,6 +327,12 @@ fun createCellGraphics(
 						columnRowIndex(2, 0)
 					}
 					image = Image(FileInputStream("img/note.png"))
+					onMouseClicked = EventHandler {
+						it.consume()
+						Tabmanager.openTab(
+							"DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createnotetab, data
+						)
+					}
 				}
 			}
 			
@@ -345,6 +356,12 @@ fun createCellGraphics(
 						columnRowIndex(2, 0)
 					}
 					image = Image(FileInputStream("img/note.png"))
+					onMouseClicked = EventHandler {
+						it.consume()
+						Tabmanager.openTab(
+							"WeekNotes${data.WeekofYear}/${data.time.year}", ::createnotetab, data
+						)
+					}
 				}
 			}
 		}
@@ -360,8 +377,11 @@ fun createCellGraphics(
 			}
 		}
 		
-		val thisexpandheight = if(data is Day) generateAppointmentsGraphic(data, pane, animations)
-		else if(data is Week) generateWeekGraphic(data, pane, animations) else 0.0
+		val thisexpandheight = when(data) {
+			is Day -> generateAppointmentsGraphic(data, pane, animations)
+			is Week -> generateWeekGraphic(data, pane, animations)
+			else -> 0.0
+		}
 		
 		if(expand.value < thisexpandheight)
 			expand.value = thisexpandheight

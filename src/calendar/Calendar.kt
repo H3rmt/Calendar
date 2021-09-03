@@ -1,11 +1,11 @@
 package calendar
 
+import logic.getJson as Json
 import javafx.beans.property.*
 import javafx.collections.*
 import logic.ConfigFiles
 import logic.LogType
 import logic.Warning
-import logic.getJson
 import logic.getJsonReader
 import logic.getLangString
 import logic.initCofigs
@@ -20,7 +20,7 @@ import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Month
-import java.time.ZoneId
+import java.time.ZoneId.systemDefault
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.IsoFields
@@ -32,7 +32,7 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
 
-val now: ZonedDateTime = ZonedDateTime.now(ZoneId.systemDefault())
+val now: ZonedDateTime = ZonedDateTime.now(systemDefault())
 
 // -1 because clone and setMonth(true) is used for init
 // and clone now
@@ -75,7 +75,7 @@ fun encrypt(algorithm: String, input: ByteArray, key: SecretKey, iv: IvParameter
 fun maino() {
 	initCofigs()
 	
-	val save = getJson().toJson(currentmonth)
+	val save = Json().toJson(currentmonth)
 	println(save)
 	
 	val key: SecretKey = getKeyFromPassword("lulpswrd")
@@ -95,7 +95,7 @@ fun maino() {
 	val plainText = String(decrypt(algorithm, read, key, ivParameterSpec))
 	
 	println(plainText)
-	val res: Any = getJson().fromJson(getJsonReader(StringReader(plainText)), Any::class.java)
+	val res: Any = Json().fromJson(getJsonReader(StringReader(plainText)), Any::class.java)
 }
 
 
@@ -155,7 +155,7 @@ fun createAppointment(appointment: Map<String, Any>, day: Boolean): Appointment?
 
 fun prepareAppointments() {
 	val read: Map<String, ArrayList<Map<String, Any>>> =
-		getJson().fromJson(getJsonReader(FileReader(ConfigFiles.appointmentsfile)), Map::class.java)
+		Json().fromJson(getJsonReader(FileReader(ConfigFiles.appointmentsfile)), Map::class.java)
 	
 	read.forEach { (name, list) ->
 		when(name) {
@@ -164,9 +164,9 @@ fun prepareAppointments() {
 				list.forEach {
 					val appointment = createAppointment(it, false)
 					appointment?.apply {
-						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneId.systemDefault())
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), systemDefault())
 						
-						val offset: ZoneOffset = ZoneId.systemDefault().rules.getOffset(Instant.ofEpochSecond(start * 60))
+						val offset: ZoneOffset = systemDefault().rules.getOffset(Instant.ofEpochSecond(start * 60))
 						start -= time.atStartOfDay().toLocalTime().toEpochSecond(time, offset) / 60
 						day = time.dayOfWeek
 						
@@ -218,7 +218,7 @@ fun createNote(note: Map<String, Any>): Note? {
 
 fun preapareNotes() {
 	val read: Map<String, ArrayList<Map<String, Any>>> =
-		getJson().fromJson(getJsonReader(FileReader(ConfigFiles.notesfile)), Map::class.java)
+		Json().fromJson(getJsonReader(FileReader(ConfigFiles.notesfile)), Map::class.java)
 	
 	read.forEach { (name, list) ->
 		when(name) {
@@ -227,7 +227,7 @@ fun preapareNotes() {
 				list.forEach {
 					val note = createNote(it)
 					note?.apply {
-						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneId.systemDefault())
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), systemDefault())
 						
 						if(!prepareddayNotes.containsKey(time.year))
 							prepareddayNotes[time.year] = mutableMapOf()
@@ -246,7 +246,7 @@ fun preapareNotes() {
 				list.forEach {
 					val note = createNote(it)
 					note?.apply {
-						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneId.systemDefault())
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), systemDefault())
 						
 						if(!preparedweekNotes.containsKey(time.year))
 							preparedweekNotes[time.year] = mutableMapOf()

@@ -90,7 +90,7 @@ class Styles: Stylesheet() {
 		}
 		
 		CalendarView.tablecell {
-			prefHeight = 39.px
+			prefHeight = 40.px
 			
 			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
 			borderRadius += box(6.px)

@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.google.gson.stream.JsonReader
+import logic.ConfigFiles.datadirectory
 import java.io.File
 import java.io.FileReader
 import java.io.PrintWriter
@@ -47,14 +48,14 @@ var configs: MutableMap<Configs, Any> = mutableMapOf()
  * must be the first method called to read from data files
  * like fonts or language
  *
- * @see ConfigFiles.getconfigfile
- * @see ConfigFiles.getdatadirectory
+ * @see ConfigFiles.configfile
+ * @see ConfigFiles.datadirectory
  */
 fun initCofigs() {
 	val file = File(ConfigFiles.configfile)
 	if(!file.exists()) {
-		if(ConfigFiles.datadirectory.isNotEmpty()) {
-			val dir = File(ConfigFiles.datadirectory)
+		if(datadirectory.isNotEmpty()) {
+			val dir = File(datadirectory)
 			dir.mkdirs()
 		}
 		file.createNewFile()
@@ -67,7 +68,7 @@ fun initCofigs() {
 		load.forEach {
 			try {
 				configs[getJson().fromJson(
-					getJsonReader(StringReader(it.key.trim().replaceFirstChar { c -> c.titlecaseChar() })),
+					getJsonReader(StringReader(it.key.trim().replaceFirstChar(Char::titlecaseChar))),
 					Configs::class.java
 				)] = it.value
 			} catch(e: NullPointerException) {
@@ -123,7 +124,7 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 				Warning("ik49dk", e, "Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}")
 				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
 					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.LOW)
-					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
+					return getJson().fromJson(getJsonReader(StringReader("$it")), T::class.java)
 				} else
 					throw Exit("k23d1f", e)
 			}
@@ -167,9 +168,7 @@ class Exit(private val code: String, private val exception: Exception? = null): 
 			this
 	}
 	
-	override fun toString(): String {
-		return "Exit <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
-	}
+	override fun toString(): String = "Exit <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
 }
 
 /**
@@ -197,7 +196,7 @@ fun Warning(code: String, exception: Exception, log: Any) {
 		if(stacktrace)
 			e.printStackTrace(PrintWriter(writer))
 		else
-			writer.append(e.toString())
+			writer.append("$e")
 		
 		log(writer, LogType.ERROR)
 	}
@@ -212,17 +211,17 @@ enum class Configs {
 }
 
 object ConfigFiles {
-	val logfile = "Calendar.log"
+	const val logfile = "Calendar.log"
 	
-	val datadirectory = "data"
+	const val datadirectory = "data"
 	
-	val languagefile = "$datadirectory/lang.json"
+	const val languagefile = "$datadirectory/lang.json"
 	
-	val configfile = "$datadirectory/config.json"
+	const val configfile = "$datadirectory/config.json"
 	
-	val appointmentsfile = "$datadirectory/appointments.json"
+	const val appointmentsfile = "$datadirectory/appointments.json"
 	
-	val notesfile = "$datadirectory/notes/August.json"
+	const val notesfile = "$datadirectory/notes/August.json"
 }
 
 lateinit var language: Language
@@ -237,26 +236,26 @@ fun getLangString(str: String): String {
 }
 
 const val default = "{\n" +
-		"\t\"Language\": \"en\",\n" +
-		"\t\"debug\": false,\n" +
-		"\t\"printstacktrace\": true,\n" +
-		"\t\"printlogs\": true,\n" +
-		"\t\"logformat\": \"[%1\$tF %1\$tT] |%3\$-10s %4\$s %n\",\n" +
-		"\t\"Animationspeed\": 300,\n" +
-		"\t\"Animationdelay\": 120,\n" +
-		"\t\"MaxDayAppointments\": 8,\n" +
-		"\t\"Appointmenttypes\": [\n" +
-		"\t\t{\n" +
-		"\t\t\t\"name\": \"Work\",\n" +
-		"\t\t\t\"color\": \"BLUE\"\n" +
-		"\t\t},\n" +
-		"\t\t{\n" +
-		"\t\t\t\"name\": \"Sport\",\n" +
-		"\t\t\t\"color\": \"BLACK\"\n" +
-		"\t\t},\n" +
-		"\t\t{\n" +
-		"\t\t\t\"name\": \"School\",\n" +
-		"\t\t\t\"color\": \"RED\"\n" +
-		"\t\t}\n" +
-		"\t]\n" +
-		"}"
+		  "\t\"Language\": \"en\",\n" +
+		  "\t\"debug\": false,\n" +
+		  "\t\"printstacktrace\": true,\n" +
+		  "\t\"printlogs\": true,\n" +
+		  "\t\"logformat\": \"[%1\$tF %1\$tT] |%3\$-10s %4\$s %n\",\n" +
+		  "\t\"Animationspeed\": 300,\n" +
+		  "\t\"Animationdelay\": 120,\n" +
+		  "\t\"MaxDayAppointments\": 8,\n" +
+		  "\t\"Appointmenttypes\": [\n" +
+		  "\t\t{\n" +
+		  "\t\t\t\"name\": \"Work\",\n" +
+		  "\t\t\t\"color\": \"BLUE\"\n" +
+		  "\t\t},\n" +
+		  "\t\t{\n" +
+		  "\t\t\t\"name\": \"Sport\",\n" +
+		  "\t\t\t\"color\": \"BLACK\"\n" +
+		  "\t\t},\n" +
+		  "\t\t{\n" +
+		  "\t\t\t\"name\": \"School\",\n" +
+		  "\t\t\t\"color\": \"RED\"\n" +
+		  "\t\t}\n" +
+		  "\t]\n" +
+		  "}"

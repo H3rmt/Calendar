@@ -19,6 +19,7 @@ import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URI
+import kotlin.reflect.KFunction
 
 
 
@@ -78,17 +79,18 @@ class Window: App(MainView::class, Styles::class) {
 		super.start(stage)
 		removeLoading()
 		log("started Frame", LogType.NORMAL)
+		Tabmanager.openTab("calendar", ::createcalendartab)
 	}
-	
 }
 
 class MainView: View("Calendar") {
 	override val root = borderpane {
 		top = createmenubar(this)
 		log("created menubar", LogType.IMPORTANT)
+		
 		center = tabpane {
 			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
-			createcalendartab(this@tabpane)
+			Tabmanager.tabpane = this@tabpane
 		}
 		log("created tabpane", LogType.IMPORTANT)
 	}
@@ -110,7 +112,10 @@ fun createmenubar(pane: BorderPane): MenuBar {
 		menu(getLangString("show")) {
 			createMenugroup(
 				createmenuitem(this@menu, "Show Reminder", "Strg + Shift + R") { log("Show Reminder") },
-				createmenuitem(this@menu, "Show Calendar", "Strg + Shift + C") { log("Show Calendar") }
+				createmenuitem(this@menu, "Show Calendar", "Strg + Shift + C") {
+					log("Show Calendar")
+					Tabmanager.Secure.overrideTab("calendar", ::createcalendartab)
+				}
 			)
 		}
 		menu(getLangString("help")) {
@@ -184,4 +189,35 @@ fun createmenuitem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 	}
 	
 	return grid
+}
+
+
+object Tabmanager {
+	
+	lateinit var tabpane: TabPane
+	
+	/**
+	 * <identifier, Tab>
+	 */
+	private val tabs: MutableMap<String, Tab> = mutableMapOf()
+	
+	fun openTab(identifier: String, createfunction: KFunction<Tab>, vararg methodargs: Any?) {
+		val newtab = tabs.getOrElse(identifier) { createfunction.call(tabpane, *methodargs).also { tabs[identifier] = it } }
+		
+		tabpane.selectionModel.select(newtab)
+	}
+	
+	object Secure {
+		
+		fun overrideTab(identifier: String, createfunction: KFunction<Tab>, vararg methodargs: Any?) {
+			tabs[identifier]?.close()
+			
+			val newtab = createfunction.call(tabpane, *methodargs).also { tabs[identifier] = it }
+			
+			tabpane.selectionModel.select(newtab)
+		}
+	}
+	
+	override fun toString(): String = tabs.keys.toString()
+	
 }

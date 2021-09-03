@@ -8,6 +8,7 @@ import java.util.logging.Formatter
 import java.util.logging.Level
 import java.util.logging.LogRecord
 import java.util.logging.Logger
+import java.util.stream.Stream
 
 
 
@@ -58,7 +59,7 @@ fun initLogger() {
 fun log(message: Any, type: LogType = LogType.NORMAL) {
 	logger?.apply {
 		val callerlist: List<StackWalker.StackFrame> =
-			StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }
+			StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(Stream<StackWalker.StackFrame>::toList)
 		val caller = callerlist.filter { it.declaringClass.simpleName != "LoggerKt" }[0]
 		var callerstr = caller.declaringClass.simpleName.ifBlank { caller.declaringClass.name.replaceBefore('.', "").substring(1) }
 		callerstr += "." + caller.methodName + "(" + caller.fileName + ":" + caller.lineNumber + ")"
@@ -74,9 +75,7 @@ fun log(message: Any, type: LogType = LogType.NORMAL) {
 }
 
 class Log(level: Level, msg: String, private val caller: String): LogRecord(level, msg) {
-	override fun getSourceClassName(): String {
-		return caller
-	}
+	override fun getSourceClassName(): String = caller
 }
 
 

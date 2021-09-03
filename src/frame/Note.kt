@@ -1,17 +1,16 @@
 package frame
 
-import calendar.Day
-import calendar.Week
+import calendar.Celldisplay
 import javafx.scene.control.*
 import javafx.scene.paint.*
-import javafx.scene.text.*
 import logic.LogType
 import logic.log
 import tornadofx.*
 
-fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
+
+fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 	log("creating week tab", LogType.IMPORTANT)
-	return pane.tab(week.toDate()) {
+	return pane.tab("note ") { // "Notes for ${data.time.dayOfMonth}/${data.time.month}"
 		isClosable = true
 		
 		stackpane {
@@ -26,25 +25,7 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 					borderWidth += box(5.px)
 					borderRadius += box(10.px)
 				}
-				label("$week") {
-					style {
-						fontSize = 18.px
-						fontWeight = FontWeight.BOLD
-					}
-				}
-				for((key, value) in week.getallappointmentssort()) {
-					label(key.name) {
-						style {
-							fontSize = 14.px
-							fontWeight = FontWeight.BOLD
-						}
-					}
-					for(ap in value) {
-						label {
-							text = "$ap"
-						}
-					}
-				}
+				label { cell.notes }
 			}
 			
 			// used to shadow the overflow from tab

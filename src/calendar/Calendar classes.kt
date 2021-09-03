@@ -21,7 +21,10 @@ import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 
 
-interface Celldisplay
+interface Celldisplay {
+	//@Expose
+	val notes: MutableList<Note>
+}
 
 class Week(
 	_time: ZonedDateTime,
@@ -38,7 +41,7 @@ class Week(
 	val time: ZonedDateTime = _time
 	
 	@Expose
-	val notes: MutableList<Note> = mutableListOf()
+	override val notes: MutableList<Note> = mutableListOf()
 	
 	@Expose
 	val alldays: Map<DayOfWeek, Day> = mapOf(
@@ -69,13 +72,11 @@ class Week(
 		return list
 	}
 	
-	fun toDate(): String {
-		return "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
-	}
+	fun toDate(): String = "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
 	
 	fun addAppointments(appointmentslist: Map<DayOfWeek, List<Appointment>>) {
-		for(day in appointmentslist) {
-			alldays[day.key]?.appointments?.addAll(day.value)
+		for((key, value) in appointmentslist) {
+			alldays[key]?.appointments?.addAll(value)
 		}
 	}
 	
@@ -99,11 +100,9 @@ class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 	val appointments: MutableList<Appointment> = mutableListOf()
 	
 	@Expose
-	val notes: MutableList<Note> = mutableListOf()
+	override val notes: MutableList<Note> = mutableListOf()
 	
-	fun getappointmentslimit(): List<Appointment> {
-		return appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
-	}
+	fun getappointmentslimit(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
 	
 	override fun toString(): String {
 		var s = "${this::class.simpleName}{"
@@ -155,9 +154,7 @@ class Note(_start: Long, _text: String, _type: Types) {
 	@Expose
 	val type = _type
 	
-	override fun toString(): String {
-		return "$start -text- $type"
-	}
+	override fun toString(): String = "$start -text- $type"
 }
 
 
@@ -166,16 +163,12 @@ class Types(_name: String, _color: Color) {
 	val name: String = _name
 	val color: Color = _color
 	
-	override fun toString(): String {
-		return name
-	}
+	override fun toString(): String = name
 	
 	companion object {
 		private var types: MutableList<Types> = mutableListOf()
 		
-		fun getTypes(): List<Types> {
-			return types.toCollection(mutableListOf())
-		}
+		fun getTypes(): List<Types> = types.toCollection(mutableListOf())
 		
 		fun valueOf(s: String): Types {
 			types.forEach {
