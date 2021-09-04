@@ -62,7 +62,6 @@ fun frameInit() {
 		// uncomment if errorpopup should be disabled TODO(Release)
 		it.consume()
 	}
-	
 	log("launching Application", LogType.IMPORTANT)
 	LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
@@ -89,6 +88,7 @@ class MainView: View("Calendar") {
 		log("created menubar", LogType.IMPORTANT)
 		
 		center = tabpane {
+			tabDragPolicy = TabPane.TabDragPolicy.REORDER
 			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
 			Tabmanager.tabpane = this@tabpane
 		}

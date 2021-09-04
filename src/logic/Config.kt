@@ -231,9 +231,7 @@ lateinit var language: Language
  *
  * @see Language
  */
-fun getLangString(str: String): String {
-	return language[str]
-}
+fun getLangString(str: String): String = language[str]
 
 const val default = "{\n" +
 		  "\t\"Language\": \"en\",\n" +

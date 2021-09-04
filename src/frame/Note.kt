@@ -12,7 +12,6 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab("note ") { // "Notes for ${data.time.dayOfMonth}/${data.time.month}"
 		isClosable = true
-		
 		stackpane {
 			style(append = true) {
 				//maxHeight = 500.px
