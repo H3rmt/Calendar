@@ -14,9 +14,11 @@ import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.image.*
+import javafx.scene.input.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.shape.*
+import javafx.scene.text.*
 import javafx.util.*
 import logic.Configs
 import logic.LogType
@@ -158,7 +160,7 @@ fun createcalendartab(pane: TabPane): Tab {
 								
 								val cells = mutableListOf<VBox>()
 								
-								val expand = SimpleDoubleProperty(0.0)
+								val expand = SimpleDoubleProperty(detailspaneminHeight.toDouble())
 								
 								val openappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
 								val closeappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
@@ -195,6 +197,7 @@ fun createcalendartab(pane: TabPane): Tab {
 										cell.removeClass(Styles.CalendarView.hoveredtablecell)
 										hoveredcell.value = -1
 									}
+									cell.widthProperty().addListener { _, _, _ -> selectedindex.value = -2 /*-1 doesnt close -2 forces close*/ }
 								}
 								
 								var openprep = false
@@ -252,7 +255,7 @@ fun createcalendartab(pane: TabPane): Tab {
 								selectedindex.addListener(ChangeListener { _, old, new ->
 									if(new != index) {
 										removeClass(Styles.CalendarView.selectedcolumn)
-										if(old == index && new != -1) {
+										if(old == index && (new != -1 || new == -2)) {
 											onMouseExited.handle(null)
 										}
 									}
@@ -310,9 +313,7 @@ fun createCellGraphics(
 						columnRowIndex(0, 0)
 					}
 					image = Image(FileInputStream("img/remind.png"))
-					onMouseClicked = EventHandler {
-						it.consume()
-					}
+					onMouseClicked = EventHandler(MouseEvent::consume)
 				}
 				
 				label(data.time.dayOfMonth.toString()) {
@@ -343,6 +344,7 @@ fun createCellGraphics(
 					prefWidth = Int.MAX_VALUE.px
 					padding = box(3.px, 3.px, 0.px, 3.px)
 				}
+				pane {}
 				
 				label(data.WeekofYear.toString()) {
 					gridpaneConstraints {
@@ -369,22 +371,24 @@ fun createCellGraphics(
 		// appointments / weekdetails
 		val pane = pane {
 			style(append = true) {
-				//backgroundColor += Color.RED
+//				backgroundColor += Color.RED
 				// must be deactivated because style gets reset
 				// when any (mouse)events happen
 				prefHeight = detailspaneminHeight.px
-				//minHeight = detailspaneminHeight.px
+//				minHeight = detailspaneminHeight.px
 			}
 		}
 		
-		val thisexpandheight = when(data) {
-			is Day -> generateAppointmentsGraphic(data, pane, animations)
-			is Week -> generateWeekGraphic(data, pane, animations)
-			else -> 0.0
+		if((data is Day && data.appointments.isNotEmpty()) || (data is Week && data.getallappointments().isNotEmpty())) {
+			val thisexpandheight = when(data) {
+				is Day -> generateAppointmentsGraphic(data, pane, animations)
+				is Week -> generateWeekGraphic(data, pane, animations)
+				else -> 0.0
+			}
+			
+			if(expand.value < thisexpandheight)
+				expand.value = thisexpandheight
 		}
-		
-		if(expand.value < thisexpandheight)
-			expand.value = thisexpandheight
 		
 		var open = KeyValue(pane.minHeightProperty(), expand.value)
 		var closeframe = KeyFrame(Duration(0.0), open)
@@ -428,6 +432,7 @@ fun createCellGraphics(
 const val spacing = 4.0
 const val circlewidth = 8.0
 
+const val sidetopmargin = 6.0
 const val vtopmargin = 4.0
 const val hleftmargin = 8.0
 
@@ -439,7 +444,7 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	
 	val ycords = mutableListOf<Double>()
 	for(index in 0 until week.getallappointmentssort().size) {
-		ycords.add(vtopmargin + index * (spacing * 2 + circlewidth))
+		ycords.add(sidetopmargin + index * (spacing * 2 + circlewidth))
 	}
 	
 	for((index, appointmententry) in week.getallappointmentssort().entries.withIndex()) {
@@ -484,15 +489,17 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	animations[1].clear()
 	animations[1].addAll(closeTransitions)
 	
-	return (ycords.getOrNull(ycords.lastIndex) ?: 0.0) + vtopmargin * 2
+	return (ycords.getOrNull(ycords.lastIndex)?.plus(sidetopmargin) ?: 0.0)
 	
 }
 
 fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<Animation>>): Double {
 	pane.clear()
 	
-	val appointments = day.getappointmentslimit()
+	var appointments = day.getappointmentslimit()
 	val limited = appointments.size != day.appointments.size
+	if(limited)
+		appointments = appointments.dropLast(1)
 	
 	// make width even because ,5 pixel are not supported <-(AI said this)
 	val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
@@ -528,12 +535,10 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	val ycords = mutableListOf<Double>()
 	for(index in appointments.indices) {
-		ycords.add(vtopmargin + index * (spacing + circlewidth))
+		ycords.add(sidetopmargin + index * (spacing + circlewidth))
 	}
-	
-	if(limited) {
-		ycords.add(vtopmargin + ycords.size * (spacing + circlewidth))
-	}
+	if(limited)
+		ycords.add(sidetopmargin + ycords.size * (spacing + circlewidth))
 	
 	for((index, appointment) in appointments.withIndex()) {
 		pane.label(appointment.description) {
@@ -549,14 +554,17 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	}
 	
 	if(limited) {
-		pane.label("...........") {
+		pane.label("· · · · · · · · · · · · · · · · · · · · · · · ·") {
 			addClass(Styles.CalendarView.cellappointtypelabel)
+			style {
+				fontWeight = FontWeight.BOLD
+			}
 			translateX = hleftmargin
-			translateY = ycords[ycords.size - 1] - circlewidth / 1.1
+			translateY = ycords[ycords.size - 1] - circlewidth //- spacing
 			opacity = 0.0
 			
 			maxWidth = width - hleftmargin
-			ellipsisString = ".."
+			ellipsisString = ""
 			textOverrun = OverrunStyle.ELLIPSIS
 		}
 	}
@@ -569,10 +577,10 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 		val label = pane.getChildList()?.filterIsInstance<Label>()?.get(index)
 		
 		val openpath = Path()
-		openpath.elements.add(MoveTo(xcords[index], vtopmargin))
+		openpath.elements.add(MoveTo(xcords[index], sidetopmargin))
 		openpath.elements.add(
 			CubicCurveTo(
-				xcords[index], vtopmargin, hleftmargin * 1.8, vtopmargin * 1.8, hleftmargin, ycords[index]
+				xcords[index], sidetopmargin, hleftmargin * 1.8, sidetopmargin * 1.8, hleftmargin, ycords[index]
 			),
 		)
 		openTransitions.add(PathTransition(Duration(getConfig(Configs.Animationspeed)), openpath, circle))
@@ -623,5 +631,5 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	animations[1].clear()
 	animations[1].addAll(closeTransitions)
 	
-	return (ycords.getOrNull(ycords.lastIndex) ?: 0.0) + vtopmargin * 2
+	return (ycords.getOrNull(ycords.lastIndex)?.plus(sidetopmargin) ?: 0.0)
 }

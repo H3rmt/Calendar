@@ -76,8 +76,8 @@ class Styles: Stylesheet() {
 		}
 		
 		CalendarView.tableheader {
-			prefHeight = 30.px
-			minHeight = prefHeight
+//			prefHeight = 30.px
+//			minHeight = prefHeight
 			
 			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
 			borderRadius += box(10.px, 10.px, 0.px, 0.px)
@@ -103,6 +103,7 @@ class Styles: Stylesheet() {
 		CalendarView.disabledtablecell {
 			backgroundColor += c(0.98, 0.98, 0.98)
 			backgroundRadius += box(6.px)
+			borderWidth += box(2.px)
 		}
 		
 		CalendarView.hoveredtablecell {
@@ -112,8 +113,9 @@ class Styles: Stylesheet() {
 		}
 		
 		CalendarView.markedtablecell {
-			backgroundRadius += box(6.px)
 			backgroundColor += c(160, 160, 190)
+			backgroundRadius += box(6.px)
+			borderWidth += box(2.px)
 		}
 		
 		CalendarView.cellheaderlabel {

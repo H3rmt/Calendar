@@ -54,7 +54,7 @@ class Week(
 		SUNDAY to Sunday
 	)
 	
-	private fun getallappointments(): List<Appointment> {
+	fun getallappointments(): List<Appointment> {
 		val list = mutableListOf<Appointment>()
 		for(day in alldays.values) {
 			list.addAll(day.appointments)
