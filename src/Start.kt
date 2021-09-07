@@ -1,9 +1,5 @@
-import calendar.preapareNotes
-import calendar.prepareAppointments
-import calendar.prepareddayNotes
-import calendar.preparedsingleAppointments
-import calendar.preparedweekNotes
-import calendar.preparedweeklyAppointments
+
+import calendar.loadCalendarData
 import frame.frameInit
 import logic.LogType
 import logic.configs
@@ -27,10 +23,9 @@ fun main(args: Array<String>) {
 	log("Updated Logger", LogType.IMPORTANT)
 	
 	log("preparing Appointments", LogType.IMPORTANT)
-	prepareAppointments()
-	
+	// TODO
 	log("preparing Notes", LogType.IMPORTANT)
-	preapareNotes()
+	loadCalendarData()
 	
 	log("starting Frame", LogType.IMPORTANT)
 	frameInit()

@@ -59,7 +59,7 @@ fun initCofigs() {
 			dir.mkdirs()
 		}
 		file.createNewFile()
-		file.writeText(default)
+		file.writeText(configdefault)
 		log("created default config:${ConfigFiles.configfile}", LogType.WARNING)
 	}
 	
@@ -219,9 +219,11 @@ object ConfigFiles {
 	
 	const val configfile = "$datadirectory/config.json"
 	
-	const val appointmentsfile = "$datadirectory/appointments.json"
+	const val weekappointmentsfile = "$datadirectory/Week appointments.json"
 	
-	const val notesfile = "$datadirectory/notes/August.json"
+	const val appointmentsdir = "$datadirectory/appointments"
+	
+	const val notesdir = "$datadirectory/notes"
 }
 
 lateinit var language: Language
@@ -233,7 +235,9 @@ lateinit var language: Language
  */
 fun getLangString(str: String): String = language[str]
 
-const val default = "{\n" +
+const val emptydefault = "{\n\n}"
+
+const val configdefault = "{\n" +
 		  "\t\"Language\": \"en\",\n" +
 		  "\t\"debug\": false,\n" +
 		  "\t\"printstacktrace\": true,\n" +

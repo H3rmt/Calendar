@@ -33,7 +33,9 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 					borderWidth += box(5.px)
 					borderRadius += box(10.px)
 				}
-				label { cell.notes }
+				for(note in cell.notes) {
+					label("$note + Text: ${note.text}")
+				}
 			}
 			
 			// used to shadow the overflow from tab

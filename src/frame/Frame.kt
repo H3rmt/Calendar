@@ -1,7 +1,6 @@
 package frame
 
 
-import calendar.changeMonth
 import com.sun.javafx.application.LauncherImpl
 import javafx.application.*
 import javafx.scene.control.*
@@ -31,8 +30,6 @@ import kotlin.reflect.KFunction
 fun frameInit() {
 	createLoading()
 	log("created loading", LogType.NORMAL)
-	
-	changeMonth(true)
 	
 	/**
 	 * this looks pretty weird, but it essentially

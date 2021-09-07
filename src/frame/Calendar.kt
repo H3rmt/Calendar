@@ -14,7 +14,6 @@ import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.image.*
-import javafx.scene.input.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.shape.*
@@ -308,12 +307,14 @@ fun createCellGraphics(
 					prefWidth = Int.MAX_VALUE.px
 					padding = box(3.px, 3.px, 0.px, 3.px)
 				}
-				imageview {
+				anchorpane {
+					val img = imageview(Image(FileInputStream("img/remind.png")))
 					gridpaneConstraints {
 						columnRowIndex(0, 0)
 					}
-					image = Image(FileInputStream("img/remind.png"))
-					onMouseClicked = EventHandler(MouseEvent::consume)
+					onMouseClicked = EventHandler { it.consume() }
+					onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/remind marked.png")) }
+					onMouseExited = EventHandler { img.image = Image(FileInputStream("img/remind.png")) }
 				}
 				
 				label(data.time.dayOfMonth.toString()) {
@@ -322,17 +323,16 @@ fun createCellGraphics(
 					}
 					addClass(Styles.CalendarView.celllabel)
 				}
-				
-				imageview {
+				anchorpane {
+					val img = imageview(Image(FileInputStream("img/note.png")))
 					gridpaneConstraints {
 						columnRowIndex(2, 0)
 					}
-					image = Image(FileInputStream("img/note.png"))
+					onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/note marked.png")) }
+					onMouseExited = EventHandler { img.image = Image(FileInputStream("img/note.png")) }
 					onMouseClicked = EventHandler {
 						it.consume()
-						Tabmanager.openTab(
-							"DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createnotetab, data
-						)
+						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createnotetab, data)
 					}
 				}
 			}
