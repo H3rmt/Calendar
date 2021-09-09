@@ -13,7 +13,6 @@ import javafx.collections.*
 import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
-import javafx.scene.image.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.shape.*
@@ -24,9 +23,6 @@ import logic.LogType
 import logic.getConfig
 import logic.log
 import tornadofx.*
-import java.io.File
-import java.io.FileInputStream
-import javax.imageio.ImageIO
 
 
 fun createcalendartab(pane: TabPane): Tab {
@@ -307,10 +303,10 @@ fun createCellGraphics(
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px
-					padding = box(0.px, 3.px, 2.px, 3.px)
+					padding = box(0.px, 1.px, 2.px, 1.px)
 				}
 				anchorpane {
-					imageview(FXImage(ImageIO.read(File("img/remind.svg")))) {
+					imageview(FXImage("img/remind.svg")) {
 						addClass(Styles.CalendarView.celllabelicon)
 						fitHeight = 21.0
 						fitWidth = 20.0
@@ -327,7 +323,7 @@ fun createCellGraphics(
 					addClass(Styles.CalendarView.celllabel)
 				}
 				anchorpane {
-					imageview(FXImage(ImageIO.read(File("img/note.svg")))) {
+					imageview(FXImage("img/note.svg")) {
 						addClass(Styles.CalendarView.celllabelicon)
 						fitHeight = 20.5
 						fitWidth = 20.0
@@ -350,9 +346,14 @@ fun createCellGraphics(
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px
-					padding = box(3.px, 3.px, 0.px, 3.px)
+					padding = box(0.px, 3.px, 2.px, 3.px)
 				}
-				pane {}
+				
+				anchorpane {
+					gridpaneConstraints {
+						columnRowIndex(0, 0)
+					}
+				}
 				
 				label(data.WeekofYear.toString()) {
 					gridpaneConstraints {
@@ -361,17 +362,24 @@ fun createCellGraphics(
 					addClass(Styles.CalendarView.celllabel)
 				}
 				
-				imageview {
+				anchorpane {
+					imageview(FXImage("img/note.svg")) {
+						addClass(Styles.CalendarView.celllabelicon)
+						fitHeight = 20.5
+						fitWidth = 20.0
+					}
 					gridpaneConstraints {
 						columnRowIndex(2, 0)
 					}
-					image = Image(FileInputStream("img/note.png"))
+					//onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/note marked.png")) }
+					//onMouseExited = EventHandler { img.image = Image(FileInputStream("img/note.png")) }
 					onMouseClicked = EventHandler {
 						it.consume()
 						Tabmanager.openTab(
 							"WeekNotes${data.WeekofYear}/${data.time.year}", ::createnotetab, data
 						)
 					}
+					
 				}
 			}
 		}

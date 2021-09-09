@@ -7,13 +7,16 @@ import javafx.scene.control.*
 import javafx.scene.image.*
 import javafx.scene.paint.*
 import logic.LogType
+import logic.Warning
 import logic.getLangString
 import logic.log
 import tornadofx.*
 import java.awt.image.BufferedImage
 import java.io.File
 import java.time.temporal.ChronoField
+import javax.imageio.IIOException
 import javax.imageio.ImageIO
+import kotlin.random.Random
 
 
 
@@ -38,10 +41,6 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 					borderWidth += box(5.px)
 					borderRadius += box(10.px)
 				}
-				/*webview {
-					engine.load(File("img/note.svg").toURI().toASCIIString())
-				}*/
-				imageview(FXImage(ImageIO.read(File("img/note.svg")))) { }
 				for(note in cell.notes) {
 					label("$note + Text: ${note.text}")
 				}
@@ -60,8 +59,22 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 	}
 }
 
+/**
+ * <path,image>
+ */
+val cache = mutableMapOf<String, Image>()
 
-fun FXImage(image: BufferedImage, width: Int = image.width, height: Int = image.height): Image {
+fun FXImage(path: String): Image {
+	cache[path]?.let { return it }
+	val image = try {
+		ImageIO.read(File(path).takeIf { it.exists() })
+	} catch(e: IllegalArgumentException) {
+		Warning("imageerror", e, "file not found:$path")
+		imagemissing()
+	} catch(e: IIOException) {
+		Warning("imageerror", e, "can't read file:$path")
+		imagemissing()
+	}
 	val wr = WritableImage(image.width, image.height)
 	val pw = wr.pixelWriter
 	for(x in 0 until image.width) {
@@ -69,5 +82,18 @@ fun FXImage(image: BufferedImage, width: Int = image.width, height: Int = image.
 			pw.setArgb(x, y, image.getRGB(x, y))
 		}
 	}
+	cache.putIfAbsent(path, wr)
 	return wr
+}
+
+fun imagemissing(): BufferedImage {
+	val im = BufferedImage(10, 30, BufferedImage.TYPE_3BYTE_BGR)
+	val g2 = im.graphics
+	for(i in 0 until 10)
+		for(j in 0 until 30) {
+			g2.color = java.awt.Color(Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))
+			g2.drawRect(i, j, 1, 1)
+		}
+	g2.dispose()
+	return im
 }
