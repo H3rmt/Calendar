@@ -30,6 +30,7 @@
 | Esc                      | Focus Editor                               | 2                 |
 | Alt + 1                  | open Project Explorer                      | 2                 |
 | Ctrl + F7                | highlight in current File                  | 2                 |
+| Ctrl + Alt + T           | surround with                              | 2                 |
 | Ctrl + (Shift) +  W      | Select / Deselect next codeblock           | 3                 |
 | Ctrl + Alt + Shift + T   | Refactor menu                              | 3                 |
 | Ctrl + Shift + A         | Search for all Actions in ItelliJ          | 3                 |
@@ -41,5 +42,4 @@
 | Ctrl + F12               | open file structue                         | 3                 |
 | Ctrl + O                 | Override                                   | 3                 |
 | Ctrl + Shift + Up / Down | move line up / down                        | 3                 |
-| Ctrl + Alt + T           | surround with                              | 3                 |
 | Ctrl + + / -             | expand / close code block                  | 3                 |

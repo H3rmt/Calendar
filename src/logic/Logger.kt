@@ -11,27 +11,36 @@ import java.util.logging.Logger
 import java.util.stream.Stream
 
 
-
-var logger: Logger? = null
+lateinit var logger: Logger
 
 lateinit var consoleHandler: ConsoleHandler
 lateinit var fileHandler: FileHandler
 
 fun updateLogger() {
-	fileHandler.level = if(getConfig(Configs.Debug)) Level.ALL else Level.CONFIG
+	/** this is necessary to turn of printing
+	 * of webkit performance by com.sun.webkit.perf.PerfLogger
+	 * as this can't be turned off, the default loglevel
+	 * is overridden to Off so the PerfLogger created
+	 * will be disabled and don't print performance because the
+	 * Platformlogger used for their creation has a higher level
+	 * than fine because they somehow use the global logging level
+	 * as their loglevel on creation.
+	 */
+	logger.level = if(getConfig(Configs.Debug)) Level.ALL else Level.CONFIG
+	
 	consoleHandler.formatter = SimpleFormatter(getConfig(Configs.Logformat))
 	fileHandler.formatter = consoleHandler.formatter
+	
 	if(!getConfig<Boolean>(Configs.Printlogs)) {
-		logger?.removeHandler(consoleHandler)
+		logger.removeHandler(consoleHandler)
 	}
 }
 
 fun initLogger() {
 	logger = Logger.getLogger("")
-	logger?.apply {
-		for(handler in handlers) {
-			removeHandler(handler)  // remove predefined ConsoleHandler
-		}
+	logger.apply {
+		handlers.forEach { removeHandler(it) }
+		
 		level = Level.ALL
 		
 		consoleHandler = ConsoleHandler()
@@ -43,6 +52,7 @@ fun initLogger() {
 		fileHandler.formatter = SimpleFormatter("[%1\$tF %1\$tT] |%3\$-10s %4\$s %n")
 		fileHandler.level = Level.ALL
 		addHandler(fileHandler)
+		
 		fileHandler.publish(LogRecord(Level.INFO, "Logging start"))
 		log("added file Handler")
 	}
@@ -57,7 +67,7 @@ fun initLogger() {
  * @see LogType
  */
 fun log(message: Any, type: LogType = LogType.NORMAL) {
-	logger?.apply {
+	logger.apply {
 		val callerlist: List<StackWalker.StackFrame> =
 			StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(Stream<StackWalker.StackFrame>::toList)
 		val caller = callerlist.filter { it.declaringClass.simpleName != "LoggerKt" }[0]

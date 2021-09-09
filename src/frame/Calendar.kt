@@ -24,7 +24,9 @@ import logic.LogType
 import logic.getConfig
 import logic.log
 import tornadofx.*
+import java.io.File
 import java.io.FileInputStream
+import javax.imageio.ImageIO
 
 
 fun createcalendartab(pane: TabPane): Tab {
@@ -208,7 +210,7 @@ fun createcalendartab(pane: TabPane): Tab {
 											Thread.sleep(getConfig<Double>(Configs.Animationdelay).toLong())
 											if(openprep) {
 												openprep = false
-												openappointmentopenanimations.forEach { it.forEach(Animation::play) }
+												openappointmentopenanimations.forEach { ani -> ani.forEach { it.play() } }
 												opentimeline.play()
 											}
 										}.start()
@@ -220,9 +222,9 @@ fun createcalendartab(pane: TabPane): Tab {
 										if(openprep)
 											openprep = false
 										else {
-											openappointmentopenanimations.forEach { it.forEach(Animation::stop) }
+											openappointmentopenanimations.forEach { ain -> ain.forEach { it.stop() } }
 											opentimeline.stop()
-											closeappointmentopenanimations.forEach { it.forEach(Animation::play) }
+											closeappointmentopenanimations.forEach { ani -> ani.forEach { it.play() } }
 											closetimeline.play()
 										}
 									}
@@ -305,16 +307,17 @@ fun createCellGraphics(
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px
-					padding = box(3.px, 3.px, 0.px, 3.px)
+					padding = box(0.px, 3.px, 2.px, 3.px)
 				}
 				anchorpane {
-					val img = imageview(Image(FileInputStream("img/remind.png")))
-					gridpaneConstraints {
-						columnRowIndex(0, 0)
+					imageview(FXImage(ImageIO.read(File("img/remind.svg")))) {
+						addClass(Styles.CalendarView.celllabelicon)
+						fitHeight = 21.0
+						fitWidth = 20.0
 					}
 					onMouseClicked = EventHandler { it.consume() }
-					onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/remind marked.png")) }
-					onMouseExited = EventHandler { img.image = Image(FileInputStream("img/remind.png")) }
+					//onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/remind marked.png")) }
+					//onMouseExited = EventHandler { img.image = Image(FileInputStream("img/remind.png")) }
 				}
 				
 				label(data.time.dayOfMonth.toString()) {
@@ -324,16 +327,21 @@ fun createCellGraphics(
 					addClass(Styles.CalendarView.celllabel)
 				}
 				anchorpane {
-					val img = imageview(Image(FileInputStream("img/note.png")))
+					imageview(FXImage(ImageIO.read(File("img/note.svg")))) {
+						addClass(Styles.CalendarView.celllabelicon)
+						fitHeight = 20.5
+						fitWidth = 20.0
+					}
 					gridpaneConstraints {
 						columnRowIndex(2, 0)
 					}
-					onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/note marked.png")) }
-					onMouseExited = EventHandler { img.image = Image(FileInputStream("img/note.png")) }
+					//onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/note marked.png")) }
+					//onMouseExited = EventHandler { img.image = Image(FileInputStream("img/note.png")) }
 					onMouseClicked = EventHandler {
 						it.consume()
 						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createnotetab, data)
 					}
+					
 				}
 			}
 			

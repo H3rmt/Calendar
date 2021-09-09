@@ -32,6 +32,8 @@ class Styles: Stylesheet() {
 		val cellheaderlabel by cssclass()
 		val cellappointlabel by cssclass()
 		val cellappointtypelabel by cssclass()
+		
+		val celllabelicon by cssclass()
 	}
 	
 	init {
@@ -129,6 +131,11 @@ class Styles: Stylesheet() {
 			
 			prefWidth = Int.MAX_VALUE.px
 			alignment = Pos.CENTER
+		}
+		
+		CalendarView.celllabelicon {
+			prefHeight = 14.px
+			prefWidth = 14.px
 		}
 		
 		CalendarView.cellappointlabel {

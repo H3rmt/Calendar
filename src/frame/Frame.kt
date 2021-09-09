@@ -2,6 +2,7 @@ package frame
 
 
 import com.sun.javafx.application.LauncherImpl
+import frame.Tabmanager.Secure
 import javafx.application.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
@@ -59,6 +60,7 @@ fun frameInit() {
 		// uncomment if errorpopup should be disabled TODO(Release)
 		it.consume()
 	}
+	
 	log("launching Application", LogType.IMPORTANT)
 	LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
@@ -188,7 +190,15 @@ fun createmenuitem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 	return grid
 }
 
-
+/**
+ * Manges tabs for the frame and is used to
+ * create, override and close tabs
+ *
+ * it contains another object with
+ * methods that must be handled with care
+ *
+ * @see Secure
+ */
 object Tabmanager {
 	
 	lateinit var tabpane: TabPane
@@ -198,13 +208,55 @@ object Tabmanager {
 	 */
 	private val tabs: MutableMap<String, Tab> = mutableMapOf()
 	
+	/**
+	 * creates a new tab, or focuses the tab if it already exists
+	 *
+	 * takes an identifier, a function to create the tab and arguments for that function
+	 * as arguments
+	 *
+	 * adds the tab to the tabpane if new created and sets focus on that tab
+	 *
+	 * @param identifier this should be a unique identifier for the tab
+	 *                   like the title but with some extra information
+	 *                   so that it doesn't prevent another tab from getting
+	 *                   created and instead joinks focus
+	 *
+	 *                   Examples:
+	 *                   > "DayNotes2020/6/12"
+	 *                   > "Week2012/43"
+	 *                   > "Settings"
+	 *
+	 * @param createfunction the function to create the tab
+	 *
+	 *                       must take a tabpane as its first parameter
+	 *                       and return ab Tab
+	 *
+	 *                       Examples:
+	 *                       > ::createWeektab   (fun createweektab(pane: TabPane, week: Week, day: Day?): Tab)
+	 *                       > ::createNoteTab   (fun createnotetab(pane: TabPane, cell: Celldisplay): Tab)
+	 *
+	 * @param methodargs add all extra parameters apart from the tabpane here
+	 *
+	 *                       Examples:
+	 *                       > week,day
+	 *                       > data
+	 */
 	fun openTab(identifier: String, createfunction: KFunction<Tab>, vararg methodargs: Any?) {
 		val newtab = tabs.getOrElse(identifier) { createfunction.call(tabpane, *methodargs).also { tabs[identifier] = it } }
 		
 		tabpane.selectionModel.select(newtab)
 	}
 	
+	/**
+	 * this part contains methods
+	 * for the Tabmanager that should
+	 * be handled carefully.
+	 */
 	object Secure {
+		
+		fun closeTab(identifier: String) {
+			tabs[identifier]?.close()
+		}
 		
 		fun overrideTab(identifier: String, createfunction: KFunction<Tab>, vararg methodargs: Any?) {
 			tabs[identifier]?.close()
