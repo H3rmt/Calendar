@@ -3,7 +3,6 @@ package frame
 import calendar.Day
 import calendar.Week
 import javafx.scene.control.*
-import javafx.scene.paint.*
 import javafx.scene.text.*
 import logic.LogType
 import logic.log
@@ -16,16 +15,11 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 		
 		stackpane {
 			style(append = true) {
-				//maxHeight = 500.px
 				padding = box(6.px)
 			}
 			
 			vbox {
-				style {
-					borderColor += box(Color.TRANSPARENT)
-					borderWidth += box(5.px)
-					borderRadius += box(10.px)
-				}
+				addClass(Styles.Tabs.maintab)
 				label("$week") {
 					style {
 						fontSize = 18.px
@@ -50,11 +44,7 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 			// used to shadow the overflow from tab
 			pane {
 				isMouseTransparent = true
-				style {
-					borderColor += box(Color.BLACK)
-					borderWidth += box(5.px)
-					borderRadius += box(10.px)
-				}
+				addClass(Styles.Tabs.shadowborder)
 			}
 		}
 	}

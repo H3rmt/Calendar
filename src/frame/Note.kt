@@ -5,7 +5,6 @@ import calendar.Day
 import calendar.Week
 import javafx.scene.control.*
 import javafx.scene.image.*
-import javafx.scene.paint.*
 import logic.LogType
 import logic.Warning
 import logic.getLangString
@@ -31,16 +30,11 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 		isClosable = true
 		stackpane {
 			style(append = true) {
-				//maxHeight = 500.px
 				padding = box(6.px)
 			}
 			
 			vbox {
-				style {
-					borderColor += box(Color.TRANSPARENT)
-					borderWidth += box(5.px)
-					borderRadius += box(10.px)
-				}
+				addClass(Styles.Tabs.maintab)
 				for(note in cell.notes) {
 					label("$note + Text: ${note.text}")
 				}
@@ -49,11 +43,7 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 			// used to shadow the overflow from tab
 			pane {
 				isMouseTransparent = true
-				style {
-					borderColor += box(Color.BLACK)
-					borderWidth += box(5.px)
-					borderRadius += box(10.px)
-				}
+				addClass(Styles.Tabs.shadowborder)
 			}
 		}
 	}

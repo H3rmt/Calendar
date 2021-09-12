@@ -64,6 +64,7 @@ fun loadCalendarData() {
 		currentmonthName.value += "  " + calendardisplay.year
 	log("set Month to ${calendardisplay.month.name}")
 	
+	preparedweeklyAppointments.clear()
 	prepareddayNotes.clear()
 	preparedweekNotes.clear()
 	preparedsingleAppointments.clear()

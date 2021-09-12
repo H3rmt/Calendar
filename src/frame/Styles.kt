@@ -13,10 +13,19 @@ class Styles: Stylesheet() {
 		val gridpane by cssclass()
 	}
 	
-	object CalendarView {
+	object Tabs {
 		val title by cssclass()
 		val titlebuttons by cssclass()
 		
+		val maintab by cssclass()
+		val seperator by cssclass()
+		
+		val topbar by cssclass()
+		
+		val shadowborder by cssclass()
+	}
+	
+	object CalendarTableView {
 		val table by cssclass()
 		val tableitem by cssclass()
 		
@@ -55,29 +64,59 @@ class Styles: Stylesheet() {
 	}
 	
 	init {
-		CalendarView.title {
+		Tabs.title {
 			fontSize = 26.px
 			fontWeight = FontWeight.BOLD
 			textFill = Color.BLACK
 		}
 		
-		CalendarView.titlebuttons {
+		Tabs.titlebuttons {
 			focusColor = Color.BLACK
 			fontWeight = FontWeight.BOLD
 		}
 		
-		CalendarView.table {
-			prefHeight = Int.MAX_VALUE.px
+		Tabs.maintab {
+			borderColor += box(Color.TRANSPARENT)
+			borderWidth += box(5.px)
+			borderRadius += box(10.px)
 		}
 		
-		CalendarView.tableitem {
+		Tabs.seperator {
+			backgroundColor += Color.BLACK
+			prefHeight = 2.px
+			maxHeight = 2.px
+			minHeight = 2.px
+		}
+		
+		Tabs.topbar {
+			minHeight = 50.px
+			maxHeight = 50.px
+			backgroundColor += Color.DODGERBLUE
+		}
+		
+		Tabs.shadowborder {
+			borderColor += box(Color.BLACK)
+			borderWidth += box(5.px)
+			borderRadius += box(10.px)
+		}
+	}
+	
+	init {
+		
+		CalendarTableView.table {
+			prefHeight = Int.MAX_VALUE.px
+			backgroundColor += Color.WHITE
+			padding = box(3.px)
+		}
+		
+		CalendarTableView.tableitem {
 			alignment = Pos.CENTER
 			prefWidth = Int.MAX_VALUE.px
 			
 			padding = box(2.px)
 		}
 		
-		CalendarView.tableheader {
+		CalendarTableView.tableheader {
 //			prefHeight = 30.px
 //			minHeight = prefHeight
 			
@@ -86,12 +125,12 @@ class Styles: Stylesheet() {
 			borderWidth += box(2.px)
 		}
 		
-		CalendarView.selectedcolumn {
+		CalendarTableView.selectedcolumn {
 			backgroundColor += c(0.94, 0.94, 0.94)
 			backgroundRadius += box(6.px)
 		}
 		
-		CalendarView.tablecell {
+		CalendarTableView.tablecell {
 			prefHeight = 40.px
 			
 			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
@@ -102,30 +141,30 @@ class Styles: Stylesheet() {
 			backgroundRadius += box(6.px)
 		}
 		
-		CalendarView.disabledtablecell {
+		CalendarTableView.disabledtablecell {
 			backgroundColor += c(0.98, 0.98, 0.98)
 			backgroundRadius += box(6.px)
 			borderWidth += box(2.px)
 		}
 		
-		CalendarView.hoveredtablecell {
+		CalendarTableView.hoveredtablecell {
 			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
 		}
 		
-		CalendarView.markedtablecell {
-			backgroundColor += c(160, 160, 190)
+		CalendarTableView.markedtablecell {
+			backgroundColor += Color.CORNFLOWERBLUE
 			backgroundRadius += box(6.px)
 			borderWidth += box(2.px)
 		}
 		
-		CalendarView.cellheaderlabel {
+		CalendarTableView.cellheaderlabel {
 			fontSize = 12.px
 			fontWeight = FontWeight.BOLD
 		}
 		
-		CalendarView.celllabel {
+		CalendarTableView.celllabel {
 			fontSize = 14.px
 			fontWeight = FontWeight.BOLD
 			
@@ -133,16 +172,16 @@ class Styles: Stylesheet() {
 			alignment = Pos.CENTER
 		}
 		
-		CalendarView.celllabelicon {
+		CalendarTableView.celllabelicon {
 			prefHeight = 14.px
 			prefWidth = 14.px
 		}
 		
-		CalendarView.cellappointlabel {
+		CalendarTableView.cellappointlabel {
 			fontSize = 10.px
 		}
 		
-		CalendarView.cellappointtypelabel {
+		CalendarTableView.cellappointtypelabel {
 			fontSize = 12.px
 		}
 	}

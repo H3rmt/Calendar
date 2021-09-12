@@ -8,7 +8,6 @@ import java.util.logging.Formatter
 import java.util.logging.Level
 import java.util.logging.LogRecord
 import java.util.logging.Logger
-import java.util.stream.Stream
 
 
 lateinit var logger: Logger
@@ -68,11 +67,14 @@ fun initLogger() {
  */
 fun log(message: Any, type: LogType = LogType.NORMAL) {
 	logger.apply {
-		val callerlist: List<StackWalker.StackFrame> =
-			StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(Stream<StackWalker.StackFrame>::toList)
+		val callerlist: List<StackWalker.StackFrame> = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }
 		val caller = callerlist.filter { it.declaringClass.simpleName != "LoggerKt" }[0]
-		var callerstr = caller.declaringClass.simpleName.ifBlank { caller.declaringClass.name.replaceBefore('.', "").substring(1) }
-		callerstr += "." + caller.methodName + "(" + caller.fileName + ":" + caller.lineNumber + ")"
+		var callerstr = "(" + caller.fileName + ":" + caller.lineNumber + ")"
+		/*callerstr += caller.declaringClass.simpleName.ifBlank { // strange formatting because nested $1$3$2 classes because tornadoFX
+			println(caller.declaringClass.name); caller.declaringClass.name.run { substring(0, indexOf('$')) }.replaceBefore('.', "").substring(1)
+		}*/
+		callerstr += " " + caller.methodName
+		
 		when(type) {
 			LogType.LOW -> log(Log(Level.CONFIG, "$message\t\t\t\t\t\t", callerstr))
 			LogType.NORMAL -> log(Log(Level.INFO, "$message\t\t\t\t\t\t", callerstr))

@@ -14,7 +14,6 @@ import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
-import javafx.scene.paint.*
 import javafx.scene.shape.*
 import javafx.scene.text.*
 import javafx.util.*
@@ -32,41 +31,32 @@ fun createcalendartab(pane: TabPane): Tab {
 		
 		stackpane {
 			style(append = true) {
-				//maxHeight = 500.px
 				padding = box(6.px)
 			}
 			
 			// maintab
 			vbox {
-				style {
-					borderColor += box(Color.TRANSPARENT)
-					borderWidth += box(5.px)
-					borderRadius += box(10.px)
-				}
+				addClass(Styles.Tabs.maintab)
 				
 				log("creating top bar", LogType.LOW)
 				// Top bar
-				hbox {
-					alignment = Pos.CENTER
-					spacing = 40.0
+				hbox(spacing = 40.0, alignment = Pos.CENTER) {
+					addClass(Styles.Tabs.topbar)
 					style {
-						minHeight = 50.px
-						maxHeight = 50.px
-						backgroundColor += Color.DODGERBLUE
 					}
 					button("<") {
-						addClass(Styles.CalendarView.titlebuttons)
+						addClass(Styles.Tabs.titlebuttons)
 						action {
 							changeMonth(false)
 						}
 					}
 					label(currentmonthName) {
-						addClass(Styles.CalendarView.title)
+						addClass(Styles.Tabs.title)
 						minWidth = 200.0
 						alignment = Pos.CENTER
 					}
 					button(">") {
-						addClass(Styles.CalendarView.titlebuttons)
+						addClass(Styles.Tabs.titlebuttons)
 						action {
 							changeMonth(true)
 						}
@@ -75,63 +65,54 @@ fun createcalendartab(pane: TabPane): Tab {
 				
 				// seperator
 				label {
-					style {
-						backgroundColor += Color.BLACK
-						prefHeight = 2.px
-						maxHeight = 2.px
-						minHeight = 2.px
-					}
+					addClass(Styles.Tabs.seperator)
 					useMaxWidth = true
 				}
 				
 				log("creating table view", LogType.LOW)
 				// Table view
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
-					addClass(Styles.CalendarView.table)
-					style(append = true) {
-						backgroundColor += Color.WHITE
-						padding = box(3.px)
-					}
+					addClass(Styles.CalendarTableView.table)
 					
 					// Top bar
 					hbox(spacing = 5.0, alignment = Pos.CENTER) {
 						label("") {
-							addClass(Styles.CalendarView.tableitem)
+							addClass(Styles.CalendarTableView.tableitem)
 						}
 						label("Monday") {
-							addClass(Styles.CalendarView.tableitem)
-							addClass(Styles.CalendarView.tableheader)
-							addClass(Styles.CalendarView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableitem)
+							addClass(Styles.CalendarTableView.tableheader)
+							addClass(Styles.CalendarTableView.cellheaderlabel)
 						}
 						label("Tuesday") {
-							addClass(Styles.CalendarView.tableitem)
-							addClass(Styles.CalendarView.tableheader)
-							addClass(Styles.CalendarView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableitem)
+							addClass(Styles.CalendarTableView.tableheader)
+							addClass(Styles.CalendarTableView.cellheaderlabel)
 						}
 						label("Wednesday") {
-							addClass(Styles.CalendarView.tableitem)
-							addClass(Styles.CalendarView.tableheader)
-							addClass(Styles.CalendarView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableitem)
+							addClass(Styles.CalendarTableView.tableheader)
+							addClass(Styles.CalendarTableView.cellheaderlabel)
 						}
 						label("Thursday") {
-							addClass(Styles.CalendarView.tableitem)
-							addClass(Styles.CalendarView.tableheader)
-							addClass(Styles.CalendarView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableitem)
+							addClass(Styles.CalendarTableView.tableheader)
+							addClass(Styles.CalendarTableView.cellheaderlabel)
 						}
 						label("Friday") {
-							addClass(Styles.CalendarView.tableitem)
-							addClass(Styles.CalendarView.tableheader)
-							addClass(Styles.CalendarView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableitem)
+							addClass(Styles.CalendarTableView.tableheader)
+							addClass(Styles.CalendarTableView.cellheaderlabel)
 						}
 						label("Saturday") {
-							addClass(Styles.CalendarView.tableitem)
-							addClass(Styles.CalendarView.tableheader)
-							addClass(Styles.CalendarView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableitem)
+							addClass(Styles.CalendarTableView.tableheader)
+							addClass(Styles.CalendarTableView.cellheaderlabel)
 						}
 						label("Sunday") {
-							addClass(Styles.CalendarView.tableitem)
-							addClass(Styles.CalendarView.tableheader)
-							addClass(Styles.CalendarView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableitem)
+							addClass(Styles.CalendarTableView.tableheader)
+							addClass(Styles.CalendarTableView.cellheaderlabel)
 						}
 					}
 					
@@ -175,7 +156,7 @@ fun createcalendartab(pane: TabPane): Tab {
 									cells.add(tmp[0] as VBox)
 									
 									if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
-										(tmp[0] as VBox).addClass(Styles.CalendarView.markedtablecell)
+										(tmp[0] as VBox).addClass(Styles.CalendarTableView.markedtablecell)
 									
 									@Suppress("UNCHECKED_CAST")
 									openappointmentopenanimations.add(tmp[1] as MutableList<Animation>)
@@ -187,11 +168,11 @@ fun createcalendartab(pane: TabPane): Tab {
 								
 								for((cellindex, cell) in cells.withIndex()) {
 									cell.onMouseEntered = EventHandler {
-										cell.addClass(Styles.CalendarView.hoveredtablecell)
+										cell.addClass(Styles.CalendarTableView.hoveredtablecell)
 										hoveredcell.value = cellindex
 									}
 									cell.onMouseExited = EventHandler {
-										cell.removeClass(Styles.CalendarView.hoveredtablecell)
+										cell.removeClass(Styles.CalendarTableView.hoveredtablecell)
 										hoveredcell.value = -1
 									}
 									cell.widthProperty().addListener { _, _, _ -> selectedindex.value = -2 /*-1 doesnt close -2 forces close*/ }
@@ -229,10 +210,10 @@ fun createcalendartab(pane: TabPane): Tab {
 								onMouseClicked = EventHandler {
 									if(selectedindex.value != index) {
 										selectedindex.value = index
-										addClass(Styles.CalendarView.selectedcolumn)
+										addClass(Styles.CalendarTableView.selectedcolumn)
 									} else {
 										selectedindex.value = -1
-										removeClass(Styles.CalendarView.selectedcolumn)
+										removeClass(Styles.CalendarTableView.selectedcolumn)
 									}
 									if(it.clickCount > 1) {
 										log(
@@ -251,7 +232,7 @@ fun createcalendartab(pane: TabPane): Tab {
 								
 								selectedindex.addListener(ChangeListener { _, old, new ->
 									if(new != index) {
-										removeClass(Styles.CalendarView.selectedcolumn)
+										removeClass(Styles.CalendarTableView.selectedcolumn)
 										if(old == index && (new != -1 || new == -2)) {
 											onMouseExited.handle(null)
 										}
@@ -272,11 +253,7 @@ fun createcalendartab(pane: TabPane): Tab {
 			// used to shadow the overflow from tab
 			pane {
 				isMouseTransparent = true
-				style {
-					borderColor += box(Color.BLACK)
-					borderWidth += box(5.px)
-					borderRadius += box(10.px)
-				}
+				addClass(Styles.Tabs.shadowborder)
 			}
 		}
 	}
@@ -293,12 +270,12 @@ fun createCellGraphics(
 ): Array<Any?> {
 	val animations: Array<MutableList<Animation>> = arrayOf(mutableListOf(), mutableListOf())
 	val graphicContainer = source.vbox {
-		addClass(Styles.CalendarView.tableitem)
-		addClass(Styles.CalendarView.tablecell)
+		addClass(Styles.CalendarTableView.tableitem)
+		addClass(Styles.CalendarTableView.tablecell)
 		
 		if(data is Day) {
 			if(!data.partofmonth)
-				addClass(Styles.CalendarView.disabledtablecell)
+				addClass(Styles.CalendarTableView.disabledtablecell)
 			
 			gridpane {
 				style {
@@ -307,7 +284,7 @@ fun createCellGraphics(
 				}
 				anchorpane {
 					imageview(FXImage("img/remind.svg")) {
-						addClass(Styles.CalendarView.celllabelicon)
+						addClass(Styles.CalendarTableView.celllabelicon)
 						fitHeight = 21.0
 						fitWidth = 20.0
 					}
@@ -320,11 +297,11 @@ fun createCellGraphics(
 					gridpaneConstraints {
 						columnRowIndex(1, 0)
 					}
-					addClass(Styles.CalendarView.celllabel)
+					addClass(Styles.CalendarTableView.celllabel)
 				}
 				anchorpane {
 					imageview(FXImage("img/note.svg")) {
-						addClass(Styles.CalendarView.celllabelicon)
+						addClass(Styles.CalendarTableView.celllabelicon)
 						fitHeight = 20.5
 						fitWidth = 20.0
 					}
@@ -342,7 +319,7 @@ fun createCellGraphics(
 			}
 			
 		} else if(data is Week) {
-			addClass(Styles.CalendarView.disabledtablecell)
+			addClass(Styles.CalendarTableView.disabledtablecell)
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px
@@ -359,12 +336,12 @@ fun createCellGraphics(
 					gridpaneConstraints {
 						columnRowIndex(1, 0)
 					}
-					addClass(Styles.CalendarView.celllabel)
+					addClass(Styles.CalendarTableView.celllabel)
 				}
 				
 				anchorpane {
 					imageview(FXImage("img/note.svg")) {
-						addClass(Styles.CalendarView.celllabelicon)
+						addClass(Styles.CalendarTableView.celllabelicon)
 						fitHeight = 20.5
 						fitWidth = 20.0
 					}
@@ -469,7 +446,7 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 				fill = appointmententry.key.color
 			}
 			label("${appointmententry.value.size}:${appointmententry.key.name}") {
-				addClass(Styles.CalendarView.cellappointtypelabel)
+				addClass(Styles.CalendarTableView.cellappointtypelabel)
 				maxWidth = width - hleftmargin - circlewidth
 				ellipsisString = ".."
 				textOverrun = OverrunStyle.ELLIPSIS
@@ -558,7 +535,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	for((index, appointment) in appointments.withIndex()) {
 		pane.label(appointment.description) {
-			addClass(Styles.CalendarView.cellappointlabel)
+			addClass(Styles.CalendarTableView.cellappointlabel)
 			translateX = hleftmargin + circlewidth
 			translateY = ycords[index] - circlewidth / 1.1
 			opacity = 0.0
@@ -571,7 +548,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	if(limited) {
 		pane.label("· · · · · · · · · · · · · · · · · · · · · · · ·") {
-			addClass(Styles.CalendarView.cellappointtypelabel)
+			addClass(Styles.CalendarTableView.cellappointtypelabel)
 			style {
 				fontWeight = FontWeight.BOLD
 			}

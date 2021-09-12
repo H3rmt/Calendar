@@ -1,6 +1,7 @@
 package frame
 
 
+import calendar.loadCalendarData
 import com.sun.javafx.application.LauncherImpl
 import frame.Tabmanager.Secure
 import javafx.application.*
@@ -10,9 +11,12 @@ import javafx.stage.*
 import logic.Configs
 import logic.Exit
 import logic.LogType
+import logic.configs
 import logic.getConfig
 import logic.getLangString
+import logic.initCofigs
 import logic.log
+import logic.updateLogger
 import tornadofx.*
 import java.awt.Desktop
 import java.io.IOException
@@ -57,7 +61,7 @@ fun frameInit() {
 			writer.append(it.error.toString())
 		log(writer, LogType.ERROR)
 		
-		// uncomment if errorpopup should be disabled TODO(Release)
+		// uncomment if errorpopup should be disabled
 		it.consume()
 	}
 	
@@ -73,7 +77,7 @@ class PreloaderWindow: Preloader() {
 class Window: App(MainView::class, Styles::class) {
 	override fun start(stage: Stage) {
 		stage.height = 600.0
-		stage.width = 700.0
+		stage.width = 800.0
 		super.start(stage)
 		removeLoading()
 		log("started Frame", LogType.NORMAL)
@@ -99,7 +103,19 @@ fun createmenubar(pane: BorderPane): MenuBar {
 	return pane.menubar {
 		menu(getLangString("options")) {
 			createMenugroup(
-				createmenuitem(this@menu, "Reload", "F5") { log("Reload") },
+				createmenuitem(this@menu, "Reload", "F5") {
+					initCofigs()
+					log("read Configs:$configs", LogType.IMPORTANT)
+					
+					log("Updating Logger with config data\n", LogType.IMPORTANT)
+					updateLogger()
+					log("Updated Logger", LogType.IMPORTANT)
+					
+					log("preparing Appointments", LogType.IMPORTANT)
+					
+					log("preparing Notes", LogType.IMPORTANT)
+					loadCalendarData()
+				},
 				createmenuitem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
 				run { separator(); return@run null },
 				createmenuitem(this@menu, "Quit", "Strg + Q") {
@@ -111,9 +127,10 @@ fun createmenubar(pane: BorderPane): MenuBar {
 		menu(getLangString("show")) {
 			createMenugroup(
 				createmenuitem(this@menu, "Show Reminder", "Strg + Shift + R") { log("Show Reminder") },
+				createmenuitem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
 				createmenuitem(this@menu, "Show Calendar", "Strg + Shift + C") {
 					log("Show Calendar")
-					Tabmanager.Secure.overrideTab("calendar", ::createcalendartab)
+					Secure.overrideTab("calendar", ::createcalendartab)
 				}
 			)
 		}
@@ -243,6 +260,7 @@ object Tabmanager {
 	 */
 	fun openTab(identifier: String, createfunction: KFunction<Tab>, vararg methodargs: Any?) {
 		val newtab = tabs.getOrElse(identifier) { createfunction.call(tabpane, *methodargs).also { tabs[identifier] = it } }
+		newtab.setOnClosed { tabs.remove(identifier) }
 		
 		tabpane.selectionModel.select(newtab)
 	}
@@ -256,12 +274,14 @@ object Tabmanager {
 		
 		fun closeTab(identifier: String) {
 			tabs[identifier]?.close()
+			tabs.remove(identifier)
 		}
 		
 		fun overrideTab(identifier: String, createfunction: KFunction<Tab>, vararg methodargs: Any?) {
 			tabs[identifier]?.close()
 			
 			val newtab = createfunction.call(tabpane, *methodargs).also { tabs[identifier] = it }
+			newtab.setOnClosed { tabs.remove(identifier) }
 			
 			tabpane.selectionModel.select(newtab)
 		}
