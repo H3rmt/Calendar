@@ -33,12 +33,6 @@ Foreground:  1BFF18
 Show on stripe:  true
 
 
-Pattern:  ^\[[^\]]*\] \|IMPORTANT *.*
-             Highlight line
-Foreground:  1BFF18
-Show on stripe:  true
-
-
 Pattern:  ^\[[^\]]*\] \|INFO *.*
              Highlight line
 Foreground:  A3F8FF

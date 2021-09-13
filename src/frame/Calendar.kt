@@ -280,17 +280,18 @@ fun createCellGraphics(
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px
-					padding = box(0.px, 1.px, 2.px, 1.px)
+					padding = box(0.px, 3.px, 2.px, 3.px)
 				}
 				anchorpane {
-					imageview(FXImage("img/remind.svg")) {
+					val defaultimg = if(false) FXImage("img/remind.svg") else FXImage("img/remind inactive.svg")
+					val img = imageview(defaultimg) {
 						addClass(Styles.CalendarTableView.celllabelicon)
-						fitHeight = 21.0
-						fitWidth = 20.0
+						fitHeight = 21.5
+						fitWidth = 21.5
 					}
 					onMouseClicked = EventHandler { it.consume() }
-					//onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/remind marked.png")) }
-					//onMouseExited = EventHandler { img.image = Image(FileInputStream("img/remind.png")) }
+					// onMouseEntered = EventHandler { img.image = FXImage("img/remind active.svg") }
+					onMouseExited = EventHandler { img.image = defaultimg }
 				}
 				
 				label(data.time.dayOfMonth.toString()) {
@@ -300,21 +301,21 @@ fun createCellGraphics(
 					addClass(Styles.CalendarTableView.celllabel)
 				}
 				anchorpane {
-					imageview(FXImage("img/note.svg")) {
+					val defaultimg = if(data.notes.isNotEmpty()) FXImage("img/note.svg") else FXImage("img/note inactive.svg")
+					val img = imageview(defaultimg) {
 						addClass(Styles.CalendarTableView.celllabelicon)
-						fitHeight = 20.5
-						fitWidth = 20.0
+						fitHeight = 21.5
+						fitWidth = 21.5
 					}
 					gridpaneConstraints {
 						columnRowIndex(2, 0)
 					}
-					//onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/note marked.png")) }
-					//onMouseExited = EventHandler { img.image = Image(FileInputStream("img/note.png")) }
 					onMouseClicked = EventHandler {
 						it.consume()
 						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createnotetab, data)
 					}
-					
+					onMouseEntered = EventHandler { img.image = FXImage("img/note active.svg") }
+					onMouseExited = EventHandler { img.image = defaultimg }
 				}
 			}
 			
@@ -340,23 +341,23 @@ fun createCellGraphics(
 				}
 				
 				anchorpane {
-					imageview(FXImage("img/note.svg")) {
+					val defaultimg = if(data.notes.isNotEmpty()) FXImage("img/note.svg") else FXImage("img/note inactive.svg")
+					val img = imageview(defaultimg) {
 						addClass(Styles.CalendarTableView.celllabelicon)
-						fitHeight = 20.5
-						fitWidth = 20.0
+						fitHeight = 21.5
+						fitWidth = 21.5
 					}
 					gridpaneConstraints {
 						columnRowIndex(2, 0)
 					}
-					//onMouseEntered = EventHandler { img.image = Image(FileInputStream("img/note marked.png")) }
-					//onMouseExited = EventHandler { img.image = Image(FileInputStream("img/note.png")) }
 					onMouseClicked = EventHandler {
 						it.consume()
 						Tabmanager.openTab(
 							"WeekNotes${data.WeekofYear}/${data.time.year}", ::createnotetab, data
 						)
 					}
-					
+					onMouseEntered = EventHandler { img.image = FXImage("img/note active.svg") }
+					onMouseExited = EventHandler { img.image = defaultimg }
 				}
 			}
 		}

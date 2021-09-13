@@ -109,6 +109,11 @@ class Styles: Stylesheet() {
 			padding = box(3.px)
 		}
 		
+		CalendarTableView.selectedcolumn {
+			backgroundColor += c(0.94, 0.94, 0.94)
+			backgroundRadius += box(6.px)
+		}
+		
 		CalendarTableView.tableitem {
 			alignment = Pos.CENTER
 			prefWidth = Int.MAX_VALUE.px
@@ -117,28 +122,23 @@ class Styles: Stylesheet() {
 		}
 		
 		CalendarTableView.tableheader {
-//			prefHeight = 30.px
-//			minHeight = prefHeight
+			prefHeight = 30.px
+			minHeight = prefHeight
 			
-			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
+			borderColor += box(c(0.75, 0.75, 0.75))
 			borderRadius += box(10.px, 10.px, 0.px, 0.px)
 			borderWidth += box(2.px)
-		}
-		
-		CalendarTableView.selectedcolumn {
-			backgroundColor += c(0.94, 0.94, 0.94)
-			backgroundRadius += box(6.px)
 		}
 		
 		CalendarTableView.tablecell {
 			prefHeight = 40.px
 			
-			borderColor += box(c(0.82, 0.82, 0.82, 0.4))
+			backgroundColor += c(0.89, 0.89, 0.89)
+			backgroundRadius += box(6.px)
+			
+			borderColor += box(c(0.75, 0.75, 0.75))
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
-			
-			backgroundColor += c(0.92, 0.92, 0.94)
-			backgroundRadius += box(6.px)
 		}
 		
 		CalendarTableView.disabledtablecell {
@@ -155,12 +155,14 @@ class Styles: Stylesheet() {
 		
 		CalendarTableView.markedtablecell {
 			backgroundColor += Color.CORNFLOWERBLUE
-			backgroundRadius += box(6.px)
+			
+			borderColor += box(Color.BLUE)
+			borderRadius += box(6.px)
 			borderWidth += box(2.px)
 		}
 		
 		CalendarTableView.cellheaderlabel {
-			fontSize = 12.px
+			fontSize = 13.px
 			fontWeight = FontWeight.BOLD
 		}
 		

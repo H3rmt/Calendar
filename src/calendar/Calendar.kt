@@ -106,13 +106,15 @@ private fun generateMonth(monthtime: ZonedDateTime): MutableList<Week> {
 			time = time.plusDays(1)
 		} while(time.dayOfWeek.value != 1)
 		
+		val starttime = time.minusDays(7)
+		
 		val week = Week(
-			time.minusDays(7),
+			starttime,
 			days[0], days[1], days[2], days[3], days[4], days[5], days[6],
-			time.minusDays(7).get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+			starttime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 		)
 		week.addAppointments(preparedweeklyAppointments)
-		week.notes.addAll(preparedweekNotes[time.month]?.get(week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)) ?: listOf())
+		week.notes.addAll(preparedweekNotes[starttime.month]?.get(week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)) ?: listOf())
 		
 		log("added week: $week", LogType.LOW)
 		weeks.add(week)
