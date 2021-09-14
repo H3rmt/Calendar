@@ -2,9 +2,13 @@ package frame
 
 import calendar.Celldisplay
 import calendar.Day
+import calendar.Types
 import calendar.Week
+import javafx.event.*
+import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.image.*
+import javafx.scene.layout.*
 import logic.LogType
 import logic.Warning
 import logic.getLangString
@@ -35,8 +39,44 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 			
 			vbox {
 				addClass(Styles.Tabs.maintab)
-				for(note in cell.notes) {
-					label("$note + Text: ${note.text}")
+				style {
+					padding = box(0.px, 0.px, 2.px, 0.px)
+				}
+				
+				lateinit var add: Button
+				lateinit var addtype: ComboBox<String>
+				
+				val notetabs = mutableListOf<TitledPane>()
+				
+				hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
+					addClass(Styles.Tabs.topbar)
+					style {
+						padding = box(0.px, 15.px, 0.px, 15.px)
+					}
+					
+					addtype = combobox {
+						items = Types.getTypes().map { it.name }.toObservable()
+					}
+					add = button {
+						text = "Add"
+						isDisable = true
+						addtype.valueProperty().addListener { _, _, new -> isDisable = new == null || notetabs.any { it.text == new } }
+						addClass(Styles.Tabs.titlebuttons)
+					}
+				}
+				
+				seperate()
+				
+				scrollpane(fitToWidth = true) {
+					style {
+						prefHeight = Int.MAX_VALUE.px
+					}
+					vbox {
+						add.action {
+							notetabs.add(notetab(this, addtype.value))
+							add.isDisable = true
+						}
+					}
 				}
 			}
 			
@@ -45,6 +85,18 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 				isMouseTransparent = true
 				addClass(Styles.Tabs.shadowborder)
 			}
+		}
+	}
+}
+
+fun notetab(accordion: VBox, title: String): TitledPane {
+	return accordion.titledpane(title = title) {
+		style {
+			padding = box(1.px)
+		}
+		content = htmleditor {
+			addClass(Styles.disablefocus)
+			addClass(Styles.NoteTab.texteditor)
 		}
 	}
 }
@@ -86,4 +138,11 @@ fun imagemissing(): BufferedImage {
 		}
 	g2.dispose()
 	return im
+}
+
+fun EventTarget.seperate() {
+	label {
+		addClass(Styles.Tabs.seperator)
+		useMaxWidth = true
+	}
 }

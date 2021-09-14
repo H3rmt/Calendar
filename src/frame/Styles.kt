@@ -7,6 +7,11 @@ import tornadofx.*
 
 
 class Styles: Stylesheet() {
+	
+	companion object {
+		val disablefocus by cssclass()
+	}
+	
 	object Menubar {
 		val itemshortcut by cssclass()
 		val itemname by cssclass()
@@ -43,6 +48,18 @@ class Styles: Stylesheet() {
 		val cellappointtypelabel by cssclass()
 		
 		val celllabelicon by cssclass()
+	}
+	
+	object NoteTab {
+		val texteditor by cssclass()
+	}
+	
+	
+	
+	init {
+		disablefocus {
+			focusColor = Color.TRANSPARENT
+		}
 	}
 	
 	init {
@@ -102,7 +119,6 @@ class Styles: Stylesheet() {
 	}
 	
 	init {
-		
 		CalendarTableView.table {
 			prefHeight = Int.MAX_VALUE.px
 			backgroundColor += Color.WHITE
@@ -185,6 +201,13 @@ class Styles: Stylesheet() {
 		
 		CalendarTableView.cellappointtypelabel {
 			fontSize = 12.px
+		}
+	}
+	
+	init {
+		NoteTab.texteditor {
+			maxHeight = 300.px
+			minHeight = 140.px
 		}
 	}
 }

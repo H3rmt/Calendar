@@ -63,11 +63,7 @@ fun createcalendartab(pane: TabPane): Tab {
 					}
 				}
 				
-				// seperator
-				label {
-					addClass(Styles.Tabs.seperator)
-					useMaxWidth = true
-				}
+				seperate()
 				
 				log("creating table view", LogType.LOW)
 				// Table view
@@ -76,6 +72,8 @@ fun createcalendartab(pane: TabPane): Tab {
 					
 					// Top bar
 					hbox(spacing = 5.0, alignment = Pos.CENTER) {
+						padding = Insets(3.0)
+						
 						label("") {
 							addClass(Styles.CalendarTableView.tableitem)
 						}
@@ -267,7 +265,7 @@ fun createCellGraphics(
 	opentimeline: Timeline,
 	closetimeline: Timeline,
 	expand: SimpleDoubleProperty
-): Array<Any?> {
+): Array<Any> {
 	val animations: Array<MutableList<Animation>> = arrayOf(mutableListOf(), mutableListOf())
 	val graphicContainer = source.vbox {
 		addClass(Styles.CalendarTableView.tableitem)
@@ -283,7 +281,7 @@ fun createCellGraphics(
 					padding = box(0.px, 3.px, 2.px, 3.px)
 				}
 				anchorpane {
-					val defaultimg = if(false) FXImage("img/remind.svg") else FXImage("img/remind inactive.svg")
+					val defaultimg = FXImage("img/remind.svg")//if() FXImage("img/remind.svg") else FXImage("img/remind inactive.svg")
 					val img = imageview(defaultimg) {
 						addClass(Styles.CalendarTableView.celllabelicon)
 						fitHeight = 21.5
