@@ -5,12 +5,15 @@ import calendar.loadCalendarData
 import com.sun.javafx.application.LauncherImpl
 import frame.Tabmanager.Secure
 import javafx.application.*
+import javafx.event.*
 import javafx.scene.control.*
+import javafx.scene.image.*
 import javafx.scene.layout.*
 import javafx.stage.*
 import logic.Configs
 import logic.Exit
 import logic.LogType
+import logic.Warning
 import logic.configs
 import logic.getConfig
 import logic.getLangString
@@ -19,10 +22,15 @@ import logic.log
 import logic.updateLogger
 import tornadofx.*
 import java.awt.Desktop
+import java.awt.image.BufferedImage
+import java.io.File
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URI
+import javax.imageio.IIOException
+import javax.imageio.ImageIO
+import kotlin.random.Random
 import kotlin.reflect.KFunction
 
 
@@ -289,4 +297,51 @@ object Tabmanager {
 	
 	override fun toString(): String = tabs.keys.toString()
 	
+}
+
+
+/**
+ * <path,image>
+ */
+val cache = mutableMapOf<String, Image>()
+
+fun FXImage(path: String): Image {
+	cache[path]?.let { return it }
+	val image = try {
+		ImageIO.read(File(path).takeIf { it.exists() })
+	} catch(e: IllegalArgumentException) {
+		Warning("imageerror", e, "file not found:$path")
+		imagemissing()
+	} catch(e: IIOException) {
+		Warning("imageerror", e, "can't read file:$path")
+		imagemissing()
+	}
+	val wr = WritableImage(image.width, image.height)
+	val pw = wr.pixelWriter
+	for(x in 0 until image.width) {
+		for(y in 0 until image.height) {
+			pw.setArgb(x, y, image.getRGB(x, y))
+		}
+	}
+	cache.putIfAbsent(path, wr)
+	return wr
+}
+
+fun imagemissing(): BufferedImage {
+	val im = BufferedImage(10, 30, BufferedImage.TYPE_3BYTE_BGR)
+	val g2 = im.graphics
+	for(i in 0 until 10)
+		for(j in 0 until 30) {
+			g2.color = java.awt.Color(Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))
+			g2.drawRect(i, j, 1, 1)
+		}
+	g2.dispose()
+	return im
+}
+
+fun EventTarget.seperate() {
+	label {
+		addClass(Styles.Tabs.seperator)
+		useMaxWidth = true
+	}
 }

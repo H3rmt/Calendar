@@ -209,5 +209,6 @@ class Styles: Stylesheet() {
 			maxHeight = 300.px
 			minHeight = 140.px
 		}
+		
 	}
 }

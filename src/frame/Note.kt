@@ -4,22 +4,15 @@ import calendar.Celldisplay
 import calendar.Day
 import calendar.Types
 import calendar.Week
-import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
-import javafx.scene.image.*
 import javafx.scene.layout.*
+import javafx.scene.paint.*
 import logic.LogType
-import logic.Warning
 import logic.getLangString
 import logic.log
 import tornadofx.*
-import java.awt.image.BufferedImage
-import java.io.File
 import java.time.temporal.ChronoField
-import javax.imageio.IIOException
-import javax.imageio.ImageIO
-import kotlin.random.Random
 
 
 
@@ -60,6 +53,7 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 					add = button {
 						text = "Add"
 						isDisable = true
+						// disables button if no type selected or type already added
 						addtype.valueProperty().addListener { _, _, new -> isDisable = new == null || notetabs.any { it.text == new } }
 						addClass(Styles.Tabs.titlebuttons)
 					}
@@ -73,8 +67,14 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 					}
 					vbox {
 						add.action {
-							notetabs.add(notetab(this, addtype.value))
+							notetabs.add(notetab(this@vbox, addtype.value, "") { println("htmlsave for new note: $it") })
 							add.isDisable = true
+						}
+						
+						for(note in cell.notes) {
+							notetabs.add(notetab(this@vbox, note.type.name, note.text) {
+								println("htmlsave for $note: $it")
+							})
 						}
 					}
 				}
@@ -89,60 +89,42 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 	}
 }
 
-fun notetab(accordion: VBox, title: String): TitledPane {
-	return accordion.titledpane(title = title) {
+fun notetab(tabs: VBox, title: String, text: String, savefun: (String) -> Unit): TitledPane {
+	return tabs.titledpane(title = title) {
 		style {
 			padding = box(1.px)
 		}
-		content = htmleditor {
-			addClass(Styles.disablefocus)
+		
+		lateinit var save: Button
+		
+		graphic = toolbar {
+			style {
+				backgroundColor += Color.TRANSPARENT
+				padding = box(0.px, 0.px, 0.px, 20.px)
+			}
+			hbox(spacing = 20.0) {
+				style {
+					fontSize = 15.px
+				}
+				save = button(getLangString("save")) {
+					action {
+					
+					}
+				}
+				button(getLangString("delete")) {
+				
+				}
+			}
+		}
+		contentDisplay = ContentDisplay.RIGHT
+		expandedProperty().addListener { _, _, new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
+		
+		htmleditor(text) {
+			//addClass(Styles.disablefocus)
 			addClass(Styles.NoteTab.texteditor)
+			save.action {
+				savefun(this@htmleditor.htmlText)
+			}
 		}
-	}
-}
-
-/**
- * <path,image>
- */
-val cache = mutableMapOf<String, Image>()
-
-fun FXImage(path: String): Image {
-	cache[path]?.let { return it }
-	val image = try {
-		ImageIO.read(File(path).takeIf { it.exists() })
-	} catch(e: IllegalArgumentException) {
-		Warning("imageerror", e, "file not found:$path")
-		imagemissing()
-	} catch(e: IIOException) {
-		Warning("imageerror", e, "can't read file:$path")
-		imagemissing()
-	}
-	val wr = WritableImage(image.width, image.height)
-	val pw = wr.pixelWriter
-	for(x in 0 until image.width) {
-		for(y in 0 until image.height) {
-			pw.setArgb(x, y, image.getRGB(x, y))
-		}
-	}
-	cache.putIfAbsent(path, wr)
-	return wr
-}
-
-fun imagemissing(): BufferedImage {
-	val im = BufferedImage(10, 30, BufferedImage.TYPE_3BYTE_BGR)
-	val g2 = im.graphics
-	for(i in 0 until 10)
-		for(j in 0 until 30) {
-			g2.color = java.awt.Color(Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))
-			g2.drawRect(i, j, 1, 1)
-		}
-	g2.dispose()
-	return im
-}
-
-fun EventTarget.seperate() {
-	label {
-		addClass(Styles.Tabs.seperator)
-		useMaxWidth = true
 	}
 }

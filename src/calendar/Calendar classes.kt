@@ -142,10 +142,10 @@ class Appointment(_day: DayOfWeek, _start: Long, _duration: Long, _title: String
 }
 
 
-class Note(_start: Long, _text: String, _type: Types) {
+class Note(_time: Long, _text: String, _type: Types, _files: List<File>) {
 	
 	@Expose
-	var start = _start
+	var time = _time
 	// stored in minutes instead of milliseconds (60 to 1)
 	
 	@Expose
@@ -154,7 +154,25 @@ class Note(_start: Long, _text: String, _type: Types) {
 	@Expose
 	val type = _type
 	
-	override fun toString(): String = "$start -text- $type"
+	@Expose
+	val files = _files
+	
+	override fun toString(): String = "$time -text- $type  | ${files.toSet()}"
+}
+
+class File(_data: ByteArray, _name: String, _origin: String) {
+	@Expose
+	val data = _data
+	
+	@Expose
+	val name = _name
+	
+	@Expose
+	val origin = _origin
+	
+	constructor(file: java.io.File): this(file.inputStream().readAllBytes(), file.name, file.absolutePath)
+	
+	override fun toString(): String = "file: $name -> ${String(data)}"
 }
 
 

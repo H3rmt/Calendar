@@ -218,13 +218,31 @@ private fun prepareMonthAppointments(Month: Month) {
 
 private fun createNote(note: Map<String, Any>): Note? {
 	try {
+		val tmp = note["files"] as List<*>
+		val files = mutableListOf<calendar.File>()
+		for(t in tmp)
+			createNoteFile(t as Map<String, Any>)?.let { files.add(it) }
 		return Note(
-			(note["start"] as Double).toLong(),
+			(note["time"] as Double).toLong(),
 			note["text"] as String,
-			Types.valueOf(note["type"] as String)
+			Types.valueOf(note["type"] as String),
+			files
 		)
 	} catch(e: Exception) {
 		Warning("an35f7", e, "Exception creating Note from map:$note")
+	}
+	return null
+}
+
+private fun createNoteFile(file: Map<String, Any>): calendar.File? {
+	try {
+		return File(
+			ByteArray((file["data"] as Double).toInt()),
+			file["name"] as String,
+			file["origin"] as String
+		)
+	} catch(e: Exception) {
+		Warning("an35f7", e, "Exception creating NoteFile from map:$file")
 	}
 	return null
 }
@@ -244,7 +262,7 @@ private fun preapareMonthNotes(Month: Month) {
 				list.forEach {
 					val note = createNote(it)
 					note?.apply {
-						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), systemDefault())
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), systemDefault())
 						
 						if(!prepareddayNotes.containsKey(time.month))
 							prepareddayNotes[time.month] = mutableMapOf()
@@ -261,7 +279,7 @@ private fun preapareMonthNotes(Month: Month) {
 				list.forEach {
 					val note = createNote(it)
 					note?.apply {
-						val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), systemDefault())
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), systemDefault())
 						
 						if(!preparedweekNotes.containsKey(time.month))
 							preparedweekNotes[time.month] = mutableMapOf()
