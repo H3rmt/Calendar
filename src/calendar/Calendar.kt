@@ -145,14 +145,14 @@ private fun createAppointment(appointment: Map<String, Any>, day: Boolean): Appo
 		return if(day) {
 			Appointment(
 				DayOfWeek.valueOf((appointment["day"] as String).uppercase()), (appointment["start"] as Double).toLong(),
-				(appointment["duration"] as Double).toLong(), appointment["type"] as String,
-				appointment["title"] as String, Types.valueOf(appointment["type"] as String)
+				(appointment["duration"] as Double).toLong(), appointment["title"] as String,
+				appointment["description"] as String, Types.valueOf(appointment["type"] as String)
 			)
 		} else {
 			Appointment(
 				DayOfWeek.SATURDAY, (appointment["start"] as Double).toLong(),
-				(appointment["duration"] as Double).toLong(), appointment["type"] as String,
-				appointment["title"] as String, Types.valueOf(appointment["type"] as String)
+				(appointment["duration"] as Double).toLong(), appointment["title"] as String,
+				appointment["description"] as String, Types.valueOf(appointment["type"] as String)
 			)
 		}
 	} catch(e: Exception) {
@@ -237,7 +237,7 @@ private fun createNote(note: Map<String, Any>): Note? {
 private fun createNoteFile(file: Map<String, Any>): calendar.File? {
 	try {
 		return File(
-			ByteArray((file["data"] as Double).toInt()),
+			(file["data"] as List<Byte>).toByteArray(),
 			file["name"] as String,
 			file["origin"] as String
 		)
@@ -273,6 +273,7 @@ private fun preapareMonthNotes(Month: Month) {
 						log("loaded Day Note: $this", LogType.LOW)
 					}
 				}
+				log("prepared day Notes $prepareddayNotes", LogType.NORMAL)
 			}
 			"Week Notes" -> {
 				log("reading Week Notes", LogType.LOW)
@@ -290,9 +291,9 @@ private fun preapareMonthNotes(Month: Month) {
 						log("loaded week Note: $this", LogType.LOW)
 					}
 				}
+				log("prepared Week Notes $preparedweekNotes", LogType.NORMAL)
 			}
 		}
 	}
-	log("prepared week Notes $preparedweekNotes", LogType.NORMAL)
-	log("prepared day Notes $prepareddayNotes", LogType.NORMAL)
+	
 }

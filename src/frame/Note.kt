@@ -53,6 +53,7 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 					add = button {
 						text = "Add"
 						isDisable = true
+						
 						// disables button if no type selected or type already added
 						addtype.valueProperty().addListener { _, _, new -> isDisable = new == null || notetabs.any { it.text == new } }
 						addClass(Styles.Tabs.titlebuttons)
@@ -67,7 +68,7 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 					}
 					vbox {
 						add.action {
-							notetabs.add(notetab(this@vbox, addtype.value, "") { println("htmlsave for new note: $it") })
+							notetabs.add(0, notetab(this@vbox, addtype.value, "") { println("htmlsave for new note: $it") })
 							add.isDisable = true
 						}
 						
@@ -90,7 +91,12 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 }
 
 fun notetab(tabs: VBox, title: String, text: String, savefun: (String) -> Unit): TitledPane {
-	return tabs.titledpane(title = title) {
+	// cannot use the EventTarget Functions because they automatically add the
+	// pane to the end of the vbox
+	val pane = TitledPane()
+	pane.apply {
+		setText(title)
+		
 		style {
 			padding = box(1.px)
 		}
@@ -127,4 +133,8 @@ fun notetab(tabs: VBox, title: String, text: String, savefun: (String) -> Unit):
 			}
 		}
 	}
+	
+	tabs.getChildList()?.add(0, pane)
+	
+	return pane
 }

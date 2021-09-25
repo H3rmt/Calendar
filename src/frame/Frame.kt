@@ -152,8 +152,16 @@ fun createmenubar(pane: BorderPane): MenuBar {
 						log("failed to open browser", LogType.WARNING)
 					}
 				},
+				createmenuitem(this@menu, "Memory Usage", "") {
+					//System.gc()
+					val rt = Runtime.getRuntime()
+					val usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024 / 1024
+					log("used memory: $usedMB  | max memory: ${rt.maxMemory()  / 1024 / 1024}  | total memory ${rt.totalMemory()  / 1024 / 1024}  | free memory ${rt.freeMemory()  / 1024 / 1024}")
+				},
 				run { separator(); return@run null },
-				createmenuitem(this@menu, "Help", "") { log("Help") }
+				createmenuitem(this@menu, "Help", "") {
+					log("Help")
+				}
 			)
 		}
 	}

@@ -17,8 +17,6 @@ import java.time.DayOfWeek.THURSDAY
 import java.time.DayOfWeek.TUESDAY
 import java.time.DayOfWeek.WEDNESDAY
 import java.time.ZonedDateTime
-import kotlin.reflect.KVisibility
-import kotlin.reflect.full.memberProperties
 
 
 interface Celldisplay {
@@ -80,12 +78,7 @@ class Week(
 		}
 	}
 	
-	override fun toString(): String {
-		var s = "$notes | ${this::class.simpleName}{"
-		this::class.memberProperties.filter { it.visibility != KVisibility.PRIVATE }
-			.forEach { s += it.name + ":" + it.getter.call(this) + " " }
-		return "$s}"
-	}
+	override fun toString(): String = "$time $notes $alldays"
 }
 
 
@@ -104,11 +97,7 @@ class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 	
 	fun getappointmentslimit(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
 	
-	override fun toString(): String {
-		var s = "${this::class.simpleName}{"
-		this::class.memberProperties.forEach { s += it.name + ":" + it.getter.call(this) + " " }
-		return "$s}"
-	}
+	override fun toString(): String = "$time $notes $appointments"
 }
 
 
@@ -134,11 +123,7 @@ class Appointment(_day: DayOfWeek, _start: Long, _duration: Long, _title: String
 	@Expose
 	val type = _type
 	
-	override fun toString(): String {
-		var s = "${this::class.simpleName}{"
-		this::class.memberProperties.forEach { s += it.name + ":" + it.getter.call(this) + " " }
-		return "$s}"
-	}
+	override fun toString(): String = "$day: $start - $duration  $type | $title: $description"
 }
 
 
@@ -157,7 +142,7 @@ class Note(_time: Long, _text: String, _type: Types, _files: List<File>) {
 	@Expose
 	val files = _files
 	
-	override fun toString(): String = "$time -text- $type  | ${files.toSet()}"
+	override fun toString(): String = "$time $type $files"
 }
 
 class File(_data: ByteArray, _name: String, _origin: String) {
@@ -172,7 +157,7 @@ class File(_data: ByteArray, _name: String, _origin: String) {
 	
 	constructor(file: java.io.File): this(file.inputStream().readAllBytes(), file.name, file.absolutePath)
 	
-	override fun toString(): String = "file: $name -> ${String(data)}"
+	override fun toString(): String = "$name ${data.size} $origin"
 }
 
 
@@ -184,6 +169,7 @@ class Types(_name: String, _color: Color) {
 	override fun toString(): String = name
 	
 	companion object {
+		
 		private var types: MutableList<Types> = mutableListOf()
 		
 		fun getTypes(): List<Types> = types.toCollection(mutableListOf())
@@ -208,6 +194,7 @@ class Types(_name: String, _color: Color) {
 		}
 		
 		fun createTypes(data: List<Map<String, String>>) {
+			types.clear()
 			data.forEach {
 				val type = createType(it)
 				type?.apply {
@@ -215,6 +202,7 @@ class Types(_name: String, _color: Color) {
 					log("added type $type", LogType.LOW)
 				}
 			}
+			log("created types $types", LogType.NORMAL)
 		}
 	}
 }

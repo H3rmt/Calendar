@@ -10,7 +10,7 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 
 
-lateinit var logger: Logger
+var logger: Logger = Logger.getLogger("")
 
 lateinit var consoleHandler: ConsoleHandler
 lateinit var fileHandler: FileHandler
@@ -36,7 +36,6 @@ fun updateLogger() {
 }
 
 fun initLogger() {
-	logger = Logger.getLogger("")
 	logger.apply {
 		handlers.forEach { removeHandler(it) }
 		
@@ -76,11 +75,11 @@ fun log(message: Any, type: LogType = LogType.NORMAL) {
 		callerstr += " " + caller.methodName
 		
 		when(type) {
-			LogType.LOW -> log(Log(Level.CONFIG, "$message\t\t\t\t\t\t", callerstr))
-			LogType.NORMAL -> log(Log(Level.INFO, "$message\t\t\t\t\t\t", callerstr))
-			LogType.IMPORTANT -> log(Log(Important(), "$message\t\t\t\t\t\t", callerstr))
-			LogType.WARNING -> log(Log(Level.WARNING, "$message\t\t\t\t\t\t", callerstr))
-			LogType.ERROR -> log(Log(Level.SEVERE, "$message\t\t\t\t\t\t", callerstr))
+			LogType.LOW -> log(Log(Level.CONFIG, "$message", callerstr))
+			LogType.NORMAL -> log(Log(Level.INFO, "$message", callerstr))
+			LogType.IMPORTANT -> log(Log(Important(), "$message", callerstr))
+			LogType.WARNING -> log(Log(Level.WARNING, "$message", callerstr))
+			LogType.ERROR -> log(Log(Level.SEVERE, "$message", callerstr))
 		}
 	}
 	return
