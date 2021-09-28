@@ -22,6 +22,8 @@ import java.time.ZonedDateTime
 interface Celldisplay {
 	//@Expose
 	val notes: MutableList<Note>
+	
+	val time: ZonedDateTime
 }
 
 class Week(
@@ -36,7 +38,7 @@ class Week(
 	val WeekofYear: Int
 ): Celldisplay {
 	
-	val time: ZonedDateTime = _time
+	override val time: ZonedDateTime = _time
 	
 	@Expose
 	override val notes: MutableList<Note> = mutableListOf()
@@ -84,7 +86,7 @@ class Week(
 
 class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 	
-	val time: ZonedDateTime = _time
+	override val time: ZonedDateTime = _time
 	
 	@Expose
 	val partofmonth: Boolean = _partofmonth
@@ -108,7 +110,7 @@ class Appointment(_day: DayOfWeek, _start: Long, _duration: Long, _title: String
 	
 	@Expose
 	var start = _start
-	// stored in minutes instead of milliseconds (60 to 1)
+	// stored in minutes instead of seconds (60 to 1)
 	
 	@Expose
 	val duration = _duration
@@ -131,10 +133,10 @@ class Note(_time: Long, _text: String, _type: Types, _files: List<File>) {
 	
 	@Expose
 	var time = _time
-	// stored in minutes instead of milliseconds (60 to 1)
+	// stored in minutes instead of seconds (60 to 1)
 	
 	@Expose
-	val text = _text
+	var text = _text
 	
 	@Expose
 	val type = _type

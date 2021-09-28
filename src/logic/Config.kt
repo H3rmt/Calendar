@@ -18,7 +18,7 @@ import kotlin.collections.set
 import kotlin.reflect.typeOf
 
 
-private val gson: Gson = GsonBuilder()/*.setPrettyPrinting()*/.setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+private val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
 	.excludeFieldsWithoutExposeAnnotation().setFieldNamingStrategy(FieldNamingStrategy { return@FieldNamingStrategy it.name }).create()
 
 /**
@@ -68,7 +68,7 @@ fun initCofigs() {
 		load.forEach {
 			try {
 				configs[getJson().fromJson(
-					getJsonReader(StringReader(it.key.trim().replaceFirstChar(Char::titlecaseChar))),
+					getJsonReader(StringReader(it.key.trim().replaceFirstChar { it.titlecaseChar() })),
 					Configs::class.java
 				)] = it.value
 			} catch(e: NullPointerException) {

@@ -5,7 +5,6 @@ import javafx.beans.property.*
 import javafx.collections.*
 import logic.ConfigFiles
 import logic.LogType
-import logic.Warning
 import logic.emptydefault
 import logic.getJsonReader
 import logic.getLangString
@@ -34,7 +33,6 @@ val currentmonthName: SimpleStringProperty = SimpleStringProperty()
  * and on startup
  */
 fun changeMonth(right: Boolean) {
-	val bevmonth = calendardisplay.month
 	calendardisplay = calendardisplay.plusMonths(if(right) 1 else -1)
 	
 	currentmonthName.set(getLangString(calendardisplay.month.name))
@@ -42,16 +40,120 @@ fun changeMonth(right: Boolean) {
 		currentmonthName.value += "  " + calendardisplay.year
 	log("changing Month to ${calendardisplay.month.name}")
 	
-	prepareddayNotes.remove(bevmonth.minus(1))
-	preparedweekNotes.remove(bevmonth.minus(1))
-	preparedsingleAppointments.remove(bevmonth.minus(1))
+	prepareddayNotes.remove(calendardisplay.month.minus(if(right) 2 else -2))
+	preparedweekNotes.remove(calendardisplay.month.minus(if(right) 2 else -2))
+	preparedsingleAppointments.remove(calendardisplay.month.minus(if(right) 2 else -2))
 	
-	prepareMonthAppointments(calendardisplay.month.plus(1))
-	preapareMonthNotes(calendardisplay.month.plus(1))
+	prepareMonthAppointments(calendardisplay.month.plus(if(right) 1 else -1))
+	preapareMonthNotes(calendardisplay.month.plus(if(right) 1 else -1))
 	
 	val data = generateMonth(calendardisplay)
 	currentmonth.clear()
 	currentmonth.addAll(data)
+}
+
+fun saveDayNote(note: Note) {
+	val notetime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), systemDefault())
+	File(ConfigFiles.notesdir + "/${notetime.month.name}.json").run {
+		if(!exists()) {
+			log("file with notes for ${notetime.month.name} not found", LogType.LOW)
+			createNewFile()
+			writeText("{\n\t\"Week Notes\": [],\n\t\"Day Notes\": []\n}")
+		}
+	}
+	
+	val tmpdaynotes: MutableMap<Int, MutableList<Note>> = mutableMapOf()
+	
+	Json().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesdir + "/${notetime.month.name}.json")), Map::class.java)
+		.forEach { (name, list) ->
+			when(name) {
+				"Day Notes" -> {
+					log("reading Day Notes", LogType.LOW)
+					list.forEach {
+						FromJSON.createNote(it)?.apply {
+							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), systemDefault())
+							
+							if(!tmpdaynotes.containsKey(time.dayOfMonth))
+								tmpdaynotes[time.dayOfMonth] = mutableListOf()
+							
+							tmpdaynotes[time.dayOfMonth]!!.add(this)
+							log("loaded Day Note: $this", LogType.LOW)
+						}
+					}
+					log("loaded temp day Notes $tmpdaynotes", LogType.NORMAL)
+				}
+			}
+		}
+	
+	tmpdaynotes[notetime.dayOfMonth]?.removeIf { it.time == note.time && it.type == note.type }
+	
+	if(!tmpdaynotes.containsKey(notetime.dayOfMonth))
+		tmpdaynotes[notetime.dayOfMonth] = mutableListOf()
+	
+	tmpdaynotes[notetime.dayOfMonth]!!.add(note)
+	log("new day Notes $tmpdaynotes", LogType.NORMAL)
+	
+	File(ConfigFiles.notesdir + "/${notetime.month.name}.json").run {
+		val original =
+			Json().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesdir + "/${notetime.month.name}.json")), Map::class.java).toMutableMap()
+		
+		val list = mutableListOf<Map<String, Any>>()
+		tmpdaynotes.forEach { list.addAll(it.value.map { ToJson.createNote(it) }) }
+		
+		original["Day Notes"] = list as ArrayList<Map<String, Any>>
+		
+		writeText(Json().toJson(original))
+	}
+}
+
+fun removeDayNote(note: Note) {
+	val notetime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), systemDefault())
+	File(ConfigFiles.notesdir + "/${notetime.month.name}.json").run {
+		if(!exists()) {
+			log("file with notes for ${notetime.month.name} not found", LogType.LOW)
+			createNewFile()
+			writeText("{\n\t\"Week Notes\": [],\n\t\"Day Notes\": []\n}")
+		}
+	}
+	
+	val tmpdaynotes: MutableMap<Int, MutableList<Note>> = mutableMapOf()
+	
+	Json().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesdir + "/${notetime.month.name}.json")), Map::class.java)
+		.forEach { (name, list) ->
+			when(name) {
+				"Day Notes" -> {
+					log("reading Day Notes", LogType.LOW)
+					list.forEach {
+						FromJSON.createNote(it)?.apply {
+							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), systemDefault())
+							
+							if(!tmpdaynotes.containsKey(time.dayOfMonth))
+								tmpdaynotes[time.dayOfMonth] = mutableListOf()
+							
+							tmpdaynotes[time.dayOfMonth]!!.add(this)
+							log("loaded Day Note: $this", LogType.LOW)
+						}
+					}
+					log("loaded temp day Notes $tmpdaynotes", LogType.NORMAL)
+				}
+			}
+		}
+	
+	tmpdaynotes[notetime.dayOfMonth]?.removeIf { it.time == note.time && it.type == note.type }
+
+	log("new day Notes $tmpdaynotes", LogType.NORMAL)
+	
+	File(ConfigFiles.notesdir + "/${notetime.month.name}.json").run {
+		val original =
+			Json().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesdir + "/${notetime.month.name}.json")), Map::class.java).toMutableMap()
+		
+		val list = mutableListOf<Map<String, Any>>()
+		tmpdaynotes.forEach { list.addAll(it.value.map { ToJson.createNote(it) }) }
+		
+		original["Day Notes"] = list as ArrayList<Map<String, Any>>
+		
+		writeText(Json().toJson(original))
+	}
 }
 
 /**
@@ -140,27 +242,6 @@ val prepareddayNotes: MutableMap<Month, MutableMap<Int, MutableList<Note>>> = mu
 val preparedweekNotes: MutableMap<Month, MutableMap<Int, MutableList<Note>>> = mutableMapOf()
 
 
-private fun createAppointment(appointment: Map<String, Any>, day: Boolean): Appointment? {
-	try {
-		return if(day) {
-			Appointment(
-				DayOfWeek.valueOf((appointment["day"] as String).uppercase()), (appointment["start"] as Double).toLong(),
-				(appointment["duration"] as Double).toLong(), appointment["title"] as String,
-				appointment["description"] as String, Types.valueOf(appointment["type"] as String)
-			)
-		} else {
-			Appointment(
-				DayOfWeek.SATURDAY, (appointment["start"] as Double).toLong(),
-				(appointment["duration"] as Double).toLong(), appointment["title"] as String,
-				appointment["description"] as String, Types.valueOf(appointment["type"] as String)
-			)
-		}
-	} catch(e: Exception) {
-		Warning("an35f7", e, "Exception creating Appointment from map:$appointment")
-	}
-	return null
-}
-
 
 fun prepareWeekAppointments() {
 	File(ConfigFiles.weekappointmentsfile).run {
@@ -172,7 +253,7 @@ fun prepareWeekAppointments() {
 	}
 	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.weekappointmentsfile)), List::class.java).forEach { list ->
 		log("reading Week Appointment: $list", LogType.LOW)
-		createAppointment(list, true)?.run {
+		FromJSON.createAppointment(list, true)?.run {
 			if(!preparedweeklyAppointments.containsKey(day))
 				preparedweeklyAppointments[day] = mutableListOf()
 			
@@ -197,7 +278,7 @@ private fun prepareMonthAppointments(Month: Month) {
 	}
 	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsdir + "/$Month.json")), List::class.java).forEach { list ->
 		log("reading single Appointment: $list", LogType.LOW)
-		createAppointment(list, false)?.run {
+		FromJSON.createAppointment(list, false)?.run {
 			val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), systemDefault())
 			
 			val offset: ZoneOffset = systemDefault().rules.getOffset(Instant.ofEpochSecond(start * 60))
@@ -216,38 +297,6 @@ private fun prepareMonthAppointments(Month: Month) {
 }
 
 
-private fun createNote(note: Map<String, Any>): Note? {
-	try {
-		val tmp = note["files"] as List<*>
-		val files = mutableListOf<calendar.File>()
-		for(t in tmp)
-			createNoteFile(t as Map<String, Any>)?.let { files.add(it) }
-		return Note(
-			(note["time"] as Double).toLong(),
-			note["text"] as String,
-			Types.valueOf(note["type"] as String),
-			files
-		)
-	} catch(e: Exception) {
-		Warning("an35f7", e, "Exception creating Note from map:$note")
-	}
-	return null
-}
-
-private fun createNoteFile(file: Map<String, Any>): calendar.File? {
-	try {
-		return File(
-			(file["data"] as List<Byte>).toByteArray(),
-			file["name"] as String,
-			file["origin"] as String
-		)
-	} catch(e: Exception) {
-		Warning("an35f7", e, "Exception creating NoteFile from map:$file")
-	}
-	return null
-}
-
-
 private fun preapareMonthNotes(Month: Month) {
 	File(ConfigFiles.notesdir + "/$Month.json").run {
 		if(!exists()) {
@@ -260,8 +309,7 @@ private fun preapareMonthNotes(Month: Month) {
 			"Day Notes" -> {
 				log("reading Day Notes", LogType.LOW)
 				list.forEach {
-					val note = createNote(it)
-					note?.apply {
+					FromJSON.createNote(it)?.apply {
 						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), systemDefault())
 						
 						if(!prepareddayNotes.containsKey(time.month))
@@ -278,8 +326,7 @@ private fun preapareMonthNotes(Month: Month) {
 			"Week Notes" -> {
 				log("reading Week Notes", LogType.LOW)
 				list.forEach {
-					val note = createNote(it)
-					note?.apply {
+					FromJSON.createNote(it)?.apply {
 						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), systemDefault())
 						
 						if(!preparedweekNotes.containsKey(time.month))

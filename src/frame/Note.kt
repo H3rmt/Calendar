@@ -2,8 +2,12 @@ package frame
 
 import calendar.Celldisplay
 import calendar.Day
+import calendar.File
+import calendar.Note
 import calendar.Types
 import calendar.Week
+import calendar.removeDayNote
+import calendar.saveDayNote
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
@@ -68,14 +72,25 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 					}
 					vbox {
 						add.action {
-							notetabs.add(0, notetab(this@vbox, addtype.value, "") { println("htmlsave for new note: $it") })
+							val note = Note(cell.time.toEpochSecond() / 60, "", Types.valueOf(addtype.value), emptyList<File>())
+							notetabs.add(0, notetab(this@vbox, addtype.value, "",
+								{
+									note.text = (it)
+									saveDayNote(note)
+								}, {
+									removeDayNote(note)
+								})
+							)
 							add.isDisable = true
 						}
 						
 						for(note in cell.notes) {
-							notetabs.add(notetab(this@vbox, note.type.name, note.text) {
-								println("htmlsave for $note: $it")
-							})
+							notetabs.add(notetab(this@vbox, note.type.name, note.text, {
+								note.text = (it)
+								saveDayNote(note)
+							}, {
+								removeDayNote(note)
+							}))
 						}
 					}
 				}
@@ -90,7 +105,7 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 	}
 }
 
-fun notetab(tabs: VBox, title: String, text: String, savefun: (String) -> Unit): TitledPane {
+fun notetab(tabs: VBox, title: String, text: String, savefun: (String) -> Unit, deletefun: () -> Unit): TitledPane {
 	// cannot use the EventTarget Functions because they automatically add the
 	// pane to the end of the vbox
 	val pane = TitledPane()
@@ -112,13 +127,10 @@ fun notetab(tabs: VBox, title: String, text: String, savefun: (String) -> Unit):
 				style {
 					fontSize = 15.px
 				}
-				save = button(getLangString("save")) {
-					action {
-					
-					}
-				}
-				button(getLangString("delete")) {
+				save = button(getLangString("save"))
 				
+				button(getLangString("delete")) {
+					action { deletefun() }
 				}
 			}
 		}
