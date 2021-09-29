@@ -7,7 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.google.gson.stream.JsonReader
-import logic.ConfigFiles.datadirectory
+import logic.ConfigFiles.dataDirectory
 import java.io.File
 import java.io.FileReader
 import java.io.PrintWriter
@@ -30,11 +30,7 @@ fun getJson() = gson
  * returns configured JSON reader
  * accepts " " in Strings
  */
-fun getJsonReader(reader: Reader): JsonReader {
-	val retreader = JsonReader(reader)
-	retreader.isLenient = true
-	return retreader
-}
+fun getJsonReader(reader: Reader): JsonReader = JsonReader(reader).apply { isLenient = true }
 
 /**
  * map that links A config with a JSON string
@@ -49,17 +45,17 @@ var configs: MutableMap<Configs, Any> = mutableMapOf()
  * like fonts or language
  *
  * @see ConfigFiles.configfile
- * @see ConfigFiles.datadirectory
+ * @see ConfigFiles.dataDirectory
  */
-fun initCofigs() {
+fun initConfigs() {
 	val file = File(ConfigFiles.configfile)
 	if(!file.exists()) {
-		if(datadirectory.isNotEmpty()) {
-			val dir = File(datadirectory)
+		if(dataDirectory.isNotEmpty()) {
+			val dir = File(dataDirectory)
 			dir.mkdirs()
 		}
 		file.createNewFile()
-		file.writeText(configdefault)
+		file.writeText(configDefault)
 		log("created default config:${ConfigFiles.configfile}", LogType.WARNING)
 	}
 	
@@ -68,7 +64,7 @@ fun initCofigs() {
 		load.forEach {
 			try {
 				configs[getJson().fromJson(
-					getJsonReader(StringReader(it.key.trim().replaceFirstChar { it.titlecaseChar() })),
+					getJsonReader(StringReader(it.key.trim().replaceFirstChar { c -> c.titlecaseChar() })),
 					Configs::class.java
 				)] = it.value
 			} catch(e: NullPointerException) {
@@ -90,7 +86,7 @@ fun initCofigs() {
 	stacktrace = getConfig(Configs.Printstacktrace)
 	log("set stacktrace $stacktrace", LogType.LOW)
 	
-	Types.createTypes(getConfig(Configs.Appointmenttypes))
+	Types.createTypes(getConfig(Configs.AppointmentTypes))
 	log("loaded Types ${Types.getTypes()}", LogType.LOW)
 }
 
@@ -139,7 +135,7 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 
 /**
  * is set to true at beginning of programm to prevent
- * stackoverflow if error produced bevore loading configuration
+ * stackoverflow if error produced before loading configuration
  * checks for stacktrace
  */
 var stacktrace = true
@@ -207,23 +203,23 @@ fun Warning(code: String, exception: Exception, log: Any) {
  */
 enum class Configs {
 	Language, Debug, Printlogs, Logformat, Printstacktrace,
-	Animationspeed, Animationdelay, MaxDayAppointments, Appointmenttypes
+	AnimationSpeed, AnimationDelay, MaxDayAppointments, AppointmentTypes
 }
 
 object ConfigFiles {
 	const val logfile = "Calendar.log"
 	
-	const val datadirectory = "data"
+	const val dataDirectory = "data"
 	
-	const val languagefile = "$datadirectory/lang.json"
+	const val languageFile = "$dataDirectory/lang.json"
 	
-	const val configfile = "$datadirectory/config.json"
+	const val configfile = "$dataDirectory/config.json"
 	
-	const val weekappointmentsfile = "$datadirectory/Week appointments.json"
+	const val weekAppointmentsFile = "$dataDirectory/Week appointments.json"
 	
-	const val appointmentsdir = "$datadirectory/appointments"
+	const val appointmentsDir = "$dataDirectory/appointments"
 	
-	const val notesdir = "$datadirectory/notes"
+	const val notesDir = "$dataDirectory/notes"
 }
 
 lateinit var language: Language
@@ -235,18 +231,18 @@ lateinit var language: Language
  */
 fun getLangString(str: String): String = language[str]
 
-const val emptydefault = "{\n\n}"
+const val emptyDefault = "{\n\n}"
 
-const val configdefault = "{\n" +
+const val configDefault = "{\n" +
 		  "\t\"Language\": \"en\",\n" +
 		  "\t\"debug\": false,\n" +
 		  "\t\"printstacktrace\": true,\n" +
 		  "\t\"printlogs\": true,\n" +
 		  "\t\"logformat\": \"[%1\$tF %1\$tT] |%3\$-10s %4\$s %n\",\n" +
-		  "\t\"Animationspeed\": 300,\n" +
-		  "\t\"Animationdelay\": 120,\n" +
+		  "\t\"AnimationSpeed\": 300,\n" +
+		  "\t\"AnimationDelay\": 120,\n" +
 		  "\t\"MaxDayAppointments\": 8,\n" +
-		  "\t\"Appointmenttypes\": [\n" +
+		  "\t\"AppointmentTypes\": [\n" +
 		  "\t\t{\n" +
 		  "\t\t\t\"name\": \"Work\",\n" +
 		  "\t\t\t\"color\": \"BLUE\"\n" +

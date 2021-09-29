@@ -17,7 +17,7 @@ import logic.Warning
 import logic.configs
 import logic.getConfig
 import logic.getLangString
-import logic.initCofigs
+import logic.initConfigs
 import logic.log
 import logic.updateLogger
 import tornadofx.*
@@ -51,7 +51,7 @@ fun frameInit() {
 	 *
 	 * /*
 	 * if it is not an Exit(custom Exception) then
-	 * Exit<errorocode> -> Exception is added at the beginning
+	 * Exit<errorCode> -> Exception is added at the beginning
 	 * */
 	 *
 	 * @see Exit
@@ -69,7 +69,7 @@ fun frameInit() {
 			writer.append(it.error.toString())
 		log(writer, LogType.ERROR)
 		
-		// uncomment if errorpopup should be disabled
+		// uncomment if errorPopup should be disabled
 		it.consume()
 	}
 	
@@ -110,9 +110,9 @@ class MainView: View("Calendar") {
 fun createmenubar(pane: BorderPane): MenuBar {
 	return pane.menubar {
 		menu(getLangString("options")) {
-			createMenugroup(
-				createmenuitem(this@menu, "Reload", "F5") {
-					initCofigs()
+			createMenuGroup(
+				createMenuItem(this@menu, "Reload", "F5") {
+					initConfigs()
 					log("read Configs:$configs", LogType.IMPORTANT)
 					
 					log("Updating Logger with config data\n", LogType.IMPORTANT)
@@ -124,27 +124,27 @@ fun createmenubar(pane: BorderPane): MenuBar {
 					log("preparing Notes", LogType.IMPORTANT)
 					loadCalendarData()
 				},
-				createmenuitem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
+				createMenuItem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
 				run { separator(); return@run null },
-				createmenuitem(this@menu, "Quit", "Strg + Q") {
+				createMenuItem(this@menu, "Quit", "Strg + Q") {
 					log("exiting Program via quit", LogType.IMPORTANT)
 					Platform.exit()
 				}
 			)
 		}
 		menu(getLangString("show")) {
-			createMenugroup(
-				createmenuitem(this@menu, "Show Reminder", "Strg + Shift + R") { log("Show Reminder") },
-				createmenuitem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
-				createmenuitem(this@menu, "Show Calendar", "Strg + Shift + C") {
+			createMenuGroup(
+				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") { log("Show Reminder") },
+				createMenuItem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
+				createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {
 					log("Show Calendar")
 					Secure.overrideTab("calendar", ::createcalendartab)
 				}
 			)
 		}
 		menu(getLangString("help")) {
-			createMenugroup(
-				createmenuitem(this@menu, "Github", "") {
+			createMenuGroup(
+				createMenuItem(this@menu, "Github", "") {
 					log("Open Github", LogType.IMPORTANT)
 					try {
 						Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
@@ -152,14 +152,14 @@ fun createmenubar(pane: BorderPane): MenuBar {
 						log("failed to open browser", LogType.WARNING)
 					}
 				},
-				createmenuitem(this@menu, "Memory Usage", "") {
+				createMenuItem(this@menu, "Memory Usage", "") {
 					//System.gc()
 					val rt = Runtime.getRuntime()
 					val usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024 / 1024
-					log("used memory: $usedMB  | max memory: ${rt.maxMemory()  / 1024 / 1024}  | total memory ${rt.totalMemory()  / 1024 / 1024}  | free memory ${rt.freeMemory()  / 1024 / 1024}")
+					log("used memory: $usedMB  | max memory: ${rt.maxMemory() / 1024 / 1024}  | total memory ${rt.totalMemory() / 1024 / 1024}  | free memory ${rt.freeMemory() / 1024 / 1024}")
 				},
 				run { separator(); return@run null },
-				createmenuitem(this@menu, "Help", "") {
+				createMenuItem(this@menu, "Help", "") {
 					log("Help")
 				}
 			)
@@ -167,18 +167,18 @@ fun createmenubar(pane: BorderPane): MenuBar {
 	}
 }
 
-fun createMenugroup(vararg panes: GridPane?) {
-	log("creating Menugroup with ${panes.size} elements", LogType.LOW)
+fun createMenuGroup(vararg panes: GridPane?) {
+	log("creating MenuGroup with ${panes.size} elements", LogType.LOW)
 	var maxWidth = 10.0
 	val items = panes.filterNotNull()
 	val changed = mutableListOf<GridPane>()
 	items.forEach { item ->
 		item.apply {
-			widthProperty().addListener(ChangeListener { _, _, newwidth ->
+			widthProperty().addListener(ChangeListener { _, _, newWidth ->
 				if(!changed.contains(this))
 					changed.add(this)
-				if(newwidth.toDouble() > maxWidth)
-					maxWidth = newwidth.toDouble()
+				if(newWidth.toDouble() > maxWidth)
+					maxWidth = newWidth.toDouble()
 				if(changed.size == items.size)
 					items.forEach {
 						it.prefWidth = maxWidth
@@ -188,15 +188,15 @@ fun createMenugroup(vararg panes: GridPane?) {
 	}
 }
 
-fun createmenuitem(menu: Menu, name: String, shortcut: String, action: () -> Unit): GridPane? {
-	log("creating menuitem: $name $shortcut", LogType.LOW)
+fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Unit): GridPane? {
+	log("creating menuItem: $name $shortcut", LogType.LOW)
 	var grid: GridPane? = null
 	menu.customitem {
 		grid = gridpane {
-			addClass(Styles.Menubar.gridpane)
+			addClass(Styles.Menubar.gridPane)
 			
 			label(getLangString(name)) {
-				addClass(Styles.Menubar.itemname)
+				addClass(Styles.Menubar.itemName)
 				gridpaneConstraints {
 					columnRowIndex(0, 0)
 				}
@@ -211,7 +211,7 @@ fun createmenuitem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 				}
 			}
 			label(shortcut) {
-				addClass(Styles.Menubar.itemshortcut)
+				addClass(Styles.Menubar.itemShortcut)
 				gridpaneConstraints {
 					columnRowIndex(2, 0)
 				}
@@ -259,23 +259,23 @@ object Tabmanager {
 	 *                   > "Week2012/43"
 	 *                   > "Settings"
 	 *
-	 * @param createfunction the function to create the tab
+	 * @param createFunction the function to create the tab
 	 *
 	 *                       must take a tabpane as its first parameter
 	 *                       and return ab Tab
 	 *
 	 *                       Examples:
-	 *                       > ::createWeektab   (fun createweektab(pane: TabPane, week: Week, day: Day?): Tab)
-	 *                       > ::createNoteTab   (fun createnotetab(pane: TabPane, cell: Celldisplay): Tab)
+	 *                       > ::createWeekTab   (fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab)
+	 *                       > ::createNoteTab   (fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab)
 	 *
-	 * @param methodargs add all extra parameters apart from the tabpane here
+	 * @param methodArgs add all extra parameters apart from the tabpane here
 	 *
 	 *                       Examples:
 	 *                       > week,day
 	 *                       > data
 	 */
-	fun openTab(identifier: String, createfunction: KFunction<Tab>, vararg methodargs: Any?) {
-		val newtab = tabs.getOrElse(identifier) { createfunction.call(tabpane, *methodargs).also { tabs[identifier] = it } }
+	fun openTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
+		val newtab = tabs.getOrElse(identifier) { createFunction.call(tabpane, *methodArgs).also { tabs[identifier] = it } }
 		newtab.setOnClosed { tabs.remove(identifier) }
 		
 		tabpane.selectionModel.select(newtab)
@@ -288,15 +288,16 @@ object Tabmanager {
 	 */
 	object Secure {
 		
+		@Suppress("unused")
 		fun closeTab(identifier: String) {
 			tabs[identifier]?.close()
 			tabs.remove(identifier)
 		}
 		
-		fun overrideTab(identifier: String, createfunction: KFunction<Tab>, vararg methodargs: Any?) {
+		fun overrideTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
 			tabs[identifier]?.close()
 			
-			val newtab = createfunction.call(tabpane, *methodargs).also { tabs[identifier] = it }
+			val newtab = createFunction.call(tabpane, *methodArgs).also { tabs[identifier] = it }
 			newtab.setOnClosed { tabs.remove(identifier) }
 			
 			tabpane.selectionModel.select(newtab)
@@ -313,16 +314,16 @@ object Tabmanager {
  */
 val cache = mutableMapOf<String, Image>()
 
-fun FXImage(path: String): Image {
+fun createFXImage(path: String): Image {
 	cache[path]?.let { return it }
 	val image = try {
 		ImageIO.read(File(path).takeIf { it.exists() })
 	} catch(e: IllegalArgumentException) {
-		Warning("imageerror", e, "file not found:$path")
-		imagemissing()
+		Warning("imageError", e, "file not found:$path")
+		getImageMissing()
 	} catch(e: IIOException) {
-		Warning("imageerror", e, "can't read file:$path")
-		imagemissing()
+		Warning("imageError", e, "can't read file:$path")
+		getImageMissing()
 	}
 	val wr = WritableImage(image.width, image.height)
 	val pw = wr.pixelWriter
@@ -335,7 +336,7 @@ fun FXImage(path: String): Image {
 	return wr
 }
 
-fun imagemissing(): BufferedImage {
+fun getImageMissing(): BufferedImage {
 	val im = BufferedImage(10, 30, BufferedImage.TYPE_3BYTE_BGR)
 	val g2 = im.graphics
 	for(i in 0 until 10)
@@ -347,9 +348,9 @@ fun imagemissing(): BufferedImage {
 	return im
 }
 
-fun EventTarget.seperate() {
+fun EventTarget.separate() {
 	label {
-		addClass(Styles.Tabs.seperator)
+		addClass(Styles.Tabs.separator)
 		useMaxWidth = true
 	}
 }

@@ -4,8 +4,8 @@ import calendar.Celldisplay
 import calendar.Day
 import calendar.Week
 import calendar.changeMonth
-import calendar.currentmonth
-import calendar.currentmonthName
+import calendar.currentMonth
+import calendar.currentMonthName
 import calendar.now
 import javafx.animation.*
 import javafx.beans.property.*
@@ -34,9 +34,9 @@ fun createcalendartab(pane: TabPane): Tab {
 				padding = box(6.px)
 			}
 			
-			// maintab
+			// mainTab
 			vbox {
-				addClass(Styles.Tabs.maintab)
+				addClass(Styles.Tabs.mainTab)
 				
 				log("creating top bar", LogType.LOW)
 				// Top bar
@@ -45,25 +45,25 @@ fun createcalendartab(pane: TabPane): Tab {
 					style {
 					}
 					button("<") {
-						addClass(Styles.Tabs.titlebuttons)
+						addClass(Styles.Tabs.titleButtons)
 						action {
 							changeMonth(false)
 						}
 					}
-					label(currentmonthName) {
+					label(currentMonthName) {
 						addClass(Styles.Tabs.title)
 						minWidth = 200.0
 						alignment = Pos.CENTER
 					}
 					button(">") {
-						addClass(Styles.Tabs.titlebuttons)
+						addClass(Styles.Tabs.titleButtons)
 						action {
 							changeMonth(true)
 						}
 					}
 				}
 				
-				seperate()
+				separate()
 				
 				log("creating table view", LogType.LOW)
 				// Table view
@@ -75,162 +75,161 @@ fun createcalendartab(pane: TabPane): Tab {
 						padding = Insets(3.0)
 						
 						label("") {
-							addClass(Styles.CalendarTableView.tableitem)
+							addClass(Styles.CalendarTableView.tableItem)
 						}
 						label("Monday") {
-							addClass(Styles.CalendarTableView.tableitem)
-							addClass(Styles.CalendarTableView.tableheader)
-							addClass(Styles.CalendarTableView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.CalendarTableView.tableHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
 						}
 						label("Tuesday") {
-							addClass(Styles.CalendarTableView.tableitem)
-							addClass(Styles.CalendarTableView.tableheader)
-							addClass(Styles.CalendarTableView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.CalendarTableView.tableHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
 						}
 						label("Wednesday") {
-							addClass(Styles.CalendarTableView.tableitem)
-							addClass(Styles.CalendarTableView.tableheader)
-							addClass(Styles.CalendarTableView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.CalendarTableView.tableHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
 						}
 						label("Thursday") {
-							addClass(Styles.CalendarTableView.tableitem)
-							addClass(Styles.CalendarTableView.tableheader)
-							addClass(Styles.CalendarTableView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.CalendarTableView.tableHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
 						}
 						label("Friday") {
-							addClass(Styles.CalendarTableView.tableitem)
-							addClass(Styles.CalendarTableView.tableheader)
-							addClass(Styles.CalendarTableView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.CalendarTableView.tableHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
 						}
 						label("Saturday") {
-							addClass(Styles.CalendarTableView.tableitem)
-							addClass(Styles.CalendarTableView.tableheader)
-							addClass(Styles.CalendarTableView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.CalendarTableView.tableHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
 						}
 						label("Sunday") {
-							addClass(Styles.CalendarTableView.tableitem)
-							addClass(Styles.CalendarTableView.tableheader)
-							addClass(Styles.CalendarTableView.cellheaderlabel)
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.CalendarTableView.tableHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
 						}
 					}
 					
 					// remove existing columns without removing header
-					val columnlist: MutableList<HBox> = mutableListOf()
+					val columnList: MutableList<HBox> = mutableListOf()
 					
 					fun updateTable(list: ObservableList<out Week>) {
-						children.removeAll(columnlist)
-						columnlist.clear()
+						children.removeAll(columnList)
+						columnList.clear()
 						
 						log("updated table view", LogType.LOW)
 						
-						val selectedindex = SimpleIntegerProperty(-1)
+						val selectedIndex = SimpleIntegerProperty(-1)
 						
 						for((index, week) in list.withIndex()) {
 							hbox(spacing = 5.0, alignment = Pos.CENTER) {
-								columnlist.add(this@hbox)
+								columnList.add(this@hbox)
 								
 								padding = Insets(3.0)
 								
-								val opentimeline = Timeline()
-								val closetimeline = Timeline()
+								val openTimeline = Timeline()
+								val closeTimeline = Timeline()
 								
 								val cells = mutableListOf<VBox>()
 								
 								val expand = SimpleDoubleProperty(detailspaneminHeight.toDouble())
 								
-								val openappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
-								val closeappointmentopenanimations: MutableList<MutableList<Animation>> = mutableListOf()
+								val openAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
+								val closeAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
 								
-								
-								val temp = createCellGraphics(week, this@hbox, opentimeline, closetimeline, expand)
+								val temp = createCellGraphics(week, this@hbox, openTimeline, closeTimeline, expand)
 								cells.add(temp[0] as VBox)
 								@Suppress("UNCHECKED_CAST")
-								openappointmentopenanimations.add(temp[1] as MutableList<Animation>)
+								openAppointmentOpenAnimations.add(temp[1] as MutableList<Animation>)
 								@Suppress("UNCHECKED_CAST")
-								closeappointmentopenanimations.add(temp[2] as MutableList<Animation>)
+								closeAppointmentOpenAnimations.add(temp[2] as MutableList<Animation>)
 								
-								week.alldays.values.forEach {
-									val tmp = createCellGraphics(it, this@hbox, opentimeline, closetimeline, expand)
+								week.allDays.values.forEach {
+									val tmp = createCellGraphics(it, this@hbox, openTimeline, closeTimeline, expand)
 									cells.add(tmp[0] as VBox)
 									
 									if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
-										(tmp[0] as VBox).addClass(Styles.CalendarTableView.markedtablecell)
+										(tmp[0] as VBox).addClass(Styles.CalendarTableView.markedTableCell)
 									
 									@Suppress("UNCHECKED_CAST")
-									openappointmentopenanimations.add(tmp[1] as MutableList<Animation>)
+									openAppointmentOpenAnimations.add(tmp[1] as MutableList<Animation>)
 									@Suppress("UNCHECKED_CAST")
-									closeappointmentopenanimations.add(tmp[2] as MutableList<Animation>)
+									closeAppointmentOpenAnimations.add(tmp[2] as MutableList<Animation>)
 								}
 								
-								val hoveredcell = SimpleIntegerProperty(-1)
+								val hoveredCell = SimpleIntegerProperty(-1)
 								
-								for((cellindex, cell) in cells.withIndex()) {
+								for((cellIndex, cell) in cells.withIndex()) {
 									cell.onMouseEntered = EventHandler {
-										cell.addClass(Styles.CalendarTableView.hoveredtablecell)
-										hoveredcell.value = cellindex
+										cell.addClass(Styles.CalendarTableView.hoveredTableCell)
+										hoveredCell.value = cellIndex
 									}
 									cell.onMouseExited = EventHandler {
-										cell.removeClass(Styles.CalendarTableView.hoveredtablecell)
-										hoveredcell.value = -1
+										cell.removeClass(Styles.CalendarTableView.hoveredTableCell)
+										hoveredCell.value = -1
 									}
-									cell.widthProperty().addListener { _, _, _ -> selectedindex.value = -2 /*-1 doesnt close -2 forces close*/ }
+									cell.widthProperty().addListener { _, _, _ -> selectedIndex.value = -2 /*-1 doesn't close -2 forces close*/ }
 								}
 								
-								var openprep = false
+								var openPreparation = false
 								
 								onMouseEntered = EventHandler {
-									if(selectedindex.value != index) {
-										openprep = true
+									if(selectedIndex.value != index) {
+										openPreparation = true
 										Thread {
-											Thread.sleep(getConfig<Double>(Configs.Animationdelay).toLong())
-											if(openprep) {
-												openprep = false
-												openappointmentopenanimations.forEach { ani -> ani.forEach { it.play() } }
-												opentimeline.play()
+											Thread.sleep(getConfig<Double>(Configs.AnimationDelay).toLong())
+											if(openPreparation) {
+												openPreparation = false
+												openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
+												openTimeline.play()
 											}
 										}.start()
 									}
 								}
 								
 								onMouseExited = EventHandler {
-									if(selectedindex.value != index) {
-										if(openprep)
-											openprep = false
+									if(selectedIndex.value != index) {
+										if(openPreparation)
+											openPreparation = false
 										else {
-											openappointmentopenanimations.forEach { ain -> ain.forEach { it.stop() } }
-											opentimeline.stop()
-											closeappointmentopenanimations.forEach { ani -> ani.forEach { it.play() } }
-											closetimeline.play()
+											openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
+											openTimeline.stop()
+											closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
+											closeTimeline.play()
 										}
 									}
 								}
 								
 								onMouseClicked = EventHandler {
-									if(selectedindex.value != index) {
-										selectedindex.value = index
-										addClass(Styles.CalendarTableView.selectedcolumn)
+									if(selectedIndex.value != index) {
+										selectedIndex.value = index
+										addClass(Styles.CalendarTableView.selectedColumn)
 									} else {
-										selectedindex.value = -1
-										removeClass(Styles.CalendarTableView.selectedcolumn)
+										selectedIndex.value = -1
+										removeClass(Styles.CalendarTableView.selectedColumn)
 									}
 									if(it.clickCount > 1) {
 										log(
 											"click week: $week   day:${
-												week.alldays.values.toTypedArray().getOrNull(hoveredcell.value - 1)
+												week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
 											}", LogType.LOW
 										)
 										Tabmanager.openTab(
 											"Week${week.toDate()}/${week.time.year}",
-											::createweektab,
+											::createWeekTab,
 											week,
-											week.alldays.values.toTypedArray().getOrNull(hoveredcell.value - 1)
+											week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
 										)
 									}
 								}
 								
-								selectedindex.addListener(ChangeListener { _, old, new ->
+								selectedIndex.addListener(ChangeListener { _, old, new ->
 									if(new != index) {
-										removeClass(Styles.CalendarTableView.selectedcolumn)
+										removeClass(Styles.CalendarTableView.selectedColumn)
 										if(old == index && (new != -1 || new == -2)) {
 											onMouseExited.handle(null)
 										}
@@ -240,18 +239,18 @@ fun createcalendartab(pane: TabPane): Tab {
 						}
 					}
 					
-					currentmonth.addListener(ListChangeListener {
+					currentMonth.addListener(ListChangeListener {
 						updateTable(it.list)
 					})
 					
-					updateTable(currentmonth)
+					updateTable(currentMonth)
 				}
 			}
 			
 			// used to shadow the overflow from tab
 			pane {
 				isMouseTransparent = true
-				addClass(Styles.Tabs.shadowborder)
+				addClass(Styles.Tabs.shadowBorder)
 			}
 		}
 	}
@@ -262,18 +261,18 @@ const val detailspaneminHeight = 8
 fun createCellGraphics(
 	data: Celldisplay,
 	source: HBox,
-	opentimeline: Timeline,
-	closetimeline: Timeline,
+	openTimeline: Timeline,
+	closeTimeline: Timeline,
 	expand: SimpleDoubleProperty
 ): Array<Any> {
 	val animations: Array<MutableList<Animation>> = arrayOf(mutableListOf(), mutableListOf())
 	val graphicContainer = source.vbox {
-		addClass(Styles.CalendarTableView.tableitem)
-		addClass(Styles.CalendarTableView.tablecell)
+		addClass(Styles.CalendarTableView.tableItem)
+		addClass(Styles.CalendarTableView.tableCell)
 		
 		if(data is Day) {
 			if(!data.partofmonth)
-				addClass(Styles.CalendarTableView.disabledtablecell)
+				addClass(Styles.CalendarTableView.disabledTableCell)
 			
 			gridpane {
 				style {
@@ -281,27 +280,27 @@ fun createCellGraphics(
 					padding = box(0.px, 3.px, 2.px, 3.px)
 				}
 				anchorpane {
-					val defaultimg = FXImage("img/remind.svg")//if() FXImage("img/remind.svg") else FXImage("img/remind inactive.svg")
-					val img = imageview(defaultimg) {
-						addClass(Styles.CalendarTableView.celllabelicon)
+					val defaultImg = createFXImage("img/remind.svg")//if() FXImage("img/remind.svg") else FXImage("img/remind inactive.svg")
+					val img = imageview(defaultImg) {
+						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
 					onMouseClicked = EventHandler { it.consume() }
 					// onMouseEntered = EventHandler { img.image = FXImage("img/remind active.svg") }
-					onMouseExited = EventHandler { img.image = defaultimg }
+					onMouseExited = EventHandler { img.image = defaultImg }
 				}
 				
 				label(data.time.dayOfMonth.toString()) {
 					gridpaneConstraints {
 						columnRowIndex(1, 0)
 					}
-					addClass(Styles.CalendarTableView.celllabel)
+					addClass(Styles.CalendarTableView.cellLabel)
 				}
 				anchorpane {
-					val defaultimg = if(data.notes.isNotEmpty()) FXImage("img/note.svg") else FXImage("img/note inactive.svg")
-					val img = imageview(defaultimg) {
-						addClass(Styles.CalendarTableView.celllabelicon)
+					val defaultImg = if(data.notes.isNotEmpty()) createFXImage("img/note.svg") else createFXImage("img/note inactive.svg")
+					val img = imageview(defaultImg) {
+						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
@@ -310,15 +309,15 @@ fun createCellGraphics(
 					}
 					onMouseClicked = EventHandler {
 						it.consume()
-						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createnotetab, data)
+						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createNoteTab, data)
 					}
-					onMouseEntered = EventHandler { img.image = FXImage("img/note active.svg") }
-					onMouseExited = EventHandler { img.image = defaultimg }
+					onMouseEntered = EventHandler { img.image = createFXImage("img/note active.svg") }
+					onMouseExited = EventHandler { img.image = defaultImg }
 				}
 			}
 			
 		} else if(data is Week) {
-			addClass(Styles.CalendarTableView.disabledtablecell)
+			addClass(Styles.CalendarTableView.disabledTableCell)
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px
@@ -335,13 +334,13 @@ fun createCellGraphics(
 					gridpaneConstraints {
 						columnRowIndex(1, 0)
 					}
-					addClass(Styles.CalendarTableView.celllabel)
+					addClass(Styles.CalendarTableView.cellLabel)
 				}
 				
 				anchorpane {
-					val defaultimg = if(data.notes.isNotEmpty()) FXImage("img/note.svg") else FXImage("img/note inactive.svg")
-					val img = imageview(defaultimg) {
-						addClass(Styles.CalendarTableView.celllabelicon)
+					val defaultImg = if(data.notes.isNotEmpty()) createFXImage("img/note.svg") else createFXImage("img/note inactive.svg")
+					val img = imageview(defaultImg) {
+						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
@@ -351,16 +350,16 @@ fun createCellGraphics(
 					onMouseClicked = EventHandler {
 						it.consume()
 						Tabmanager.openTab(
-							"WeekNotes${data.WeekofYear}/${data.time.year}", ::createnotetab, data
+							"WeekNotes${data.WeekofYear}/${data.time.year}", ::createNoteTab, data
 						)
 					}
-					onMouseEntered = EventHandler { img.image = FXImage("img/note active.svg") }
-					onMouseExited = EventHandler { img.image = defaultimg }
+					onMouseEntered = EventHandler { img.image = createFXImage("img/note active.svg") }
+					onMouseExited = EventHandler { img.image = defaultImg }
 				}
 			}
 		}
 		
-		// appointments / weekdetails
+		// appointments / WeekDetails
 		val pane = pane {
 			style(append = true) {
 //				backgroundColor += Color.RED
@@ -371,38 +370,38 @@ fun createCellGraphics(
 			}
 		}
 		
-		if((data is Day && data.appointments.isNotEmpty()) || (data is Week && data.getallappointments().isNotEmpty())) {
-			val thisexpandheight = when(data) {
+		if((data is Day && data.appointments.isNotEmpty()) || (data is Week && data.getallAppointments().isNotEmpty())) {
+			val expandHeight = when(data) {
 				is Day -> generateAppointmentsGraphic(data, pane, animations)
 				is Week -> generateWeekGraphic(data, pane, animations)
 				else -> 0.0
 			}
 			
-			if(expand.value < thisexpandheight)
-				expand.value = thisexpandheight
+			if(expand.value < expandHeight)
+				expand.value = expandHeight
 		}
 		
 		var open = KeyValue(pane.minHeightProperty(), expand.value)
-		var closeframe = KeyFrame(Duration(0.0), open)
-		var openframe = KeyFrame(Duration(getConfig(Configs.Animationspeed)), open)
+		var closeFrame = KeyFrame(Duration(0.0), open)
+		var openFrame = KeyFrame(Duration(getConfig(Configs.AnimationSpeed)), open)
 		
 		expand.addListener(ChangeListener { _, _, new: Number ->
-			opentimeline.keyFrames.remove(openframe)
-			closetimeline.keyFrames.remove(closeframe)
+			openTimeline.keyFrames.remove(openFrame)
+			closeTimeline.keyFrames.remove(closeFrame)
 			open = KeyValue(pane.minHeightProperty(), new)
-			closeframe = KeyFrame(Duration(0.0), open)
-			openframe = KeyFrame(Duration(getConfig(Configs.Animationspeed)), open)
-			opentimeline.keyFrames.add(openframe)
-			closetimeline.keyFrames.add(closeframe)
+			closeFrame = KeyFrame(Duration(0.0), open)
+			openFrame = KeyFrame(Duration(getConfig(Configs.AnimationSpeed)), open)
+			openTimeline.keyFrames.add(openFrame)
+			closeTimeline.keyFrames.add(closeFrame)
 		})
 		
-		opentimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), detailspaneminHeight)))
-		opentimeline.keyFrames.add(openframe)
+		openTimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), detailspaneminHeight)))
+		openTimeline.keyFrames.add(openFrame)
 		
-		closetimeline.keyFrames.add(closeframe)
-		closetimeline.keyFrames.add(
+		closeTimeline.keyFrames.add(closeFrame)
+		closeTimeline.keyFrames.add(
 			KeyFrame(
-				Duration(getConfig(Configs.Animationspeed)),
+				Duration(getConfig(Configs.AnimationSpeed)),
 				KeyValue(pane.minHeightProperty(), detailspaneminHeight)
 			)
 		)
@@ -422,11 +421,11 @@ fun createCellGraphics(
 
 
 const val spacing = 4.0
-const val circlewidth = 8.0
+const val circleWidth = 8.0
 
-const val sidetopmargin = 6.0
-const val vtopmargin = 4.0
-const val hleftmargin = 8.0
+const val sideTopMargin = 6.0
+const val verticalTopMargin = 4.0
+const val horizontalLeftMargin = 8.0
 
 fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<Animation>>): Double {
 	pane.clear()
@@ -434,25 +433,25 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	// make width even because ,5 pixel are not supported <-(AI said this)
 	val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
 	
-	val ycords = mutableListOf<Double>()
-	for(index in 0 until week.getallappointmentssort().size) {
-		ycords.add(sidetopmargin + index * (spacing * 2 + circlewidth))
+	val yCords = mutableListOf<Double>()
+	for(index in 0 until week.getallAppointmentsSorted().size) {
+		yCords.add(sideTopMargin + index * (spacing * 2 + circleWidth))
 	}
 	
-	for((index, appointmententry) in week.getallappointmentssort().entries.withIndex()) {
+	for((index, appointmentEntry) in week.getallAppointmentsSorted().entries.withIndex()) {
 		pane.hbox(alignment = Pos.CENTER_LEFT, spacing = spacing) {
-			circle(radius = circlewidth / 2) {
-				fill = appointmententry.key.color
+			circle(radius = circleWidth / 2) {
+				fill = appointmentEntry.key.color
 			}
-			label("${appointmententry.value.size}:${appointmententry.key.name}") {
-				addClass(Styles.CalendarTableView.cellappointtypelabel)
-				maxWidth = width - hleftmargin - circlewidth
+			label("${appointmentEntry.value.size}:${appointmentEntry.key.name}") {
+				addClass(Styles.CalendarTableView.cellAppointTypeLabel)
+				maxWidth = width - horizontalLeftMargin - circleWidth
 				ellipsisString = ".."
 				textOverrun = OverrunStyle.ELLIPSIS
 			}
 			
-			translateX = circlewidth / 2
-			translateY = ycords[index] - circlewidth
+			translateX = circleWidth / 2
+			translateY = yCords[index] - circleWidth
 			opacity = 0.0
 		}
 	}
@@ -461,19 +460,19 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	val closeTransitions = mutableListOf<Animation>()
 	
 	for(label in pane.getChildList()?.filterIsInstance<HBox>()!!) {
-		val openfadeTransition = Timeline(
+		val openFadeTransition = Timeline(
 			KeyFrame(Duration(0.0), KeyValue(label.opacityProperty(), 0.0)),
-			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3 * 2), KeyValue(label.opacityProperty(), 0.0)),
-			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label.opacityProperty(), 1.0))
+			KeyFrame(Duration(getConfig<Double>(Configs.AnimationSpeed) / 3 * 2), KeyValue(label.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.AnimationSpeed)), KeyValue(label.opacityProperty(), 1.0))
 		)
-		openTransitions.add(openfadeTransition)
+		openTransitions.add(openFadeTransition)
 		
-		val closefadeTransition = Timeline(
+		val closeFadeTransition = Timeline(
 			KeyFrame(Duration(0.0), KeyValue(label.opacityProperty(), 1.0)),
-			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3), KeyValue(label.opacityProperty(), 0.0)),
-			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label.opacityProperty(), 0.0))
+			KeyFrame(Duration(getConfig<Double>(Configs.AnimationSpeed) / 3), KeyValue(label.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.AnimationSpeed)), KeyValue(label.opacityProperty(), 0.0))
 		)
-		closeTransitions.add(closefadeTransition)
+		closeTransitions.add(closeFadeTransition)
 	}
 	
 	animations[0].clear()
@@ -481,14 +480,14 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	animations[1].clear()
 	animations[1].addAll(closeTransitions)
 	
-	return (ycords.getOrNull(ycords.lastIndex)?.plus(sidetopmargin) ?: 0.0)
+	return (yCords.getOrNull(yCords.lastIndex)?.plus(sideTopMargin) ?: 0.0)
 	
 }
 
 fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<Animation>>): Double {
 	pane.clear()
 	
-	var appointments = day.getappointmentslimit()
+	var appointments = day.getAppointmentsLimited()
 	val limited = appointments.size != day.appointments.size
 	if(limited)
 		appointments = appointments.dropLast(1)
@@ -496,50 +495,50 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	// make width even because ,5 pixel are not supported <-(AI said this)
 	val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
 	
-	val topspacing: Double = maxOf(2.0, minOf(spacing, (((width - spacing) / appointments.size) / 3)))
-	val topcirclewidth: Double = topspacing * 2
+	val topSpacing: Double = maxOf(2.0, minOf(spacing, (((width - spacing) / appointments.size) / 3)))
+	val topCircleWidth: Double = topSpacing * 2
 	
-	val xcords = mutableListOf<Double>()
+	val xCords = mutableListOf<Double>()
 	
 	if(appointments.size % 2 == 0) {
 		for(index in 0 until appointments.size / 2) {
-			xcords.add((width / 2) + ((topspacing / 2) + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
-			xcords.add((width / 2) - ((topspacing / 2) + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
+			xCords.add((width / 2) + ((topSpacing / 2) + (index * (topCircleWidth + topSpacing)) + topCircleWidth / 2))
+			xCords.add((width / 2) - ((topSpacing / 2) + (index * (topCircleWidth + topSpacing)) + topCircleWidth / 2))
 		}
 	} else {
-		xcords.add(width / 2)
+		xCords.add(width / 2)
 		for(index in 0 until (appointments.size - 1) / 2) {
-			xcords.add((width / 2) + ((topcirclewidth / 2) + topspacing + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
-			xcords.add((width / 2) - ((topcirclewidth / 2) + topspacing + (index * (topcirclewidth + topspacing)) + topcirclewidth / 2))
+			xCords.add((width / 2) + ((topCircleWidth / 2) + topSpacing + (index * (topCircleWidth + topSpacing)) + topCircleWidth / 2))
+			xCords.add((width / 2) - ((topCircleWidth / 2) + topSpacing + (index * (topCircleWidth + topSpacing)) + topCircleWidth / 2))
 		}
 	}
 	
 	// better animation because vertical are sorted from top to bottom
-	xcords.sortDescending()
+	xCords.sortDescending()
 	
 	for((index, appointment) in appointments.withIndex()) {
-		pane.circle(radius = topcirclewidth / 2) {
+		pane.circle(radius = topCircleWidth / 2) {
 			fill = appointment.type.color
-			centerY = vtopmargin
-			centerX = xcords[index]
+			centerY = verticalTopMargin
+			centerX = xCords[index]
 		}
 	}
 	
-	val ycords = mutableListOf<Double>()
+	val yCords = mutableListOf<Double>()
 	for(index in appointments.indices) {
-		ycords.add(sidetopmargin + index * (spacing + circlewidth))
+		yCords.add(sideTopMargin + index * (spacing + circleWidth))
 	}
 	if(limited)
-		ycords.add(sidetopmargin + ycords.size * (spacing + circlewidth))
+		yCords.add(sideTopMargin + yCords.size * (spacing + circleWidth))
 	
 	for((index, appointment) in appointments.withIndex()) {
 		pane.label(appointment.description) {
-			addClass(Styles.CalendarTableView.cellappointlabel)
-			translateX = hleftmargin + circlewidth
-			translateY = ycords[index] - circlewidth / 1.1
+			addClass(Styles.CalendarTableView.cellAppointLabel)
+			translateX = horizontalLeftMargin + circleWidth
+			translateY = yCords[index] - circleWidth / 1.1
 			opacity = 0.0
 			
-			maxWidth = width - hleftmargin - circlewidth
+			maxWidth = width - horizontalLeftMargin - circleWidth
 			ellipsisString = ".."
 			textOverrun = OverrunStyle.ELLIPSIS
 		}
@@ -547,15 +546,15 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	if(limited) {
 		pane.label("· · · · · · · · · · · · · · · · · · · · · · · ·") {
-			addClass(Styles.CalendarTableView.cellappointtypelabel)
+			addClass(Styles.CalendarTableView.cellAppointTypeLabel)
 			style {
 				fontWeight = FontWeight.BOLD
 			}
-			translateX = hleftmargin
-			translateY = ycords[ycords.size - 1] - circlewidth //- spacing
+			translateX = horizontalLeftMargin
+			translateY = yCords[yCords.size - 1] - circleWidth //- spacing
 			opacity = 0.0
 			
-			maxWidth = width - hleftmargin
+			maxWidth = width - horizontalLeftMargin
 			ellipsisString = ""
 			textOverrun = OverrunStyle.ELLIPSIS
 		}
@@ -568,54 +567,54 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 		val circle = pane.getChildList()?.filterIsInstance<Circle>()?.get(index)
 		val label = pane.getChildList()?.filterIsInstance<Label>()?.get(index)
 		
-		val openpath = Path()
-		openpath.elements.add(MoveTo(xcords[index], sidetopmargin))
-		openpath.elements.add(
+		val openPath = Path()
+		openPath.elements.add(MoveTo(xCords[index], sideTopMargin))
+		openPath.elements.add(
 			CubicCurveTo(
-				xcords[index], sidetopmargin, hleftmargin * 1.8, sidetopmargin * 1.8, hleftmargin, ycords[index]
+				xCords[index], sideTopMargin, horizontalLeftMargin * 1.8, sideTopMargin * 1.8, horizontalLeftMargin, yCords[index]
 			),
 		)
-		openTransitions.add(PathTransition(Duration(getConfig(Configs.Animationspeed)), openpath, circle))
+		openTransitions.add(PathTransition(Duration(getConfig(Configs.AnimationSpeed)), openPath, circle))
 		
-		val openfadeTransition = Timeline(
+		val openFadeTransition = Timeline(
 			KeyFrame(Duration(0.0), KeyValue(label?.opacityProperty(), 0.0)),
-			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3 * 2), KeyValue(label?.opacityProperty(), 0.0)),
-			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label?.opacityProperty(), 1.0))
+			KeyFrame(Duration(getConfig<Double>(Configs.AnimationSpeed) / 3 * 2), KeyValue(label?.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.AnimationSpeed)), KeyValue(label?.opacityProperty(), 1.0))
 		)
-		openTransitions.add(openfadeTransition)
+		openTransitions.add(openFadeTransition)
 		
-		val closepath = Path()
-		closepath.elements.add(MoveTo(hleftmargin, ycords[index]))
-		closepath.elements.add(
+		val closePath = Path()
+		closePath.elements.add(MoveTo(horizontalLeftMargin, yCords[index]))
+		closePath.elements.add(
 			CubicCurveTo(
-				hleftmargin, ycords[index], xcords[index], ycords[index], xcords[index], vtopmargin
+				horizontalLeftMargin, yCords[index], xCords[index], yCords[index], xCords[index], verticalTopMargin
 			)
 		)
-		closeTransitions.add(PathTransition(Duration(getConfig(Configs.Animationspeed)), closepath, circle))
+		closeTransitions.add(PathTransition(Duration(getConfig(Configs.AnimationSpeed)), closePath, circle))
 		
-		val closefadeTransition = Timeline(
+		val closeFadeTransition = Timeline(
 			KeyFrame(Duration(0.0), KeyValue(label?.opacityProperty(), 1.0)),
-			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3), KeyValue(label?.opacityProperty(), 0.0)),
-			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label?.opacityProperty(), 0.0))
+			KeyFrame(Duration(getConfig<Double>(Configs.AnimationSpeed) / 3), KeyValue(label?.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.AnimationSpeed)), KeyValue(label?.opacityProperty(), 0.0))
 		)
-		closeTransitions.add(closefadeTransition)
+		closeTransitions.add(closeFadeTransition)
 	}
 	
 	if(limited) {
 		val label = pane.getChildList()?.filterIsInstance<Label>()?.last()
-		val openfadeTransition = Timeline(
+		val openFadeTransition = Timeline(
 			KeyFrame(Duration(0.0), KeyValue(label?.opacityProperty(), 0.0)),
-			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3 * 2), KeyValue(label?.opacityProperty(), 0.0)),
-			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label?.opacityProperty(), 1.0))
+			KeyFrame(Duration(getConfig<Double>(Configs.AnimationSpeed) / 3 * 2), KeyValue(label?.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.AnimationSpeed)), KeyValue(label?.opacityProperty(), 1.0))
 		)
-		openTransitions.add(openfadeTransition)
+		openTransitions.add(openFadeTransition)
 		
-		val closefadeTransition = Timeline(
+		val closeFadeTransition = Timeline(
 			KeyFrame(Duration(0.0), KeyValue(label?.opacityProperty(), 1.0)),
-			KeyFrame(Duration(getConfig<Double>(Configs.Animationspeed) / 3), KeyValue(label?.opacityProperty(), 0.0)),
-			KeyFrame(Duration(getConfig(Configs.Animationspeed)), KeyValue(label?.opacityProperty(), 0.0))
+			KeyFrame(Duration(getConfig<Double>(Configs.AnimationSpeed) / 3), KeyValue(label?.opacityProperty(), 0.0)),
+			KeyFrame(Duration(getConfig(Configs.AnimationSpeed)), KeyValue(label?.opacityProperty(), 0.0))
 		)
-		closeTransitions.add(closefadeTransition)
+		closeTransitions.add(closeFadeTransition)
 	}
 	
 	animations[0].clear()
@@ -623,5 +622,5 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	animations[1].clear()
 	animations[1].addAll(closeTransitions)
 	
-	return (ycords.getOrNull(ycords.lastIndex)?.plus(sidetopmargin) ?: 0.0)
+	return (yCords.getOrNull(yCords.lastIndex)?.plus(sideTopMargin) ?: 0.0)
 }

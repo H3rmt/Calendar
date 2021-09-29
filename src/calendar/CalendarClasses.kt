@@ -44,7 +44,7 @@ class Week(
 	override val notes: MutableList<Note> = mutableListOf()
 	
 	@Expose
-	val alldays: Map<DayOfWeek, Day> = mapOf(
+	val allDays: Map<DayOfWeek, Day> = mapOf(
 		MONDAY to Monday,
 		TUESDAY to Tuesday,
 		WEDNESDAY to Wednesday,
@@ -54,17 +54,17 @@ class Week(
 		SUNDAY to Sunday
 	)
 	
-	fun getallappointments(): List<Appointment> {
+	fun getallAppointments(): List<Appointment> {
 		val list = mutableListOf<Appointment>()
-		for(day in alldays.values) {
+		for(day in allDays.values) {
 			list.addAll(day.appointments)
 		}
 		return list
 	}
 	
-	fun getallappointmentssort(): Map<Types, List<Appointment>> {
+	fun getallAppointmentsSorted(): Map<Types, List<Appointment>> {
 		val list = mutableMapOf<Types, MutableList<Appointment>>()
-		for(appointment in getallappointments()) {
+		for(appointment in getallAppointments()) {
 			if(list[appointment.type] == null)
 				list[appointment.type] = mutableListOf()
 			list[appointment.type]!!.add(appointment)
@@ -76,11 +76,11 @@ class Week(
 	
 	fun addAppointments(appointmentslist: Map<DayOfWeek, List<Appointment>>) {
 		for((key, value) in appointmentslist) {
-			alldays[key]?.appointments?.addAll(value)
+			allDays[key]?.appointments?.addAll(value)
 		}
 	}
 	
-	override fun toString(): String = "$time $notes $alldays"
+	override fun toString(): String = "$time $notes $allDays"
 }
 
 
@@ -97,7 +97,7 @@ class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 	@Expose
 	override val notes: MutableList<Note> = mutableListOf()
 	
-	fun getappointmentslimit(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
+	fun getAppointmentsLimited(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
 	
 	override fun toString(): String = "$time $notes $appointments"
 }
@@ -157,6 +157,7 @@ class File(_data: ByteArray, _name: String, _origin: String) {
 	@Expose
 	val origin = _origin
 	
+	@Suppress("unused")
 	constructor(file: java.io.File): this(file.inputStream().readAllBytes(), file.name, file.absolutePath)
 	
 	override fun toString(): String = "$name ${data.size} $origin"

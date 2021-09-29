@@ -1,6 +1,5 @@
 package logic
 
-import com.google.gson.stream.JsonReader
 import java.io.File
 import java.io.FileReader
 
@@ -16,18 +15,16 @@ class Language(private val language: Availablelanguages) {
 	 *
 	 * reads JSON from file and stores different Strings
 	 * in translations Map
-	 *
-	 * @see translations
 	 */
 	init {
-		val file = File(ConfigFiles.languagefile)
+		val file = File(ConfigFiles.languageFile)
 		if(!file.exists()) {
 			file.createNewFile()
-			file.writeText(emptydefault)
+			file.writeText(emptyDefault)
 		}
-		val alltranslations: Map<String, Map<String, String>> =
-			getJson().fromJson(JsonReader(FileReader(ConfigFiles.languagefile)), Map::class.java)
-		translations = alltranslations["$language"] ?: mapOf()
+		val allTranslations: Map<String, Map<String, String>> =
+			getJson().fromJson(getJsonReader(FileReader(ConfigFiles.languageFile)), Map::class.java)
+		translations = allTranslations["$language"] ?: mapOf()
 	}
 	
 	/**

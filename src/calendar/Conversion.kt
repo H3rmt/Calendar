@@ -29,6 +29,7 @@ object ToJson {
 object FromJSON {
 	private fun createNoteFile(file: Map<String, Any>): File? {
 		try {
+			@Suppress("UNCHECKED_CAST")
 			return File(
 				(file["data"] as List<Byte>).toByteArray(),
 				file["name"] as String,
@@ -45,7 +46,9 @@ object FromJSON {
 			val tmp = note["files"] as List<*>
 			val files = mutableListOf<File>()
 			for(t in tmp)
+				@Suppress("UNCHECKED_CAST")
 				createNoteFile(t as Map<String, Any>)?.let { files.add(it) }
+			
 			return Note(
 				(note["time"] as Double).toLong(),
 				note["text"] as String,

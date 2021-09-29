@@ -11,19 +11,19 @@ import java.awt.geom.Ellipse2D
 import javax.swing.JFrame
 
 val loadingScreen = LoadingScreen()
-val loadingscircles = arrayOf(0.0, 90.0, 180.0, 270.0)
-val innerloadingscircles = arrayOf(0.0, 120.0, 240.0)
+val loadingsCircles = arrayOf(0.0, 90.0, 180.0, 270.0)
+val innerLoadingsCircles = arrayOf(0.0, 120.0, 240.0)
 val thread: Thread = Thread {
 	while(true) {
 		try {
 			Thread.sleep(30)
 		} catch(e: InterruptedException) {
 		}
-		for(i in (loadingscircles.indices)) {
-			loadingscircles[i]++
+		for(i in (loadingsCircles.indices)) {
+			loadingsCircles[i]++
 		}
-		for(i in (innerloadingscircles.indices)) {
-			innerloadingscircles[i]--
+		for(i in (innerLoadingsCircles.indices)) {
+			innerLoadingsCircles[i]--
 		}
 		loadingScreen.repaint()
 	}
@@ -59,15 +59,15 @@ class LoadingScreen: JFrame() {
 		g2.color = Color(0, 170, 170, 160)
 		g2.stroke = BasicStroke(15F)
 		
-		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingscircles[0], 40.0, Arc2D.OPEN))
-		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingscircles[1], 40.0, Arc2D.OPEN))
-		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingscircles[2], 40.0, Arc2D.OPEN))
-		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingscircles[3], 40.0, Arc2D.OPEN))
+		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[0], 40.0, Arc2D.OPEN))
+		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[1], 40.0, Arc2D.OPEN))
+		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[2], 40.0, Arc2D.OPEN))
+		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[3], 40.0, Arc2D.OPEN))
 		
 		g2.stroke = BasicStroke(7F)
-		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerloadingscircles[0], 50.0, Arc2D.OPEN))
-		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerloadingscircles[1], 50.0, Arc2D.OPEN))
-		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerloadingscircles[2], 50.0, Arc2D.OPEN))
+		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[0], 50.0, Arc2D.OPEN))
+		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[1], 50.0, Arc2D.OPEN))
+		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[2], 50.0, Arc2D.OPEN))
 		
 	}
 }

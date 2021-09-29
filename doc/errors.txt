@@ -10,7 +10,7 @@ Code: <Errorcode>
 
 Code: 5e928h
     src/logic/Config
-    Config Files missing <Exception>
+    Configuration Files missing <Exception>
 
     config.json file missing
     must be there and contain all constants,

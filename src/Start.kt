@@ -1,9 +1,8 @@
-
 import calendar.loadCalendarData
 import frame.frameInit
 import logic.LogType
 import logic.configs
-import logic.initCofigs
+import logic.initConfigs
 import logic.initLogger
 import logic.log
 import logic.updateLogger
@@ -15,7 +14,7 @@ fun main(args: Array<String>) {
 	initLogger()
 	log("initialised Logger", LogType.IMPORTANT)
 	
-	initCofigs()
+	initConfigs()
 	log("read Configs:$configs", LogType.IMPORTANT)
 	
 	log("Updating Logger with config data\n", LogType.IMPORTANT)
@@ -23,7 +22,6 @@ fun main(args: Array<String>) {
 	log("Updated Logger", LogType.IMPORTANT)
 	
 	log("preparing Appointments", LogType.IMPORTANT)
-	// TODO
 	log("preparing Notes", LogType.IMPORTANT)
 	loadCalendarData()
 	

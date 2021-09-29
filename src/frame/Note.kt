@@ -2,7 +2,6 @@ package frame
 
 import calendar.Celldisplay
 import calendar.Day
-import calendar.File
 import calendar.Note
 import calendar.Types
 import calendar.Week
@@ -20,7 +19,7 @@ import java.time.temporal.ChronoField
 
 
 
-fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
+fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab("") {
 		if(cell is Day)
@@ -35,15 +34,15 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 			}
 			
 			vbox {
-				addClass(Styles.Tabs.maintab)
+				addClass(Styles.Tabs.mainTab)
 				style {
 					padding = box(0.px, 0.px, 2.px, 0.px)
 				}
 				
 				lateinit var add: Button
-				lateinit var addtype: ComboBox<String>
+				lateinit var addType: ComboBox<String>
 				
-				val notetabs = mutableListOf<TitledPane>()
+				val noteTabs = mutableListOf<TitledPane>()
 				
 				hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
 					addClass(Styles.Tabs.topbar)
@@ -51,7 +50,7 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 						padding = box(0.px, 15.px, 0.px, 15.px)
 					}
 					
-					addtype = combobox {
+					addType = combobox {
 						items = Types.getTypes().map { it.name }.toObservable()
 					}
 					add = button {
@@ -59,12 +58,12 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 						isDisable = true
 						
 						// disables button if no type selected or type already added
-						addtype.valueProperty().addListener { _, _, new -> isDisable = new == null || notetabs.any { it.text == new } }
-						addClass(Styles.Tabs.titlebuttons)
+						addType.valueProperty().addListener { _, _, new -> isDisable = new == null || noteTabs.any { it.text == new } }
+						addClass(Styles.Tabs.titleButtons)
 					}
 				}
 				
-				seperate()
+				separate()
 				
 				scrollpane(fitToWidth = true) {
 					style {
@@ -72,8 +71,8 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 					}
 					vbox {
 						add.action {
-							val note = Note(cell.time.toEpochSecond() / 60, "", Types.valueOf(addtype.value), emptyList<File>())
-							notetabs.add(0, notetab(this@vbox, addtype.value, "",
+							val note = Note(cell.time.toEpochSecond() / 60, "", Types.valueOf(addType.value), emptyList())
+							noteTabs.add(0, noteTab(this, addType.value, "",
 								{
 									note.text = (it)
 									saveDayNote(note)
@@ -85,7 +84,7 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 						}
 						
 						for(note in cell.notes) {
-							notetabs.add(notetab(this@vbox, note.type.name, note.text, {
+							noteTabs.add(noteTab(this, note.type.name, note.text, {
 								note.text = (it)
 								saveDayNote(note)
 							}, {
@@ -99,13 +98,13 @@ fun createnotetab(pane: TabPane, cell: Celldisplay): Tab {
 			// used to shadow the overflow from tab
 			pane {
 				isMouseTransparent = true
-				addClass(Styles.Tabs.shadowborder)
+				addClass(Styles.Tabs.shadowBorder)
 			}
 		}
 	}
 }
 
-fun notetab(tabs: VBox, title: String, text: String, savefun: (String) -> Unit, deletefun: () -> Unit): TitledPane {
+fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, deleteFun: () -> Unit): TitledPane {
 	// cannot use the EventTarget Functions because they automatically add the
 	// pane to the end of the vbox
 	val pane = TitledPane()
@@ -130,7 +129,7 @@ fun notetab(tabs: VBox, title: String, text: String, savefun: (String) -> Unit, 
 				save = button(getLangString("save"))
 				
 				button(getLangString("delete")) {
-					action { deletefun() }
+					action { deleteFun() }
 				}
 			}
 		}
@@ -138,10 +137,10 @@ fun notetab(tabs: VBox, title: String, text: String, savefun: (String) -> Unit, 
 		expandedProperty().addListener { _, _, new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
 		
 		htmleditor(text) {
-			//addClass(Styles.disablefocus)
+			//addClass(Styles.disableFocus)
 			addClass(Styles.NoteTab.texteditor)
 			save.action {
-				savefun(this@htmleditor.htmlText)
+				saveFun(this@htmleditor.htmlText)
 			}
 		}
 	}

@@ -8,7 +8,7 @@ import logic.LogType
 import logic.log
 import tornadofx.*
 
-fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
+fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab(week.toDate()) {
 		isClosable = true
@@ -19,14 +19,14 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 			}
 			
 			vbox {
-				addClass(Styles.Tabs.maintab)
+				addClass(Styles.Tabs.mainTab)
 				label("$week") {
 					style {
 						fontSize = 18.px
 						fontWeight = FontWeight.BOLD
 					}
 				}
-				for((key, value) in week.getallappointmentssort()) {
+				for((key, value) in week.getallAppointmentsSorted()) {
 					label(key.name) {
 						style {
 							fontSize = 14.px
@@ -44,7 +44,7 @@ fun createweektab(pane: TabPane, week: Week, day: Day?): Tab {
 			// used to shadow the overflow from tab
 			pane {
 				isMouseTransparent = true
-				addClass(Styles.Tabs.shadowborder)
+				addClass(Styles.Tabs.shadowBorder)
 			}
 		}
 	}

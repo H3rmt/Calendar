@@ -4,10 +4,10 @@
 	"printstacktrace": true,
 	"printlogs": true,
 	"logformat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
-	"Animationspeed": 300,
-	"Animationdelay": 120,
+	"AnimationSpeed": 300,
+	"AnimationDelay": 120,
 	"MaxDayAppointments": 8,
-	"Appointmenttypes": [
+	"AppointmentTypes": [
 		{
 			"name": "Work",
 			"color": "#0000ff"
