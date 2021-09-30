@@ -22,7 +22,7 @@ import java.time.temporal.ChronoField
 
 
 fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit): Tab {
-	log("creating week tab", LogType.IMPORTANT)
+	log("creating note tab", LogType.IMPORTANT)
 	return pane.tab("") {
 		if(cell is Day)
 			text = "Notes for ${cell.time.dayOfMonth}. ${getLangString(cell.time.month.name)}"
@@ -74,27 +74,8 @@ fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit):
 					vbox {
 						add.action {
 							val note = Note(cell.time.toEpochSecond() / 60, "", Types.valueOf(addType.value), emptyList())
-							noteTabs.add(
-								0, noteTab(this, addType.value, "", {
-									note.text = (it)
-									if(cell is Day)
-										saveDayNote(note)
-									else if(cell is Week)
-										saveWeekNote(note)
-									updateCallback()
-								}, {
-									if(cell is Day)
-										removeDayNote(note)
-									else if(cell is Week)
-										removeWeekNote(note)
-									updateCallback()
-								})
-							)
-							add.isDisable = true
-						}
-						
-						for(note in cell.notes) {
-							noteTabs.add(noteTab(this, note.type.name, note.text, {
+							lateinit var tb: TitledPane
+							tb = noteTab(this, addType.value, "", {
 								note.text = (it)
 								if(cell is Day)
 									saveDayNote(note)
@@ -106,8 +87,34 @@ fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit):
 									removeDayNote(note)
 								else if(cell is Week)
 									removeWeekNote(note)
+								this.children.remove(noteTabs.first { it == tb })
+								noteTabs.remove(tb)
 								updateCallback()
-							}))
+							})
+							noteTabs.add(0, tb)
+							add.isDisable = true
+						}
+						
+						for(note in cell.notes) {
+							lateinit var tb: TitledPane
+							tb = noteTab(this, note.type.name, note.text, {
+								note.text = (it)
+								if(cell is Day)
+									saveDayNote(note)
+								else if(cell is Week)
+									saveWeekNote(note)
+								updateCallback()
+							}, {
+								if(cell is Day)
+									removeDayNote(note)
+								else if(cell is Week)
+									removeWeekNote(note)
+								this.children.remove(noteTabs.first { it == tb })
+								noteTabs.remove(tb)
+								updateCallback()
+							})
+							
+							noteTabs.add(tb)
 						}
 					}
 				}

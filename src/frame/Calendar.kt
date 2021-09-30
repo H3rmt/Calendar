@@ -3,10 +3,15 @@ package frame
 import calendar.Celldisplay
 import calendar.Day
 import calendar.Week
+import calendar.calendarDisplay
 import calendar.changeMonth
 import calendar.currentMonth
 import calendar.currentMonthName
+import calendar.generateMonth
 import calendar.now
+import calendar.prepareMonthNotes
+import calendar.preparedDayNotes
+import calendar.preparedWeekNotes
 import javafx.animation.*
 import javafx.beans.property.*
 import javafx.collections.*
@@ -310,7 +315,16 @@ fun createCellGraphics(
 					onMouseClicked = EventHandler {
 						it.consume()
 						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createNoteTab, data, {
-							println("save callback on cell") // TODO refresh
+							if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
+								log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
+								
+								preparedWeekNotes[data.time.month]?.clear()
+								preparedDayNotes[data.time.month]?.clear()
+								prepareMonthNotes(data.time.month)
+								val weeksdata = generateMonth(calendarDisplay)
+								currentMonth.clear()
+								currentMonth.addAll(weeksdata)
+							}
 						})
 					}
 					onMouseEntered = EventHandler { img.image = createFXImage("img/note active.svg") }
@@ -353,7 +367,16 @@ fun createCellGraphics(
 						it.consume()
 						Tabmanager.openTab(
 							"WeekNotes${data.WeekofYear}/${data.time.year}", ::createNoteTab, data, {
-								println("save callback on Week")  // TODO refresh
+								if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
+									log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
+									
+									preparedWeekNotes[data.time.month]?.clear()
+									preparedDayNotes[data.time.month]?.clear()
+									prepareMonthNotes(data.time.month)
+									val weeksdata = generateMonth(calendarDisplay)
+									currentMonth.clear()
+									currentMonth.addAll(weeksdata)
+								}
 							}
 						)
 					}

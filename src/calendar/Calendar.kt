@@ -83,7 +83,7 @@ fun loadCalendarData() {
 }
 
 
-private fun generateMonth(monthTime: ZonedDateTime): MutableList<Week> {
+fun generateMonth(monthTime: ZonedDateTime): MutableList<Week> {
 	log("generating Month", LogType.LOW)
 	var time: ZonedDateTime = monthTime.withDayOfMonth(1)
 	val month = time.month
@@ -191,7 +191,7 @@ private fun prepareMonthAppointments(Month: Month) {
 }
 
 
-private fun prepareMonthNotes(Month: Month) {
+fun prepareMonthNotes(Month: Month) {
 	File(ConfigFiles.notesDir + "/$Month.json").run {
 		if(!exists()) {
 			log("file with notes for $Month not found", LogType.LOW)
