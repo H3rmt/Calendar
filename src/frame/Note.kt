@@ -6,7 +6,9 @@ import calendar.Note
 import calendar.Types
 import calendar.Week
 import calendar.removeDayNote
+import calendar.removeWeekNote
 import calendar.saveDayNote
+import calendar.saveWeekNote
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
@@ -19,7 +21,7 @@ import java.time.temporal.ChronoField
 
 
 
-fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab {
+fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab("") {
 		if(cell is Day)
@@ -72,12 +74,20 @@ fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab {
 					vbox {
 						add.action {
 							val note = Note(cell.time.toEpochSecond() / 60, "", Types.valueOf(addType.value), emptyList())
-							noteTabs.add(0, noteTab(this, addType.value, "",
-								{
+							noteTabs.add(
+								0, noteTab(this, addType.value, "", {
 									note.text = (it)
-									saveDayNote(note)
+									if(cell is Day)
+										saveDayNote(note)
+									else if(cell is Week)
+										saveWeekNote(note)
+									updateCallback()
 								}, {
-									removeDayNote(note)
+									if(cell is Day)
+										removeDayNote(note)
+									else if(cell is Week)
+										removeWeekNote(note)
+									updateCallback()
 								})
 							)
 							add.isDisable = true
@@ -86,9 +96,17 @@ fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab {
 						for(note in cell.notes) {
 							noteTabs.add(noteTab(this, note.type.name, note.text, {
 								note.text = (it)
-								saveDayNote(note)
+								if(cell is Day)
+									saveDayNote(note)
+								else if(cell is Week)
+									saveWeekNote(note)
+								updateCallback()
 							}, {
-								removeDayNote(note)
+								if(cell is Day)
+									removeDayNote(note)
+								else if(cell is Week)
+									removeWeekNote(note)
+								updateCallback()
 							}))
 						}
 					}

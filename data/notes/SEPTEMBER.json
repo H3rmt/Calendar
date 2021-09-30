@@ -1,5 +1,12 @@
 {
-  "Week Notes": [],
+  "Week Notes": [
+    {
+      "time": 2.7212091E7,
+      "text": "\u003chtml dir\u003d\"ltr\"\u003e\u003chead\u003e\u003c/head\u003e\u003cbody contenteditable\u003d\"true\"\u003e\u003cp\u003eWorkdays: Mittwoch,\u0026nbsp;\u003cspan style\u003d\"font-style: italic;\"\u003eDonnerstag\u003c/span\u003e\u003c/p\u003e\u003c/body\u003e\u003c/html\u003e",
+      "type": "Work",
+      "files": []
+    }
+  ],
   "Day Notes": [
     {
       "time": 27213880,
@@ -9,7 +16,19 @@
     },
     {
       "time": 27213664,
-      "text": "\u003chtml dir\u003d\"ltr\"\u003e\u003chead\u003e\u003c/head\u003e\u003cbody contenteditable\u003d\"true\"\u003e\u003cp\u003e\u003cspan style\u003d\"font-family: \u0026quot;\u0026quot;;\"\u003e~6 Hours of Work (\u003cspan style\u003d\"font-weight: bold;\"\u003eestimated\u003c/span\u003e)\u003c/span\u003e\u003c/p\u003e\u003c/body\u003e\u003c/html\u003e",
+      "text": "\u003chtml dir\u003d\"ltr\"\u003e\u003chead\u003e\u003c/head\u003e\u003cbody contenteditable\u003d\"true\"\u003e\u003cp\u003e\u003cspan style\u003d\"font-family: \u0026quot;\u0026quot;;\"\u003e~6 Hours of Work (\u003cspan style\u003d\"font-weight: bold;\"\u003eestimated\u003c/span\u003e)\u003c/span\u003e\u003c/p\u003e\u003cp\u003e\u003cspan style\u003d\"font-family: \u0026quot;\u0026quot;;\"\u003e4,5h\u0026nbsp;\u003c/span\u003e\u003c/p\u003e\u003c/body\u003e\u003c/html\u003e",
+      "type": "Work",
+      "files": []
+    },
+    {
+      "time": 27212086,
+      "text": "\u003chtml dir\u003d\"ltr\"\u003e\u003chead\u003e\u003c/head\u003e\u003cbody contenteditable\u003d\"true\"\u003e\u003cp\u003e\u003cspan style\u003d\"font-family: \u0026quot;\u0026quot;;\"\u003eWorkdays: Mittwoch, \u003cspan style\u003d\"font-style: italic;\"\u003eDonnerstag\u003c/span\u003e\u003c/span\u003e\u003c/p\u003e\u003c/body\u003e\u003c/html\u003e",
+      "type": "Work",
+      "files": []
+    },
+    {
+      "time": 27212089,
+      "text": "\u003chtml dir\u003d\"ltr\"\u003e\u003chead\u003e\u003c/head\u003e\u003cbody contenteditable\u003d\"true\"\u003e\u003cp\u003e\u003cspan style\u003d\"font-family: \u0026quot;\u0026quot;;\"\u003eWorkdays: Mittwoch, \u003cspan style\u003d\"font-style: italic;\"\u003eDonnerstag\u003c/span\u003e\u003c/span\u003e\u003c/p\u003e\u003c/body\u003e\u003c/html\u003e",
       "type": "Work",
       "files": []
     }

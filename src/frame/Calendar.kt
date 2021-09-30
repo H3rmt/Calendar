@@ -309,7 +309,9 @@ fun createCellGraphics(
 					}
 					onMouseClicked = EventHandler {
 						it.consume()
-						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createNoteTab, data)
+						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createNoteTab, data, {
+							println("save callback on cell") // TODO refresh
+						})
 					}
 					onMouseEntered = EventHandler { img.image = createFXImage("img/note active.svg") }
 					onMouseExited = EventHandler { img.image = defaultImg }
@@ -350,7 +352,9 @@ fun createCellGraphics(
 					onMouseClicked = EventHandler {
 						it.consume()
 						Tabmanager.openTab(
-							"WeekNotes${data.WeekofYear}/${data.time.year}", ::createNoteTab, data
+							"WeekNotes${data.WeekofYear}/${data.time.year}", ::createNoteTab, data, {
+								println("save callback on Week")  // TODO refresh
+							}
 						)
 					}
 					onMouseEntered = EventHandler { img.image = createFXImage("img/note active.svg") }
