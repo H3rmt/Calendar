@@ -75,7 +75,7 @@ fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit):
 						add.action {
 							val note = Note(cell.time.toEpochSecond() / 60, "", Types.valueOf(addType.value), emptyList())
 							lateinit var tb: TitledPane
-							tb = noteTab(this, addType.value, "", {
+							tb = noteTab(this, addType.value, true, "", {
 								note.text = (it)
 								if(cell is Day)
 									saveDayNote(note)
@@ -97,7 +97,7 @@ fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit):
 						
 						for(note in cell.notes) {
 							lateinit var tb: TitledPane
-							tb = noteTab(this, note.type.name, note.text, {
+							tb = noteTab(this, note.type.name, false, note.text, {
 								note.text = (it)
 								if(cell is Day)
 									saveDayNote(note)
@@ -129,7 +129,7 @@ fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit):
 	}
 }
 
-fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, deleteFun: () -> Unit): TitledPane {
+fun noteTab(tabs: VBox, title: String, new: Boolean, text: String, saveFun: (String) -> Unit, deleteFun: () -> Unit): TitledPane {
 	// cannot use the EventTarget Functions because they automatically add the
 	// pane to the end of the vbox
 	val pane = TitledPane()
@@ -151,7 +151,7 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 				style {
 					fontSize = 15.px
 				}
-				save = button(getLangString("save"))
+				save = button(if(new) getLangString("create") else getLangString("save"))
 				
 				button(getLangString("delete")) {
 					action { deleteFun() }
@@ -166,10 +166,12 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 			addClass(Styles.NoteTab.texteditor)
 			save.action {
 				saveFun(this@htmleditor.htmlText)
+				save.text = getLangString("save")
 			}
 		}
 	}
 	
+	// set tab as first
 	tabs.getChildList()?.add(0, pane)
 	
 	return pane

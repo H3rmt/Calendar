@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="kotlin:13.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.3.61/2e07c9a84c9e118efb70eede7e579fd663932122/kotlin-reflect-1.3.61.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.5.31/77e0f2568912e45d26c31fd417a332458508acdf/kotlin-stdlib-jdk7-1.5.31.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.5.31/ff5d99aecd328872494e8921b72bf6e3af97af3e/kotlin-stdlib-jdk8-1.5.31.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/5991ca87ef1fb5544943d9abc5a9a37583fabe03/annotations-13.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-reflect/1.3.61/713188cab0fff2335e9bf3cec57244a1a8aa50be/kotlin-reflect-1.3.61-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.5.31/ccdfdab71f0f3ba104191d8f673d0620e7ed2e46/kotlin-stdlib-jdk7-1.5.31-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.5.31/171265ccd1f7a4307c3cb8eedd9115e662013190/kotlin-stdlib-jdk8-1.5.31-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

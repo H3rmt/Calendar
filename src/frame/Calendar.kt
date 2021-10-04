@@ -25,13 +25,14 @@ import javafx.util.*
 import logic.Configs
 import logic.LogType
 import logic.getConfig
+import logic.getLangString
 import logic.log
 import tornadofx.*
 
 
 fun createcalendartab(pane: TabPane): Tab {
 	log("creating calendar tab", LogType.IMPORTANT)
-	return pane.tab("Calender") {
+	return pane.tab(getLangString("calender")) {
 		isClosable = false
 		
 		stackpane {
@@ -321,9 +322,9 @@ fun createCellGraphics(
 								preparedWeekNotes[data.time.month]?.clear()
 								preparedDayNotes[data.time.month]?.clear()
 								prepareMonthNotes(data.time.month)
-								val weeksdata = generateMonth(calendarDisplay)
+								val weeksData = generateMonth(calendarDisplay)
 								currentMonth.clear()
-								currentMonth.addAll(weeksdata)
+								currentMonth.addAll(weeksData)
 							}
 						})
 					}
@@ -373,9 +374,9 @@ fun createCellGraphics(
 									preparedWeekNotes[data.time.month]?.clear()
 									preparedDayNotes[data.time.month]?.clear()
 									prepareMonthNotes(data.time.month)
-									val weeksdata = generateMonth(calendarDisplay)
+									val weeksData = generateMonth(calendarDisplay)
 									currentMonth.clear()
-									currentMonth.addAll(weeksdata)
+									currentMonth.addAll(weeksData)
 								}
 							}
 						)

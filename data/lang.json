@@ -1,18 +1,22 @@
 {
 	"en": {
+		// Menu bar
 		"options": "Options",
 		"reload": "Reload",
-		"save": "Save",
-		"delete": "Delete",
-		"quit": "Quit",
-		"view": "View",
-		"show": "Show",
-		"calendar": "Calendar",
-		"reminder": "Reminder",
-		"help": "Help",
 		"preferences": "Preferences",
+		"quit": "Quit",
+		"show": "Show",
 		"show reminder": "Show Reminder",
 		"show calendar": "Show Calendar",
+		"show todo list": "Show TODO list",
+		"github": "Github",
+		"memory usage": "Memory usage",
+		"help": "Help",
+		
+		// Tabs
+		"calender": "Calendar",
+		
+		// days
 		"monday": "Monday",
 		"tuesday": "Tuesday",
 		"wednesday": "Wednesday",
@@ -20,6 +24,8 @@
 		"friday": "Friday",
 		"saturday": "Saturday",
 		"sunday": "Sunday",
+		
+		// months
 		"january": "January",
 		"february": "February",
 		"march": "March",
@@ -31,6 +37,10 @@
 		"september": "September",
 		"october": "October",
 		"november": "November",
-		"december": "December"
+		"december": "December",
+		
+		// Note Tab
+		"save": "Save",
+		"delete": "Delete"
 	}
 }

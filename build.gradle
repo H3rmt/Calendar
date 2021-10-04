@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.30-M1'
+	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31'
 
 	implementation 'no.tornado:tornadofx:1.7.20'
 

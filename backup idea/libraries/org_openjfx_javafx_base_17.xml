@@ -1,0 +1,25 @@
+<component name="libraryTable">
+  <library name="javafx-base:17">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/17/1e6732190939254735dc2a88eca88c5c7ccc719d/javafx-base-17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/17/616d987ba02a86196d7feca443677fff908d5737/javafx-graphics-17.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/17/2c56d252b97eba8b42f049c6ce145172d744ce08/javafx-graphics-17-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-controls/17/efc0f4edde079c22987064922530c67fa1350a9b/javafx-controls-17-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/17/b63b9696f73009ca5002f49ec4db73576e2de168/javafx-base-17-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-web/17/be4a308dbcc947af2a9d9c42a72fd7f6d0ba77b9/javafx-web-17-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-media/17/6012cc30ced1539f167b64959cb9d6a4283f7aa7/javafx-media-17-win.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-media/17/4d95015ecad2405a9b90482a201147b55a0165c6/javafx-media-17.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/17/5bb56c62e0fe12829893645950137155d83903c/javafx-base-17-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/17/c5d8a26d28bb271ac5fe667e27814829d73a6124/javafx-graphics-17-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-controls/17/524e01d068fbef60d149127a725920969d2e2045/javafx-controls-17-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-graphics/17/c5d8a26d28bb271ac5fe667e27814829d73a6124/javafx-graphics-17-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-base/17/5bb56c62e0fe12829893645950137155d83903c/javafx-base-17-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-web/17/335499571cc8df39bf5c8a99b2ae4d09304d9735/javafx-web-17-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-media/17/2ae36181c0f4322481ced656821e0f792407b114/javafx-media-17-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/org.openjfx/javafx-media/17/2ae36181c0f4322481ced656821e0f792407b114/javafx-media-17-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="imageio:3.7.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-core/3.7.0/5da15caa7f9afdba07af92c004e80251f3ed32f1/imageio-core-3.7.0.jar!/" />  
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-batik/3.7.0/594fded5860fac2def312c8f14a8c3dd3e09700c/imageio-batik-3.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-lang/3.7.0/3757c85d1f0c6482b4c63f19023fbe712de4c71c/common-lang-3.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-io/3.7.0/3f272f94eb7b054b8ea5fc5c679f7f7b89aaff77/common-io-3.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-image/3.7.0/b48b5bd350066b292f964d7f1bf5a1aedf8bb503/common-image-3.7.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-batik/3.7.0/a866fa37ea1720034838e2d78288fe23e4dba803/imageio-batik-3.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.imageio/imageio-core/3.7.0/fe962b68fcce5d3f1f048ea8540e851848dcf30a/imageio-core-3.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-lang/3.7.0/a454064752a0162d9eb49999299c4a4d3f6ec0e1/common-lang-3.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-io/3.7.0/4e631b0862d5679ec19a4616ed03460c41924b/common-io-3.7.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../Gradle/caches/modules-2/files-2.1/com.twelvemonkeys.common/common-image/3.7.0/1c0139903f5bb265ed48037217c79b4ea1cd0bcd/common-image-3.7.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
