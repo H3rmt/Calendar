@@ -55,7 +55,8 @@ class Styles: Stylesheet() {
 	}
 	
 	object WeekTab {
-		val tablecell by cssclass()
+		val tableCell by cssclass()
+		val TimeCell by cssclass()
 	}
 	
 	
@@ -130,7 +131,7 @@ class Styles: Stylesheet() {
 			table {
 				prefHeight = Int.MAX_VALUE.px
 				backgroundColor += Color.WHITE
-				padding = box(3.px)
+				padding = box(2.px)
 			}
 			
 			selectedColumn {
@@ -224,8 +225,13 @@ class Styles: Stylesheet() {
 	
 	init {
 		WeekTab.apply {
-			tablecell {
-				prefHeight = 750.px
+			tableCell {
+				prefWidth = Int.MAX_VALUE.px
+				
+				padding = box(2.px)
+			}
+			TimeCell {
+				prefHeight = 40.px
 				minHeight = prefHeight
 			}
 		}

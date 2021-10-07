@@ -4,7 +4,6 @@ import calendar.Day
 import calendar.Week
 import javafx.geometry.*
 import javafx.scene.control.*
-import javafx.scene.paint.*
 import logic.LogType
 import logic.log
 import tornadofx.*
@@ -43,13 +42,11 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 				// Table view
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
-					style(append = true) {
-						backgroundColor += Color.GREEN
-					}
 					// Top bar
 					hbox(spacing = 5.0, alignment = Pos.CENTER) {
-						padding = Insets(3.0, 18.0, 3.0, 3.0)
-						
+						style {
+							padding = box(3.px, 20.px, 3.px, 4.px)
+						}
 						label("") {
 							addClass(Styles.CalendarTableView.tableItem)
 						}
@@ -93,31 +90,30 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 					fun updateTable() {
 						log("updated table view", LogType.LOW)
 						scrollpane(fitToWidth = true) {
-							style {
-								backgroundColor += Color.RED
-								prefHeight = Int.MAX_VALUE.px
-							}
-							for(hour in 0..10) {
-								hbox(spacing = 5.0, alignment = Pos.CENTER) {
-									padding = Insets(3.0)
-									
-									vbox() {
-										style(append = true) {
-											backgroundColor += Color.LIGHTSEAGREEN
-										}
-										addClass(Styles.CalendarTableView.tableItem)
-										addClass(Styles.WeekTab.tablecell)
-									}
-									for((dayOfWeek, _day) in week.allDays) {
-										vbox() {
-											style(append = true) {
-												backgroundColor += Color.GOLD
-											}
-											addClass(Styles.CalendarTableView.tableItem)
-											addClass(Styles.WeekTab.tablecell)
-										}
+							hbox(spacing = 5.0, alignment = Pos.CENTER) {
+								style(append = true) {
+									padding = box(4.px)
+								}
+								vbox {
+									addClass(Styles.WeekTab.tableCell)
+								}
+								for((_, _) in week.allDays) {
+									vbox(alignment = Pos.TOP_CENTER, spacing = 1.0) {
+										addClass(Styles.WeekTab.tableCell)
 										
+										for(hour in 0..12) {
+											vbox() {
+												addClass(Styles.WeekTab.TimeCell)
+												label {
+													text = "hi das text"
+												}
+												label {
+													text = "das text"
+												}
+											}
+										}
 									}
+									
 								}
 							}
 						}
