@@ -120,7 +120,7 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 				Warning("ik49dk", e, "Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}")
 				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
 					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.LOW)
-					return getJson().fromJson(getJsonReader(StringReader("$it")), T::class.java)
+					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
 				} else
 					throw Exit("k23d1f", e)
 			}
@@ -192,7 +192,7 @@ fun Warning(code: String, exception: Exception, log: Any) {
 		if(stacktrace)
 			e.printStackTrace(PrintWriter(writer))
 		else
-			writer.append("$e")
+			writer.append(e.toString())
 		
 		log(writer, LogType.ERROR)
 	}

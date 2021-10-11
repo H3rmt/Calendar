@@ -41,6 +41,7 @@
 		
 		// Note Tab
 		"save": "Save",
+		"create": "Create",
 		"delete": "Delete"
 	}
 }
