@@ -6,11 +6,13 @@ import calendar.now
 import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
+import javafx.scene.layout.*
 import javafx.scene.paint.*
 import logic.LogType
 import logic.log
 import tornadofx.*
 import java.time.temporal.IsoFields
+import kotlin.math.min
 
 fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 	log("creating week tab", LogType.IMPORTANT)
@@ -71,37 +73,37 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 							}
 							label("Monday") {
 								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.CalendarTableView.tableHeader)
+								addClass(Styles.WeekTab.tableTimeHeader)
 								addClass(Styles.CalendarTableView.cellHeaderLabel)
 							}
 							label("Tuesday") {
 								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.CalendarTableView.tableHeader)
+								addClass(Styles.WeekTab.tableTimeHeader)
 								addClass(Styles.CalendarTableView.cellHeaderLabel)
 							}
 							label("Wednesday") {
 								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.CalendarTableView.tableHeader)
+								addClass(Styles.WeekTab.tableTimeHeader)
 								addClass(Styles.CalendarTableView.cellHeaderLabel)
 							}
 							label("Thursday") {
 								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.CalendarTableView.tableHeader)
+								addClass(Styles.WeekTab.tableTimeHeader)
 								addClass(Styles.CalendarTableView.cellHeaderLabel)
 							}
 							label("Friday") {
 								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.CalendarTableView.tableHeader)
+								addClass(Styles.WeekTab.tableTimeHeader)
 								addClass(Styles.CalendarTableView.cellHeaderLabel)
 							}
 							label("Saturday") {
 								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.CalendarTableView.tableHeader)
+								addClass(Styles.WeekTab.tableTimeHeader)
 								addClass(Styles.CalendarTableView.cellHeaderLabel)
 							}
 							label("Sunday") {
 								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.CalendarTableView.tableHeader)
+								addClass(Styles.WeekTab.tableTimeHeader)
 								addClass(Styles.CalendarTableView.cellHeaderLabel)
 							}
 						}
@@ -109,6 +111,9 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 					
 					fun updateTable() {
 						log("updated table view", LogType.LOW)
+						
+						var scrollto = 0
+						
 						scrollpane(fitToWidth = true) {
 							style {
 								borderWidth += box(1.px)
@@ -125,6 +130,13 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 									for(hour in 0..23) {
 										vbox(alignment = Pos.CENTER) {
 											addClass(Styles.WeekTab.TimeCell)
+											if(hour != 23) { // remove border on last element
+												style(append = true) {
+													borderColor += box(c(0.75, 0.75, 0.75))
+													borderStyle += BorderStrokeStyle.DOTTED
+													borderWidth += box(0.px, 0.px, 2.px, 0.px)
+												}
+											}
 											
 											if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) && week.time.year == now.year)
 												addClass(Styles.WeekTab.ActiveTimeCell)
@@ -144,17 +156,16 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 										for(hour in 0..23) {
 											hbox {
 												addClass(Styles.WeekTab.TimeCell)
+												if(hour != 23)  // remove border on last element
+													addClass(Styles.WeekTab.TimeCellBorder)
 												
-												if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) && week.time.year == now.year)
+												if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) && week.time.year == now.year) {
 													addClass(Styles.WeekTab.ActiveTimeCell)
+													scrollto = hour
+												}
 												
 												vbox {
-													label {
-														text = "hi das text"
-													}
-													label {
-														text = "das text"
-													}
+													// appointments
 													
 													addClass(Styles.WeekTab.UnHoveredInnerTimeCell)
 													onMouseEntered = EventHandler {
@@ -163,12 +174,17 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 													onMouseExited = EventHandler {
 														removeClass(Styles.WeekTab.HoveredInnerTimeCell)
 													}
+													
+													contextmenu {
+														item("TestContexMenu TODO new appointment")
+													}
 												}
 											}
 										}
 									}
 								}
 							}
+							vvalue = (min(scrollto.toDouble() + 4, 24.0) / 24.0) * vmax  // scroll to current time anp place ~in middle
 						}
 					}
 					
