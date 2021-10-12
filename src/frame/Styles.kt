@@ -61,6 +61,8 @@ class Styles: Stylesheet() {
 		
 		val UnHoveredInnerTimeCell by cssclass()
 		val HoveredInnerTimeCell by cssclass()
+		
+		val invisibleScrollbar by cssclass()
 	}
 	
 	
@@ -259,6 +261,19 @@ class Styles: Stylesheet() {
 		
 		WeekTab.HoveredInnerTimeCell {
 			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
+		}
+		
+		WeekTab.invisibleScrollbar {
+			scrollBar {
+				backgroundColor += Color.WHITE
+				
+				decrementArrow {
+					prefHeight = 0.px
+				}
+				incrementArrow {
+					prefHeight = 0.px
+				}
+			}
 		}
 	}
 }

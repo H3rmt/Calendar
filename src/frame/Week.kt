@@ -6,6 +6,7 @@ import calendar.now
 import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
+import javafx.scene.paint.*
 import logic.LogType
 import logic.log
 import tornadofx.*
@@ -47,9 +48,23 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 					addClass(Styles.CalendarTableView.table)
 					// Top bar
 					scrollpane(fitToWidth = true) {
+						vbarPolicy = ScrollPane.ScrollBarPolicy.ALWAYS
+						
+						addClass(Styles.WeekTab.invisibleScrollbar)
+						style {
+							borderWidth += box(1.px)
+							borderColor += box(Color.WHITE)
+							backgroundColor += Color.WHITE
+							
+							prefHeight = 38.px
+							minHeight = prefHeight
+							
+							padding = box(3.px, 4.px, 3.px, 6.px)
+						}
+						
 						hbox(spacing = 2.0, alignment = Pos.CENTER) {
 							style {
-								padding = box(3.px, 4.px, 3.px, 4.px)
+								backgroundColor += Color.WHITE
 							}
 							label("") {
 								addClass(Styles.CalendarTableView.tableItem)
@@ -95,9 +110,15 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 					fun updateTable() {
 						log("updated table view", LogType.LOW)
 						scrollpane(fitToWidth = true) {
+							style {
+								borderWidth += box(1.px)
+								borderColor += box(Color.WHITE)
+							}
+							
 							hbox(spacing = 2.0, alignment = Pos.CENTER) {
 								style(append = true) {
 									padding = box(4.px)
+									backgroundColor += Color.WHITE
 								}
 								vbox(alignment = Pos.TOP_CENTER) {
 									addClass(Styles.WeekTab.tableDay)
