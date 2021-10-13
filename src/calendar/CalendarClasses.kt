@@ -84,12 +84,7 @@ class Week(
 }
 
 
-class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
-	
-	override val time: ZonedDateTime = _time
-	
-	@Expose
-	val partofmonth: Boolean = _partofmonth
+data class Day(override val time: ZonedDateTime, val partofmonth: Boolean): Celldisplay {
 	
 	@Expose
 	val appointments: MutableList<Appointment> = mutableListOf()
@@ -103,59 +98,34 @@ class Day(_time: ZonedDateTime, _partofmonth: Boolean): Celldisplay {
 }
 
 
-class Appointment(_day: DayOfWeek, _start: Long, _duration: Long, _title: String, _description: String, _type: Types) {
-	
-	@Expose
-	var day = _day
-	
-	@Expose
-	var start = _start
-	// stored in minutes instead of seconds (60 to 1)
-	
-	@Expose
-	val duration = _duration
-	// stored in minutes instead of seconds (60 to 1)
-	
-	@Expose
-	val title = _title
-	
-	@Expose
-	val description = _description
-	
-	@Expose
-	val type = _type
+data class Appointment(
+	@Expose var day: DayOfWeek,
+	@Expose var start: Long,
+	@Expose val duration: Long,
+	@Expose val title: String,
+	@Expose val description: String,
+	@Expose val type: Types
+) {
 	
 	override fun toString(): String = "$day: $start - $duration  $type | $title: $description"
 }
 
 
-class Note(_time: Long, _text: String, _type: Types, _files: List<File>) {
-	
-	@Expose
-	var time = _time
-	// stored in minutes instead of seconds (60 to 1)
-	
-	@Expose
-	var text = _text
-	
-	@Expose
-	val type = _type
-	
-	@Expose
-	val files = _files
+data class Note(
+	@Expose var time: Long,
+	@Expose var text: String,
+	@Expose val type: Types,
+	@Expose val files: List<File>
+) {
 	
 	override fun toString(): String = "$time $type $files"
 }
 
-class File(_data: ByteArray, _name: String, _origin: String) {
-	@Expose
-	val data = _data
-	
-	@Expose
-	val name = _name
-	
-	@Expose
-	val origin = _origin
+data class File(
+	@Expose val data: ByteArray,
+	@Expose val name: String,
+	@Expose val origin: String
+) {
 	
 	@Suppress("unused")
 	constructor(file: java.io.File): this(file.inputStream().readAllBytes(), file.name, file.absolutePath)
@@ -164,10 +134,10 @@ class File(_data: ByteArray, _name: String, _origin: String) {
 }
 
 
-class Types(_name: String, _color: Color) {
-	
-	val name: String = _name
-	val color: Color = _color
+data class Types(
+	@Expose val name: String,
+	@Expose val color: Color
+) {
 	
 	override fun toString(): String = name
 	

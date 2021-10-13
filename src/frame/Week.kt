@@ -112,7 +112,7 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 					fun updateTable() {
 						log("updated table view", LogType.LOW)
 						
-						var scrollto = 0
+						var scrollToHour = 0
 						
 						scrollpane(fitToWidth = true) {
 							style {
@@ -150,7 +150,10 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 										}
 									}
 								}
-								for((_, _) in week.allDays) {
+								for((dayOfWeek, _) in week.allDays) {
+									val appointments = week.allDays[dayOfWeek]?.appointments ?: listOf()
+									log(appointments)
+									
 									vbox(alignment = Pos.TOP_CENTER) {
 										addClass(Styles.WeekTab.tableDay)
 										for(hour in 0..23) {
@@ -161,11 +164,14 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 												
 												if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) && week.time.year == now.year) {
 													addClass(Styles.WeekTab.ActiveTimeCell)
-													scrollto = hour
+													scrollToHour = hour
 												}
 												
 												vbox {
 													// appointments
+													for(app in appointments.filter { (it.start / 60).toInt() == hour }) {
+														label(app.description)
+													}
 													
 													addClass(Styles.WeekTab.UnHoveredInnerTimeCell)
 													onMouseEntered = EventHandler {
@@ -184,7 +190,7 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 									}
 								}
 							}
-							vvalue = (min(scrollto.toDouble() + 4, 24.0) / 24.0) * vmax  // scroll to current time anp place ~in middle
+							vvalue = (min(scrollToHour.toDouble() + 4, 24.0) / 24.0) * vmax  // scroll to current time anp place ~in middle
 						}
 					}
 					

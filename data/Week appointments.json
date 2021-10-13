@@ -21,7 +21,15 @@
 		"start": 860,
 		"duration": 150,
 		"type": "Sport",
-		"title": "Work",
+		"title": "Spoort",
 		"description": "ne"
+	},
+	{
+		"day": "SUNDAY",
+		"start": 0,
+		"duration": 150,
+		"type": "Work",
+		"title": "Work",
+		"description": "yeet"
 	}
 ]
