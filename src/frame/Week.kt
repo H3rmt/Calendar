@@ -169,7 +169,7 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 												
 												vbox {
 													// appointments
-													for(app in appointments.filter { (it.start / 60).toInt() == hour }) {
+													for(app in appointments.filter { it.start <= hour * 60 && it.start + it.duration > hour * 60 }) {
 														label(app.description)
 													}
 													

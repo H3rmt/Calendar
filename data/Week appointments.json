@@ -27,7 +27,15 @@
 	{
 		"day": "SUNDAY",
 		"start": 0,
-		"duration": 150,
+		"duration": 361,
+		"type": "Work",
+		"title": "Work",
+		"description": "yeet"
+	},
+	{
+		"day": "FRIDAY",
+		"start": 0,
+		"duration": 120,
 		"type": "Work",
 		"title": "Work",
 		"description": "yeet"
