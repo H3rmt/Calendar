@@ -178,7 +178,7 @@ fun createcalendartab(pane: TabPane): Tab {
 										cell.removeClass(Styles.CalendarTableView.hoveredTableCell)
 										hoveredCell.value = -1
 									}
-									cell.widthProperty().addListener { _, _, _ -> selectedIndex.value = -2 /*-1 doesn't close -2 forces close*/ }
+									cell.widthProperty().addListener { _, _, _ -> selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
 								}
 								
 								var openPreparation = false
@@ -560,7 +560,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 		yCords.add(sideTopMargin + yCords.size * (spacing + circleWidth))
 	
 	for((index, appointment) in appointments.withIndex()) {
-		pane.label(appointment.description) {
+		pane.label(appointment.title) {
 			addClass(Styles.CalendarTableView.cellAppointLabel)
 			translateX = horizontalLeftMargin + circleWidth
 			translateY = yCords[index] - circleWidth / 1.1
