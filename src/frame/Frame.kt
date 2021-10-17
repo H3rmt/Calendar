@@ -69,7 +69,7 @@ fun frameInit() {
 			writer.append(it.error.toString())
 		log(writer, LogType.ERROR)
 		
-		// uncomment if errorPopup should be disabled
+		// uncomment if errorPopup should be disabled  enable in Release
 		it.consume()
 	}
 	

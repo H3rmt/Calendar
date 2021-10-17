@@ -8,11 +8,15 @@ import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
+import javafx.stage.*
 import logic.LogType
+import logic.getLangString
 import logic.log
 import tornadofx.*
 import java.time.temporal.IsoFields
 import kotlin.math.min
+
+
 
 fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 	log("creating week tab", LogType.IMPORTANT)
@@ -182,7 +186,11 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 													}
 													
 													contextmenu {
-														item("TestContexMenu TODO new appointment")
+														item(getLangString("New appointment")) {
+															action {
+																NewPopup.open()
+															}
+														}
 													}
 												}
 											}
@@ -203,6 +211,18 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 				isMouseTransparent = true
 				addClass(Styles.Tabs.shadowBorder)
 			}
+		}
+	}
+}
+
+class NewPopup: Fragment() {
+	override val root = borderpane {
+		center = label("testpopup")
+	}
+	
+	companion object {
+		fun open() {
+			find(NewPopup::class).openModal(modality = Modality.NONE, escapeClosesWindow = false)
 		}
 	}
 }
