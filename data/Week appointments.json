@@ -5,7 +5,7 @@
 		"start": 420,
 		"duration": 120,
 		"type": "Sport",
-		"title": "Work",
+		"title": "Sport2",
 		"description": "Very Important"
 	},
 	{
@@ -13,7 +13,7 @@
 		"start": 560,
 		"duration": 350,
 		"type": "Sport",
-		"title": "Work",
+		"title": "Spot",
 		"description": "Very Important"
 	},
 	{
@@ -33,11 +33,27 @@
 		"description": "yeet"
 	},
 	{
+		"day": "SUNDAY",
+		"start": 120,
+		"duration": 61,
+		"type": "School",
+		"title": "Maths",
+		"description": "yeet too"
+	},
+	{
 		"day": "FRIDAY",
-		"start": 0,
-		"duration": 120,
+		"start": 60,
+		"duration": 10,
 		"type": "Work",
 		"title": "Work",
 		"description": "yeet"
+	},
+	{
+		"day": "TUESDAY",
+		"start": 59,
+		"duration": 10,
+		"type": "School",
+		"title": "Info",
+		"description": "g"
 	}
 ]

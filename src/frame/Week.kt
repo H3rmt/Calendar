@@ -160,7 +160,9 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 									
 									vbox(alignment = Pos.TOP_CENTER) {
 										addClass(Styles.WeekTab.tableDay)
+										
 										for(hour in 0..23) {
+											// outer cell with border
 											hbox {
 												addClass(Styles.WeekTab.TimeCell)
 												if(hour != 23)  // remove border on last element
@@ -171,10 +173,41 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 													scrollToHour = hour
 												}
 												
-												vbox {
+												// inner cell
+												gridpane {
+													style(append = true) {
+														
+														alignment = Pos.CENTER
+														spacing = 2.px
+													}
 													// appointments
-													for(app in appointments.filter { it.start <= hour * 60 && it.start + it.duration > hour * 60 }) {
-														label(app.description)
+													val appmtns = appointments.filter {
+														it.start < (hour + 1) * 60 && (it.start + it.duration) > hour * 60
+													}
+													
+													for((ind, app) in appmtns.withIndex()) {
+														// colored box(es)
+														hbox {
+															gridpaneConstraints {
+																columnRowIndex(ind, 0)
+															}
+															
+															label(app.title)
+															style {
+																prefWidth = Int.MAX_VALUE.px
+																
+																// val height = ((app.start + app.duration) - hour * 60).coerceAtMost(60).toInt()
+																
+																// prefHeight = 20.px//height * (this@gridpane.height / 60).px
+																// maxHeight = prefHeight
+																// minHeight = prefHeight
+																
+																// translateY = -10.px
+																
+																padding = box(2.px)
+																backgroundColor += app.type.color
+															}
+														}
 													}
 													
 													addClass(Styles.WeekTab.UnHoveredInnerTimeCell)
@@ -192,13 +225,14 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 															}
 														}
 													}
+													
 												}
 											}
 										}
 									}
 								}
 							}
-							vvalue = (min(scrollToHour.toDouble() + 4, 24.0) / 24.0) * vmax  // scroll to current time anp place ~in middle
+							vvalue = (min(scrollToHour.toDouble() + 8, 24.0) / 24.0) * vmax  // scroll to current time an place ~in middle
 						}
 					}
 					
