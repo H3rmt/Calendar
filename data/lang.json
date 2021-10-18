@@ -42,6 +42,9 @@
 		// Note Tab
 		"save": "Save",
 		"create": "Create",
-		"delete": "Delete"
+		"delete": "Delete",
+		
+		// Week Tab
+		"new appointment": "new Appointment"
 	}
 }

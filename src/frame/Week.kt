@@ -1,6 +1,7 @@
 package frame
 
 import calendar.Day
+import calendar.Types
 import calendar.Week
 import calendar.now
 import javafx.event.*
@@ -174,11 +175,10 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 												}
 												
 												// inner cell
-												gridpane {
+												hbox {
 													style(append = true) {
-														
 														alignment = Pos.CENTER
-														spacing = 2.px
+														spacing = 3.px
 													}
 													// appointments
 													val appmtns = appointments.filter {
@@ -221,11 +221,10 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 													contextmenu {
 														item(getLangString("New appointment")) {
 															action {
-																NewPopup.open()
+																NewAppointmentPopup.open(false)
 															}
 														}
 													}
-													
 												}
 											}
 										}
@@ -249,14 +248,49 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 	}
 }
 
-class NewPopup: Fragment() {
-	override val root = borderpane {
-		center = label("testpopup")
+class NewAppointmentPopup: Fragment() {
+	override val root = form {
+		fieldset(getLangString("New appointment")) {
+			field("Type") {
+				combobox(values = Types.getTypes()) {
+				}.required()
+			}
+			field(getLangString("start")) {
+				datepicker {
+				}.required()
+			}
+			field(getLangString("end")) {
+				val button = togglebutton("endtime", value = true) {
+					selectedProperty().addListener { _, _, selected ->
+						text = if(selected) "endtime" else "duration"
+					}
+				}
+				datepicker {
+					removeWhen { button.selectedProperty().not() }
+				}
+				textfield {
+					removeWhen { button.selectedProperty() }
+				}
+			}
+			buttonbar {
+				button(getLangString("Cancel")) {
+					isCancelButton = true
+					action {
+					}
+				}
+				button(getLangString("Create")) {
+					isDefaultButton = true
+					enableWhen { false.toProperty() }
+					action {
+					}
+				}
+			}
+		}
 	}
 	
 	companion object {
-		fun open() {
-			find(NewPopup::class).openModal(modality = Modality.NONE, escapeClosesWindow = false)
+		fun open(block: Boolean) {
+			find(NewAppointmentPopup::class).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 		}
 	}
 }

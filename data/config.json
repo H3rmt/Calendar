@@ -10,11 +10,11 @@
 	"AppointmentTypes": [
 		{
 			"name": "Work",
-			"color": "#0000ff"
+			"color": "#c000ff"
 		},
 		{
 			"name": "Sport",
-			"color": "#000000"
+			"color": "#e50000"
 		},
 		{
 			"name": "School",
