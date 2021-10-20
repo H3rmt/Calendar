@@ -203,7 +203,7 @@ fun Warning(code: String, exception: Exception, log: Any) {
  */
 enum class Configs {
 	Language, Debug, Printlogs, Logformat, Printstacktrace,
-	AnimationSpeed, AnimationDelay, MaxDayAppointments, AppointmentTypes
+	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen, AppointmentTypes
 }
 
 object ConfigFiles {

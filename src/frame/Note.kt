@@ -13,7 +13,9 @@ import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
+import logic.Configs
 import logic.LogType
+import logic.getConfig
 import logic.getLangString
 import logic.log
 import tornadofx.*
@@ -135,6 +137,7 @@ fun noteTab(tabs: VBox, title: String, new: Boolean, text: String, saveFun: (Str
 	val pane = TitledPane()
 	pane.apply {
 		setText(title)
+		isExpanded = getConfig(Configs.ExpandNotesOnOpen)
 		
 		style {
 			padding = box(1.px)
