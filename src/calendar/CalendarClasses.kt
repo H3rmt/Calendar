@@ -16,18 +16,19 @@ import java.time.DayOfWeek.SUNDAY
 import java.time.DayOfWeek.THURSDAY
 import java.time.DayOfWeek.TUESDAY
 import java.time.DayOfWeek.WEDNESDAY
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
+import kotlin.collections.set
 
 
 interface Celldisplay {
 	//@Expose
 	val notes: MutableList<Note>
 	
-	val time: ZonedDateTime
+	val time: LocalDateTime
 }
 
 class Week(
-	_time: ZonedDateTime,
+	_time: LocalDateTime,
 	Monday: Day,
 	Tuesday: Day,
 	Wednesday: Day,
@@ -38,7 +39,7 @@ class Week(
 	val WeekofYear: Int
 ): Celldisplay {
 	
-	override val time: ZonedDateTime = _time
+	override val time: LocalDateTime = _time
 	
 	@Expose
 	override val notes: MutableList<Note> = mutableListOf()
@@ -84,7 +85,7 @@ class Week(
 }
 
 
-data class Day(override val time: ZonedDateTime, val partofmonth: Boolean): Celldisplay {
+data class Day(override val time: LocalDateTime, val partofmonth: Boolean): Celldisplay {
 	
 	@Expose
 	val appointments: MutableList<Appointment> = mutableListOf()
@@ -98,15 +99,24 @@ data class Day(override val time: ZonedDateTime, val partofmonth: Boolean): Cell
 }
 
 
-data class Appointment(
-	@Expose var day: DayOfWeek,
+open class Appointment(
 	@Expose var start: Long,
 	@Expose val duration: Long,
 	@Expose val title: String,
 	@Expose val description: String,
 	@Expose val type: Types
 ) {
-	
+	override fun toString(): String = "$start - $duration  $type | $title: $description"
+}
+
+class WeekAppointment(
+	@Expose var day: DayOfWeek,
+	start: Long,
+	duration: Long,
+	title: String,
+	description: String,
+	type: Types
+): Appointment(start, duration, title, description, type) {
 	override fun toString(): String = "$day: $start - $duration  $type | $title: $description"
 }
 
@@ -117,7 +127,6 @@ data class Note(
 	@Expose val type: Types,
 	@Expose val files: List<File>
 ) {
-	
 	override fun toString(): String = "$time $type $files"
 }
 

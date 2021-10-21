@@ -1,9 +1,12 @@
 package frame
 
+import calendar.Appointment
 import calendar.Day
+import calendar.Timing
 import calendar.Types
 import calendar.Week
 import calendar.now
+import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
@@ -14,12 +17,12 @@ import logic.LogType
 import logic.getLangString
 import logic.log
 import tornadofx.*
+import tornadofx.control.DateTimePicker
+import java.time.LocalDateTime
 import java.time.temporal.IsoFields
 import kotlin.math.min
 
-
-
-fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
+fun createWeekTab(pane: TabPane, week: Week, _day: Day?): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab(week.toDate()) {
 		isClosable = true
@@ -155,7 +158,7 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 										}
 									}
 								}
-								for((dayOfWeek, _) in week.allDays) {
+								for((dayOfWeek, day) in week.allDays) {
 									val appointments = week.allDays[dayOfWeek]?.appointments ?: listOf()
 									log(appointments)
 									
@@ -221,7 +224,9 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 													contextmenu {
 														item(getLangString("New appointment")) {
 															action {
-																NewAppointmentPopup.open(false)
+																NewAppointmentPopup.open(false).apply {
+																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour) // TODO timezones removed
+																}
 															}
 														}
 													}
@@ -249,27 +254,34 @@ fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab {
 }
 
 class NewAppointmentPopup: Fragment() {
+	
+	var start: Property<LocalDateTime> = LocalDateTime.now().toProperty()
+	var duration: Property<LocalDateTime> = LocalDateTime.now().toProperty()
+	var appointmenttitle: Property<String>? = null
+	var description: Property<String>? = null
+	var type: Property<Types>? = null
+	
+	fun createAppointment(): Appointment {
+		val _start: Long = 0//start.value?.to ?: 0
+		val _duration: Long = 0//duration.value?.?: 0  // subtract start from duration
+		val _title: String = appointmenttitle?.value ?: ""
+		val _description: String = description?.value ?: ""
+		val _type: Types = type?.value ?: Types.getTypes().component1()
+		return Appointment(_start, _duration, _title, _description, _type)
+	}
+	
 	override val root = form {
 		fieldset(getLangString("New appointment")) {
 			field("Type") {
-				combobox(values = Types.getTypes()) {
-				}.required()
+				combobox(values = Types.getTypes(), property = type) {
+				}
 			}
 			field(getLangString("start")) {
-				datepicker {
-				}.required()
+				dateTimePicker(start) {
+				}
 			}
 			field(getLangString("end")) {
-				val button = togglebutton("endtime", value = true) {
-					selectedProperty().addListener { _, _, selected ->
-						text = if(selected) "endtime" else "duration"
-					}
-				}
-				datepicker {
-					removeWhen { button.selectedProperty().not() }
-				}
-				textfield {
-					removeWhen { button.selectedProperty() }
+				dateTimePicker(duration) {
 				}
 			}
 			buttonbar {
@@ -289,8 +301,12 @@ class NewAppointmentPopup: Fragment() {
 	}
 	
 	companion object {
-		fun open(block: Boolean) {
-			find(NewAppointmentPopup::class).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
-		}
+		fun open(block: Boolean): Stage? = find(NewAppointmentPopup::class).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 	}
+	
 }
+
+fun EventTarget.dateTimePicker(time: Property<LocalDateTime>? = null, op: DateTimePicker.() -> Unit = {}): DateTimePicker = DateTimePicker().attachTo(this, op) {
+	if(time != null) it.dateTimeValueProperty().bindBidirectional(time)
+}
+

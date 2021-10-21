@@ -9,12 +9,12 @@ import java.io.File
 import java.io.FileReader
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.temporal.IsoFields
 
 
 fun saveDayNote(note: Note) {
-	val noteTime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), ZoneId.systemDefault())
+	val noteTime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), ZoneOffset.UTC)
 	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
 		if(!exists()) {
 			log("file with notes for ${noteTime.month.name} not found", LogType.LOW)
@@ -32,7 +32,7 @@ fun saveDayNote(note: Note) {
 					log("reading Day Notes", LogType.LOW)
 					list.forEach {
 						FromJSON.createNote(it)?.apply {
-							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneId.systemDefault())
+							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 							
 							if(!tmpDayNotes.containsKey(time.dayOfMonth))
 								tmpDayNotes[time.dayOfMonth] = mutableListOf()
@@ -69,7 +69,7 @@ fun saveDayNote(note: Note) {
 }
 
 fun removeDayNote(note: Note) {
-	val noteTime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), ZoneId.systemDefault())
+	val noteTime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), ZoneOffset.UTC)
 	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
 		if(!exists()) {
 			log("file with notes for ${noteTime.month.name} not found", LogType.LOW)
@@ -87,7 +87,7 @@ fun removeDayNote(note: Note) {
 					log("reading Day Notes", LogType.LOW)
 					list.forEach {
 						FromJSON.createNote(it)?.apply {
-							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneId.systemDefault())
+							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 							
 							if(!tmpDayNotes.containsKey(time.dayOfMonth))
 								tmpDayNotes[time.dayOfMonth] = mutableListOf()
@@ -120,7 +120,7 @@ fun removeDayNote(note: Note) {
 }
 
 fun saveWeekNote(note: Note) {
-	val noteTime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), ZoneId.systemDefault())
+	val noteTime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), ZoneOffset.UTC)
 	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
 		if(!exists()) {
 			log("file with notes for ${noteTime.month.name} not found", LogType.LOW)
@@ -138,7 +138,7 @@ fun saveWeekNote(note: Note) {
 					log("reading Week Notes", LogType.LOW)
 					list.forEach {
 						FromJSON.createNote(it)?.apply {
-							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneId.systemDefault())
+							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 							
 							if(!tmpWeekNotes.containsKey(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)))
 								tmpWeekNotes[time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)] = mutableListOf()
@@ -175,7 +175,7 @@ fun saveWeekNote(note: Note) {
 }
 
 fun removeWeekNote(note: Note) {
-	val noteTime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), ZoneId.systemDefault())
+	val noteTime = LocalDate.ofInstant(Instant.ofEpochSecond(note.time * 60), ZoneOffset.UTC)
 	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
 		if(!exists()) {
 			log("file with notes for ${noteTime.month.name} not found", LogType.LOW)
@@ -193,7 +193,7 @@ fun removeWeekNote(note: Note) {
 					log("reading Week Notes", LogType.LOW)
 					list.forEach {
 						FromJSON.createNote(it)?.apply {
-							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneId.systemDefault())
+							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 							
 							if(!tmpWeekNotes.containsKey(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)))
 								tmpWeekNotes[time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)] = mutableListOf()

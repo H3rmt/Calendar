@@ -14,16 +14,16 @@ import java.io.FileReader
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.Month
-import java.time.ZoneId.systemDefault
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.IsoFields
 
 
-val now: ZonedDateTime = ZonedDateTime.now(systemDefault())
+val now: ZonedDateTime = Timing.getNow()
 
-var calendarDisplay: ZonedDateTime = ZonedDateTime.now(systemDefault())
+var calendarDisplay: LocalDateTime = Timing.getNowLocal()
 
 val currentMonth: ObservableList<Week> = FXCollections.observableArrayList()
 val currentMonthName: SimpleStringProperty = SimpleStringProperty()
@@ -83,9 +83,9 @@ fun loadCalendarData() {
 }
 
 
-fun generateMonth(monthTime: ZonedDateTime): MutableList<Week> {
+fun generateMonth(monthTime: LocalDateTime): MutableList<Week> {
 	log("generating Month", LogType.LOW)
-	var time: ZonedDateTime = monthTime.withDayOfMonth(1)
+	var time: LocalDateTime = monthTime.withDayOfMonth(1)
 	val month = time.month
 	
 	val dayOffset = time.dayOfWeek.value
@@ -123,7 +123,7 @@ fun generateMonth(monthTime: ZonedDateTime): MutableList<Week> {
 
 
 // Day: { Appointments }
-val preparedweeklyAppointments: MutableMap<DayOfWeek, MutableList<Appointment>> = mutableMapOf()
+val preparedweeklyAppointments: MutableMap<DayOfWeek, MutableList<WeekAppointment>> = mutableMapOf()
 
 // ----overridden with each Month change----
 
@@ -148,6 +148,8 @@ fun prepareWeekAppointments() {
 	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.weekAppointmentsFile)), List::class.java).forEach { list ->
 		log("reading Week Appointment: $list", LogType.LOW)
 		FromJSON.createAppointment(list, true)?.run {
+			this as WeekAppointment
+			
 			if(!preparedweeklyAppointments.containsKey(day))
 				preparedweeklyAppointments[day] = mutableListOf()
 			
@@ -173,11 +175,10 @@ private fun prepareMonthAppointments(Month: Month) {
 	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/$Month.json")), List::class.java).forEach { list ->
 		log("reading single Appointment: $list", LogType.LOW)
 		FromJSON.createAppointment(list, false)?.run {
-			val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), systemDefault())
+			val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneOffset.UTC)
 			
-			val offset: ZoneOffset = systemDefault().rules.getOffset(Instant.ofEpochSecond(start * 60))
+			val offset: ZoneOffset = ZoneOffset.UTC.rules.getOffset(Instant.ofEpochSecond(start * 60))
 			start -= time.atStartOfDay().toLocalTime().toEpochSecond(time, offset) / 60
-			day = time.dayOfWeek
 			if(!preparedsingleAppointments.containsKey(time.month))
 				preparedsingleAppointments[time.month] = mutableMapOf()
 			if(!preparedsingleAppointments[time.month]!!.containsKey(time.dayOfMonth))
@@ -204,7 +205,7 @@ fun prepareMonthNotes(Month: Month) {
 				log("reading Day Notes", LogType.LOW)
 				list.forEach {
 					FromJSON.createNote(it)?.apply {
-						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), systemDefault())
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 						
 						if(!preparedDayNotes.containsKey(time.month))
 							preparedDayNotes[time.month] = mutableMapOf()
@@ -221,7 +222,7 @@ fun prepareMonthNotes(Month: Month) {
 				log("reading Week Notes", LogType.LOW)
 				list.forEach {
 					FromJSON.createNote(it)?.apply {
-						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), systemDefault())
+						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 						
 						if(!preparedWeekNotes.containsKey(time.month))
 							preparedWeekNotes[time.month] = mutableMapOf()

@@ -61,21 +61,17 @@ object FromJSON {
 		return null
 	}
 	
-	fun createAppointment(appointment: Map<String, Any>, day: Boolean): Appointment? {
+	fun createAppointment(appointment: Map<String, Any>, week: Boolean): Appointment? {
 		try {
-			return if(day) {
-				Appointment(
-					DayOfWeek.valueOf((appointment["day"] as String).uppercase()), (appointment["start"] as Double).toLong(),
-					(appointment["duration"] as Double).toLong(), appointment["title"] as String,
-					appointment["description"] as String, Types.valueOf(appointment["type"] as String)
-				)
-			} else {
-				Appointment(
-					DayOfWeek.SATURDAY, (appointment["start"] as Double).toLong(),
-					(appointment["duration"] as Double).toLong(), appointment["title"] as String,
-					appointment["description"] as String, Types.valueOf(appointment["type"] as String)
-				)
-			}
+			return if(!week) return Appointment(
+				(appointment["start"] as Double).toLong(),
+				(appointment["duration"] as Double).toLong(), appointment["title"] as String,
+				appointment["description"] as String, Types.valueOf(appointment["type"] as String)
+			) else WeekAppointment(
+				DayOfWeek.valueOf((appointment["day"] as String).uppercase()), (appointment["start"] as Double).toLong(),
+				(appointment["duration"] as Double).toLong(), appointment["title"] as String,
+				appointment["description"] as String, Types.valueOf(appointment["type"] as String)
+			)
 		} catch(e: Exception) {
 			Warning("an35f7", e, "Exception creating Appointment from map:$appointment")
 		}

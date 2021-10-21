@@ -3,6 +3,7 @@ package frame
 import calendar.Celldisplay
 import calendar.Day
 import calendar.Note
+import calendar.Timing.toUTCEpochSecond
 import calendar.Types
 import calendar.Week
 import calendar.removeDayNote
@@ -75,7 +76,7 @@ fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit):
 					}
 					vbox {
 						add.action {
-							val note = Note(cell.time.toEpochSecond() / 60, "", Types.valueOf(addType.value), emptyList())
+							val note = Note(cell.time.toUTCEpochSecond() / 60, "", Types.valueOf(addType.value), emptyList())
 							lateinit var tb: TitledPane
 							tb = noteTab(this, addType.value, true, "", {
 								note.text = (it)
