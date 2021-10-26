@@ -224,3 +224,55 @@ fun removeWeekNote(note: Note) {
 		writeText(getJson().toJson(original))
 	}
 }
+
+
+
+fun saveDayAppointment(appointment: Appointment) {
+	val appointmentTime = LocalDate.ofInstant(Instant.ofEpochSecond(appointment.start * 60), ZoneOffset.UTC)
+	
+	File(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json").run {
+		if(!exists()) {
+			log("file with notes for ${appointmentTime.month.name} not found", LogType.LOW)
+			createNewFile()
+			writeText("[\n\t\n]")
+		}
+	}
+	
+	val tmpDayAppointments: MutableMap<Int, MutableList<Appointment>> = mutableMapOf()
+	
+	getJson().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json")), List::class.java)
+		.forEach { list ->
+			log("reading Appointments", LogType.LOW)
+			FromJSON.createAppointment(list, false)?.apply {
+				val time = LocalDate.ofInstant(Instant.ofEpochSecond(appointment.start * 60), ZoneOffset.UTC)
+				
+				if(!tmpDayAppointments.containsKey(time.dayOfMonth))
+					tmpDayAppointments[time.dayOfMonth] = mutableListOf()
+				
+				tmpDayAppointments[time.dayOfMonth]!!.add(this)
+				log("loaded Day Note: $this", LogType.LOW)
+			}
+		}
+	
+	log("loaded temp Day Appointments $tmpDayAppointments", LogType.NORMAL)
+	
+	// removes duplicate / overrides old  // TODO ID
+	tmpDayAppointments[appointmentTime.dayOfMonth]?.removeIf { it.start == appointment.start && it.duration == appointment.duration && it.type == appointment.type }
+	
+	if(!tmpDayAppointments.containsKey(appointmentTime.dayOfMonth))
+		tmpDayAppointments[appointmentTime.dayOfMonth] = mutableListOf()
+	
+	tmpDayAppointments[appointmentTime.dayOfMonth]!!.add(appointment)
+	
+	log("new day Appointments $tmpDayAppointments", LogType.NORMAL)
+	
+	File(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json").run {
+		val original =
+			getJson().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json")), List::class.java)
+				.toMutableList()
+		
+		tmpDayAppointments.forEach { original.addAll(it.value.map { app -> ToJson.createAppointment(app) }) }
+		
+		writeText(getJson().toJson(original))
+	}
+}

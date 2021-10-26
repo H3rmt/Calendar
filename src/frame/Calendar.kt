@@ -228,7 +228,9 @@ fun createcalendartab(pane: TabPane): Tab {
 											"Week${week.toDate()}/${week.time.year}",
 											::createWeekTab,
 											week,
-											week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
+											week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
+												log("update from Week triggered")  // TODO Update
+											}
 										)
 									}
 								}

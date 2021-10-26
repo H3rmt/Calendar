@@ -18,8 +18,8 @@ object Timing {
 		return LocalDateTime.now(ZoneId.systemDefault())
 	}
 	
-	fun LocalDateTime.toUTCEpochSecond(): Long {
-		return toEpochSecond(ZoneOffset.UTC)
+	fun LocalDateTime.toUTCEpochMinute(): Long {
+		return toEpochSecond(ZoneOffset.UTC) / 60
 	}
 	
 	fun getNowUTC(year: Int, month: Month, dayOfMonth: Int, hour: Int): LocalDateTime {

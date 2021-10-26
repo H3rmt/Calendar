@@ -3,10 +3,11 @@ package frame
 import calendar.Appointment
 import calendar.Day
 import calendar.Timing
-import calendar.Timing.toUTCEpochSecond
+import calendar.Timing.toUTCEpochMinute
 import calendar.Types
 import calendar.Week
 import calendar.now
+import calendar.saveDayAppointment
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*
@@ -23,7 +24,7 @@ import java.time.LocalDateTime
 import java.time.temporal.IsoFields
 import kotlin.math.min
 
-fun createWeekTab(pane: TabPane, week: Week, _day: Day): Tab {
+fun createWeekTab(pane: TabPane, week: Week, _day: Day, updateCallback: () -> Unit): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab(week.toDate()) {
 		isClosable = true
@@ -228,8 +229,11 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day): Tab {
 																NewAppointmentPopup.open(false) {
 																	start.value = Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour)
 																	end.value = Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1)
-																	savecall = { log("created appointment: $it") }
-																	// TODO create and add
+																	savecall = {
+																		log("Created:$it")
+																		saveDayAppointment(it)
+																		updateCallback()
+																	}
 																}
 															}
 														}
@@ -267,9 +271,14 @@ class NewAppointmentPopup: Fragment() {
 	
 	lateinit var savecall: (Appointment) -> Unit
 	
+	lateinit var startpicker: DateTimePicker
+	lateinit var endpicker: DateTimePicker
+	
 	private fun createAppointment(): Appointment {
-		val _start: Long = start.value.toUTCEpochSecond()
-		val _duration: Long = end.value.toUTCEpochSecond() - _start  // subtract start from duration
+		println(start.value)
+		println(end.value)
+		val _start: Long = startpicker.dateTimeValue.toUTCEpochMinute()
+		val _duration: Long = endpicker.dateTimeValue.toUTCEpochMinute() - _start  // subtract start from duration
 		val _title: String = appointmentTitle.value ?: ""
 		val _description: String = description.value ?: ""
 		val _type: Types = type.value!!
@@ -294,9 +303,9 @@ class NewAppointmentPopup: Fragment() {
 				}
 			}
 			field(getLangString("start to end")) {
-				dateTimePicker(time = start) {
+				startpicker = dateTimePicker(time = start) {
 				}
-				dateTimePicker(time = end) {
+				endpicker = dateTimePicker(time = end) {
 				}
 			}
 			field(getLangString("title")) {
@@ -338,7 +347,7 @@ class NewAppointmentPopup: Fragment() {
 	
 }
 
-fun EventTarget.dateTimePicker(time: Property<LocalDateTime>? = null, op: DateTimePicker.() -> Unit = {}): DateTimePicker = DateTimePicker().attachTo(this, op) {
-	time?.run { it.dateTimeValueProperty().bindBidirectional(time) }
+fun EventTarget.dateTimePicker(time: Property<LocalDateTime>, op: DateTimePicker.() -> Unit = {}): DateTimePicker = DateTimePicker().attachTo(this, op) {
+	it.dateTimeValueProperty().bindBidirectional(time)
 }
 

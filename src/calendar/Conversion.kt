@@ -24,6 +24,16 @@ object ToJson {
 			"files" to files
 		)
 	}
+	
+	fun createAppointment(appointment: Appointment): Map<String, Any> {
+		return mapOf(
+			"start" to appointment.start,
+			"duration" to appointment.duration,
+			"type" to appointment.type.name,
+			"title" to appointment.title,
+			"description" to appointment.description
+		)
+	}
 }
 
 object FromJSON {
