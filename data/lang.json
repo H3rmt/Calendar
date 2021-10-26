@@ -1,5 +1,12 @@
 {
 	"en": {
+		// General
+		"start": "Start",
+		"end": "End",
+		"cancel": "Cancel",
+		"title": "Title",
+		"help": "Help",
+		
 		// Menu bar
 		"options": "Options",
 		"reload": "Reload",
@@ -11,7 +18,6 @@
 		"show todo list": "Show TODO list",
 		"github": "Github",
 		"memory usage": "Memory usage",
-		"help": "Help",
 		
 		// Tabs
 		"calender": "Calendar",
@@ -45,6 +51,8 @@
 		"delete": "Delete",
 		
 		// Week Tab
-		"new appointment": "new Appointment"
+		"new appointment": "New Appointment",
+		"description": "Description",
+		"start to end": "Start - End"
 	}
 }

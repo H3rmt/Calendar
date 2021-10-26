@@ -3,6 +3,7 @@ package frame
 import calendar.Appointment
 import calendar.Day
 import calendar.Timing
+import calendar.Timing.toUTCEpochSecond
 import calendar.Types
 import calendar.Week
 import calendar.now
@@ -22,7 +23,7 @@ import java.time.LocalDateTime
 import java.time.temporal.IsoFields
 import kotlin.math.min
 
-fun createWeekTab(pane: TabPane, week: Week, _day: Day?): Tab {
+fun createWeekTab(pane: TabPane, week: Week, _day: Day): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab(week.toDate()) {
 		isClosable = true
@@ -222,10 +223,13 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?): Tab {
 													}
 													
 													contextmenu {
-														item(getLangString("New appointment")) {
+														item(getLangString("new appointment")) {
 															action {
-																NewAppointmentPopup.open(false).apply {
-																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour) // TODO timezones removed
+																NewAppointmentPopup.open(false) {
+																	start.value = Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour)
+																	end.value = Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1)
+																	savecall = { log("created appointment: $it") }
+																	// TODO create and add
 																}
 															}
 														}
@@ -256,44 +260,71 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?): Tab {
 class NewAppointmentPopup: Fragment() {
 	
 	var start: Property<LocalDateTime> = LocalDateTime.now().toProperty()
-	var duration: Property<LocalDateTime> = LocalDateTime.now().toProperty()
-	var appointmenttitle: Property<String>? = null
-	var description: Property<String>? = null
-	var type: Property<Types>? = null
+	var end: Property<LocalDateTime> = LocalDateTime.now().toProperty()
+	private var appointmentTitle: Property<String> = "".toProperty()
+	private var description: Property<String> = "".toProperty()
+	private var type: Property<Types?> = SimpleObjectProperty<Types>(null)
 	
-	fun createAppointment(): Appointment {
-		val _start: Long = 0//start.value?.to ?: 0
-		val _duration: Long = 0//duration.value?.?: 0  // subtract start from duration
-		val _title: String = appointmenttitle?.value ?: ""
-		val _description: String = description?.value ?: ""
-		val _type: Types = type?.value ?: Types.getTypes().component1()
+	lateinit var savecall: (Appointment) -> Unit
+	
+	private fun createAppointment(): Appointment {
+		val _start: Long = start.value.toUTCEpochSecond()
+		val _duration: Long = end.value.toUTCEpochSecond() - _start  // subtract start from duration
+		val _title: String = appointmentTitle.value ?: ""
+		val _description: String = description.value ?: ""
+		val _type: Types = type.value!!
 		return Appointment(_start, _duration, _title, _description, _type)
 	}
 	
+	override fun onBeforeShow() {
+		modalStage?.height = 320.0
+		modalStage?.width = 400.0
+	}
+	
 	override val root = form {
+		style {
+			backgroundColor += Color.WHITE
+		}
 		fieldset(getLangString("New appointment")) {
+			style {
+				prefHeight = Int.MAX_VALUE.px
+			}
 			field("Type") {
 				combobox(values = Types.getTypes(), property = type) {
 				}
 			}
-			field(getLangString("start")) {
-				dateTimePicker(start) {
+			field(getLangString("start to end")) {
+				dateTimePicker(time = start) {
+				}
+				dateTimePicker(time = end) {
 				}
 			}
-			field(getLangString("end")) {
-				dateTimePicker(duration) {
+			field(getLangString("title")) {
+				textfield {
+				}.bind(appointmentTitle)
+			}
+			field(getLangString("description")) {
+				style(append = true) {
+					prefHeight = Int.MAX_VALUE.px
+					minHeight = 60.px
 				}
+				textarea {
+					style(append = true) {
+						prefHeight = Int.MAX_VALUE.px
+					}
+				}.bind(description)
 			}
 			buttonbar {
 				button(getLangString("Cancel")) {
 					isCancelButton = true
 					action {
+						close()
 					}
 				}
 				button(getLangString("Create")) {
 					isDefaultButton = true
-					enableWhen { false.toProperty() }
 					action {
+						savecall.invoke(createAppointment())
 					}
 				}
 			}
@@ -301,12 +332,13 @@ class NewAppointmentPopup: Fragment() {
 	}
 	
 	companion object {
-		fun open(block: Boolean): Stage? = find(NewAppointmentPopup::class).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+		fun open(block: Boolean, op: NewAppointmentPopup.() -> Unit = {}): Stage? =
+			find<NewAppointmentPopup>().also(op).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 	}
 	
 }
 
 fun EventTarget.dateTimePicker(time: Property<LocalDateTime>? = null, op: DateTimePicker.() -> Unit = {}): DateTimePicker = DateTimePicker().attachTo(this, op) {
-	if(time != null) it.dateTimeValueProperty().bindBidirectional(time)
+	time?.run { it.dateTimeValueProperty().bindBidirectional(time) }
 }
 

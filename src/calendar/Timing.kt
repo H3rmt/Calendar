@@ -22,7 +22,7 @@ object Timing {
 		return toEpochSecond(ZoneOffset.UTC)
 	}
 	
-	fun getNowUTC(year: Int, month: Month, dayOfMonth: Int, hour: Int): Long {
-		return LocalDateTime.of(year, month, dayOfMonth, hour, 0).toUTCEpochSecond()
+	fun getNowUTC(year: Int, month: Month, dayOfMonth: Int, hour: Int): LocalDateTime {
+		return LocalDateTime.of(year, month, dayOfMonth, hour, 0)
 	}
 }
