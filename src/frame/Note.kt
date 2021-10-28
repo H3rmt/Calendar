@@ -1,6 +1,6 @@
 package frame
 
-import calendar.Celldisplay
+import calendar.CellDisplay
 import calendar.Day
 import calendar.Note
 import calendar.Timing.toUTCEpochMinute
@@ -24,7 +24,7 @@ import java.time.temporal.ChronoField
 
 
 
-fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit): Tab {
+fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit): Tab {
 	log("creating note tab", LogType.IMPORTANT)
 	return pane.tab("") {
 		if(cell is Day)
@@ -56,7 +56,7 @@ fun createNoteTab(pane: TabPane, cell: Celldisplay, updateCallback: () -> Unit):
 					}
 					
 					addType = combobox {
-						items = Types.getTypes().map { it.name }.toObservable()
+						items = Types.types.map { it.name }.toObservable()
 					}
 					add = button {
 						text = "Add"

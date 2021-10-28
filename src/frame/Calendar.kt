@@ -1,6 +1,6 @@
 package frame
 
-import calendar.Celldisplay
+import calendar.CellDisplay
 import calendar.Day
 import calendar.Week
 import calendar.calendarDisplay
@@ -267,7 +267,7 @@ fun createcalendartab(pane: TabPane): Tab {
 const val detailspaneminHeight = 8
 
 fun createCellGraphics(
-	data: Celldisplay,
+	data: CellDisplay,
 	source: HBox,
 	openTimeline: Timeline,
 	closeTimeline: Timeline,
@@ -279,7 +279,7 @@ fun createCellGraphics(
 		addClass(Styles.CalendarTableView.tableCell)
 		
 		if(data is Day) {
-			if(!data.partofmonth)
+			if(!data.partOfMonth)
 				addClass(Styles.CalendarTableView.disabledTableCell)
 			
 			gridpane {
@@ -349,7 +349,7 @@ fun createCellGraphics(
 					}
 				}
 				
-				label(data.WeekofYear.toString()) {
+				label(data.WeekOfYear.toString()) {
 					gridpaneConstraints {
 						columnRowIndex(1, 0)
 					}
@@ -369,7 +369,7 @@ fun createCellGraphics(
 					onMouseClicked = EventHandler {
 						it.consume()
 						Tabmanager.openTab(
-							"WeekNotes${data.WeekofYear}/${data.time.year}", ::createNoteTab, data, {
+							"WeekNotes${data.WeekOfYear}/${data.time.year}", ::createNoteTab, data, {
 								if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
 									log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
 									

@@ -26,7 +26,7 @@ import kotlin.math.min
 
 fun createWeekTab(pane: TabPane, week: Week, _day: Day, updateCallback: () -> Unit): Tab {
 	log("creating week tab", LogType.IMPORTANT)
-	return pane.tab(week.toDate()) {
+	return pane.tab(week.date) {
 		isClosable = true
 		
 		stackpane {
@@ -299,7 +299,7 @@ class NewAppointmentPopup: Fragment() {
 				prefHeight = Int.MAX_VALUE.px
 			}
 			field("Type") {
-				combobox(values = Types.getTypes(), property = type) {
+				combobox(values = Types.types, property = type) {
 				}
 			}
 			field(getLangString("start to end")) {

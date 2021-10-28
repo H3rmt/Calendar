@@ -256,7 +256,7 @@ fun saveDayAppointment(appointment: Appointment) {
 	
 	log("loaded temp Day Appointments $tmpDayAppointments", LogType.NORMAL)
 	
-	// removes duplicate / overrides old  // TODO ID
+	// removes duplicate / overrides old  // TODO id
 	tmpDayAppointments[appointmentTime.dayOfMonth]?.removeIf { it.start == appointment.start && it.duration == appointment.duration && it.type == appointment.type }
 	
 	if(!tmpDayAppointments.containsKey(appointmentTime.dayOfMonth))
@@ -275,4 +275,10 @@ fun saveDayAppointment(appointment: Appointment) {
 		
 		writeText(getJson().toJson(original))
 	}
+}
+
+// TODO implement
+fun createID(name: String): Long {
+	log("id for $name generated")
+	return -1
 }

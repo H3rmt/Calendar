@@ -1,7 +1,7 @@
 package calendar
 
-import logic.Warning
-import java.time.DayOfWeek
+
+/*
 
 object ToJson {
 	private fun createNoteFile(file: File): Map<String, Any> {
@@ -89,3 +89,5 @@ object FromJSON {
 	}
 	
 }
+
+*/

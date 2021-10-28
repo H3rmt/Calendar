@@ -10,19 +10,11 @@ import java.time.ZonedDateTime
 
 object Timing {
 	
-	fun getNow(): ZonedDateTime {
-		return ZonedDateTime.now(ZoneId.systemDefault())
-	}
+	fun getNow(): ZonedDateTime = ZonedDateTime.now(ZoneId.systemDefault())
 	
-	fun getNowLocal(): LocalDateTime {
-		return LocalDateTime.now(ZoneId.systemDefault())
-	}
+	fun getNowLocal(): LocalDateTime = LocalDateTime.now(ZoneId.systemDefault())
 	
-	fun LocalDateTime.toUTCEpochMinute(): Long {
-		return toEpochSecond(ZoneOffset.UTC) / 60
-	}
+	fun LocalDateTime.toUTCEpochMinute(): Long = toEpochSecond(ZoneOffset.UTC) / 60
 	
-	fun getNowUTC(year: Int, month: Month, dayOfMonth: Int, hour: Int): LocalDateTime {
-		return LocalDateTime.of(year, month, dayOfMonth, hour, 0)
-	}
+	fun getNowUTC(year: Int, month: Month, dayOfMonth: Int, hour: Int): LocalDateTime = LocalDateTime.of(year, month, dayOfMonth, hour, 0)
 }
