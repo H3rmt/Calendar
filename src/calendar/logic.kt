@@ -147,9 +147,7 @@ fun prepareWeekAppointments() {
 	}
 	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.weekAppointmentsFile)), List::class.java).forEach { list ->
 		log("reading Week Appointment: $list", LogType.LOW)
-		FromJSON.createAppointment(list, true)?.run {
-			this as WeekAppointment
-			
+		WeekAppointment.fromJSON<WeekAppointment>(list)?.run {
 			if(!preparedweeklyAppointments.containsKey(day))
 				preparedweeklyAppointments[day] = mutableListOf()
 			
@@ -174,7 +172,7 @@ private fun prepareMonthAppointments(Month: Month) {
 	}
 	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/$Month.json")), List::class.java).forEach { list ->
 		log("reading single Appointment: $list", LogType.LOW)
-		FromJSON.createAppointment(list, false)?.run {
+		Appointment.fromJSON<Appointment>(list)?.run {
 			val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneOffset.UTC)
 			
 			val offset: ZoneOffset = ZoneOffset.UTC.rules.getOffset(Instant.ofEpochSecond(start * 60))
@@ -204,7 +202,7 @@ fun prepareMonthNotes(Month: Month) {
 			"Day Notes" -> {
 				log("reading Day Notes", LogType.LOW)
 				list.forEach {
-					FromJSON.createNote(it)?.apply {
+					Note.fromJSON<Note>(it)?.apply {
 						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 						
 						if(!preparedDayNotes.containsKey(time.month))
@@ -221,7 +219,7 @@ fun prepareMonthNotes(Month: Month) {
 			"Week Notes" -> {
 				log("reading Week Notes", LogType.LOW)
 				list.forEach {
-					FromJSON.createNote(it)?.apply {
+					Note.fromJSON<Note>(it)?.apply {
 						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 						
 						if(!preparedWeekNotes.containsKey(time.month))

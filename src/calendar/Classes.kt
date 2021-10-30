@@ -29,8 +29,6 @@ interface CreateFromStorage {
 interface Storage {
 	val id: Long
 	
-	fun initID() = createID(this.javaClass.name)
-	
 	fun toJSON(): Map<String, Any>
 }
 
@@ -120,8 +118,10 @@ open class Appointment(
 	val title: String,
 	val description: String,
 	val type: Types,
+	override val id: Long
 ): Storage {
-	override val id: Long = initID()
+	
+	constructor(start: Long, duration: Long, title: String, description: String, type: Types): this(start, duration, title, description, type, createID())
 	
 	override fun toJSON(): Map<String, Any> {
 		return mapOf(
@@ -153,15 +153,16 @@ open class Appointment(
 }
 
 class WeekAppointment(
-	var day: DayOfWeek,
+	val day: DayOfWeek,
 	start: Long,
 	duration: Long,
 	title: String,
 	description: String,
-	type: Types
-): Appointment(start, duration, title, description, type) {
+	type: Types,
+	id: Long
+): Appointment(start, duration, title, description, type, id) {
 	
-	override val id: Long = initID()
+	constructor(day: DayOfWeek, start: Long, duration: Long, title: String, description: String, type: Types): this(day, start, duration, title, description, type, createID())
 	
 	override fun toJSON(): Map<String, Any> {
 		return mapOf(
@@ -198,10 +199,10 @@ data class Note(
 	var time: Long,
 	var text: String,
 	val type: Types,
-	val files: List<File>
+	val files: List<File>,
+	override val id: Long
 ): Storage {
-	
-	override val id: Long = initID()
+	constructor(time: Long, text: String, type: Types, file: List<File>): this(time, text, type, file, createID())
 	
 	override fun toJSON(): Map<String, Any> {
 		val files = mutableListOf<Map<String, Any>>()
@@ -250,8 +251,10 @@ data class File(
 	val data: ByteArray,
 	val name: String,
 	val origin: String,
+	override val id: Long
 ): Storage {
-	override val id: Long = initID()
+	
+	constructor(data: ByteArray, name: String, origin: String): this(data, name, origin, createID())
 	
 	override fun toJSON(): Map<String, Any> {
 		return mapOf(
@@ -280,7 +283,7 @@ data class File(
 	}
 	
 	@Suppress("unused")
-	//constructor(file: java.io.File): this(file.inputStream().readAllBytes(), file.name, file.absolutePath)
+	constructor(file: java.io.File): this(file.inputStream().readAllBytes(), file.name, file.absolutePath)
 	
 	override fun toString(): String = "[{$id} $name ${data.size} $origin]"
 }
@@ -295,8 +298,9 @@ data class Types(
 	
 	companion object {
 		
-		val types: MutableList<Types> = mutableListOf()
-			get() = field.toCollection(mutableListOf())
+		private val types: MutableList<Types> = mutableListOf()
+		
+		fun clonetypes() = types.toCollection(mutableListOf())
 		
 		fun valueOf(s: String): Types {
 			types.forEach {

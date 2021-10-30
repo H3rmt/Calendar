@@ -1,5 +1,6 @@
 [
 	{
+		"id": 0,
 		"start and duration measured in": "minutes because seconds are irrelevant",
 		"day": "MONDAY",
 		"start": 420,
@@ -9,6 +10,7 @@
 		"description": "Very Important"
 	},
 	{
+		"id": 1,
 		"day": "TUESDAY",
 		"start": 560,
 		"duration": 350,
@@ -17,6 +19,7 @@
 		"description": "Very Important"
 	},
 	{
+		"id": 2,
 		"day": "TUESDAY",
 		"start": 860,
 		"duration": 150,
@@ -25,6 +28,7 @@
 		"description": "ne"
 	},
 	{
+		"id": 3,
 		"day": "SUNDAY",
 		"start": 0,
 		"duration": 361,
@@ -33,6 +37,7 @@
 		"description": "yeet"
 	},
 	{
+		"id": 4,
 		"day": "SUNDAY",
 		"start": 120,
 		"duration": 61,
@@ -41,6 +46,7 @@
 		"description": "yeet too"
 	},
 	{
+		"id": 5,
 		"day": "FRIDAY",
 		"start": 60,
 		"duration": 10,
@@ -49,6 +55,7 @@
 		"description": "yeet"
 	},
 	{
+		"id": 6,
 		"day": "TUESDAY",
 		"start": 59,
 		"duration": 10,

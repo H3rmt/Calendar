@@ -87,7 +87,7 @@ fun initConfigs() {
 	log("set stacktrace $stacktrace", LogType.LOW)
 	
 	Types.createTypes(getConfig(Configs.AppointmentTypes))
-	log("loaded Types ${Types.getTypes()}", LogType.LOW)
+	log("loaded Types ${Types.clonetypes()}", LogType.LOW)
 }
 
 /**

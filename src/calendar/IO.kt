@@ -11,6 +11,9 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.temporal.IsoFields
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 
 fun saveDayNote(note: Note) {
@@ -31,7 +34,7 @@ fun saveDayNote(note: Note) {
 				"Day Notes" -> {
 					log("reading Day Notes", LogType.LOW)
 					list.forEach {
-						FromJSON.createNote(it)?.apply {
+						Note.fromJSON<Note>(it)?.apply {
 							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 							
 							if(!tmpDayNotes.containsKey(time.dayOfMonth))
@@ -46,7 +49,7 @@ fun saveDayNote(note: Note) {
 			}
 		}
 	
-	tmpDayNotes[noteTime.dayOfMonth]?.removeIf { it.time == note.time && it.type == note.type }
+	tmpDayNotes[noteTime.dayOfMonth]?.removeIf { it.id == note.id }
 	
 	if(!tmpDayNotes.containsKey(noteTime.dayOfMonth))
 		tmpDayNotes[noteTime.dayOfMonth] = mutableListOf()
@@ -60,7 +63,7 @@ fun saveDayNote(note: Note) {
 				.toMutableMap()
 		
 		val list = mutableListOf<Map<String, Any>>()
-		tmpDayNotes.forEach { list.addAll(it.value.map { note -> ToJson.createNote(note) }) }
+		tmpDayNotes.forEach { list.addAll(it.value.map { note -> note.toJSON() }) }
 		
 		original["Day Notes"] = list as ArrayList<Map<String, Any>>
 		
@@ -86,7 +89,7 @@ fun removeDayNote(note: Note) {
 				"Day Notes" -> {
 					log("reading Day Notes", LogType.LOW)
 					list.forEach {
-						FromJSON.createNote(it)?.apply {
+						Note.fromJSON<Note>(it)?.apply {
 							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 							
 							if(!tmpDayNotes.containsKey(time.dayOfMonth))
@@ -101,7 +104,7 @@ fun removeDayNote(note: Note) {
 			}
 		}
 	
-	tmpDayNotes[noteTime.dayOfMonth]?.removeIf { it.time == note.time && it.type == note.type }
+	tmpDayNotes[noteTime.dayOfMonth]?.removeIf { it.id == note.id }
 	
 	log("new day Notes $tmpDayNotes", LogType.NORMAL)
 	
@@ -111,7 +114,7 @@ fun removeDayNote(note: Note) {
 				.toMutableMap()
 		
 		val list = mutableListOf<Map<String, Any>>()
-		tmpDayNotes.forEach { list.addAll(it.value.map { note -> ToJson.createNote(note) }) }
+		tmpDayNotes.forEach { list.addAll(it.value.map { note -> note.toJSON() }) }
 		
 		original["Day Notes"] = list as ArrayList<Map<String, Any>>
 		
@@ -137,7 +140,7 @@ fun saveWeekNote(note: Note) {
 				"Week Notes" -> {
 					log("reading Week Notes", LogType.LOW)
 					list.forEach {
-						FromJSON.createNote(it)?.apply {
+						Note.fromJSON<Note>(it)?.apply {
 							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 							
 							if(!tmpWeekNotes.containsKey(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)))
@@ -152,7 +155,7 @@ fun saveWeekNote(note: Note) {
 			}
 		}
 	
-	tmpWeekNotes[noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]?.removeIf { it.time == note.time && it.type == note.type }
+	tmpWeekNotes[noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]?.removeIf { it.id == note.id }
 	
 	if(!tmpWeekNotes.containsKey(noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)))
 		tmpWeekNotes[noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)] = mutableListOf()
@@ -166,7 +169,7 @@ fun saveWeekNote(note: Note) {
 				.toMutableMap()
 		
 		val list = mutableListOf<Map<String, Any>>()
-		tmpWeekNotes.forEach { list.addAll(it.value.map { note -> ToJson.createNote(note) }) }
+		tmpWeekNotes.forEach { list.addAll(it.value.map { note -> note.toJSON() }) }
 		
 		original["Week Notes"] = list as ArrayList<Map<String, Any>>
 		
@@ -192,7 +195,7 @@ fun removeWeekNote(note: Note) {
 				"Week Notes" -> {
 					log("reading Week Notes", LogType.LOW)
 					list.forEach {
-						FromJSON.createNote(it)?.apply {
+						Note.fromJSON<Note>(it)?.apply {
 							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
 							
 							if(!tmpWeekNotes.containsKey(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)))
@@ -207,7 +210,7 @@ fun removeWeekNote(note: Note) {
 			}
 		}
 	
-	tmpWeekNotes[noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]?.removeIf { it.time == note.time && it.type == note.type }
+	tmpWeekNotes[noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]?.removeIf { it.id == note.id }
 	
 	log("new Week Notes $tmpWeekNotes", LogType.NORMAL)
 	
@@ -217,7 +220,7 @@ fun removeWeekNote(note: Note) {
 				.toMutableMap()
 		
 		val list = mutableListOf<Map<String, Any>>()
-		tmpWeekNotes.forEach { list.addAll(it.value.map { note -> ToJson.createNote(note) }) }
+		tmpWeekNotes.forEach { list.addAll(it.value.map { note -> note.toJSON() }) }
 		
 		original["Week Notes"] = list as ArrayList<Map<String, Any>>
 		
@@ -243,7 +246,7 @@ fun saveDayAppointment(appointment: Appointment) {
 	getJson().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json")), List::class.java)
 		.forEach { list ->
 			log("reading Appointments", LogType.LOW)
-			FromJSON.createAppointment(list, false)?.apply {
+			Appointment.fromJSON<Appointment>(list)?.apply {
 				val time = LocalDate.ofInstant(Instant.ofEpochSecond(appointment.start * 60), ZoneOffset.UTC)
 				
 				if(!tmpDayAppointments.containsKey(time.dayOfMonth))
@@ -256,8 +259,8 @@ fun saveDayAppointment(appointment: Appointment) {
 	
 	log("loaded temp Day Appointments $tmpDayAppointments", LogType.NORMAL)
 	
-	// removes duplicate / overrides old  // TODO id
-	tmpDayAppointments[appointmentTime.dayOfMonth]?.removeIf { it.start == appointment.start && it.duration == appointment.duration && it.type == appointment.type }
+	// removes duplicate / overrides old
+	tmpDayAppointments[appointmentTime.dayOfMonth]?.removeIf { it.id == appointment.id }
 	
 	if(!tmpDayAppointments.containsKey(appointmentTime.dayOfMonth))
 		tmpDayAppointments[appointmentTime.dayOfMonth] = mutableListOf()
@@ -271,14 +274,14 @@ fun saveDayAppointment(appointment: Appointment) {
 			getJson().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json")), List::class.java)
 				.toMutableList()
 		
-		tmpDayAppointments.forEach { original.addAll(it.value.map { app -> ToJson.createAppointment(app) }) }
+		tmpDayAppointments.forEach { original.addAll(it.value.map { app -> app.toJSON() }) }
 		
 		writeText(getJson().toJson(original))
 	}
 }
 
 // TODO implement
-fun createID(name: String): Long {
-	log("id for $name generated")
+fun createID(): Long {
+	log("id for generated")
 	return -1
 }

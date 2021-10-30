@@ -299,7 +299,7 @@ class NewAppointmentPopup: Fragment() {
 				prefHeight = Int.MAX_VALUE.px
 			}
 			field("Type") {
-				combobox(values = Types.types, property = type) {
+				combobox(values = Types.clonetypes(), property = type) {
 				}
 			}
 			field(getLangString("start to end")) {

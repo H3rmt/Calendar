@@ -225,7 +225,7 @@ fun createcalendartab(pane: TabPane): Tab {
 											}", LogType.LOW
 										)
 										Tabmanager.openTab(
-											"Week${week.toDate()}/${week.time.year}",
+											"Week${week.date}/${week.time.year}",
 											::createWeekTab,
 											week,
 											week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
@@ -400,7 +400,7 @@ fun createCellGraphics(
 			}
 		}
 		
-		if((data is Day && data.appointments.isNotEmpty()) || (data is Week && data.getallAppointments().isNotEmpty())) {
+		if((data is Day && data.appointments.isNotEmpty()) || (data is Week && data.appointments.isNotEmpty())) {
 			val expandHeight = when(data) {
 				is Day -> generateAppointmentsGraphic(data, pane, animations)
 				is Week -> generateWeekGraphic(data, pane, animations)

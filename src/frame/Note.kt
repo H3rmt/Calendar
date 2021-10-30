@@ -56,7 +56,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					}
 					
 					addType = combobox {
-						items = Types.types.map { it.name }.toObservable()
+						items = Types.clonetypes().map { it.name }.toObservable()
 					}
 					add = button {
 						text = "Add"
