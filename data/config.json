@@ -7,7 +7,7 @@
 	"AnimationSpeed": 300,
 	"AnimationDelay": 120,
 	"MaxDayAppointments": 8,
-	"expandNotesOnOpen": false,
+	"expandNotesOnOpen": true,
 	"AppointmentTypes": [
 		{
 			"name": "Work",

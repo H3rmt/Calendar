@@ -184,18 +184,14 @@ class Exit(private val code: String, private val exception: Exception? = null): 
  */
 fun Warning(code: String, exception: Exception, log: Any) {
 	log(log, LogType.WARNING)
-	try {
-		throw Exit(code, exception)
-	} catch(e: Exit) {
-		val writer = StringWriter()
-		
-		if(stacktrace)
-			e.printStackTrace(PrintWriter(writer))
-		else
-			writer.append(e.toString())
-		
-		log(writer, LogType.ERROR)
-	}
+	val writer = StringWriter()
+	
+	if(stacktrace)
+		exception.printStackTrace(PrintWriter(writer))
+	else
+		writer.append(exception.toString())
+	
+	log(writer, LogType.ERROR)
 }
 
 /**

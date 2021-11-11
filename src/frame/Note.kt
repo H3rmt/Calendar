@@ -6,8 +6,6 @@ import calendar.Note
 import calendar.Timing.toUTCEpochMinute
 import calendar.Types
 import calendar.Week
-import calendar.removeDayNote
-import calendar.removeWeekNote
 import calendar.saveDayNote
 import calendar.saveWeekNote
 import javafx.geometry.*
@@ -79,7 +77,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 							val note = Note(cell.time.toUTCEpochMinute(), "", Types.valueOf(addType.value), emptyList())
 							lateinit var tb: TitledPane
 							tb = noteTab(this, addType.value, true, "", {
-								note.text = (it)
+								note.text = it
 								if(cell is Day)
 									saveDayNote(note)
 								else if(cell is Week)
@@ -87,9 +85,9 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 								updateCallback()
 							}, {
 								if(cell is Day)
-									removeDayNote(note)
+									saveDayNote(note, false)
 								else if(cell is Week)
-									removeWeekNote(note)
+									saveWeekNote(note, false)
 								this.children.remove(noteTabs.first { it == tb })
 								noteTabs.remove(tb)
 								updateCallback()
@@ -109,9 +107,9 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 								updateCallback()
 							}, {
 								if(cell is Day)
-									removeDayNote(note)
+									saveDayNote(note, false)
 								else if(cell is Week)
-									removeWeekNote(note)
+									saveWeekNote(note, false)
 								this.children.remove(noteTabs.first { it == tb })
 								noteTabs.remove(tb)
 								updateCallback()

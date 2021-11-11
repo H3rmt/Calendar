@@ -3,6 +3,7 @@ package frame
 import calendar.Appointment
 import calendar.Day
 import calendar.Timing
+import calendar.Timing.UTCEpochMinuteToLocalDateTime
 import calendar.Timing.toUTCEpochMinute
 import calendar.Types
 import calendar.Week
@@ -24,7 +25,7 @@ import java.time.LocalDateTime
 import java.time.temporal.IsoFields
 import kotlin.math.min
 
-fun createWeekTab(pane: TabPane, week: Week, _day: Day, updateCallback: () -> Unit): Tab {
+fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> Unit): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab(week.date) {
 		isClosable = true
@@ -119,12 +120,16 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day, updateCallback: () -> Un
 						}
 					}
 					
+					var table: ScrollPane? = null
+					
+					// table
 					fun updateTable() {
+						children.remove(table)
 						log("updated table view", LogType.LOW)
 						
 						var scrollToHour = 0
 						
-						scrollpane(fitToWidth = true) {
+						table = scrollpane(fitToWidth = true) {
 							style {
 								borderWidth += box(1.px)
 								borderColor += box(Color.WHITE)
@@ -162,7 +167,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day, updateCallback: () -> Un
 								}
 								for((dayOfWeek, day) in week.allDays) {
 									val appointments = week.allDays[dayOfWeek]?.appointments ?: listOf()
-									log(appointments)
+									log("Day: $dayOfWeek: $appointments")
 									
 									vbox(alignment = Pos.TOP_CENTER) {
 										addClass(Styles.WeekTab.tableDay)
@@ -183,14 +188,15 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day, updateCallback: () -> Un
 												hbox {
 													style(append = true) {
 														alignment = Pos.CENTER
-														spacing = 3.px
+														spacing = 2.px
+														padding = box(0.px)
 													}
 													// appointments
-													val appmtns = appointments.filter {
-														it.start < (hour + 1) * 60 && (it.start + it.duration) > hour * 60
+													val cellappointments = appointments.filter {
+														it.daystart < (hour + 1) * 60 && (it.daystart + it.duration) > hour * 60
 													}
 													
-													for((ind, app) in appmtns.withIndex()) {
+													for((ind, app) in cellappointments.withIndex()) {
 														// colored box(es)
 														hbox {
 															gridpaneConstraints {
@@ -233,6 +239,9 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day, updateCallback: () -> Un
 																		log("Created:$it")
 																		saveDayAppointment(it)
 																		updateCallback()
+																		val r = week.allDays[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]
+																		week.allDays[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.appointments?.add(it)
+																		updateTable()
 																	}
 																}
 															}
@@ -271,16 +280,14 @@ class NewAppointmentPopup: Fragment() {
 	
 	lateinit var savecall: (Appointment) -> Unit
 	
-	lateinit var startpicker: DateTimePicker
-	lateinit var endpicker: DateTimePicker
+	private lateinit var startpicker: DateTimePicker
+	private lateinit var endpicker: DateTimePicker
 	
 	private fun createAppointment(): Appointment {
-		println(start.value)
-		println(end.value)
 		val _start: Long = startpicker.dateTimeValue.toUTCEpochMinute()
 		val _duration: Long = endpicker.dateTimeValue.toUTCEpochMinute() - _start  // subtract start from duration
-		val _title: String = appointmentTitle.value ?: ""
-		val _description: String = description.value ?: ""
+		val _title: String = appointmentTitle.value
+		val _description: String = description.value
 		val _type: Types = type.value!!
 		return Appointment(_start, _duration, _title, _description, _type)
 	}
@@ -334,6 +341,7 @@ class NewAppointmentPopup: Fragment() {
 					isDefaultButton = true
 					action {
 						savecall.invoke(createAppointment())
+						close()
 					}
 				}
 			}

@@ -1,6 +1,7 @@
 package calendar
 
 import logic.getJson as Json
+import calendar.Timing.UTCEpochMinuteToLocalDateTime
 import javafx.beans.property.*
 import javafx.collections.*
 import logic.ConfigFiles
@@ -17,13 +18,12 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.time.temporal.IsoFields
 
 
-val now: ZonedDateTime = Timing.getNow()
+val now: LocalDateTime = Timing.getNowLocal()
 
-var calendarDisplay: LocalDateTime = Timing.getNowLocal()
+var calendarDisplay: LocalDate = Timing.getNowLocal().toLocalDate()
 
 val currentMonth: ObservableList<Week> = FXCollections.observableArrayList()
 val currentMonthName: SimpleStringProperty = SimpleStringProperty()
@@ -83,9 +83,9 @@ fun loadCalendarData() {
 }
 
 
-fun generateMonth(monthTime: LocalDateTime): MutableList<Week> {
+fun generateMonth(monthTime: LocalDate): MutableList<Week> {
 	log("generating Month", LogType.LOW)
-	var time: LocalDateTime = monthTime.withDayOfMonth(1)
+	var time: LocalDate = monthTime.withDayOfMonth(1)
 	val month = time.month
 	
 	val dayOffset = time.dayOfWeek.value
@@ -130,10 +130,10 @@ val preparedweeklyAppointments: MutableMap<DayOfWeek, MutableList<WeekAppointmen
 // Month: { Day of month: Appointments }
 val preparedsingleAppointments: MutableMap<Month, MutableMap<Int, MutableList<Appointment>>> = mutableMapOf()
 
-// Month: { Day of month: Appointments }
+// Month: { Day of month: Note }
 val preparedDayNotes: MutableMap<Month, MutableMap<Int, MutableList<Note>>> = mutableMapOf()
 
-// Month: { Week of year: Appointments }
+// Month: { Week of year: Note }
 val preparedWeekNotes: MutableMap<Month, MutableMap<Int, MutableList<Note>>> = mutableMapOf()
 
 
@@ -145,12 +145,14 @@ fun prepareWeekAppointments() {
 			log("created default weekAppointmentsFile:${ConfigFiles.weekAppointmentsFile}", LogType.WARNING)
 		}
 	}
+	resetGroup(IDGroups.Appointments)
 	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.weekAppointmentsFile)), List::class.java).forEach { list ->
 		log("reading Week Appointment: $list", LogType.LOW)
 		WeekAppointment.fromJSON<WeekAppointment>(list)?.run {
 			if(!preparedweeklyAppointments.containsKey(day))
 				preparedweeklyAppointments[day] = mutableListOf()
 			
+			usedID(IDGroups.Appointments, id)
 			preparedweeklyAppointments[day]!!.add(this)
 			log("loaded Week Appointment: $this", LogType.LOW)
 		}
@@ -170,18 +172,18 @@ private fun prepareMonthAppointments(Month: Month) {
 			return
 		}
 	}
+	resetGroup(IDGroups.Appointments)
 	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/$Month.json")), List::class.java).forEach { list ->
 		log("reading single Appointment: $list", LogType.LOW)
 		Appointment.fromJSON<Appointment>(list)?.run {
-			val time = LocalDate.ofInstant(Instant.ofEpochSecond(start * 60), ZoneOffset.UTC)
+			val time = UTCEpochMinuteToLocalDateTime(start)
 			
-			val offset: ZoneOffset = ZoneOffset.UTC.rules.getOffset(Instant.ofEpochSecond(start * 60))
-			start -= time.atStartOfDay().toLocalTime().toEpochSecond(time, offset) / 60
 			if(!preparedsingleAppointments.containsKey(time.month))
 				preparedsingleAppointments[time.month] = mutableMapOf()
 			if(!preparedsingleAppointments[time.month]!!.containsKey(time.dayOfMonth))
 				preparedsingleAppointments[time.month]!![time.dayOfMonth] = mutableListOf()
 			
+			usedID(IDGroups.Appointments, id)
 			preparedsingleAppointments[time.month]!![time.dayOfMonth]!!.add(this)
 			log("loaded single Appointment: $this", LogType.LOW)
 		}
@@ -197,6 +199,7 @@ fun prepareMonthNotes(Month: Month) {
 			return
 		}
 	}
+	resetGroup(IDGroups.Notes)
 	Json().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesDir + "/$Month.json")), Map::class.java).forEach { (name, list) ->
 		when(name) {
 			"Day Notes" -> {
@@ -211,6 +214,8 @@ fun prepareMonthNotes(Month: Month) {
 							preparedDayNotes[time.month]!![time.dayOfMonth] = mutableListOf()
 						
 						preparedDayNotes[time.month]!![time.dayOfMonth]!!.add(this)
+						
+						usedID(IDGroups.Notes, id)
 						log("loaded Day Note: $this", LogType.LOW)
 					}
 				}
@@ -228,6 +233,8 @@ fun prepareMonthNotes(Month: Month) {
 							preparedWeekNotes[time.month]!![time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)] = mutableListOf()
 						
 						preparedWeekNotes[time.month]!![time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]!!.add(this)
+						
+						usedID(IDGroups.Notes, id)
 						log("loaded week Note: $this", LogType.LOW)
 					}
 				}
