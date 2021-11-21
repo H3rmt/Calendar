@@ -10,6 +10,7 @@ import calendar.Types
 import calendar.Week
 import calendar.now
 import calendar.saveDayAppointment
+import dateTimePicker
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*
@@ -17,6 +18,7 @@ import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.stage.*
+import lglisten
 import logic.LogType
 import logic.getLangString
 import logic.log
@@ -233,16 +235,16 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 													contextmenu {
 														item(getLangString("new appointment")) {
 															action {
-																NewAppointmentPopup.open(false) {
-																	start.value = Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour)
-																	end.value = Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1)
-																	savecall = {
-																		log("Created:$it")
-																		saveDayAppointment(it)
-																		updateCallback()
-																		week.allDays[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.appointments?.add(it)
-																		updateTable()
-																	}
+																NewAppointmentPopup.open(
+																	false,
+																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
+																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1)
+																) { app: Appointment ->
+																	log("Created:$app")
+																	saveDayAppointment(app)
+																	updateCallback()
+																	week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
+																	updateTable()
 																}
 															}
 														}
@@ -271,21 +273,22 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 }
 
 class NewAppointmentPopup: Fragment() {
+	override val scope = super.scope as ItemsScope
 	
-	var start: Property<LocalDateTime> = LocalDateTime.now().toProperty()
-	var end: Property<LocalDateTime> = LocalDateTime.now().toProperty()
+	var start: Property<LocalDateTime> = scope.start.toProperty()
+	var end: Property<LocalDateTime> = scope.end.toProperty()
 	private var appointmentTitle: Property<String> = "".toProperty()
 	private var description: Property<String> = "".toProperty()
 	private var type: Property<Types?> = SimpleObjectProperty<Types>(null)
 	
-	lateinit var savecall: (Appointment) -> Unit
+	var savecall: (Appointment) -> Unit = scope.save
 	
 	private lateinit var startpicker: DateTimePicker
 	private lateinit var endpicker: DateTimePicker
 	
 	private fun createAppointment(): Appointment {
-		val _start: Long = startpicker.dateTimeProperty().value.toUTCEpochMinute()
-		val _duration: Long = endpicker.dateTimeProperty().value.toUTCEpochMinute() - _start  // subtract start from duration
+		val _start: Long = startpicker.dateTimeProperty.value.toUTCEpochMinute()
+		val _duration: Long = endpicker.dateTimeProperty.value.toUTCEpochMinute() - _start  // subtract start from duration
 		val _title: String = appointmentTitle.value
 		val _description: String = description.value
 		val _type: Types = type.value!!
@@ -309,10 +312,12 @@ class NewAppointmentPopup: Fragment() {
 				combobox(values = Types.clonetypes(), property = type) {
 				}
 			}
+			start.lglisten()
+			end.lglisten()
 			field(getLangString("start to end")) {
-				startpicker = dateTimePicker(time = start) {
+				startpicker = dateTimePicker(dateTime = start) {
 				}
-				endpicker = dateTimePicker(time = end) {
+				endpicker = dateTimePicker(dateTime = end) {
 				}
 			}
 			field(getLangString("title")) {
@@ -348,14 +353,13 @@ class NewAppointmentPopup: Fragment() {
 		}
 	}
 	
+	class ItemsScope(val start: LocalDateTime, val end: LocalDateTime, val save: (Appointment) -> Unit): Scope()
+	
 	companion object {
-		fun open(block: Boolean, op: NewAppointmentPopup.() -> Unit = {}): Stage? =
-			find<NewAppointmentPopup>().also(op).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+		fun open(block: Boolean, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
+			val scope = ItemsScope(start, end, save)
+			return find<NewAppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+		}
 	}
 	
 }
-
-fun EventTarget.dateTimePicker(time: Property<LocalDateTime>, op: DateTimePicker.() -> Unit = {}): DateTimePicker = DateTimePicker().attachTo(this, op) {
-	it.dateTimeProperty().bindBidirectional(time)
-}
-

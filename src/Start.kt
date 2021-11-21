@@ -1,5 +1,6 @@
 import calendar.loadCalendarData
 import frame.frameInit
+import javafx.beans.value.*
 import logic.LogType
 import logic.configs
 import logic.initConfigs
@@ -30,4 +31,23 @@ fun main(args: Array<String>) {
 	
 	log("exiting Frame", LogType.IMPORTANT)
 	exitProcess(1)
+}
+
+fun <T> T.lg(): T {
+	println(this)
+	return this
+}
+
+
+
+fun <T> ObservableValue<T>.lglisten(): ObservableValue<T> {
+	this.addListener { ob, _, nw ->
+		println(ob)
+	}
+	return this
+}
+
+fun println(vararg any: Any) {
+	any.forEach { print("$it ") }
+	kotlin.io.println()
 }

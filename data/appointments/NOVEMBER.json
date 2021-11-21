@@ -113,10 +113,18 @@
   },
   {
     "id": 24.0,
-    "start": 2.728662E7,
-    "duration": 180.0,
-    "type": "School",
-    "title": "Test3",
-    "description": "3"
+    "start": 2.726358E7,
+    "duration": 93.0,
+    "type": "Sport",
+    "title": "Test",
+    "description": "wuw"
+  },
+  {
+    "id": 25.0,
+    "start": 2.726598E7,
+    "duration": 60.0,
+    "type": "Work",
+    "title": "TEst",
+    "description": "tes2"
   }
 ]

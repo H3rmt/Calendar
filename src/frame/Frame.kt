@@ -314,7 +314,8 @@ object Tabmanager {
  */
 val cache = mutableMapOf<String, Image>()
 
-fun createFXImage(path: String): Image {
+fun createFXImage(name: String): Image {
+	val path = "img/$name"
 	cache[path]?.let { return it }
 	val image = try {
 		ImageIO.read(File(path).takeIf { it.exists() })
