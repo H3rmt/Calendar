@@ -1,5 +1,6 @@
 package frame
 
+import DateTimePicker
 import calendar.Appointment
 import calendar.Day
 import calendar.Timing
@@ -20,10 +21,10 @@ import logic.LogType
 import logic.getLangString
 import logic.log
 import tornadofx.*
-import tornadofx.control.DateTimePicker
 import java.time.LocalDateTime
 import java.time.temporal.IsoFields
 import kotlin.math.min
+
 
 fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> Unit): Tab {
 	log("creating week tab", LogType.IMPORTANT)
@@ -239,7 +240,6 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																		log("Created:$it")
 																		saveDayAppointment(it)
 																		updateCallback()
-																		val r = week.allDays[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]
 																		week.allDays[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.appointments?.add(it)
 																		updateTable()
 																	}
@@ -284,8 +284,8 @@ class NewAppointmentPopup: Fragment() {
 	private lateinit var endpicker: DateTimePicker
 	
 	private fun createAppointment(): Appointment {
-		val _start: Long = startpicker.dateTimeValue.toUTCEpochMinute()
-		val _duration: Long = endpicker.dateTimeValue.toUTCEpochMinute() - _start  // subtract start from duration
+		val _start: Long = startpicker.dateTimeProperty().value.toUTCEpochMinute()
+		val _duration: Long = endpicker.dateTimeProperty().value.toUTCEpochMinute() - _start  // subtract start from duration
 		val _title: String = appointmentTitle.value
 		val _description: String = description.value
 		val _type: Types = type.value!!
@@ -356,6 +356,6 @@ class NewAppointmentPopup: Fragment() {
 }
 
 fun EventTarget.dateTimePicker(time: Property<LocalDateTime>, op: DateTimePicker.() -> Unit = {}): DateTimePicker = DateTimePicker().attachTo(this, op) {
-	it.dateTimeValueProperty().bindBidirectional(time)
+	it.dateTimeProperty().bindBidirectional(time)
 }
 

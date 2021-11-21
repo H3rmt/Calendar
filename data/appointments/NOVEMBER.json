@@ -110,5 +110,13 @@
     "type": "Sport",
     "title": "Test",
     "description": "wdarwawag"
+  },
+  {
+    "id": 24.0,
+    "start": 2.728662E7,
+    "duration": 180.0,
+    "type": "School",
+    "title": "Test3",
+    "description": "3"
   }
 ]
