@@ -1,0 +1,59 @@
+encription:
+
+
+// https://www.baeldung.com/java-aes-encryption-decryption
+
+fun getKeyFromPassword(password: String): SecretKey {
+	val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+	val spec: KeySpec = PBEKeySpec(
+		password.toCharArray(),
+		byteArrayOf(2, -127, 65, -67, -17, 65, 67, 36, -17, 65, -67, -17, -65, -67, -17, -65, -67, 20, 19),
+		65536, 256
+	)
+	return SecretKeySpec(factory.generateSecret(spec).encoded, "AES")
+}
+
+fun generateIv(): IvParameterSpec {
+	val iv = ByteArray(16)
+	SecureRandom().nextBytes(iv)
+	return IvParameterSpec(iv)
+}
+
+fun decrypt(algorithm: String, cipherText: ByteArray, key: SecretKey, iv: IvParameterSpec): ByteArray {
+	val cipher = Cipher.getInstance(algorithm)
+	cipher.init(Cipher.DECRYPT_MODE, key, iv)
+	return cipher.doFinal(cipherText)
+}
+
+fun encrypt(algorithm: String, input: ByteArray, key: SecretKey, iv: IvParameterSpec): ByteArray {
+	val cipher = Cipher.getInstance(algorithm)
+	cipher.init(Cipher.ENCRYPT_MODE, key, iv)
+	return cipher.doFinal(input)
+}
+
+
+fun main() {
+	initCofigs()
+
+	val save = Json().toJson(currentmonth)
+	println(save)
+
+	val key: SecretKey = getKeyFromPassword("lulpswrd")
+	val ivParameterSpec: IvParameterSpec = generateIv()
+	val algorithm = "AES/CBC/PKCS5Padding"
+	val cipherText = encrypt(algorithm, save.toByteArray(), key, ivParameterSpec)
+
+	val fout = FileOutputStream("outp")
+	fout.write(cipherText)
+	fout.close()
+
+	val fin = FileInputStream("outp")
+	val read = fin.readAllBytes()
+	println(read.toString(Charsets.UTF_8))
+	fin.close()
+
+	val plainText = String(decrypt(algorithm, read, key, ivParameterSpec))
+
+	println(plainText)
+	val res: Any = Json().fromJson(getJsonReader(StringReader(plainText)), Any::class.java)
+}
