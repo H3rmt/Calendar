@@ -1,6 +1,5 @@
 package calendar
 
-import com.google.gson.annotations.Expose
 import javafx.scene.paint.*
 import logic.Configs
 import logic.LogType
@@ -100,10 +99,8 @@ class Week(
 
 data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisplay {
 	
-	@Expose
 	val appointments: MutableList<Appointment> = mutableListOf()
 	
-	@Expose
 	override val notes: MutableList<Note> = mutableListOf()
 	
 	fun getAppointmentsLimited(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))

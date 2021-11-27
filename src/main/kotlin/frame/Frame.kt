@@ -1,8 +1,10 @@
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
+
 package frame
 
 
+
 import calendar.loadCalendarData
-import com.sun.javafx.application.LauncherImpl
 import frame.Tabmanager.Secure
 import javafx.application.*
 import javafx.event.*
@@ -74,7 +76,8 @@ fun frameInit() {
 	}
 	
 	log("launching Application", LogType.IMPORTANT)
-	LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
+	launch<Window>()
+	//LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
 
 class PreloaderWindow: Preloader() {
@@ -333,7 +336,7 @@ fun createFXImage(name: String): Image {
 			pw.setArgb(x, y, image.getRGB(x, y))
 		}
 	}
-	cache.putIfAbsent(path, wr)
+	cache[path] = wr
 	return wr
 }
 

@@ -1,4 +1,3 @@
-import com.sun.javafx.application.LauncherImpl
 import frame.createFXImage
 import javafx.beans.property.*
 import javafx.event.*
@@ -15,7 +14,7 @@ import java.time.format.FormatStyle
 
 
 fun main() {
-	LauncherImpl.launchApplication(TestWindow::class.java, null, emptyArray())
+	launch<TestWindow>()
 }
 
 class TestWindow: App(TestMainView::class) {

@@ -68,7 +68,7 @@ fun initLogger() {
  */
 fun log(message: Any?, type: LogType = LogType.NORMAL) {
 	logger.apply {
-		val callerList: List<StackWalker.StackFrame> = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }
+		val callerList = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }
 		val caller = callerList.filter { it.declaringClass.simpleName != "LoggerKt" }[0]
 		var callerStr = "(" + caller.fileName + ":" + caller.lineNumber + ")"
 		/*callerStr += caller.declaringClass.simpleName.ifBlank { // strange formatting because nested $1$3$2 classes because tornadoFX

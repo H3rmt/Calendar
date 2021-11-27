@@ -9,7 +9,7 @@ import logic.log
 import logic.updateLogger
 import kotlin.system.exitProcess
 
-fun main(args: Array<String>) {
+fun main() {
 	println("\n\tStarting Calendar... \n")
 	
 	initLogger()
@@ -41,7 +41,7 @@ fun <T> T.lg(): T {
 
 
 fun <T> ObservableValue<T>.lglisten(): ObservableValue<T> {
-	this.addListener { ob, _, nw ->
+	this.addListener { ob, _, _ ->
 		println(ob)
 	}
 	return this
