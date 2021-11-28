@@ -47,6 +47,12 @@ fun <T> ObservableValue<T>.lglisten(): ObservableValue<T> {
 	return this
 }
 
+fun <T> ObservableValue<T>.listen(listener: (new: T) -> Unit) {
+	this.addListener { _, _, newValue ->
+		listener(newValue)
+	}
+}
+
 fun println(vararg any: Any) {
 	any.forEach { print("$it ") }
 	kotlin.io.println()
