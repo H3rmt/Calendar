@@ -19,9 +19,11 @@ import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
+import javafx.scene.paint.*
 import javafx.scene.shape.*
 import javafx.scene.text.*
 import javafx.util.*
+import listen
 import logic.Configs
 import logic.LogType
 import logic.getConfig
@@ -43,12 +45,16 @@ fun createcalendartab(pane: TabPane): Tab {
 			// mainTab
 			vbox {
 				addClass(Styles.Tabs.mainTab)
+				style {
+					padding = box(0.px, 0.px, 2.px, 0.px)
+				}
 				
 				log("creating top bar", LogType.LOW)
 				// Top bar
 				hbox(spacing = 40.0, alignment = Pos.CENTER) {
 					addClass(Styles.Tabs.topbar)
 					style {
+						padding = box(0.px, 15.px, 0.px, 15.px)
 					}
 					button("<") {
 						addClass(Styles.Tabs.titleButtons)
@@ -76,10 +82,18 @@ fun createcalendartab(pane: TabPane): Tab {
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
 					
+					lateinit var scrollbarWidth: DoubleProperty
+					lateinit var scrollbarWidthInitial: Number
+					
 					// Top bar
 					hbox(spacing = 5.0, alignment = Pos.CENTER) {
 						padding = Insets(3.0)
-						
+						style {
+							backgroundColor += Color.WHITE
+							paddingRight = 2.0
+						}
+						scrollbarWidthInitial = paddingRight
+						scrollbarWidth = paddingRightProperty
 						label("") {
 							addClass(Styles.CalendarTableView.tableItem)
 						}
@@ -120,129 +134,151 @@ fun createcalendartab(pane: TabPane): Tab {
 						}
 					}
 					
-					// remove existing columns without removing header
-					val columnList: MutableList<HBox> = mutableListOf()
+					var table: ScrollPane? = null
 					
 					fun updateTable(list: ObservableList<out Week>) {
-						children.removeAll(columnList)
-						columnList.clear()
-						
+						children.remove(table)
 						log("updated table view", LogType.LOW)
-						
 						val selectedIndex = SimpleIntegerProperty(-1)
 						
-						for((index, week) in list.withIndex()) {
-							hbox(spacing = 5.0, alignment = Pos.CENTER) {
-								columnList.add(this@hbox)
-								
-								padding = Insets(3.0)
-								
-								val openTimeline = Timeline()
-								val closeTimeline = Timeline()
-								
-								val cells = mutableListOf<VBox>()
-								
-								val expand = SimpleDoubleProperty(detailspaneminHeight.toDouble())
-								
-								val openAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
-								val closeAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
-								
-								val temp = createCellGraphics(week, this@hbox, openTimeline, closeTimeline, expand)
-								cells.add(temp[0] as VBox)
-								@Suppress("UNCHECKED_CAST")
-								openAppointmentOpenAnimations.add(temp[1] as MutableList<Animation>)
-								@Suppress("UNCHECKED_CAST")
-								closeAppointmentOpenAnimations.add(temp[2] as MutableList<Animation>)
-								
-								week.allDays.values.forEach {
-									val tmp = createCellGraphics(it, this@hbox, openTimeline, closeTimeline, expand)
-									cells.add(tmp[0] as VBox)
-									
-									if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
-										(tmp[0] as VBox).addClass(Styles.CalendarTableView.markedTableCell)
-									
-									@Suppress("UNCHECKED_CAST")
-									openAppointmentOpenAnimations.add(tmp[1] as MutableList<Animation>)
-									@Suppress("UNCHECKED_CAST")
-									closeAppointmentOpenAnimations.add(tmp[2] as MutableList<Animation>)
-								}
-								
-								val hoveredCell = SimpleIntegerProperty(-1)
-								
-								for((cellIndex, cell) in cells.withIndex()) {
-									cell.onMouseEntered = EventHandler {
-										cell.addClass(Styles.CalendarTableView.hoveredTableCell)
-										hoveredCell.value = cellIndex
-									}
-									cell.onMouseExited = EventHandler {
-										cell.removeClass(Styles.CalendarTableView.hoveredTableCell)
-										hoveredCell.value = -1
-									}
-									cell.widthProperty().addListener { _, _, _ -> selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
-								}
-								
-								var openPreparation = false
-								
-								onMouseEntered = EventHandler {
-									if(selectedIndex.value != index) {
-										openPreparation = true
-										Thread {
-											Thread.sleep(getConfig<Double>(Configs.AnimationDelay).toLong())
-											if(openPreparation) {
-												openPreparation = false
-												openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
-												openTimeline.play()
-											}
-										}.start()
-									}
-								}
-								
-								onMouseExited = EventHandler {
-									if(selectedIndex.value != index) {
-										if(openPreparation)
-											openPreparation = false
-										else {
-											openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
-											openTimeline.stop()
-											closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
-											closeTimeline.play()
+						table = scrollpane(fitToWidth = true) {
+							
+							// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
+							widthProperty().listen {
+								lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
+									bar.visibleProperty()
+										.listen {
+											if(it)
+												scrollbarWidth.value = bar.width + scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+											else
+												scrollbarWidth.value = scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 										}
-									}
 								}
-								
-								onMouseClicked = EventHandler {
-									if(selectedIndex.value != index) {
-										selectedIndex.value = index
-										addClass(Styles.CalendarTableView.selectedColumn)
-									} else {
-										selectedIndex.value = -1
-										removeClass(Styles.CalendarTableView.selectedColumn)
-									}
-									if(it.clickCount > 1) {
-										log(
-											"click week: $week   day:${
-												week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
-											}", LogType.LOW
-										)
-										Tabmanager.openTab(
-											"Week${week.date}/${week.time.year}",
-											::createWeekTab,
-											week,
-											week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
-												log("update from Week triggered")  // TODO Update
-											}
-										)
-									}
+							}
+							
+							style {
+								borderWidth += box(1.px)
+								borderColor += box(Color.WHITE)
+							}
+							vbox(spacing = 5.0, alignment = Pos.CENTER) {
+								style(append = true) {
+									backgroundColor += Color.WHITE
+									paddingRight = 2.0
 								}
-								
-								selectedIndex.addListener(ChangeListener { _, old, new ->
-									if(new != index) {
-										removeClass(Styles.CalendarTableView.selectedColumn)
-										if(old == index && (new != -1 || new == -2)) {
-											onMouseExited.handle(null)
+								for((index, week) in list.withIndex()) {
+									hbox(spacing = 5.0, alignment = Pos.CENTER) {
+										style(append = true) {
+											backgroundColor += Color.WHITE
 										}
+										
+										val openTimeline = Timeline()
+										val closeTimeline = Timeline()
+										
+										val cells = mutableListOf<VBox>()
+										
+										val expand = SimpleDoubleProperty(detailspaneminHeight.toDouble())
+										
+										val openAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
+										val closeAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
+										
+										val temp = createCellGraphics(week, this@hbox, openTimeline, closeTimeline, expand)
+										cells.add(temp[0] as VBox)
+										@Suppress("UNCHECKED_CAST")
+										openAppointmentOpenAnimations.add(temp[1] as MutableList<Animation>)
+										@Suppress("UNCHECKED_CAST")
+										closeAppointmentOpenAnimations.add(temp[2] as MutableList<Animation>)
+										
+										week.allDays.values.forEach {
+											val tmp = createCellGraphics(it, this@hbox, openTimeline, closeTimeline, expand)
+											cells.add(tmp[0] as VBox)
+											
+											if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
+												(tmp[0] as VBox).addClass(Styles.CalendarTableView.markedTableCell)
+											
+											@Suppress("UNCHECKED_CAST")
+											openAppointmentOpenAnimations.add(tmp[1] as MutableList<Animation>)
+											@Suppress("UNCHECKED_CAST")
+											closeAppointmentOpenAnimations.add(tmp[2] as MutableList<Animation>)
+										}
+										
+										val hoveredCell = SimpleIntegerProperty(-1)
+										
+										for((cellIndex, cell) in cells.withIndex()) {
+											cell.onMouseEntered = EventHandler {
+												cell.addClass(Styles.CalendarTableView.hoveredTableCell)
+												hoveredCell.value = cellIndex
+											}
+											cell.onMouseExited = EventHandler {
+												cell.removeClass(Styles.CalendarTableView.hoveredTableCell)
+												hoveredCell.value = -1
+											}
+											cell.widthProperty().addListener { _, _, _ -> selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
+										}
+										
+										var openPreparation = false
+										
+										onMouseEntered = EventHandler {
+											if(selectedIndex.value != index) {
+												openPreparation = true
+												Thread {
+													Thread.sleep(getConfig<Double>(Configs.AnimationDelay).toLong())
+													if(openPreparation) {
+														openPreparation = false
+														openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
+														openTimeline.play()
+													}
+												}.start()
+											}
+										}
+										
+										onMouseExited = EventHandler {
+											if(selectedIndex.value != index) {
+												if(openPreparation)
+													openPreparation = false
+												else {
+													openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
+													openTimeline.stop()
+													closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
+													closeTimeline.play()
+												}
+											}
+										}
+										
+										onMouseClicked = EventHandler {
+											if(selectedIndex.value != index) {
+												selectedIndex.value = index
+												addClass(Styles.CalendarTableView.selectedColumn)
+											} else {
+												selectedIndex.value = -1
+												removeClass(Styles.CalendarTableView.selectedColumn)
+											}
+											if(it.clickCount > 1) {
+												log(
+													"click week: $week   day:${
+														week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
+													}", LogType.LOW
+												)
+												Tabmanager.openTab(
+													"Week${week.date}/${week.time.year}",
+													::createWeekTab,
+													week,
+													week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
+														log("update from Week triggered")  // TODO Update
+													}
+												)
+											}
+										}
+										
+										selectedIndex.addListener(ChangeListener { _, old, new ->
+											if(new != index) {
+												removeClass(Styles.CalendarTableView.selectedColumn)
+												if(old == index && (new != -1 || new == -2)) {
+													onMouseExited.handle(null)
+												}
+											}
+										})
 									}
-								})
+								}
 							}
 						}
 					}

@@ -19,6 +19,7 @@ import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.stage.*
 import lglisten
+import listen
 import logic.LogType
 import logic.getLangString
 import logic.log
@@ -38,13 +39,14 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 				padding = box(6.px)
 			}
 			
+			// mainTab
 			vbox {
 				addClass(Styles.Tabs.mainTab)
 				style {
 					padding = box(0.px, 0.px, 2.px, 0.px)
 				}
 				
-				hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
+				hbox(spacing = 40.0, alignment = Pos.CENTER_LEFT) {
 					addClass(Styles.Tabs.topbar)
 					style {
 						padding = box(0.px, 15.px, 0.px, 15.px)
@@ -62,64 +64,56 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 				// Table view
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
+					
+					lateinit var scrollbarWidth: DoubleProperty
+					lateinit var scrollbarWidthInitial: Number
+					
 					// Top bar
-					scrollpane(fitToWidth = true) {
-						vbarPolicy = ScrollPane.ScrollBarPolicy.ALWAYS
-						
-						addClass(Styles.WeekTab.invisibleScrollbar)
+					hbox(spacing = 2.0, alignment = Pos.CENTER) {
+						padding = Insets(3.0)
 						style {
-							borderWidth += box(1.px)
-							borderColor += box(Color.WHITE)
 							backgroundColor += Color.WHITE
-							
-							prefHeight = 38.px
-							minHeight = prefHeight
-							
-							padding = box(3.px, 4.px, 3.px, 6.px)
+							paddingRight = 2.0
 						}
-						
-						hbox(spacing = 2.0, alignment = Pos.CENTER) {
-							style {
-								backgroundColor += Color.WHITE
-							}
-							label("") {
-								addClass(Styles.CalendarTableView.tableItem)
-							}
-							label("Monday") {
-								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.WeekTab.tableTimeHeader)
-								addClass(Styles.CalendarTableView.cellHeaderLabel)
-							}
-							label("Tuesday") {
-								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.WeekTab.tableTimeHeader)
-								addClass(Styles.CalendarTableView.cellHeaderLabel)
-							}
-							label("Wednesday") {
-								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.WeekTab.tableTimeHeader)
-								addClass(Styles.CalendarTableView.cellHeaderLabel)
-							}
-							label("Thursday") {
-								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.WeekTab.tableTimeHeader)
-								addClass(Styles.CalendarTableView.cellHeaderLabel)
-							}
-							label("Friday") {
-								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.WeekTab.tableTimeHeader)
-								addClass(Styles.CalendarTableView.cellHeaderLabel)
-							}
-							label("Saturday") {
-								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.WeekTab.tableTimeHeader)
-								addClass(Styles.CalendarTableView.cellHeaderLabel)
-							}
-							label("Sunday") {
-								addClass(Styles.CalendarTableView.tableItem)
-								addClass(Styles.WeekTab.tableTimeHeader)
-								addClass(Styles.CalendarTableView.cellHeaderLabel)
-							}
+						scrollbarWidthInitial = paddingRight
+						scrollbarWidth = paddingRightProperty
+						label("") {
+							addClass(Styles.CalendarTableView.tableItem)
+						}
+						label("Monday") {
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.WeekTab.tableTimeHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						}
+						label("Tuesday") {
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.WeekTab.tableTimeHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						}
+						label("Wednesday") {
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.WeekTab.tableTimeHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						}
+						label("Thursday") {
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.WeekTab.tableTimeHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						}
+						label("Friday") {
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.WeekTab.tableTimeHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						}
+						label("Saturday") {
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.WeekTab.tableTimeHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						}
+						label("Sunday") {
+							addClass(Styles.CalendarTableView.tableItem)
+							addClass(Styles.WeekTab.tableTimeHeader)
+							addClass(Styles.CalendarTableView.cellHeaderLabel)
 						}
 					}
 					
@@ -129,10 +123,23 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 					fun updateTable() {
 						children.remove(table)
 						log("updated table view", LogType.LOW)
-						
 						var scrollToHour = 0
 						
 						table = scrollpane(fitToWidth = true) {
+							
+							// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
+							widthProperty().listen {
+								lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
+									bar.visibleProperty()
+										.listen {
+											if(it)
+												scrollbarWidth.value = bar.width + scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+											else
+												scrollbarWidth.value = scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+										}
+								}
+							}
+							
 							style {
 								borderWidth += box(1.px)
 								borderColor += box(Color.WHITE)
@@ -140,7 +147,6 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 							
 							hbox(spacing = 2.0, alignment = Pos.CENTER) {
 								style(append = true) {
-									padding = box(4.px)
 									backgroundColor += Color.WHITE
 								}
 								vbox(alignment = Pos.TOP_CENTER) {
@@ -255,7 +261,9 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 									}
 								}
 							}
-							vvalue = (min(scrollToHour.toDouble() + 8, 24.0) / 24.0) * vmax  // scroll to current time an place ~in middle
+							// scroll to current time a place ~in middle
+							//vvalue = (min(scrollToHour.toDouble() + 8, 24.0) / 24.0) * vmax
+							vvalue = (min(0.toDouble(), 24.0) / 24.0) * vmax
 						}
 					}
 					
