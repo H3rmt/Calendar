@@ -1,6 +1,5 @@
 package frame
 
-import DateTimePicker
 import calendar.Appointment
 import calendar.Day
 import calendar.Timing
@@ -10,7 +9,8 @@ import calendar.Types
 import calendar.Week
 import calendar.now
 import calendar.saveDayAppointment
-import dateTimePicker
+import datetimepicker.DateTimePicker
+import datetimepicker.dateTimePicker
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*
