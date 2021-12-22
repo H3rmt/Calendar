@@ -1,3 +1,5 @@
+package datetimepicker
+
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*
@@ -19,23 +21,15 @@ class DateTimePickerPopup(dateProperty: Property<LocalDate>, hourProperty: Integ
 				//borderRadius += box(3.px)
 				borderWidth += box(1.px)
 				
-				backgroundColor += Color.LIGHTGRAY
+				backgroundColor += Color.valueOf("#E9E9E9")
 			}
 			datepicker = datepicker(dateProperty) { }
-			timepicker = timepicker(hourProperty, minuteProperty) { }
-			borderpane {
-				padding = insets(5)
-				center = button("OK") {
-					action {
-						save()
-					}
-				}
-			}
+			timepicker = timepicker(hourProperty, minuteProperty, save) { }
 		})
 	}
 }
 
-class TimePicker(hourProperty: IntegerProperty, minuteProperty: IntegerProperty): Control() {
+class TimePicker(hourProperty: IntegerProperty, minuteProperty: IntegerProperty, save: () -> Unit): Control() {
 	
 	override fun createDefaultSkin(): Skin<*> {
 		return object: SkinBase<TimePicker>(this) {
@@ -43,33 +37,41 @@ class TimePicker(hourProperty: IntegerProperty, minuteProperty: IntegerProperty)
 	}
 	
 	init {
-		hbox(spacing = 3.0, alignment = Pos.CENTER) {
-			vbox(spacing = 1.0) {
+		vbox(spacing = 5.0) {
+			//prefWidth = 40.0
+			padding = insets(0, 3, 3, 3)
+			
+			hbox(spacing = 3.0, alignment = Pos.CENTER) {
 				spinner(min = 0, max = 23, amountToStepBy = 1, enableScroll = true, property = hourProperty) {
+					prefWidth = 65.0
 					isEditable = true
 				}
+				text(" : ")
+				spinner(min = 0, max = 59, amountToStepBy = 1, enableScroll = true, property = minuteProperty) {
+					prefWidth = 65.0
+					isEditable = true
+				}
+			}
+			hbox(spacing = 1.0, alignment = Pos.CENTER) {
 				slider(min = 0, max = 23, orientation = Orientation.HORIZONTAL) {
+					prefWidth = 55.0
 					valueProperty().bindBidirectional(hourProperty)
 				}
-				prefWidth = 60.0
-			}
-			text(" : ") {
-			
-			}
-			vbox(spacing = 1.0) {
-				spinner(min = 0, max = 59, amountToStepBy = 1, enableScroll = true, property = minuteProperty) {
-					isEditable = true
+				button("OK") {
+					action {
+						save()
+					}
 				}
 				slider(min = 0, max = 59, orientation = Orientation.HORIZONTAL) {
+					prefWidth = 55.0
 					valueProperty().bindBidirectional(minuteProperty)
 				}
-				prefWidth = 60.0
 			}
 		}
 	}
 }
 
-fun EventTarget.timepicker(hourProperty: IntegerProperty, minuteProperty: IntegerProperty, op: TimePicker.() -> Unit = {}): TimePicker =
-	TimePicker(hourProperty, minuteProperty).attachTo(this, op).apply {
+fun EventTarget.timepicker(hourProperty: IntegerProperty, minuteProperty: IntegerProperty, save: () -> Unit, op: TimePicker.() -> Unit = {}): TimePicker =
+	TimePicker(hourProperty, minuteProperty, save).attachTo(this, op).apply {
 		op(this)
 	}
