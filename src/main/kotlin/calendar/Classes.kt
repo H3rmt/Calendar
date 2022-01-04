@@ -37,17 +37,7 @@ interface CellDisplay {
 	val time: LocalDate
 }
 
-class Week(
-	_time: LocalDate,
-	Monday: Day,
-	Tuesday: Day,
-	Wednesday: Day,
-	Thursday: Day,
-	Friday: Day,
-	Saturday: Day,
-	Sunday: Day,
-	val WeekOfYear: Int
-): CellDisplay {
+class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday: Day, Friday: Day, Saturday: Day, Sunday: Day, val WeekOfYear: Int): CellDisplay {
 	
 	override val time: LocalDate = _time
 	
@@ -63,20 +53,13 @@ class Week(
 		}
 	
 	val allDays: Map<DayOfWeek, Day> = mapOf(
-		MONDAY to Monday,
-		TUESDAY to Tuesday,
-		WEDNESDAY to Wednesday,
-		THURSDAY to Thursday,
-		FRIDAY to Friday,
-		SATURDAY to Saturday,
-		SUNDAY to Sunday
+		MONDAY to Monday, TUESDAY to Tuesday, WEDNESDAY to Wednesday, THURSDAY to Thursday, FRIDAY to Friday, SATURDAY to Saturday, SUNDAY to Sunday
 	)
 	
 	fun getallAppointmentsSorted(): Map<Types, List<Appointment>> {
 		val list = mutableMapOf<Types, MutableList<Appointment>>()
 		for(appointment in appointments) {
-			if(list[appointment.type] == null)
-				list[appointment.type] = mutableListOf()
+			if(list[appointment.type] == null) list[appointment.type] = mutableListOf()
 			list[appointment.type]!!.add(appointment)
 		}
 		return list
@@ -110,28 +93,17 @@ data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisp
 
 
 open class Appointment(
-	val start: Long,
-	val duration: Long,
-	val title: String,
-	val description: String,
-	val type: Types,
-	override val id: Long,
-	val daystart: Int = Timing.startofDayMinutes(start)
+	val start: Long, val duration: Long, val title: String, val description: String, val type: Types, override val id: Long, val daystart: Int = Timing.startofDayMinutes(start)
 ): Storage {
 	
 	// create New
 	constructor(start: Long, duration: Long, title: String, description: String, type: Types): this(
-		start, duration, title, description, type, createID(IDGroups.Appointments)
+		start, duration, title, description, type, getFreeID(IDGroups.Appointments)
 	)
 	
 	override fun toJSON(): Map<String, Any> {
 		return mapOf(
-			"id" to id.toDouble(),
-			"start" to start.toDouble(),
-			"duration" to duration.toDouble(),
-			"type" to type.toString(),
-			"title" to title,
-			"description" to description
+			"id" to id.toDouble(), "start" to start.toDouble(), "duration" to duration.toDouble(), "type" to type.toString(), "title" to title, "description" to description
 		)
 	}
 	
@@ -140,13 +112,16 @@ open class Appointment(
 			try {
 				return Appointment(
 					(map["start"] as Double).toLong(),
-					(map["duration"] as Double).toLong(), map["title"] as String,
-					map["description"] as String, Types.valueOf(map["type"] as String), (map["id"] as Double).toLong()
+					(map["duration"] as Double).toLong(),
+					map["title"] as String,
+					map["description"] as String,
+					Types.valueOf(map["type"] as String),
+					(map["id"] as Double).toLong()
 				) as Appointment
 			} catch(e: Exception) {
 				Warning("an35f7", e, "Exception creating Appointment from map:$map")
+				return null
 			}
-			return null
 		}
 	}
 	
@@ -154,18 +129,12 @@ open class Appointment(
 }
 
 class WeekAppointment(
-	val day: DayOfWeek,
-	start: Long,
-	duration: Long,
-	title: String,
-	description: String,
-	type: Types,
-	id: Long
+	val day: DayOfWeek, start: Long, duration: Long, title: String, description: String, type: Types, id: Long
 ): Appointment(start, duration, title, description, type, id) {
 	
-	// @Suppress("unused") // create New
+	@Suppress("unused")
 	constructor(day: DayOfWeek, start: Long, duration: Long, title: String, description: String, type: Types): this(
-		day, start, duration, title, description, type, createID(IDGroups.Appointments)
+		day, start, duration, title, description, type, getFreeID(IDGroups.Appointments)
 	)
 	
 	override fun toJSON(): Map<String, Any> {
@@ -184,14 +153,18 @@ class WeekAppointment(
 		override fun <WeekAppointment> fromJSON(map: Map<String, Any>): WeekAppointment? {
 			try {
 				return WeekAppointment(
-					DayOfWeek.valueOf((map["day"] as String).uppercase()), (map["start"] as Double).toLong(),
-					(map["duration"] as Double).toLong(), map["title"] as String,
-					map["description"] as String, Types.valueOf(map["type"] as String), (map["id"] as Double).toLong()
+					DayOfWeek.valueOf((map["day"] as String).uppercase()),
+					(map["start"] as Double).toLong(),
+					(map["duration"] as Double).toLong(),
+					map["title"] as String,
+					map["description"] as String,
+					Types.valueOf(map["type"] as String),
+					(map["id"] as Double).toLong()
 				) as WeekAppointment
 			} catch(e: Exception) {
 				Warning("an35f7", e, "Exception creating Appointment from map:$map")
+				return null
 			}
-			return null
 		}
 	}
 	
@@ -200,28 +173,18 @@ class WeekAppointment(
 
 
 data class Note(
-	val time: Long,
-	var text: String,
-	val type: Types,
-	val files: List<File>,
-	override val id: Long,
-	val daystart: Int = Timing.startofDayMinutes(time)
+	val time: Long, var text: String, val type: Types, val files: List<File>, override val id: Long, val daystart: Int = Timing.startofDayMinutes(time)
 ): Storage {
 	constructor(time: Long, text: String, type: Types, file: List<File>): this(
-		time, text, type, file, createID(IDGroups.Notes)
+		time, text, type, file, getFreeID(IDGroups.Notes)
 	)
 	
 	override fun toJSON(): Map<String, Any> {
 		val files = mutableListOf<Map<String, Any>>()
-		for(t in this.files)
-			t.toJSON().let { files.add(it) }
+		for(t in this.files) t.toJSON().let { files.add(it) }
 		
 		return mapOf(
-			"id" to id.toDouble(),
-			"time" to time.toDouble(),
-			"text" to text,
-			"type" to type.toString(),
-			"files" to files.toList()
+			"id" to id.toDouble(), "time" to time.toDouble(), "text" to text, "type" to type.toString(), "files" to files.toList()
 		)
 	}
 	
@@ -230,20 +193,18 @@ data class Note(
 			try {
 				val tmp = map["files"] as List<*>
 				val files = mutableListOf<File>()
-				for(t in tmp)
+				for(t in tmp) {
 					@Suppress("UNCHECKED_CAST")
 					File.fromJSON<File>(t as Map<String, Any>)?.let { files.add(it) }
+				}
 				
 				return Note(
-					(map["time"] as Double).toLong(),
-					map["text"] as String,
-					Types.valueOf(map["type"] as String),
-					files, (map["id"] as Double).toLong()
+					(map["time"] as Double).toLong(), map["text"] as String, Types.valueOf(map["type"] as String), files, (map["id"] as Double).toLong()
 				) as Note
 			} catch(e: Exception) {
 				Warning("an35f7", e, "Exception creating Note from map:$map")
+				return null
 			}
-			return null
 		}
 	}
 	
@@ -251,52 +212,41 @@ data class Note(
 }
 
 data class File(
-	val data: ByteArray,
-	val name: String,
-	val origin: String,
-	override val id: Long
+	val data: ByteArray, val name: String, val origin: String, override val id: Long
 ): Storage {
 	
 	constructor(data: ByteArray, name: String, origin: String): this(
-		data, name, origin, createID(IDGroups.Files)
+		data, name, origin, getFreeID(IDGroups.Files)
 	)
+	
+	@Suppress("unused")
+	constructor(file: java.io.File): this(file.inputStream().readAllBytes(), file.name, file.absolutePath)
 	
 	override fun toJSON(): Map<String, Any> {
 		return mapOf(
-			"id" to id.toDouble(),
-			"data" to data.toList(),
-			"name" to name,
-			"origin" to origin
+			"id" to id.toDouble(), "data" to data.toList(), "name" to name, "origin" to origin
 		)
 	}
 	
 	companion object: CreateFromStorage {
 		override fun <File> fromJSON(map: Map<String, Any>): File? {
 			try {
-				@Suppress("UNCHECKED_CAST")
-				val f = File(
-					(map["data"] as List<Byte>).toByteArray(), map["name"] as String,
-					map["origin"] as String, (map["id"] as Double).toLong()
+				@Suppress("UNCHECKED_CAST") val f = File(
+					(map["data"] as List<Byte>).toByteArray(), map["name"] as String, map["origin"] as String, (map["id"] as Double).toLong()
 				)
 				return f as File
 			} catch(e: Exception) {
 				Warning("an35f7", e, "Exception creating NoteFile from map:$map")
+				return null
 			}
-			return null
 		}
 	}
-	
-	@Suppress("unused")
-	constructor(file: java.io.File): this(file.inputStream().readAllBytes(), file.name, file.absolutePath)
 	
 	override fun toString(): String = "[{$id} $name ${data.size} $origin]"
 }
 
 
-data class Types(
-	val name: String,
-	val color: Color
-) {
+data class Types(val name: String, val color: Color) {
 	
 	override fun toString(): String = name
 	
@@ -308,8 +258,7 @@ data class Types(
 		
 		fun valueOf(s: String): Types {
 			types.forEach {
-				if(it.name.equals(s, true))
-					return@valueOf it
+				if(it.name.equals(s, true)) return@valueOf it
 			}
 			throw IllegalArgumentException("$s not a valid Type of $types")
 		}
@@ -328,10 +277,9 @@ data class Types(
 		fun createTypes(data: List<Map<String, String>>) {
 			types.clear()
 			data.forEach {
-				val type = createType(it)
-				type?.apply {
+				createType(it)?.apply {
 					types.add(this)
-					log("added type $type", LogType.LOW)
+					log("added type $this", LogType.LOW)
 				}
 			}
 			log("created types $types", LogType.NORMAL)

@@ -18,7 +18,6 @@ import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.stage.*
-import lglisten
 import listen
 import logic.LogType
 import logic.getLangString
@@ -65,18 +64,16 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
 					
-					lateinit var scrollbarWidth: DoubleProperty
-					lateinit var scrollbarWidthInitial: Number
+					lateinit var topMargin: DoubleProperty
 					
 					// Top bar
 					hbox(spacing = 2.0, alignment = Pos.CENTER) {
 						padding = Insets(3.0)
 						style {
 							backgroundColor += Color.WHITE
-							paddingRight = 2.0
+							paddingRight = 15.3
 						}
-						scrollbarWidthInitial = paddingRight
-						scrollbarWidth = paddingRightProperty
+						topMargin = paddingRightProperty
 						label("") {
 							addClass(Styles.CalendarTableView.tableItem)
 						}
@@ -128,15 +125,18 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 						table = scrollpane(fitToWidth = true) {
 							
 							// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-							widthProperty().listen {
+							widthProperty().listen(once = true) {
 								lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-									bar.visibleProperty()
-										.listen {
-											if(it)
-												scrollbarWidth.value = bar.width + scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
-											else
-												scrollbarWidth.value = scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+									fun update(visible: Boolean) {
+										if(visible) {
+											topMargin.value = bar.width + 2 //+ scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+										} else {
+											topMargin.value = 2.0 //scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 										}
+									}
+									bar.visibleProperty().listen { visible ->
+										update(visible)
+									}
 								}
 							}
 							
@@ -289,14 +289,14 @@ class NewAppointmentPopup: Fragment() {
 	private var description: Property<String> = "".toProperty()
 	private var type: Property<Types?> = SimpleObjectProperty<Types>(null)
 	
-	var savecall: (Appointment) -> Unit = scope.save
+	private var savecall: (Appointment) -> Unit = scope.save
 	
 	private lateinit var startpicker: DateTimePicker
 	private lateinit var endpicker: DateTimePicker
 	
 	private fun createAppointment(): Appointment {
-		val _start: Long = startpicker.dateTimeProperty.value.toUTCEpochMinute()
-		val _duration: Long = endpicker.dateTimeProperty.value.toUTCEpochMinute() - _start  // subtract start from duration
+		val _start: Long = start.value.toUTCEpochMinute()
+		val _duration: Long = end.value.toUTCEpochMinute() - _start  // subtract start from duration
 		val _title: String = appointmentTitle.value
 		val _description: String = description.value
 		val _type: Types = type.value!!
@@ -317,31 +317,26 @@ class NewAppointmentPopup: Fragment() {
 				prefHeight = Int.MAX_VALUE.px
 			}
 			field("Type") {
-				combobox(values = Types.clonetypes(), property = type) {
-				}
+				combobox(values = Types.clonetypes(), property = type)
 			}
-			start.lglisten()
-			end.lglisten()
 			field(getLangString("start to end")) {
-				startpicker = dateTimePicker(dateTime = start) {
-				}
-				endpicker = dateTimePicker(dateTime = end) {
-				}
+				startpicker = dateTimePicker(dateTime = start)
+				endpicker = dateTimePicker(dateTime = end)
 			}
 			field(getLangString("title")) {
-				textfield {
-				}.bind(appointmentTitle)
+				textfield(appointmentTitle)
 			}
 			field(getLangString("description")) {
 				style(append = true) {
 					prefHeight = Int.MAX_VALUE.px
 					minHeight = 60.px
+					padding = box(0.px, 0.px, 20.px, 0.px)
 				}
-				textarea {
+				textarea(description) {
 					style(append = true) {
 						prefHeight = Int.MAX_VALUE.px
 					}
-				}.bind(description)
+				}
 			}
 			buttonbar {
 				button(getLangString("Cancel")) {

@@ -23,7 +23,7 @@ dependencies {
 	implementation("com.google.code.gson:gson:2.8.9")
 	
 	implementation("org.apache.xmlgraphics:batik-transcoder:1.14")
-	implementation("com.twelvemonkeys.imageio:imageio-batik:3.7.0")
+	implementation("com.twelvemonkeys.imageio:imageio-batik:3.8.0")
 	
 	//testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
 	//testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

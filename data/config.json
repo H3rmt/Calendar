@@ -1,13 +1,16 @@
 {
 	"Language": "en",
-	"debug": false,
-	"printstacktrace": true,
-	"printlogs": true,
-	"logformat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
+	"Debug": false,
+	"PrintStacktrace": true,
+	"PrintLogs": true,
+	"StoreLogs": true,
+	"LogFormat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
+	"DebugLogFormat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
+	// "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
 	"AnimationSpeed": 300,
 	"AnimationDelay": 120,
 	"MaxDayAppointments": 8,
-	"expandNotesOnOpen": true,
+	"ExpandNotesOnOpen": true,
 	"AppointmentTypes": [
 		{
 			"name": "Work",
@@ -20,6 +23,10 @@
 		{
 			"name": "School",
 			"color": "ORANGE"
+		},
+		{
+			"name": "Schoolll",
+			"color": "Green"
 		}
 	]
 }

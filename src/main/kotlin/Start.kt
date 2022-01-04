@@ -38,19 +38,22 @@ fun <T> T.lg(): T {
 	return this
 }
 
-
-
 fun <T> ObservableValue<T>.lglisten(): ObservableValue<T> {
+	println("lglisten on: $this ")
 	this.addListener { ob, _, _ ->
-		println(ob)
+		println("lglisten:", ob)
 	}
 	return this
 }
 
-fun <T> ObservableValue<T>.listen(listener: (new: T) -> Unit) {
-	this.addListener { _, _, newValue ->
+fun <T> ObservableValue<T>.listen(once: Boolean = false, listener: (new: T) -> Unit) {
+	lateinit var lst: ChangeListener<T>
+	lst = ChangeListener<T> { _, _, newValue ->
 		listener(newValue)
+		if(once)
+			this.removeListener(lst)
 	}
+	this.addListener(lst)
 }
 
 fun println(vararg any: Any) {

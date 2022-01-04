@@ -13,7 +13,9 @@ import java.time.temporal.IsoFields
 
 
 fun saveDayNote(note: Note, add: Boolean = true) {
+	log("${if(add) "Adding" else "Removing"} Day Note $note", LogType.IMPORTANT)
 	val noteTime = UTCEpochMinuteToLocalDateTime(note.time)
+	
 	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
 		if(!exists()) {
 			log("file with notes for ${noteTime.month.name} not found", LogType.LOW)
@@ -43,7 +45,7 @@ fun saveDayNote(note: Note, add: Boolean = true) {
 							log("loaded Day Note: $this", LogType.LOW)
 						}
 					}
-					log("loaded temp day Notes $tmpDayNotes", LogType.NORMAL)
+					log("loaded old day Notes $tmpDayNotes", LogType.NORMAL)
 				}
 			}
 		}
@@ -74,7 +76,9 @@ fun saveDayNote(note: Note, add: Boolean = true) {
 }
 
 fun saveWeekNote(note: Note, add: Boolean = true) {
+	log("${if(add) "Adding" else "Removing"} Week Note $note", LogType.IMPORTANT)
 	val noteTime = UTCEpochMinuteToLocalDateTime(note.time)
+	
 	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
 		if(!exists()) {
 			log("file with notes for ${noteTime.month.name} not found", LogType.LOW)
@@ -104,7 +108,7 @@ fun saveWeekNote(note: Note, add: Boolean = true) {
 							log("loaded week Note: $this", LogType.LOW)
 						}
 					}
-					log("loaded temp Week Notes $tmpWeekNotes", LogType.NORMAL)
+					log("loaded old Week Notes $tmpWeekNotes", LogType.NORMAL)
 				}
 			}
 		}
@@ -136,11 +140,12 @@ fun saveWeekNote(note: Note, add: Boolean = true) {
 
 
 fun saveDayAppointment(appointment: Appointment, add: Boolean = true) {
+	log("${if(add) "Adding" else "Removing"} Day Appointment $appointment", LogType.IMPORTANT)
 	val appointmentTime = UTCEpochMinuteToLocalDateTime(appointment.start)
 	
 	File(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json").run {
 		if(!exists()) {
-			log("file with notes for ${appointmentTime.month.name} not found", LogType.LOW)
+			log("file with notes for ${appointmentTime.month.name} not found", LogType.WARNING)
 			createNewFile()
 			writeText("[\n\t\n]")
 		}
@@ -165,7 +170,7 @@ fun saveDayAppointment(appointment: Appointment, add: Boolean = true) {
 			}
 		}
 	
-	log("loaded temp Day Appointments $tmpDayAppointments", LogType.NORMAL)
+	log("loaded old Day Appointments $tmpDayAppointments", LogType.NORMAL)
 	
 	// removes duplicate / overrides old
 	tmpDayAppointments[appointmentTime.dayOfMonth]?.removeIf { it.id == appointment.id }
@@ -187,8 +192,11 @@ fun saveDayAppointment(appointment: Appointment, add: Boolean = true) {
 	}
 }
 
-val idstorage: MutableMap<IDGroups, MutableList<Long>> =
-	mutableMapOf(IDGroups.Appointments to mutableListOf(), IDGroups.Notes to mutableListOf(), IDGroups.Files to mutableListOf())
+val idstorage: MutableMap<IDGroups, MutableList<Long>> = mutableMapOf(
+	IDGroups.Appointments to mutableListOf(),
+	IDGroups.Notes to mutableListOf(),
+	IDGroups.Files to mutableListOf()
+)
 
 enum class IDGroups {
 	Appointments,
@@ -201,18 +209,27 @@ fun resetGroup(group: IDGroups) {
 }
 
 fun usedID(group: IDGroups, id: Long) {
-	if(!idstorage[group]!!.contains(id))
+	if(!idstorage[group]!!.contains(id)) {
 		idstorage[group]!!.add(id)
-	else {
+		log("added ID $id for group $group: ${idstorage[group]}", LogType.LOW)
+	} else {
 		log("duplicate ID $id for group registered $group: ${idstorage[group]}", LogType.WARNING)
 		throw Exit("TODO")
 	}
 }
 
-fun createID(group: IDGroups): Long {
+fun getFreeID(group: IDGroups): Long {
 	val id: Long = idstorage[group]!!.run {
-		sortDescending(); getOrNull(0)?.inc()
-	} ?: 0
-	log("created id $id")
+		sort()
+		var idTmp: Long = 0
+		forEach { i ->
+			if(idTmp != i)
+				return@run idTmp;
+			idTmp++
+		}
+		return@run idTmp;
+	}
+	log("created id $id", LogType.IMPORTANT)
+	usedID(group, id)
 	return id
 }

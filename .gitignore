@@ -1,9 +1,9 @@
-.idea
+/.idea
 
 # Build stuff
-.gradle
-build
-out
+/.gradle
+/build
+/out
 
 # Log files
 *.log

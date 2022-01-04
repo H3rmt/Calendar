@@ -26,7 +26,6 @@ import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
 import java.io.File
-import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URI
@@ -65,7 +64,7 @@ fun frameInit() {
 		writer.append("Exit <ErrorCode: Frame Exception> -> ")
 		//}
 		
-		if(getConfig(Configs.Printstacktrace))
+		if(getConfig(Configs.PrintStacktrace))
 			it.error.printStackTrace(PrintWriter(writer))
 		else
 			writer.append(it.error.toString())
@@ -126,6 +125,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 					
 					log("preparing Notes", LogType.IMPORTANT)
 					loadCalendarData()
+					Secure.overrideTab("calendar", ::createcalendartab)
 				},
 				createMenuItem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
 				run { separator(); return@run null },
@@ -151,7 +151,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 					log("Open Github", LogType.IMPORTANT)
 					try {
 						Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
-					} catch(e: IOException) {
+					} catch(e: Exception) {
 						log("failed to open browser", LogType.WARNING)
 					}
 				},
@@ -290,7 +290,6 @@ object Tabmanager {
 	 * be handled carefully.
 	 */
 	object Secure {
-		
 		@Suppress("unused")
 		fun closeTab(identifier: String) {
 			tabs[identifier]?.close()
@@ -320,6 +319,7 @@ val cache = mutableMapOf<String, Image>()
 fun createFXImage(name: String): Image {
 	val path = "img/$name"
 	cache[path]?.let { return it }
+	
 	val image = try {
 		ImageIO.read(File(path).takeIf { it.exists() })
 	} catch(e: IllegalArgumentException) {
@@ -341,12 +341,12 @@ fun createFXImage(name: String): Image {
 }
 
 fun getImageMissing(): BufferedImage {
-	val im = BufferedImage(10, 30, BufferedImage.TYPE_3BYTE_BGR)
+	val im = BufferedImage(30, 30, BufferedImage.TYPE_3BYTE_BGR)
 	val g2 = im.graphics
-	for(i in 0 until 10)
-		for(j in 0 until 30) {
-			g2.color = java.awt.Color(Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))
-			g2.drawRect(i, j, 1, 1)
+	for(i in 0 until 4)
+		for(j in 0 until 4) {
+			g2.color = java.awt.Color(Random.nextInt(155), Random.nextInt(155), Random.nextInt(255))
+			g2.fillRect(1 + i * 6, 1 + j * 6, 3, 3)
 		}
 	g2.dispose()
 	return im
