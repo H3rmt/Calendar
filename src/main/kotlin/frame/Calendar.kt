@@ -321,14 +321,22 @@ fun createCellGraphics(
 					padding = box(0.px, 3.px, 2.px, 3.px)
 				}
 				anchorpane {
-					val defaultImg = createFXImage("remind.svg")//if() FXImage("img/remind.svg") else FXImage("img/remind inactive.svg")
+					val defaultImg = if(true)
+						createFXImage("remind.svg")
+					else
+						createFXImage("remind active.svg")
+					val hoveredImg = if(true)
+						createFXImage("remind hovered.svg")
+					else
+						createFXImage("remind active hovered.svg")
+					
 					val img = imageview(defaultImg) {
 						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
 					onMouseClicked = EventHandler { it.consume() }
-					// onMouseEntered = EventHandler { img.image = FXImage("img/remind active.svg") }
+					onMouseEntered = EventHandler { img.image = hoveredImg }
 					onMouseExited = EventHandler { img.image = defaultImg }
 				}
 				
@@ -339,7 +347,15 @@ fun createCellGraphics(
 					addClass(Styles.CalendarTableView.cellLabel)
 				}
 				anchorpane {
-					val defaultImg = if(data.notes.isNotEmpty()) createFXImage("note.svg") else createFXImage("note inactive.svg")
+					val defaultImg = if(data.notes.isEmpty())
+						createFXImage("note.svg")
+					else
+						createFXImage("note active.svg")
+					val hoveredImg = if(data.notes.isEmpty())
+						createFXImage("note hovered.svg")
+					else
+						createFXImage("note active hovered.svg")
+					
 					val img = imageview(defaultImg) {
 						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
@@ -363,7 +379,7 @@ fun createCellGraphics(
 							}
 						})
 					}
-					onMouseEntered = EventHandler { img.image = createFXImage("note active.svg") }
+					onMouseEntered = EventHandler { img.image = hoveredImg }
 					onMouseExited = EventHandler { img.image = defaultImg }
 				}
 			}
@@ -390,7 +406,15 @@ fun createCellGraphics(
 				}
 				
 				anchorpane {
-					val defaultImg = if(data.notes.isNotEmpty()) createFXImage("note.svg") else createFXImage("note inactive.svg")
+					val defaultImg = if(data.notes.isEmpty())
+						createFXImage("note.svg")
+					else
+						createFXImage("note active.svg")
+					val hoveredImg = if(data.notes.isEmpty())
+						createFXImage("note hovered.svg")
+					else
+						createFXImage("note active hovered.svg")
+					
 					val img = imageview(defaultImg) {
 						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
@@ -416,7 +440,7 @@ fun createCellGraphics(
 							}
 						)
 					}
-					onMouseEntered = EventHandler { img.image = createFXImage("note active.svg") }
+					onMouseEntered = EventHandler { img.image = hoveredImg }
 					onMouseExited = EventHandler { img.image = defaultImg }
 				}
 			}
