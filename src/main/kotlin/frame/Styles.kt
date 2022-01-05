@@ -213,7 +213,7 @@ class Styles: Stylesheet() {
 		}
 		
 		CalendarTableView.cellAppointTypeLabel {
-			fontSize = 12.px
+			fontSize = 11.px
 		}
 	}
 	

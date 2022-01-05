@@ -260,7 +260,8 @@ fun createcalendartab(pane: TabPane): Tab {
 													::createWeekTab,
 													week,
 													week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
-														log("update from Week triggered")  // TODO Update
+														log("update from Week triggered")
+														updateTable(currentMonth)
 													}
 												)
 											}
@@ -568,7 +569,6 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	animations[1].addAll(closeTransitions)
 	
 	return (yCords.getOrNull(yCords.lastIndex)?.plus(sideTopMargin) ?: 0.0)
-	
 }
 
 fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<Animation>>): Double {
