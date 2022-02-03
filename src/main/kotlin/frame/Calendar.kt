@@ -9,9 +9,6 @@ import calendar.currentMonth
 import calendar.currentMonthName
 import calendar.generateMonth
 import calendar.now
-import calendar.prepareMonthNotes
-import calendar.preparedDayNotes
-import calendar.preparedWeekNotes
 import javafx.animation.*
 import javafx.beans.property.*
 import javafx.collections.*
@@ -370,10 +367,6 @@ fun createCellGraphics(
 						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createNoteTab, data, {
 							if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
 								log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
-								
-								preparedWeekNotes[data.time.month]?.clear()
-								preparedDayNotes[data.time.month]?.clear()
-								prepareMonthNotes(data.time.month, data.time.year)
 								val weeksData = generateMonth(calendarDisplay)
 								currentMonth.clear()
 								currentMonth.addAll(weeksData)
@@ -430,10 +423,6 @@ fun createCellGraphics(
 							"WeekNotes${data.WeekOfYear}/${data.time.year}", ::createNoteTab, data, {
 								if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
 									log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
-									
-									preparedWeekNotes[data.time.month]?.clear()
-									preparedDayNotes[data.time.month]?.clear()
-									prepareMonthNotes(data.time.month,data.time.year)
 									val weeksData = generateMonth(calendarDisplay)
 									currentMonth.clear()
 									currentMonth.addAll(weeksData)

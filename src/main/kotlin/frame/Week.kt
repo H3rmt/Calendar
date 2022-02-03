@@ -8,7 +8,6 @@ import calendar.Timing.toUTCEpochMinute
 import calendar.Types
 import calendar.Week
 import calendar.now
-import calendar.saveDayAppointment
 import datetimepicker.DateTimePicker
 import datetimepicker.dateTimePicker
 import javafx.beans.property.*
@@ -260,8 +259,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1)
 																) { app: Appointment ->
-																	log("Created:$app")
-																	saveDayAppointment(app) // TODO multi day
+																	log("Created:$app") // TODO multi day
 																	week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
 																	updateTable()
 																	updateCallback()
@@ -277,8 +275,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																			Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
 																			Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1)
 																		) { app: Appointment ->
-																			log("Removed:$app")
-																			saveDayAppointment(app, false) // TODO multi day
+																			log("Removed:$app") // TODO multi day
 																			week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.remove(app)
 																			updateTable()
 																			updateCallback()
@@ -338,12 +335,13 @@ class NewAppointmentPopup: Fragment() {
 	private lateinit var endpicker: DateTimePicker
 	
 	private fun createAppointment(): Appointment =
-		Appointment(
+		Appointment.new(
 			start.value.toUTCEpochMinute(),
 			end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
 			appointmentTitle.value,
 			description.value,
-			type.value!!
+			type.value!!,
+			false
 		)
 	
 	private fun checkAppointment(): String? {

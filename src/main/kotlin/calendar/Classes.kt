@@ -1,5 +1,6 @@
 package calendar
 
+import calendar.Timing.UTCEpochMinuteToLocalDateTime
 import javafx.scene.paint.*
 import logic.Configs
 import logic.LogType
@@ -7,6 +8,10 @@ import logic.Warning
 import logic.getConfig
 import logic.getLangString
 import logic.log
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.DayOfWeek
 import java.time.DayOfWeek.FRIDAY
 import java.time.DayOfWeek.MONDAY
@@ -19,17 +24,6 @@ import java.time.LocalDate
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
-
-// implemented in companion object to have static method to create object
-interface CreateFromStorage {
-	fun <T> fromJSON(map: Map<String, Any>): T?
-}
-
-interface Storage {
-	val id: Long
-	
-	fun toJSON(): Map<String, Any>
-}
 
 interface CellDisplay {
 	val notes: MutableList<Note>
@@ -70,9 +64,11 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 	
 	//fun toDate(): String = "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
 	
-	fun addAppointments(appointmentslist: Map<DayOfWeek, List<Appointment>>) {
-		for((key, value) in appointmentslist) {
-			allDays[key]?.appointments?.addAll(value)
+	fun addAppointments(list: List<Appointment>) {
+		val appointmentlist = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
+		list.forEach { appointmentlist[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
+		for((key, value) in appointmentlist) {
+			allDays[key]?.appointments?.addAll(value ?: listOf())
 		}
 	}
 	
@@ -82,9 +78,9 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 
 data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisplay {
 	
-	val appointments: MutableList<Appointment> = mutableListOf()
+	var appointments: MutableList<Appointment> = mutableListOf()
 	
-	override val notes: MutableList<Note> = mutableListOf()
+	override var notes: MutableList<Note> = mutableListOf()
 	
 	fun getAppointmentsLimited(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
 	
@@ -92,153 +88,201 @@ data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisp
 }
 
 
-open class Appointment(
-	val start: Long, val duration: Long, val title: String, val description: String, val type: Types, override val id: Long
-): Storage {
-	
-	// create New
-	constructor(start: Long, duration: Long, title: String, description: String, type: Types): this(
-		start, duration, title, description, type, getFreeID(IDGroups.Appointments)
-	)
-	
-	override fun toJSON(): Map<String, Any> {
-		return mapOf(
-			"id" to id.toDouble(), "start" to start.toDouble(), "duration" to duration.toDouble(), "type" to type.toString(), "title" to title, "description" to description
-		)
-	}
-	
-	companion object: CreateFromStorage {
-		override fun <Appointment> fromJSON(map: Map<String, Any>): Appointment? {
-			try {
-				return Appointment(
-					(map["start"] as Double).toLong(),
-					(map["duration"] as Double).toLong(),
-					map["title"] as String,
-					map["description"] as String,
-					Types.valueOf(map["type"] as String),
-					(map["id"] as Double).toLong()
-				) as Appointment
-			} catch(e: Exception) {
-				Warning("an35f7", e, "Exception creating Appointment from map:$map")
-				return null
-			}
-		}
-	}
-	
-	override fun toString(): String = "[{$id} $start - $duration  $type | $title: $description]"
-}
 
-class WeekAppointment(
-	val day: DayOfWeek, start: Long, duration: Long, title: String, description: String, type: Types, id: Long
-): Appointment(start, duration, title, description, type, id) {
+class Appointment(id: EntityID<Long>): LongEntity(id) {
 	
-	@Suppress("unused")
-	constructor(day: DayOfWeek, start: Long, duration: Long, title: String, description: String, type: Types): this(
-		day, start, duration, title, description, type, getFreeID(IDGroups.Appointments)
-	)
+	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 	
-	override fun toJSON(): Map<String, Any> {
-		return mapOf(
-			"id" to id.toDouble(),
-			"day" to day.toString(),
-			"start" to start.toDouble(),
-			"duration" to duration.toDouble(),
-			"type" to type.toString(),
-			"title" to title,
-			"description" to description
-		)
-	}
-	
-	companion object: CreateFromStorage {
-		override fun <WeekAppointment> fromJSON(map: Map<String, Any>): WeekAppointment? {
-			try {
-				return WeekAppointment(
-					DayOfWeek.valueOf((map["day"] as String).uppercase()),
-					(map["start"] as Double).toLong(),
-					(map["duration"] as Double).toLong(),
-					map["title"] as String,
-					map["description"] as String,
-					Types.valueOf(map["type"] as String),
-					(map["id"] as Double).toLong()
-				) as WeekAppointment
-			} catch(e: Exception) {
-				Warning("an35f7", e, "Exception creating Appointment from map:$map")
-				return null
-			}
-		}
-	}
-	
-	override fun toString(): String = "[{$id} $day: $start - $duration  $type | $title: $description]"
-}
-
-
-data class Note(
-	val time: Long, var text: String, val type: Types, val files: List<File>, override val id: Long
-): Storage {
-	constructor(time: Long, text: String, type: Types, file: List<File>): this(
-		time, text, type, file, getFreeID(IDGroups.Notes)
-	)
-	
-	override fun toJSON(): Map<String, Any> {
-		val files = mutableListOf<Map<String, Any>>()
-		for(t in this.files) t.toJSON().let { files.add(it) }
-		
-		return mapOf(
-			"id" to id.toDouble(), "time" to time.toDouble(), "text" to text, "type" to type.toString(), "files" to files.toList()
-		)
-	}
-	
-	companion object: CreateFromStorage {
-		override fun <Note> fromJSON(map: Map<String, Any>): Note? {
-			try {
-				val tmp = map["files"] as List<*>
-				val files = mutableListOf<File>()
-				for(t in tmp) {
-					@Suppress("UNCHECKED_CAST")
-					File.fromJSON<File>(t as Map<String, Any>)?.let { files.add(it) }
+	companion object {
+		fun new(_start: Long, _duration: Long, _title: String, _description: String, _type: Types, _week: Boolean): Appointment {
+			return transaction {
+				return@transaction Appointments.new {
+					start = _start
+					duration = _duration
+					title = _title
+					description = _description
+					type = _type
+					week = _week
 				}
-				
-				return Note(
-					(map["time"] as Double).toLong(), map["text"] as String, Types.valueOf(map["type"] as String), files, (map["id"] as Double).toLong()
-				) as Note
-			} catch(e: Exception) {
-				Warning("an35f7", e, "Exception creating Note from map:$map")
-				return null
 			}
 		}
 	}
 	
-	override fun toString(): String = "[{$id} $time $type $files]"
-}
-
-data class File(
-	val data: ByteArray, val name: String, val origin: String, override val id: Long
-): Storage {
+	private var dbStart by AppointmentTable.start
+	private var dbDuration by AppointmentTable.duration
+	private var dbTitle by AppointmentTable.title
+	private var dbDescription by AppointmentTable.description
+	private var dbType by AppointmentTable.type
+	private var dbWeek by AppointmentTable.week
 	
-	constructor(data: ByteArray, name: String, origin: String): this(
-		data, name, origin, getFreeID(IDGroups.Files)
-	)
+	var start: Long
+		get() = dbStart
+		set(value) {
+			transaction {
+				dbStart = value
+			}
+		}
 	
-	@Suppress("unused")
-	constructor(file: java.io.File): this(file.inputStream().readAllBytes(), file.name, file.absolutePath)
+	var duration
+		get() = dbDuration
+		set(value) {
+			transaction {
+				dbDuration = value
+			}
+		}
+	var title: String
+		get() = dbTitle
+		set(value) {
+			transaction {
+				dbTitle = value
+			}
+		}
+	var description: String
+		get() = dbDescription
+		set(value) {
+			transaction {
+				dbDescription = value
+			}
+		}
+	var type: Types
+		get() = Types.valueOf(dbType)
+		set(value) {
+			transaction {
+				dbType = value.toString()
+			}
+		}
+	var week: Boolean
+		get() = dbWeek
+		set(value) {
+			transaction {
+				dbWeek = value
+			}
+		}
 	
-	override fun toJSON(): Map<String, Any> {
-		return mapOf(
-			"id" to id.toDouble(), "data" to data.toList(), "name" to name, "origin" to origin
-		)
+	fun remove() {
+		transaction {
+			delete()
+		}
 	}
 	
-	companion object: CreateFromStorage {
-		override fun <File> fromJSON(map: Map<String, Any>): File? {
-			try {
-				@Suppress("UNCHECKED_CAST") val f = File(
-					(map["data"] as List<Byte>).toByteArray(), map["name"] as String, map["origin"] as String, (map["id"] as Double).toLong()
-				)
-				return f as File
-			} catch(e: Exception) {
-				Warning("an35f7", e, "Exception creating NoteFile from map:$map")
-				return null
+	override fun toString(): String = "[${if(week) "Week" else "Day"}{$id} $start - $duration  $type | $title: $description]"
+}
+
+
+class Note(id: EntityID<Long>): LongEntity(id) {
+	
+	object Notes: LongEntityClass<Note>(NoteTable)
+	
+	companion object {
+		fun new(_time: Long, _text: String, _type: Types, _week: Boolean, _file: File?): Note {
+			return transaction {
+				return@transaction Notes.new {
+					time = _time
+					text = _text
+					type = _type
+					week = _week
+//					file = _file
+				}
 			}
+		}
+	}
+	
+	private var dbTime by NoteTable.time
+	private var dbText by NoteTable.text
+	private var dbType by NoteTable.type
+	private var dbWeek by NoteTable.week
+//	private var dbFile by File.Files referencedOn NoteTable.files
+	
+	var time: Long
+		get() = dbTime
+		set(value) {
+			transaction {
+				dbTime = value
+			}
+		}
+	var text
+		get() = dbText
+		set(value) {
+			transaction {
+				dbText = value
+			}
+		}
+	var type: Types
+		get() = Types.valueOf(dbType)
+		set(value) {
+			transaction {
+				dbType = value.toString()
+			}
+		}
+	var week: Boolean
+		get() = dbWeek
+		set(value) {
+			transaction {
+				dbWeek = value
+			}
+		}
+	
+	//	var file: File
+//		get() = dbFile
+//		set(value) {
+//			dbFile = value
+//		}
+	fun remove() {
+		transaction {
+			delete()
+		}
+	}
+	
+	//	override fun toString(): String = "[{$id} $time $type $file]"
+	override fun toString(): String = "[{$id} $time $type]"
+	
+}
+
+class File(id: EntityID<Long>): LongEntity(id) {
+	
+	object Files: LongEntityClass<File>(FileTable)
+	
+	companion object {
+		fun new(_data: ByteArray, _name: String, _origin: String): File {
+			return transaction {
+				return@transaction Files.new {
+					data = _data
+					name = _name
+					origin = _origin
+				}
+			}
+		}
+	}
+	
+	private var dbData by FileTable.data
+	private var dbName by FileTable.name
+	private var dbOrigin by FileTable.origin
+	
+	var data: ByteArray
+		get() = dbData.encodeToByteArray()
+		set(value) {
+			transaction {
+				dbData = value.decodeToString()
+			}
+		}
+	var name: String
+		get() = dbName
+		set(value) {
+			transaction {
+				dbName = value
+			}
+		}
+	var origin: String
+		get() = dbOrigin
+		set(value) {
+			transaction {
+				dbOrigin = value
+			}
+		}
+	
+	fun remove() {
+		transaction {
+			delete()
 		}
 	}
 	
@@ -251,7 +295,6 @@ data class Types(val name: String, val color: Color) {
 	override fun toString(): String = name
 	
 	companion object {
-		
 		private val types: MutableList<Types> = mutableListOf()
 		
 		fun clonetypes() = types.toCollection(mutableListOf())

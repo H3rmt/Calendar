@@ -1,3 +1,4 @@
+import calendar.initDb
 import calendar.loadCalendarData
 import frame.frameInit
 import javafx.beans.value.*
@@ -21,6 +22,8 @@ fun main() {
 	log("Updating Logger with config data", LogType.IMPORTANT)
 	updateLogger()
 	log("Updated Logger", LogType.IMPORTANT)
+	
+	initDb()
 	
 	log("preparing Appointments", LogType.IMPORTANT)
 	log("preparing Notes", LogType.IMPORTANT)

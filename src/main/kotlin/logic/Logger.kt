@@ -79,13 +79,14 @@ fun log(message: Any?, type: LogType = LogType.NORMAL) {
 		callerStr += " " + caller.methodName
 		
 		
-		val mess = message.toString().replace("\n", "\\n ")
+		val mess = message.toString()
+		val messstrip = message.toString().replace("\n", "\\n")
 		
 		when(type) {
-			LogType.LOW -> log(Log(Level.CONFIG, mess, callerStr))
-			LogType.NORMAL -> log(Log(Level.INFO, mess, callerStr))
-			LogType.IMPORTANT -> log(Log(Important(), mess, callerStr))
-			LogType.WARNING -> log(Log(Level.WARNING, mess, callerStr))
+			LogType.LOW -> log(Log(Level.CONFIG, messstrip, callerStr))
+			LogType.NORMAL -> log(Log(Level.INFO, messstrip, callerStr))
+			LogType.IMPORTANT -> log(Log(Important(), messstrip, callerStr))
+			LogType.WARNING -> log(Log(Level.WARNING, messstrip, callerStr))
 			LogType.ERROR -> log(Log(Level.SEVERE, mess, callerStr))
 		}
 	}

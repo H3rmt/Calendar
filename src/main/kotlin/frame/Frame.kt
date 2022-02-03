@@ -71,7 +71,7 @@ fun frameInit() {
 		log(writer, LogType.ERROR)
 		
 		// uncomment if errorPopup should be disabled  enable in Release
-		it.consume()
+		// it.consume()
 	}
 	
 	log("launching Application", LogType.IMPORTANT)
@@ -150,7 +150,9 @@ fun createmenubar(pane: BorderPane): MenuBar {
 				createMenuItem(this@menu, "Github", "") {
 					log("Open Github", LogType.IMPORTANT)
 					try {
-						Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
+						runAsync {
+							Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
+						}
 					} catch(e: Exception) {
 						log("failed to open browser", LogType.WARNING)
 					}
