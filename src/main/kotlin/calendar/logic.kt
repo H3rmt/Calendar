@@ -44,8 +44,8 @@ fun changeMonth(right: Boolean) {
 	preparedWeekNotes.remove(calendarDisplay.month.minus(if(right) 2 else -2))
 	preparedsingleAppointments.remove(calendarDisplay.month.minus(if(right) 2 else -2))
 	
-	prepareMonthAppointments(calendarDisplay.month.plus(if(right) 1 else -1))
-	prepareMonthNotes(calendarDisplay.month.plus(if(right) 1 else -1))
+	prepareMonthAppointments(calendarDisplay.month.plus(if(right) 1 else -1), calendarDisplay.year)
+	prepareMonthNotes(calendarDisplay.month.plus(if(right) 1 else -1), calendarDisplay.year)
 	
 	val data = generateMonth(calendarDisplay)
 	currentMonth.clear()
@@ -69,12 +69,12 @@ fun loadCalendarData() {
 	
 	run {
 		prepareWeekAppointments()
-		prepareMonthAppointments(calendarDisplay.month.minus(1))
-		prepareMonthNotes(calendarDisplay.month.minus(1))
-		prepareMonthAppointments(calendarDisplay.month)
-		prepareMonthNotes(calendarDisplay.month)
-		prepareMonthAppointments(calendarDisplay.month.plus(1))
-		prepareMonthNotes(calendarDisplay.month.plus(1))
+		prepareMonthAppointments(calendarDisplay.month.minus(1), calendarDisplay.year)
+		prepareMonthNotes(calendarDisplay.month.minus(1), calendarDisplay.year)
+		prepareMonthAppointments(calendarDisplay.month, calendarDisplay.year)
+		prepareMonthNotes(calendarDisplay.month, calendarDisplay.year)
+		prepareMonthAppointments(calendarDisplay.month.plus(1), calendarDisplay.year)
+		prepareMonthNotes(calendarDisplay.month.plus(1), calendarDisplay.year)
 	}
 	
 	val data = generateMonth(calendarDisplay)
@@ -83,9 +83,9 @@ fun loadCalendarData() {
 }
 
 
-fun generateMonth(monthTime: LocalDate): MutableList<Week> {
-	log("generating Month", LogType.LOW)
-	var time: LocalDate = monthTime.withDayOfMonth(1)
+fun generateMonth(_time: LocalDate): MutableList<Week> {
+	log("generating Month", LogType.NORMAL)
+	var time: LocalDate = _time.withDayOfMonth(1)
 	val month = time.month
 	
 	val dayOffset = time.dayOfWeek.value
@@ -116,7 +116,7 @@ fun generateMonth(monthTime: LocalDate): MutableList<Week> {
 		
 		log("added week: $week", LogType.LOW)
 		weeks.add(week)
-	} while(time.month == monthTime.month && time.dayOfMonth > 1)
+	} while(time.month == time.month && time.dayOfMonth > 1)
 	
 	return weeks
 }
@@ -149,8 +149,7 @@ fun prepareWeekAppointments() {
 	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.weekAppointmentsFile)), List::class.java).forEach { list ->
 		log("reading Week Appointment: $list", LogType.LOW)
 		WeekAppointment.fromJSON<WeekAppointment>(list)?.run {
-			if(!preparedweeklyAppointments.containsKey(day))
-				preparedweeklyAppointments[day] = mutableListOf()
+			preparedweeklyAppointments.putIfAbsent(day, mutableListOf())
 			
 			usedID(IDGroups.Appointments, id)
 			preparedweeklyAppointments[day]!!.add(this)
@@ -165,26 +164,30 @@ fun prepareWeekAppointments() {
  * loads appointments for this
  * the leading and trailing month
  */
-private fun prepareMonthAppointments(Month: Month) {
-	File(ConfigFiles.appointmentsDir + "/$Month.json").run {
+private fun prepareMonthAppointments(Month: Month, _time: Int) {
+	File(ConfigFiles.appointmentsDir + "${_time}/$Month.json").run {
 		if(!exists()) {
-			log("file with appointments for $Month not found", LogType.LOW)
+			log("file with appointments for ${_time}/$Month not found", LogType.LOW)
 			return
 		}
 	}
 	resetGroup(IDGroups.Appointments)
-	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/$Month.json")), List::class.java).forEach { list ->
+	Json().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/${_time}/$Month.json")), List::class.java).forEach { list ->
 		log("reading single Appointment: $list", LogType.LOW)
 		Appointment.fromJSON<Appointment>(list)?.run {
 			val time = UTCEpochMinuteToLocalDateTime(start)
+			val timeEnd = UTCEpochMinuteToLocalDateTime(start + duration)
 			
-			if(!preparedsingleAppointments.containsKey(time.month))
-				preparedsingleAppointments[time.month] = mutableMapOf()
-			if(!preparedsingleAppointments[time.month]!!.containsKey(time.dayOfMonth))
-				preparedsingleAppointments[time.month]!![time.dayOfMonth] = mutableListOf()
+			var tempTime = time
+			do {
+				preparedsingleAppointments.putIfAbsent(tempTime.month, mutableMapOf())
+				preparedsingleAppointments[tempTime.month]!!.putIfAbsent(tempTime.dayOfMonth, mutableListOf())
+				
+				preparedsingleAppointments[tempTime.month]!![tempTime.dayOfMonth]!!.add(this)
+				tempTime = tempTime.plusDays(1)
+			} while(tempTime <= timeEnd)
 			
 			usedID(IDGroups.Appointments, id)
-			preparedsingleAppointments[time.month]!![time.dayOfMonth]!!.add(this)
 			log("loaded single Appointment: $this", LogType.LOW)
 		}
 	}
@@ -192,55 +195,52 @@ private fun prepareMonthAppointments(Month: Month) {
 }
 
 
-fun prepareMonthNotes(Month: Month) {
-	File(ConfigFiles.notesDir + "/$Month.json").run {
+fun prepareMonthNotes(Month: Month, _time: Int) {
+	File(ConfigFiles.notesDir + "/${_time}/$Month.json").run {
 		if(!exists()) {
-			log("file with notes for $Month not found", LogType.LOW)
+			log("file with notes for /${_time}/$Month not found", LogType.LOW)
 			return
 		}
 	}
 	resetGroup(IDGroups.Notes)
-	Json().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesDir + "/$Month.json")), Map::class.java).forEach { (name, list) ->
-		when(name) {
-			"Day Notes" -> {
-				log("reading Day Notes", LogType.LOW)
-				list.forEach {
-					Note.fromJSON<Note>(it)?.apply {
-						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
-						
-						if(!preparedDayNotes.containsKey(time.month))
-							preparedDayNotes[time.month] = mutableMapOf()
-						if(!preparedDayNotes[time.month]!!.containsKey(time.dayOfMonth))
-							preparedDayNotes[time.month]!![time.dayOfMonth] = mutableListOf()
-						
-						preparedDayNotes[time.month]!![time.dayOfMonth]!!.add(this)
-						
-						usedID(IDGroups.Notes, id)
-						log("loaded Day Note: $this", LogType.LOW)
+	Json().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesDir + "/${_time}/$Month.json")), Map::class.java)
+		.forEach { (name, list) ->
+			when(name) {
+				"Day Notes" -> {
+					log("reading Day Notes", LogType.LOW)
+					list.forEach {
+						Note.fromJSON<Note>(it)?.apply {
+							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
+							
+							preparedDayNotes.putIfAbsent(time.month, mutableMapOf())
+							preparedDayNotes[time.month]!!.putIfAbsent(time.dayOfMonth, mutableListOf())
+							
+							preparedDayNotes[time.month]!![time.dayOfMonth]!!.add(this)
+							
+							usedID(IDGroups.Notes, id)
+							log("loaded Day Note: $this", LogType.LOW)
+						}
 					}
+					log("prepared day Notes $preparedDayNotes", LogType.NORMAL)
 				}
-				log("prepared day Notes $preparedDayNotes", LogType.NORMAL)
-			}
-			"Week Notes" -> {
-				log("reading Week Notes", LogType.LOW)
-				list.forEach {
-					Note.fromJSON<Note>(it)?.apply {
-						val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
-						
-						if(!preparedWeekNotes.containsKey(time.month))
-							preparedWeekNotes[time.month] = mutableMapOf()
-						if(!preparedWeekNotes[time.month]!!.containsKey(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)))
-							preparedWeekNotes[time.month]!![time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)] = mutableListOf()
-						
-						preparedWeekNotes[time.month]!![time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]!!.add(this)
-						
-						usedID(IDGroups.Notes, id)
-						log("loaded week Note: $this", LogType.LOW)
+				"Week Notes" -> {
+					log("reading Week Notes", LogType.LOW)
+					list.forEach {
+						Note.fromJSON<Note>(it)?.apply {
+							val time = LocalDate.ofInstant(Instant.ofEpochSecond(time * 60), ZoneOffset.UTC)
+							
+							preparedWeekNotes.putIfAbsent(time.month, mutableMapOf())
+							preparedWeekNotes[time.month]!!.putIfAbsent(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR), mutableListOf())
+							
+							preparedWeekNotes[time.month]!![time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]!!.add(this)
+							
+							usedID(IDGroups.Notes, id)
+							log("loaded week Note: $this", LogType.LOW)
+						}
 					}
+					log("prepared Week Notes $preparedWeekNotes", LogType.NORMAL)
 				}
-				log("prepared Week Notes $preparedWeekNotes", LogType.NORMAL)
 			}
 		}
-	}
 	
 }

@@ -93,7 +93,7 @@ data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisp
 
 
 open class Appointment(
-	val start: Long, val duration: Long, val title: String, val description: String, val type: Types, override val id: Long, val daystart: Int = Timing.startofDayMinutes(start)
+	val start: Long, val duration: Long, val title: String, val description: String, val type: Types, override val id: Long
 ): Storage {
 	
 	// create New
@@ -173,7 +173,7 @@ class WeekAppointment(
 
 
 data class Note(
-	val time: Long, var text: String, val type: Types, val files: List<File>, override val id: Long, val daystart: Int = Timing.startofDayMinutes(time)
+	val time: Long, var text: String, val type: Types, val files: List<File>, override val id: Long
 ): Storage {
 	constructor(time: Long, text: String, type: Types, file: List<File>): this(
 		time, text, type, file, getFreeID(IDGroups.Notes)

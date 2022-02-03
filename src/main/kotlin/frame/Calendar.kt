@@ -186,16 +186,16 @@ fun createcalendartab(pane: TabPane): Tab {
 										closeAppointmentOpenAnimations.add(temp[2] as MutableList<Animation>)
 										
 										week.allDays.values.forEach {
-											val tmp = createCellGraphics(it, this@hbox, openTimeline, closeTimeline, expand)
-											cells.add(tmp[0] as VBox)
+											val graphic = createCellGraphics(it, this@hbox, openTimeline, closeTimeline, expand)
+											cells.add(graphic[0] as VBox)
 											
 											if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
-												(tmp[0] as VBox).addClass(Styles.CalendarTableView.markedTableCell)
+												(graphic[0] as VBox).addClass(Styles.CalendarTableView.markedTableCell)
 											
 											@Suppress("UNCHECKED_CAST")
-											openAppointmentOpenAnimations.add(tmp[1] as MutableList<Animation>)
+											openAppointmentOpenAnimations.add(graphic[1] as MutableList<Animation>)
 											@Suppress("UNCHECKED_CAST")
-											closeAppointmentOpenAnimations.add(tmp[2] as MutableList<Animation>)
+											closeAppointmentOpenAnimations.add(graphic[2] as MutableList<Animation>)
 										}
 										
 										val hoveredCell = SimpleIntegerProperty(-1)
@@ -209,7 +209,7 @@ fun createcalendartab(pane: TabPane): Tab {
 												cell.removeClass(Styles.CalendarTableView.hoveredTableCell)
 												hoveredCell.value = -1
 											}
-											cell.widthProperty().addListener { _, _, _ -> selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
+											cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
 										}
 										
 										var openPreparation = false
@@ -373,7 +373,7 @@ fun createCellGraphics(
 								
 								preparedWeekNotes[data.time.month]?.clear()
 								preparedDayNotes[data.time.month]?.clear()
-								prepareMonthNotes(data.time.month)
+								prepareMonthNotes(data.time.month, data.time.year)
 								val weeksData = generateMonth(calendarDisplay)
 								currentMonth.clear()
 								currentMonth.addAll(weeksData)
@@ -433,7 +433,7 @@ fun createCellGraphics(
 									
 									preparedWeekNotes[data.time.month]?.clear()
 									preparedDayNotes[data.time.month]?.clear()
-									prepareMonthNotes(data.time.month)
+									prepareMonthNotes(data.time.month,data.time.year)
 									val weeksData = generateMonth(calendarDisplay)
 									currentMonth.clear()
 									currentMonth.addAll(weeksData)

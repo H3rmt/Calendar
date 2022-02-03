@@ -249,7 +249,7 @@ class Styles: Stylesheet() {
 		}
 		
 		WeekTab.ActiveTimeCell {
-			backgroundColor += Color.CORNFLOWERBLUE
+			backgroundColor += Color.DARKGRAY
 		}
 		
 		WeekTab.UnHoveredInnerTimeCell {

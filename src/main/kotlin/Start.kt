@@ -18,7 +18,7 @@ fun main() {
 	initConfigs()
 	log("read Configs:$configs", LogType.IMPORTANT)
 	
-	log("Updating Logger with config data\n", LogType.IMPORTANT)
+	log("Updating Logger with config data", LogType.IMPORTANT)
 	updateLogger()
 	log("Updated Logger", LogType.IMPORTANT)
 	
