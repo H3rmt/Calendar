@@ -1,13 +1,13 @@
 package calendar
 
+import calendar.File.Files.referrersOn
 import calendar.Timing.UTCEpochMinuteToLocalDateTime
 import javafx.scene.paint.*
 import logic.Configs
-import logic.LogType
-import logic.Warning
 import logic.getConfig
 import logic.getLangString
-import logic.log
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -50,10 +50,11 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 		MONDAY to Monday, TUESDAY to Tuesday, WEDNESDAY to Wednesday, THURSDAY to Thursday, FRIDAY to Friday, SATURDAY to Saturday, SUNDAY to Sunday
 	)
 	
-	fun getallAppointmentsSorted(): Map<Types, List<Appointment>> {
-		val list = mutableMapOf<Types, MutableList<Appointment>>()
+	fun getallAppointmentsSorted(): Map<Type, List<Appointment>> {
+		val list = mutableMapOf<Type, MutableList<Appointment>>()
 		for(appointment in appointments) {
-			if(list[appointment.type] == null) list[appointment.type] = mutableListOf()
+			if(list[appointment.type] == null)
+				list[appointment.type] = mutableListOf()
 			list[appointment.type]!!.add(appointment)
 		}
 		return list
@@ -94,7 +95,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 	
 	companion object {
-		fun new(_start: Long, _duration: Long, _title: String, _description: String, _type: Types, _week: Boolean): Appointment {
+		fun new(_start: Long, _duration: Long, _title: String, _description: String, _type: Type, _week: Boolean): Appointment {
 			return transaction {
 				return@transaction Appointments.new {
 					start = _start
@@ -112,7 +113,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	private var dbDuration by AppointmentTable.duration
 	private var dbTitle by AppointmentTable.title
 	private var dbDescription by AppointmentTable.description
-	private var dbType by AppointmentTable.type
+	private var dbType by Type.Types referencedOn AppointmentTable.type
 	private var dbWeek by AppointmentTable.week
 	
 	var start: Long
@@ -124,40 +125,20 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 		}
 	
 	var duration
-		get() = dbDuration
-		set(value) {
-			transaction {
-				dbDuration = value
-			}
-		}
+		get() = transaction { dbDuration }
+		set(value) = transaction { dbDuration = value }
 	var title: String
-		get() = dbTitle
-		set(value) {
-			transaction {
-				dbTitle = value
-			}
-		}
+		get() = transaction { dbTitle }
+		set(value) = transaction { dbTitle = value }
 	var description: String
-		get() = dbDescription
-		set(value) {
-			transaction {
-				dbDescription = value
-			}
-		}
-	var type: Types
-		get() = Types.valueOf(dbType)
-		set(value) {
-			transaction {
-				dbType = value.toString()
-			}
-		}
+		get() = transaction { dbDescription }
+		set(value) = transaction { dbDescription = value }
+	var type: Type
+		get() = transaction { dbType }
+		set(value) = transaction { dbType = value }
 	var week: Boolean
-		get() = dbWeek
-		set(value) {
-			transaction {
-				dbWeek = value
-			}
-		}
+		get() = transaction { dbWeek }
+		set(value) = transaction { dbWeek = value }
 	
 	fun remove() {
 		transaction {
@@ -174,14 +155,13 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	object Notes: LongEntityClass<Note>(NoteTable)
 	
 	companion object {
-		fun new(_time: Long, _text: String, _type: Types, _week: Boolean, _file: File?): Note {
+		fun new(_time: Long, _text: String, _type: Type, _week: Boolean): Note {
 			return transaction {
 				return@transaction Notes.new {
 					time = _time
 					text = _text
 					type = _type
 					week = _week
-//					file = _file
 				}
 			}
 		}
@@ -189,44 +169,25 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	
 	private var dbTime by NoteTable.time
 	private var dbText by NoteTable.text
-	private var dbType by NoteTable.type
+	private var dbType by Type.Types referencedOn NoteTable.type
 	private var dbWeek by NoteTable.week
-//	private var dbFile by File.Files referencedOn NoteTable.files
+	private val dbFiles by File.Files referrersOn FileTable.note
 	
 	var time: Long
-		get() = dbTime
-		set(value) {
-			transaction {
-				dbTime = value
-			}
-		}
-	var text
-		get() = dbText
-		set(value) {
-			transaction {
-				dbText = value
-			}
-		}
-	var type: Types
-		get() = Types.valueOf(dbType)
-		set(value) {
-			transaction {
-				dbType = value.toString()
-			}
-		}
+		get() = transaction { dbTime }
+		set(value) = transaction { dbTime = value }
+	var text: String
+		get() = transaction { dbText }
+		set(value) = transaction { dbText = value }
+	var type: Type
+		get() = transaction { dbType }
+		set(value) = transaction { dbType = value }
 	var week: Boolean
-		get() = dbWeek
-		set(value) {
-			transaction {
-				dbWeek = value
-			}
-		}
+		get() = transaction { dbWeek }
+		set(value) = transaction { dbWeek = value }
+	val files: List<File>
+		get() = transaction { dbFiles.toList() }
 	
-	//	var file: File
-//		get() = dbFile
-//		set(value) {
-//			dbFile = value
-//		}
 	fun remove() {
 		transaction {
 			delete()
@@ -259,26 +220,14 @@ class File(id: EntityID<Long>): LongEntity(id) {
 	private var dbOrigin by FileTable.origin
 	
 	var data: ByteArray
-		get() = dbData.encodeToByteArray()
-		set(value) {
-			transaction {
-				dbData = value.decodeToString()
-			}
-		}
+		get() = transaction { dbData.encodeToByteArray() }
+		set(value) = transaction { dbData = value.decodeToString() }
 	var name: String
-		get() = dbName
-		set(value) {
-			transaction {
-				dbName = value
-			}
-		}
+		get() = transaction { dbName }
+		set(value) = transaction { dbName = value }
 	var origin: String
-		get() = dbOrigin
-		set(value) {
-			transaction {
-				dbOrigin = value
-			}
-		}
+		get() = transaction { dbOrigin }
+		set(value) = transaction { dbOrigin = value }
 	
 	fun remove() {
 		transaction {
@@ -290,42 +239,50 @@ class File(id: EntityID<Long>): LongEntity(id) {
 }
 
 
-data class Types(val name: String, val color: Color) {
+class Type(id: EntityID<Int>): IntEntity(id) {
 	
-	override fun toString(): String = name
+	object Types: IntEntityClass<Type>(TypeTable)
 	
 	companion object {
-		private val types: MutableList<Types> = mutableListOf()
-		
-		fun clonetypes() = types.toCollection(mutableListOf())
-		
-		fun valueOf(s: String): Types {
-			types.forEach {
-				if(it.name.equals(s, true)) return@valueOf it
-			}
-			throw IllegalArgumentException("$s not a valid Type of $types")
-		}
-		
-		private fun createType(type: Map<String, String>): Types? {
-			try {
-				if(type.containsKey("name") && type.containsKey("color")) {
-					return Types(type["name"]!!, Color.valueOf(type["color"]!!))
-				}
-			} catch(e: Exception) {
-				Warning("o2wi35", e, "Exception creating Type from map:$type")
-			}
-			return null
-		}
-		
-		fun createTypes(data: List<Map<String, String>>) {
-			types.clear()
-			data.forEach {
-				createType(it)?.apply {
-					types.add(this)
-					log("added type $this", LogType.LOW)
+		fun new(_name: String, _color: Color): Type {
+			return transaction {
+				return@transaction Types.new {
+					name = _name
+					color = _color
 				}
 			}
-			log("created types $types", LogType.NORMAL)
 		}
 	}
+	
+	private var dbName by TypeTable.name
+	private var dbColor by TypeTable.color
+	
+	var name: String
+		get() = transaction { dbName }
+		set(value) = transaction { dbName = value }
+	var color: Color
+		get() = transaction { Color.valueOf(dbColor) }
+		set(value) = transaction { dbColor = value.toString() }
+	
+	
+	fun remove() {
+		transaction {
+			delete()
+		}
+	}
+	
+	override fun toString(): String = "[{$id} $name $color]"
+	
+	override fun equals(other: Any?): Boolean {
+		return if(other !is Type) false
+		else other.name == name && other.color == color
+	}
+	
+	override fun hashCode(): Int {
+		var result = name.hashCode()
+		result = 31 * result + color.hashCode()
+		return result
+	}
 }
+
+

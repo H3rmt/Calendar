@@ -1,5 +1,6 @@
 package calendar
 
+import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -9,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun initDb() {
 	Database.connect("jdbc:sqlite:data/data.sqlite")
 	transaction {
-		SchemaUtils.create(AppointmentTable, FileTable, NoteTable)
+		SchemaUtils.create(AppointmentTable, FileTable, NoteTable, TypeTable)
 	}
 }
 
@@ -45,25 +46,36 @@ fun getWeekAppointments(): List<Appointment> {
 	}
 }
 
+fun getTypes(): List<Type> {
+	return transaction {
+		return@transaction Type.Types.all().toList()
+	}
+}
+
 object AppointmentTable: LongIdTable() {
 	val start = long("start")
 	val duration = long("duration")
 	val title = text("title")
 	val description = text("description")
 	val week = bool("week")
-	val type = varchar("type", 20)
+	val type = reference("type", TypeTable)
 }
 
 object NoteTable: LongIdTable() {
 	val time = long("time")
 	val text = text("text")
-	val type = varchar("type", 20)
+	val type = reference("type", TypeTable)
 	val week = bool("week")
-//	val files = reference("files", FileTable)
 }
 
 object FileTable: LongIdTable() {
 	val data = text("data")
 	val name = text("text")
 	val origin = text("origin")
+	val note = reference("note", NoteTable)
+}
+
+object TypeTable: IntIdTable() {
+	val name = text("name")
+	val color = varchar("color", 20)
 }

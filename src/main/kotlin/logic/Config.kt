@@ -1,6 +1,5 @@
 package logic
 
-import calendar.Types
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.FieldNamingStrategy
 import com.google.gson.Gson
@@ -85,9 +84,6 @@ fun initConfigs() {
 	
 	stacktrace = getConfig(Configs.PrintStacktrace)
 	log("set stacktrace $stacktrace", LogType.LOW)
-	
-	Types.createTypes(getConfig(Configs.AppointmentTypes))
-	log("loaded Types ${Types.clonetypes()}", LogType.LOW)
 }
 
 /**
@@ -199,7 +195,7 @@ fun Warning(code: String, exception: Exception, log: Any) {
  */
 enum class Configs {
 	Language, Debug, PrintLogs, LogFormat, DebugLogFormat, StoreLogs, PrintStacktrace,
-	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen, AppointmentTypes
+	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen
 }
 
 object ConfigFiles {

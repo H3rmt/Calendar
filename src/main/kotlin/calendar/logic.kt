@@ -24,15 +24,7 @@ val currentMonthName: SimpleStringProperty = SimpleStringProperty()
  */
 fun changeMonth(right: Boolean) {
 	calendarDisplay = calendarDisplay.plusMonths(if(right) 1 else -1)
-	
-	currentMonthName.set(getLangString(calendarDisplay.month.name))
-	if(calendarDisplay.year != now.year)
-		currentMonthName.value += "  " + calendarDisplay.year
-	log("changing Month to ${calendarDisplay.month.name}")
-	
-	val data = generateMonth(calendarDisplay)
-	currentMonth.clear()
-	currentMonth.addAll(data)
+	loadCalendarData()
 }
 
 /**
@@ -49,7 +41,6 @@ fun loadCalendarData() {
 	currentMonth.clear()
 	currentMonth.addAll(data)
 }
-
 
 fun generateMonth(_time: LocalDate): MutableList<Week> {
 	log("generating Month", LogType.NORMAL)

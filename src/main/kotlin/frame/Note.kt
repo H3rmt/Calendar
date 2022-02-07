@@ -4,8 +4,8 @@ import calendar.CellDisplay
 import calendar.Day
 import calendar.Note
 import calendar.Timing.toUTCEpochMinute
-import calendar.Types
 import calendar.Week
+import calendar.getTypes
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
@@ -52,7 +52,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					}
 					
 					addType = combobox {
-						items = Types.clonetypes().map { it.name }.toObservable()
+						items = getTypes().map { it.name }.toObservable()
 					}
 					add = button {
 						text = "Add"
@@ -72,7 +72,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					}
 					vbox {
 						add.action {
-							val note = Note.new(cell.time.toUTCEpochMinute(), "", Types.valueOf(addType.value), cell is Week, null)
+							val note = Note.new(cell.time.toUTCEpochMinute(), "", getTypes().find { it.name == addType.value }!!, cell is Week)
 							lateinit var tb: TitledPane
 							tb = noteTab(this, addType.value, "", {
 								note.text = it

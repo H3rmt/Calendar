@@ -5,8 +5,9 @@ import calendar.Day
 import calendar.Timing
 import calendar.Timing.UTCEpochMinuteToLocalDateTime
 import calendar.Timing.toUTCEpochMinute
-import calendar.Types
+import calendar.Type
 import calendar.Week
+import calendar.getTypes
 import calendar.now
 import datetimepicker.DateTimePicker
 import datetimepicker.dateTimePicker
@@ -327,7 +328,7 @@ class NewAppointmentPopup: Fragment() {
 	private var end: Property<LocalDateTime> = scope.end.toProperty()
 	private var appointmentTitle: Property<String> = "".toProperty()
 	private var description: Property<String> = "".toProperty()
-	private var type: Property<Types?> = SimpleObjectProperty<Types>(null)
+	private var type: Property<Type?> = SimpleObjectProperty(null)
 	
 	private var savecall: (Appointment) -> Unit = scope.save
 	
@@ -374,7 +375,7 @@ class NewAppointmentPopup: Fragment() {
 				prefHeight = Int.MAX_VALUE.px
 			}
 			field("Type") {
-				combobox(values = Types.clonetypes(), property = type)
+				combobox(values = getTypes(), property = type)
 			}
 			field(getLangString("start to end")) {
 				startpicker = dateTimePicker(dateTime = start)

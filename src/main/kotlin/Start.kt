@@ -16,6 +16,16 @@ fun main() {
 	initLogger()
 	log("initialised Logger", LogType.IMPORTANT)
 	
+	init()
+	
+	log("starting Frame", LogType.IMPORTANT)
+	frameInit()
+	
+	log("exiting Frame", LogType.IMPORTANT)
+	exitProcess(1)
+}
+
+fun init() {
 	initConfigs()
 	log("read Configs:$configs", LogType.IMPORTANT)
 	
@@ -28,12 +38,6 @@ fun main() {
 	log("preparing Appointments", LogType.IMPORTANT)
 	log("preparing Notes", LogType.IMPORTANT)
 	loadCalendarData()
-	
-	log("starting Frame", LogType.IMPORTANT)
-	frameInit()
-	
-	log("exiting Frame", LogType.IMPORTANT)
-	exitProcess(1)
 }
 
 fun <T> T.lg(): T {

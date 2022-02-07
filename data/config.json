@@ -10,23 +10,5 @@
 	"AnimationSpeed": 200,
 	"AnimationDelay": 80,
 	"MaxDayAppointments": 8,
-	"ExpandNotesOnOpen": true,
-	"AppointmentTypes": [
-		{
-			"name": "Work",
-			"color": "#c000ff"
-		},
-		{
-			"name": "Sport",
-			"color": "#e50000"
-		},
-		{
-			"name": "School",
-			"color": "ORANGE"
-		},
-		{
-			"name": "Schoolll",
-			"color": "Green"
-		}
-	]
+	"ExpandNotesOnOpen": true
 }
