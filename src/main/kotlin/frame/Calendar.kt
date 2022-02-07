@@ -217,9 +217,12 @@ fun createcalendartab(pane: TabPane): Tab {
 												Thread {
 													Thread.sleep(getConfig<Double>(Configs.AnimationDelay).toLong())
 													if(openPreparation) {
+														val skip = closeTimeline.totalDuration - closeTimeline.currentTime
 														openPreparation = false
-														openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
-														openTimeline.play()
+														closeAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
+														closeTimeline.stop()
+														openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
+														openTimeline.playFrom(skip)
 													}
 												}.start()
 											}
@@ -230,13 +233,18 @@ fun createcalendartab(pane: TabPane): Tab {
 												if(openPreparation)
 													openPreparation = false
 												else {
+													val skip = openTimeline.totalDuration - openTimeline.currentTime
 													openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
 													openTimeline.stop()
-													closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
-													closeTimeline.play()
+													closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
+													closeTimeline.playFrom(skip)
 												}
 											}
 										}
+										
+										// jumpTo end of close, so first open animation starts at beginning as closeTimeline.currentTime is at end
+										closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.jumpTo(it.totalDuration) } }
+										closeTimeline.jumpTo(closeTimeline.totalDuration)
 										
 										onMouseClicked = EventHandler {
 											if(selectedIndex.value != index) {
@@ -267,7 +275,7 @@ fun createcalendartab(pane: TabPane): Tab {
 										selectedIndex.addListener(ChangeListener { _, old, new ->
 											if(new != index) {
 												removeClass(Styles.CalendarTableView.selectedColumn)
-												if(old == index && (new != -1 || new == -2)) {
+												if(old == index && (new != -1)) {
 													onMouseExited.handle(null)
 												}
 											}

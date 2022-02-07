@@ -257,13 +257,14 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																NewAppointmentPopup.open(
 																	false,
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
-																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1)
-																) { app: Appointment ->
-																	log("Created:$app") // TODO multi day
-																	week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
-																	updateTable()
-																	updateCallback()
-																}
+																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1),
+																	save = { app: Appointment ->
+																		log("Created:$app") // TODO multi day
+																		week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
+																		updateTable()
+																		updateCallback()
+																	}
+																)
 															}
 														}
 														menu(getLangString("remove appointment")) {
@@ -273,13 +274,14 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																		NewAppointmentPopup.open(
 																			false,
 																			Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
-																			Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1)
-																		) { app: Appointment ->
-																			log("Removed:$app") // TODO multi day
-																			week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.remove(app)
-																			updateTable()
-																			updateCallback()
-																		}
+																			Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1),
+																			save = { app: Appointment ->
+																				log("Removed:$app") // TODO multi day
+																				week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.remove(app)
+																				updateTable()
+																				updateCallback()
+																			}
+																		)
 																	}
 																}
 															}

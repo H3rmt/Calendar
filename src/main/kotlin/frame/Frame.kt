@@ -270,8 +270,8 @@ object Tabmanager {
 	 *                       and return ab Tab
 	 *
 	 *                       Examples:
-	 *                       > ::createWeekTab   (fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab)
-	 *                       > ::createNoteTab   (fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab)
+	 *                       > ::createWeekTab(fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab)
+	 *                       > ::createNoteTab(fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab)
 	 *
 	 * @param methodArgs add all extra parameters apart from the tabpane here
 	 *
@@ -280,10 +280,10 @@ object Tabmanager {
 	 *                       > data
 	 */
 	fun openTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
-		val newtab = tabs.getOrElse(identifier) { createFunction.call(tabpane, *methodArgs).also { tabs[identifier] = it } }
-		newtab.setOnClosed { tabs.remove(identifier) }
+		val newTab = tabs.getOrElse(identifier) { createFunction.call(tabpane, *methodArgs).also { tabs[identifier] = it } }
+		newTab.setOnClosed { tabs.remove(identifier) }
 		
-		tabpane.selectionModel.select(newtab)
+		tabpane.selectionModel.select(newTab)
 	}
 	
 	/**
