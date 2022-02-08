@@ -5,7 +5,6 @@ import calendar.Day
 import calendar.Timing
 import calendar.Timing.UTCEpochMinuteToLocalDateTime
 import calendar.Timing.toUTCEpochMinute
-import calendar.Type
 import calendar.Week
 import calendar.getTypes
 import calendar.now
@@ -328,7 +327,7 @@ class NewAppointmentPopup: Fragment() {
 	private var end: Property<LocalDateTime> = scope.end.toProperty()
 	private var appointmentTitle: Property<String> = "".toProperty()
 	private var description: Property<String> = "".toProperty()
-	private var type: Property<Type?> = SimpleObjectProperty(null)
+	private var type: Property<String> = "".toProperty()
 	
 	private var savecall: (Appointment) -> Unit = scope.save
 	
@@ -343,7 +342,7 @@ class NewAppointmentPopup: Fragment() {
 			end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
 			appointmentTitle.value,
 			description.value,
-			type.value!!,
+			getTypes().find { it.name == type.value }!!,
 			false
 		)
 	
@@ -375,7 +374,7 @@ class NewAppointmentPopup: Fragment() {
 				prefHeight = Int.MAX_VALUE.px
 			}
 			field("Type") {
-				combobox(values = getTypes(), property = type)
+				combobox(values = getTypes().map { it.name }, property = type)
 			}
 			field(getLangString("start to end")) {
 				startpicker = dateTimePicker(dateTime = start)
