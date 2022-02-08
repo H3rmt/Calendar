@@ -62,9 +62,7 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 	
 	val date: String
 		get() = "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
-	
-	//fun toDate(): String = "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
-	
+
 	fun addAppointments(list: List<Appointment>) {
 		val appointmentlist = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
 		list.forEach { appointmentlist[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
@@ -117,13 +115,8 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	private var dbWeek by AppointmentTable.week
 	
 	var start: Long
-		get() = dbStart
-		set(value) {
-			transaction {
-				dbStart = value
-			}
-		}
-	
+		get() = transaction { dbStart }
+		set(value) = transaction { dbStart = value }
 	var duration
 		get() = transaction { dbDuration }
 		set(value) = transaction { dbDuration = value }
@@ -147,6 +140,21 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	}
 	
 	override fun toString(): String = "[${if(week) "Week" else "Day"}{$id} $start - $duration  $type | $title: $description]"
+	
+	override fun equals(other: Any?): Boolean {
+		return if(other !is Appointment) false
+		else start == other.start && duration == other.duration && title == other.title && description == other.description && type == other.type && week == other.week
+	}
+	
+	override fun hashCode(): Int {
+		var result = start.hashCode()
+		result = 31 * result + duration.hashCode()
+		result = 31 * result + title.hashCode()
+		result = 31 * result + description.hashCode()
+		result = 31 * result + type.hashCode()
+		result = 31 * result + week.hashCode()
+		return result
+	}
 }
 
 
@@ -194,9 +202,21 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	//	override fun toString(): String = "[{$id} $time $type $file]"
-	override fun toString(): String = "[{$id} $time $type]"
+	override fun toString(): String = "[{$id} $time $type |$files| ]"
 	
+	override fun equals(other: Any?): Boolean {
+		return if(other !is Note) false
+		else other.time == time && text == other.text && type == other.type && week == other.week && files == other.files
+	}
+	
+	override fun hashCode(): Int {
+		var result = time.hashCode()
+		result = 31 * result + text.hashCode()
+		result = 31 * result + type.hashCode()
+		result = 31 * result + week.hashCode()
+		result = 31 * result + files.hashCode()
+		return result
+	}
 }
 
 class File(id: EntityID<Long>): LongEntity(id) {
@@ -236,6 +256,18 @@ class File(id: EntityID<Long>): LongEntity(id) {
 	}
 	
 	override fun toString(): String = "[{$id} $name ${data.size} $origin]"
+	
+	override fun equals(other: Any?): Boolean {
+		return if(other !is File) false
+		else other.name == name && data.contentEquals(other.data) && origin == other.origin
+	}
+	
+	override fun hashCode(): Int {
+		var result = data.contentHashCode()
+		result = 31 * result + name.hashCode()
+		result = 31 * result + origin.hashCode()
+		return result
+	}
 }
 
 
