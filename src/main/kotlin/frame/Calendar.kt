@@ -84,8 +84,8 @@ fun createcalendartab(pane: TabPane): Tab {
 					// Top bar
 					hbox(spacing = 5.0, alignment = Pos.CENTER) {
 						padding = Insets(3.0)
-						style {
-							backgroundColor += Color.WHITE
+						style(append = true) {
+//							backgroundColor += Color.WHITE
 						}
 						scrollbarWidth = paddingRightProperty
 						label("") {
@@ -150,9 +150,11 @@ fun createcalendartab(pane: TabPane): Tab {
 								}
 							}
 							
+							
 							style {
 								borderWidth += box(1.px)
 								borderColor += box(Color.WHITE)
+								prefHeight = Int.MAX_VALUE.px
 							}
 							vbox(spacing = 5.0, alignment = Pos.CENTER) {
 								style(append = true) {
@@ -195,6 +197,7 @@ fun createcalendartab(pane: TabPane): Tab {
 											closeAppointmentOpenAnimations.add(graphic[2] as MutableList<Animation>)
 										}
 										
+										
 										val hoveredCell = SimpleIntegerProperty(-1)
 										
 										for((cellIndex, cell) in cells.withIndex()) {
@@ -214,31 +217,30 @@ fun createcalendartab(pane: TabPane): Tab {
 										onMouseEntered = EventHandler {
 											if(selectedIndex.value != index) {
 												openPreparation = true
-												Thread {
+												runAsync {
 													Thread.sleep(getConfig<Double>(Configs.AnimationDelay).toLong())
 													if(openPreparation) {
-														val skip = closeTimeline.totalDuration - closeTimeline.currentTime
 														openPreparation = false
+														val skip = closeTimeline.totalDuration - closeTimeline.currentTime
+														
 														closeAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
 														closeTimeline.stop()
 														openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
 														openTimeline.playFrom(skip)
 													}
-												}.start()
+												}
 											}
 										}
 										
 										onMouseExited = EventHandler {
 											if(selectedIndex.value != index) {
-												if(openPreparation)
-													openPreparation = false
-												else {
-													val skip = openTimeline.totalDuration - openTimeline.currentTime
-													openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
-													openTimeline.stop()
-													closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
-													closeTimeline.playFrom(skip)
-												}
+												openPreparation = false
+												val skip = openTimeline.totalDuration - openTimeline.currentTime
+												
+												openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
+												openTimeline.stop()
+												closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
+												closeTimeline.playFrom(skip)
 											}
 										}
 										
