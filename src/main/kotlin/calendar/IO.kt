@@ -33,7 +33,12 @@ fun getWeekNotes(from: Long, to: Long): List<Note> {
 fun getAppointments(from: Long, to: Long): List<Appointment> {
 	return transaction {
 		return@transaction Appointment.Appointments.all().filter {
-			from < it.start + it.duration && it.start < to
+//			log("from:  $from   to: $to")
+//			log("start: ${it.start}  end: ${it.start + it.duration}")
+//			log("$from <= ${it.start} + ${it.duration}: ${from <= it.start + it.duration}")
+//			log("$to > ${it.start}: ${to > it.start}")
+//			log("")
+			from <= it.start + it.duration && to > it.start
 		}
 	}
 }

@@ -8,3 +8,5 @@
 # Log files
 *.log
 *.lck
+
+/data/data.sqlite

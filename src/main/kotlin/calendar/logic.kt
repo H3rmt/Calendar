@@ -58,8 +58,9 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 			val day = Day(time, time.month == month)
 			
 			day.notes = getNotes(time.toUTCEpochMinute()).toMutableList()
+//			log(time.dayOfWeek, LogType.IMPORTANT)
 			day.appointments = getAppointments(time.toUTCEpochMinute(), time.plusDays(1).toUTCEpochMinute()).toMutableList()
-			
+//			log(day.appointments, LogType.WARNING)
 			days.add(day)
 			time = time.plusDays(1)
 		} while(time.dayOfWeek.value != 1)

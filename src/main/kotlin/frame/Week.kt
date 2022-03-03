@@ -169,7 +169,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 												style {
 													fontSize = 20.px
 												}
-												text = String.format("%02d:00", hour)
+												text = String.format("%02d", hour)
 											}
 										}
 									}
@@ -202,20 +202,8 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 													}
 													// appointments
 													val cellappointments = appointments.filter {
-														val start = UTCEpochMinuteToLocalDateTime(it.start)
-														val end = UTCEpochMinuteToLocalDateTime(it.start + it.duration)
-														
-														return@filter when(day.time) {
-															start.toLocalDate() -> {
-																start.hour <= hour
-															}
-															end.toLocalDate() -> {
-																end.hour > hour
-															}
-															else -> {
-																true
-															}
-														}
+														val from = LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0).toUTCEpochMinute()
+														from <= it.start + it.duration && from + 60 > it.start
 													}
 													
 													for((ind, app) in cellappointments.withIndex()) {
