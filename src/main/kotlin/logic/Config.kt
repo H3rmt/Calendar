@@ -1,6 +1,5 @@
 package logic
 
-import calendar.Types
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.FieldNamingStrategy
 import com.google.gson.Gson
@@ -44,11 +43,11 @@ var configs: MutableMap<Configs, Any> = mutableMapOf()
  * must be the first method called to read from data files
  * like fonts or language
  *
- * @see ConfigFiles.configfile
+ * @see ConfigFiles.configFile
  * @see ConfigFiles.dataDirectory
  */
 fun initConfigs() {
-	val file = File(ConfigFiles.configfile)
+	val file = File(ConfigFiles.configFile)
 	if(!file.exists()) {
 		if(dataDirectory.isNotEmpty()) {
 			val dir = File(dataDirectory)
@@ -56,11 +55,11 @@ fun initConfigs() {
 		}
 		file.createNewFile()
 		file.writeText(configDefault)
-		log("created default config:${ConfigFiles.configfile}", LogType.WARNING)
+		log("created default config:${ConfigFiles.configFile}", LogType.WARNING)
 	}
 	
 	try {
-		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(ConfigFiles.configfile)), Map::class.java)
+		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(ConfigFiles.configFile)), Map::class.java)
 		load.forEach {
 			try {
 				configs[getJson().fromJson(
@@ -83,11 +82,8 @@ fun initConfigs() {
 	language = Language(getConfig(Configs.Language))
 	log("loaded language $language", LogType.LOW)
 	
-	stacktrace = getConfig(Configs.Printstacktrace)
+	stacktrace = getConfig(Configs.PrintStacktrace)
 	log("set stacktrace $stacktrace", LogType.LOW)
-	
-	Types.createTypes(getConfig(Configs.AppointmentTypes))
-	log("loaded Types ${Types.clonetypes()}", LogType.LOW)
 }
 
 /**
@@ -198,8 +194,8 @@ fun Warning(code: String, exception: Exception, log: Any) {
  * only Configs in this Config enum are loaded from config.json
  */
 enum class Configs {
-	Language, Debug, Printlogs, Logformat, Printstacktrace,
-	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen, AppointmentTypes
+	Language, Debug, PrintLogs, LogFormat, DebugLogFormat, StoreLogs, PrintStacktrace,
+	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen
 }
 
 object ConfigFiles {
@@ -209,7 +205,7 @@ object ConfigFiles {
 	
 	const val languageFile = "$dataDirectory/lang.json"
 	
-	const val configfile = "$dataDirectory/config.json"
+	const val configFile = "$dataDirectory/config.json"
 	
 	const val weekAppointmentsFile = "$dataDirectory/Week appointments.json"
 	
@@ -227,7 +223,7 @@ lateinit var language: Language
  */
 fun getLangString(str: String): String = language[str]
 
-const val emptyDefault = "{\n\n}"
+const val emptyDefault = "[\n\n]"
 
 const val configDefault = "{\n" +
 		  "\t\"Language\": \"en\",\n" +

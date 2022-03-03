@@ -1,218 +1,86 @@
 package calendar
 
-import calendar.Timing.UTCEpochMinuteToLocalDateTime
-import logic.ConfigFiles
-import logic.Exit
-import logic.LogType
-import logic.getJson
-import logic.getJsonReader
-import logic.log
-import java.io.File
-import java.io.FileReader
-import java.time.temporal.IsoFields
+import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.transaction
 
 
-fun saveDayNote(note: Note, add: Boolean = true) {
-	val noteTime = UTCEpochMinuteToLocalDateTime(note.time)
-	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
-		if(!exists()) {
-			log("file with notes for ${noteTime.month.name} not found", LogType.LOW)
-			createNewFile()
-			writeText("{\n\t\"Week Notes\": [],\n\t\"Day Notes\": []\n}")
-		}
-	}
-	
-	resetGroup(IDGroups.Notes)
-	val tmpDayNotes: MutableMap<Int, MutableList<Note>> = mutableMapOf()
-	
-	getJson().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesDir + "/${noteTime.month.name}.json")), Map::class.java)
-		.forEach { (name, list) ->
-			when(name) {
-				"Day Notes" -> {
-					log("reading Day Notes", LogType.LOW)
-					list.forEach {
-						Note.fromJSON<Note>(it)?.apply {
-							val time = UTCEpochMinuteToLocalDateTime(time)
-							
-							if(!tmpDayNotes.containsKey(time.dayOfMonth))
-								tmpDayNotes[time.dayOfMonth] = mutableListOf()
-							
-							tmpDayNotes[time.dayOfMonth]!!.add(this)
-							
-							usedID(IDGroups.Notes, id)
-							log("loaded Day Note: $this", LogType.LOW)
-						}
-					}
-					log("loaded temp day Notes $tmpDayNotes", LogType.NORMAL)
-				}
-			}
-		}
-	
-	tmpDayNotes[noteTime.dayOfMonth]?.removeIf { it.id == note.id }
-	
-	if(add) {
-		if(!tmpDayNotes.containsKey(noteTime.dayOfMonth))
-			tmpDayNotes[noteTime.dayOfMonth] = mutableListOf()
-		
-		tmpDayNotes[noteTime.dayOfMonth]!!.add(note)
-	}
-	
-	log("new day Notes $tmpDayNotes", LogType.NORMAL)
-	
-	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
-		val original =
-			getJson().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesDir + "/${noteTime.month.name}.json")), Map::class.java)
-				.toMutableMap()
-		
-		val list = mutableListOf<Map<String, Any>>()
-		tmpDayNotes.forEach { list.addAll(it.value.map { note -> note.toJSON() }) }
-		
-		original["Day Notes"] = list as ArrayList<Map<String, Any>>
-		
-		writeText(getJson().toJson(original))
+fun initDb() {
+	Database.connect("jdbc:sqlite:data/data.sqlite")
+	transaction {
+		SchemaUtils.create(AppointmentTable, FileTable, NoteTable, TypeTable)
 	}
 }
 
-fun saveWeekNote(note: Note, add: Boolean = true) {
-	val noteTime = UTCEpochMinuteToLocalDateTime(note.time)
-	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
-		if(!exists()) {
-			log("file with notes for ${noteTime.month.name} not found", LogType.LOW)
-			createNewFile()
-			writeText("{\n\t\"Week Notes\": [],\n\t\"Day Notes\": []\n}")
+fun getNotes(at: Long): List<Note> {
+	return transaction {
+		return@transaction Note.Notes.all().filter {
+			!it.week && at == it.time
 		}
 	}
-	
-	resetGroup(IDGroups.Notes)
-	val tmpWeekNotes: MutableMap<Int, MutableList<Note>> = mutableMapOf()
-	
-	getJson().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesDir + "/${noteTime.month.name}.json")), Map::class.java)
-		.forEach { (name, list) ->
-			when(name) {
-				"Week Notes" -> {
-					log("reading Week Notes", LogType.LOW)
-					list.forEach {
-						Note.fromJSON<Note>(it)?.apply {
-							val time = UTCEpochMinuteToLocalDateTime(time)
-							
-							if(!tmpWeekNotes.containsKey(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)))
-								tmpWeekNotes[time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)] = mutableListOf()
-							
-							tmpWeekNotes[time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]!!.add(this)
-							
-							usedID(IDGroups.Notes, id)
-							log("loaded week Note: $this", LogType.LOW)
-						}
-					}
-					log("loaded temp Week Notes $tmpWeekNotes", LogType.NORMAL)
-				}
-			}
-		}
-	
-	tmpWeekNotes[noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]?.removeIf { it.id == note.id }
-	
-	if(add) {
-		if(!tmpWeekNotes.containsKey(noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)))
-			tmpWeekNotes[noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)] = mutableListOf()
-		
-		tmpWeekNotes[noteTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)]!!.add(note)
-	}
-	
-	log("new Week Notes $tmpWeekNotes", LogType.NORMAL)
-	
-	File(ConfigFiles.notesDir + "/${noteTime.month.name}.json").run {
-		val original =
-			getJson().fromJson<Map<String, ArrayList<Map<String, Any>>>>(getJsonReader(FileReader(ConfigFiles.notesDir + "/${noteTime.month.name}.json")), Map::class.java)
-				.toMutableMap()
-		
-		val list = mutableListOf<Map<String, Any>>()
-		tmpWeekNotes.forEach { list.addAll(it.value.map { note -> note.toJSON() }) }
-		
-		original["Week Notes"] = list as ArrayList<Map<String, Any>>
-		
-		writeText(getJson().toJson(original))
-	}
 }
 
-
-fun saveDayAppointment(appointment: Appointment, add: Boolean = true) {
-	val appointmentTime = UTCEpochMinuteToLocalDateTime(appointment.start)
-	
-	File(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json").run {
-		if(!exists()) {
-			log("file with notes for ${appointmentTime.month.name} not found", LogType.LOW)
-			createNewFile()
-			writeText("[\n\t\n]")
+fun getWeekNotes(from: Long, to: Long): List<Note> {
+	return transaction {
+		return@transaction Note.Notes.all().filter {
+			it.week && from < it.time && it.time < to
 		}
 	}
-	
-	resetGroup(IDGroups.Appointments)
-	val tmpDayAppointments: MutableMap<Int, MutableList<Appointment>> = mutableMapOf()
-	
-	getJson().fromJson<ArrayList<Map<String, Any>>>(getJsonReader(FileReader(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json")), List::class.java)
-		.forEach { list ->
-			log("reading Appointments", LogType.LOW)
-			Appointment.fromJSON<Appointment>(list)?.apply {
-				val time = UTCEpochMinuteToLocalDateTime(appointment.start)
-				
-				if(!tmpDayAppointments.containsKey(time.dayOfMonth))
-					tmpDayAppointments[time.dayOfMonth] = mutableListOf()
-				
-				tmpDayAppointments[time.dayOfMonth]!!.add(this)
-				
-				usedID(IDGroups.Appointments, id)
-				log("loaded Day Note: $this", LogType.LOW)
-			}
+}
+
+fun getAppointments(from: Long, to: Long): List<Appointment> {
+	return transaction {
+		return@transaction Appointment.Appointments.all().filter {
+//			log("from:  $from   to: $to")
+//			log("start: ${it.start}  end: ${it.start + it.duration}")
+//			log("$from <= ${it.start} + ${it.duration}: ${from <= it.start + it.duration}")
+//			log("$to > ${it.start}: ${to > it.start}")
+//			log("")
+			from <= it.start + it.duration && to > it.start
 		}
-	
-	log("loaded temp Day Appointments $tmpDayAppointments", LogType.NORMAL)
-	
-	// removes duplicate / overrides old
-	tmpDayAppointments[appointmentTime.dayOfMonth]?.removeIf { it.id == appointment.id }
-	
-	if(add) {
-		if(!tmpDayAppointments.containsKey(appointmentTime.dayOfMonth))
-			tmpDayAppointments[appointmentTime.dayOfMonth] = mutableListOf()
-		
-		tmpDayAppointments[appointmentTime.dayOfMonth]!!.add(appointment)
-	}
-	
-	log("new day Appointments $tmpDayAppointments", LogType.NORMAL)
-	
-	File(ConfigFiles.appointmentsDir + "/${appointmentTime.month.name}.json").run {
-		val list = mutableListOf<Map<String, Any>>()
-		tmpDayAppointments.forEach { list.addAll(it.value.map { note -> note.toJSON() }) }
-		
-		writeText(getJson().toJson(list))
 	}
 }
 
-val idstorage: MutableMap<IDGroups, MutableList<Long>> =
-	mutableMapOf(IDGroups.Appointments to mutableListOf(), IDGroups.Notes to mutableListOf(), IDGroups.Files to mutableListOf())
-
-enum class IDGroups {
-	Appointments,
-	Notes,
-	Files
-}
-
-fun resetGroup(group: IDGroups) {
-	idstorage[group]!!.clear()
-}
-
-fun usedID(group: IDGroups, id: Long) {
-	if(!idstorage[group]!!.contains(id))
-		idstorage[group]!!.add(id)
-	else {
-		log("duplicate ID $id for group registered $group: ${idstorage[group]}", LogType.WARNING)
-		throw Exit("TODO")
+fun getWeekAppointments(): List<Appointment> {
+	return transaction {
+		return@transaction Appointment.Appointments.all().filter {
+			it.week
+		}
 	}
 }
 
-fun createID(group: IDGroups): Long {
-	val id: Long = idstorage[group]!!.run {
-		sortDescending(); getOrNull(0)?.inc()
-	} ?: 0
-	log("created id $id")
-	return id
+fun getTypes(): List<Type> {
+	return transaction {
+		return@transaction Type.Types.all().toList()
+	}
+}
+
+object AppointmentTable: LongIdTable() {
+	val start = long("start")
+	val duration = long("duration")
+	val title = text("title")
+	val description = text("description")
+	val week = bool("week")
+	val type = reference("type", TypeTable)
+}
+
+object NoteTable: LongIdTable() {
+	val time = long("time")
+	val text = text("text")
+	val type = reference("type", TypeTable)
+	val week = bool("week")
+}
+
+object FileTable: LongIdTable() {
+	val data = text("data")
+	val name = text("text")
+	val origin = text("origin")
+	val note = reference("note", NoteTable)
+}
+
+object TypeTable: IntIdTable() {
+	val name = text("name")
+	val color = varchar("color", 20)
 }

@@ -4,10 +4,8 @@ import calendar.CellDisplay
 import calendar.Day
 import calendar.Note
 import calendar.Timing.toUTCEpochMinute
-import calendar.Types
 import calendar.Week
-import calendar.saveDayNote
-import calendar.saveWeekNote
+import calendar.getTypes
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
@@ -54,7 +52,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					}
 					
 					addType = combobox {
-						items = Types.clonetypes().map { it.name }.toObservable()
+						items = getTypes().map { it.name }.toObservable()
 					}
 					add = button {
 						text = "Add"
@@ -74,23 +72,16 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					}
 					vbox {
 						add.action {
-							val note = Note(cell.time.toUTCEpochMinute(), "", Types.valueOf(addType.value), emptyList())
+							val note = Note.new(cell.time.toUTCEpochMinute(), "", getTypes().find { it.name == addType.value }!!, cell is Week)
 							lateinit var tb: TitledPane
-							tb = noteTab(this, addType.value, true, "", {
+							tb = noteTab(this, addType.value, "", {
 								note.text = it
-								if(cell is Day)
-									saveDayNote(note)
-								else if(cell is Week)
-									saveWeekNote(note)
 								updateCallback()
 							}, {
-								if(cell is Day)
-									saveDayNote(note, false)
-								else if(cell is Week)
-									saveWeekNote(note, false)
 								this.children.remove(noteTabs.first { it == tb })
 								noteTabs.remove(tb)
 								updateCallback()
+								note.remove()
 							})
 							noteTabs.add(0, tb)
 							add.isDisable = true
@@ -98,23 +89,15 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 						
 						for(note in cell.notes) {
 							lateinit var tb: TitledPane
-							tb = noteTab(this, note.type.name, false, note.text, {
+							tb = noteTab(this, note.type.name, note.text, {
 								note.text = (it)
-								if(cell is Day)
-									saveDayNote(note)
-								else if(cell is Week)
-									saveWeekNote(note)
 								updateCallback()
 							}, {
-								if(cell is Day)
-									saveDayNote(note, false)
-								else if(cell is Week)
-									saveWeekNote(note, false)
 								this.children.remove(noteTabs.first { it == tb })
 								noteTabs.remove(tb)
 								updateCallback()
+								note.remove()
 							})
-							
 							noteTabs.add(tb)
 						}
 					}
@@ -130,7 +113,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 	}
 }
 
-fun noteTab(tabs: VBox, title: String, new: Boolean, text: String, saveFun: (String) -> Unit, deleteFun: () -> Unit): TitledPane {
+fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, deleteFun: () -> Unit): TitledPane {
 	// cannot use the EventTarget Functions because they automatically add the
 	// pane to the end of the vbox
 	val pane = TitledPane()
@@ -153,7 +136,7 @@ fun noteTab(tabs: VBox, title: String, new: Boolean, text: String, saveFun: (Str
 				style {
 					fontSize = 15.px
 				}
-				save = button(if(new) getLangString("create") else getLangString("save"))
+				save = button(getLangString("save"))
 				
 				button(getLangString("delete")) {
 					action { deleteFun() }

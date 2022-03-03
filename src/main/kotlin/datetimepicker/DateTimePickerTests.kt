@@ -106,7 +106,10 @@ open class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTi
 			}
 			
 			button = button {
-				imageview(createFXImage("calendar.png"))
+				imageview(createFXImage("datetimechooser.svg")) {
+					fitHeight = 18.0
+					fitWidth = 17.0
+				}
 				prefHeight = 24.5  // -1 because else border shadows outer border
 				action {
 					if(popup.isShowing) {

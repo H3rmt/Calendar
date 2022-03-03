@@ -1,25 +1,14 @@
 {
 	"Language": "en",
-	"debug": false,
-	"printstacktrace": true,
-	"printlogs": true,
-	"logformat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
-	"AnimationSpeed": 300,
-	"AnimationDelay": 120,
+	"Debug": false,
+	"PrintStacktrace": true,
+	"PrintLogs": true,
+	"StoreLogs": true,
+	"LogFormat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
+	"DebugLogFormat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
+	// "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
+	"AnimationSpeed": 200,
+	"AnimationDelay": 80,
 	"MaxDayAppointments": 8,
-	"expandNotesOnOpen": true,
-	"AppointmentTypes": [
-		{
-			"name": "Work",
-			"color": "#c000ff"
-		},
-		{
-			"name": "Sport",
-			"color": "#e50000"
-		},
-		{
-			"name": "School",
-			"color": "ORANGE"
-		}
-	]
+	"ExpandNotesOnOpen": true
 }

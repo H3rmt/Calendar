@@ -4,3 +4,5 @@ man hat dann auch ne Übersicht, über alle Termine mit bestimmter wichtigkeit i
 	notes an die gewissen tage legen und mann sieht dann in ner woche welche Termine man hat
 	und was man bis da erledigen soll
 man kann auch reminder für die Termine machen
+
+Keinen Allround box inset mehr sondern nur rechts
