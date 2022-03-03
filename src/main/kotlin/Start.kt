@@ -1,3 +1,4 @@
+import calendar.initDb
 import calendar.loadCalendarData
 import frame.frameInit
 import javafx.beans.value.*
@@ -15,16 +16,7 @@ fun main() {
 	initLogger()
 	log("initialised Logger", LogType.IMPORTANT)
 	
-	initConfigs()
-	log("read Configs:$configs", LogType.IMPORTANT)
-	
-	log("Updating Logger with config data\n", LogType.IMPORTANT)
-	updateLogger()
-	log("Updated Logger", LogType.IMPORTANT)
-	
-	log("preparing Appointments", LogType.IMPORTANT)
-	log("preparing Notes", LogType.IMPORTANT)
-	loadCalendarData()
+	init()
 	
 	log("starting Frame", LogType.IMPORTANT)
 	frameInit()
@@ -33,24 +25,42 @@ fun main() {
 	exitProcess(1)
 }
 
+fun init() {
+	initConfigs()
+	log("read Configs:$configs", LogType.IMPORTANT)
+	
+	log("Updating Logger with config data", LogType.IMPORTANT)
+	updateLogger()
+	log("Updated Logger", LogType.IMPORTANT)
+	
+	initDb()
+	
+	log("preparing Appointments", LogType.IMPORTANT)
+	log("preparing Notes", LogType.IMPORTANT)
+	loadCalendarData()
+}
+
 fun <T> T.lg(): T {
 	println(this)
 	return this
 }
 
-
-
 fun <T> ObservableValue<T>.lglisten(): ObservableValue<T> {
+	println("lglisten on: $this ")
 	this.addListener { ob, _, _ ->
-		println(ob)
+		println("lglisten:", ob)
 	}
 	return this
 }
 
-fun <T> ObservableValue<T>.listen(listener: (new: T) -> Unit) {
-	this.addListener { _, _, newValue ->
+fun <T> ObservableValue<T>.listen(once: Boolean = false, listener: (new: T) -> Unit) {
+	lateinit var lst: ChangeListener<T>
+	lst = ChangeListener<T> { _, _, newValue ->
 		listener(newValue)
+		if(once)
+			this.removeListener(lst)
 	}
+	this.addListener(lst)
 }
 
 fun println(vararg any: Any) {

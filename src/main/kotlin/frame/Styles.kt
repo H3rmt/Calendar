@@ -213,7 +213,7 @@ class Styles: Stylesheet() {
 		}
 		
 		CalendarTableView.cellAppointTypeLabel {
-			fontSize = 12.px
+			fontSize = 11.px
 		}
 	}
 	
@@ -249,7 +249,7 @@ class Styles: Stylesheet() {
 		}
 		
 		WeekTab.ActiveTimeCell {
-			backgroundColor += Color.CORNFLOWERBLUE
+			backgroundColor += Color.DARKGRAY
 		}
 		
 		WeekTab.UnHoveredInnerTimeCell {

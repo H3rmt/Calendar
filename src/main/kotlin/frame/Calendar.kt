@@ -9,9 +9,6 @@ import calendar.currentMonth
 import calendar.currentMonthName
 import calendar.generateMonth
 import calendar.now
-import calendar.prepareMonthNotes
-import calendar.preparedDayNotes
-import calendar.preparedWeekNotes
 import javafx.animation.*
 import javafx.beans.property.*
 import javafx.collections.*
@@ -83,16 +80,13 @@ fun createcalendartab(pane: TabPane): Tab {
 					addClass(Styles.CalendarTableView.table)
 					
 					lateinit var scrollbarWidth: DoubleProperty
-					lateinit var scrollbarWidthInitial: Number
 					
 					// Top bar
 					hbox(spacing = 5.0, alignment = Pos.CENTER) {
 						padding = Insets(3.0)
-						style {
-							backgroundColor += Color.WHITE
-							paddingRight = 2.0
+						style(append = true) {
+//							backgroundColor += Color.WHITE
 						}
-						scrollbarWidthInitial = paddingRight
 						scrollbarWidth = paddingRightProperty
 						label("") {
 							addClass(Styles.CalendarTableView.tableItem)
@@ -144,21 +138,23 @@ fun createcalendartab(pane: TabPane): Tab {
 						table = scrollpane(fitToWidth = true) {
 							
 							// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-							widthProperty().listen {
+							widthProperty().listen(once = true) {
 								lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 									bar.visibleProperty()
 										.listen {
 											if(it)
-												scrollbarWidth.value = bar.width + scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+												scrollbarWidth.value = bar.width + 2 // 2 padding right of inner vbox
 											else
-												scrollbarWidth.value = scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+												scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
 										}
 								}
 							}
 							
+							
 							style {
 								borderWidth += box(1.px)
 								borderColor += box(Color.WHITE)
+								prefHeight = Int.MAX_VALUE.px
 							}
 							vbox(spacing = 5.0, alignment = Pos.CENTER) {
 								style(append = true) {
@@ -189,17 +185,18 @@ fun createcalendartab(pane: TabPane): Tab {
 										closeAppointmentOpenAnimations.add(temp[2] as MutableList<Animation>)
 										
 										week.allDays.values.forEach {
-											val tmp = createCellGraphics(it, this@hbox, openTimeline, closeTimeline, expand)
-											cells.add(tmp[0] as VBox)
+											val graphic = createCellGraphics(it, this@hbox, openTimeline, closeTimeline, expand)
+											cells.add(graphic[0] as VBox)
 											
 											if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
-												(tmp[0] as VBox).addClass(Styles.CalendarTableView.markedTableCell)
+												(graphic[0] as VBox).addClass(Styles.CalendarTableView.markedTableCell)
 											
 											@Suppress("UNCHECKED_CAST")
-											openAppointmentOpenAnimations.add(tmp[1] as MutableList<Animation>)
+											openAppointmentOpenAnimations.add(graphic[1] as MutableList<Animation>)
 											@Suppress("UNCHECKED_CAST")
-											closeAppointmentOpenAnimations.add(tmp[2] as MutableList<Animation>)
+											closeAppointmentOpenAnimations.add(graphic[2] as MutableList<Animation>)
 										}
+										
 										
 										val hoveredCell = SimpleIntegerProperty(-1)
 										
@@ -212,7 +209,7 @@ fun createcalendartab(pane: TabPane): Tab {
 												cell.removeClass(Styles.CalendarTableView.hoveredTableCell)
 												hoveredCell.value = -1
 											}
-											cell.widthProperty().addListener { _, _, _ -> selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
+											cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
 										}
 										
 										var openPreparation = false
@@ -220,29 +217,36 @@ fun createcalendartab(pane: TabPane): Tab {
 										onMouseEntered = EventHandler {
 											if(selectedIndex.value != index) {
 												openPreparation = true
-												Thread {
+												runAsync {
 													Thread.sleep(getConfig<Double>(Configs.AnimationDelay).toLong())
 													if(openPreparation) {
 														openPreparation = false
-														openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
-														openTimeline.play()
+														val skip = closeTimeline.totalDuration - closeTimeline.currentTime
+														
+														closeAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
+														closeTimeline.stop()
+														openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
+														openTimeline.playFrom(skip)
 													}
-												}.start()
+												}
 											}
 										}
 										
 										onMouseExited = EventHandler {
 											if(selectedIndex.value != index) {
-												if(openPreparation)
-													openPreparation = false
-												else {
-													openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
-													openTimeline.stop()
-													closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.play() } }
-													closeTimeline.play()
-												}
+												openPreparation = false
+												val skip = openTimeline.totalDuration - openTimeline.currentTime
+												
+												openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
+												openTimeline.stop()
+												closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
+												closeTimeline.playFrom(skip)
 											}
 										}
+										
+										// jumpTo end of close, so first open animation starts at beginning as closeTimeline.currentTime is at end
+										closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.jumpTo(it.totalDuration) } }
+										closeTimeline.jumpTo(closeTimeline.totalDuration)
 										
 										onMouseClicked = EventHandler {
 											if(selectedIndex.value != index) {
@@ -263,7 +267,8 @@ fun createcalendartab(pane: TabPane): Tab {
 													::createWeekTab,
 													week,
 													week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
-														log("update from Week triggered")  // TODO Update
+														log("update from Week triggered")
+														updateTable(currentMonth)
 													}
 												)
 											}
@@ -272,7 +277,7 @@ fun createcalendartab(pane: TabPane): Tab {
 										selectedIndex.addListener(ChangeListener { _, old, new ->
 											if(new != index) {
 												removeClass(Styles.CalendarTableView.selectedColumn)
-												if(old == index && (new != -1 || new == -2)) {
+												if(old == index && (new != -1)) {
 													onMouseExited.handle(null)
 												}
 											}
@@ -324,14 +329,22 @@ fun createCellGraphics(
 					padding = box(0.px, 3.px, 2.px, 3.px)
 				}
 				anchorpane {
-					val defaultImg = createFXImage("remind.svg")//if() FXImage("img/remind.svg") else FXImage("img/remind inactive.svg")
+					val defaultImg = if(true)
+						createFXImage("remind.svg")
+					else
+						createFXImage("remind active.svg")
+					val hoveredImg = if(true)
+						createFXImage("remind hovered.svg")
+					else
+						createFXImage("remind active hovered.svg")
+					
 					val img = imageview(defaultImg) {
 						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
 					onMouseClicked = EventHandler { it.consume() }
-					// onMouseEntered = EventHandler { img.image = FXImage("img/remind active.svg") }
+					onMouseEntered = EventHandler { img.image = hoveredImg }
 					onMouseExited = EventHandler { img.image = defaultImg }
 				}
 				
@@ -342,7 +355,15 @@ fun createCellGraphics(
 					addClass(Styles.CalendarTableView.cellLabel)
 				}
 				anchorpane {
-					val defaultImg = if(data.notes.isNotEmpty()) createFXImage("note.svg") else createFXImage("note inactive.svg")
+					val defaultImg = if(data.notes.isEmpty())
+						createFXImage("note.svg")
+					else
+						createFXImage("note active.svg")
+					val hoveredImg = if(data.notes.isEmpty())
+						createFXImage("note hovered.svg")
+					else
+						createFXImage("note active hovered.svg")
+					
 					val img = imageview(defaultImg) {
 						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
@@ -356,17 +377,13 @@ fun createCellGraphics(
 						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createNoteTab, data, {
 							if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
 								log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
-								
-								preparedWeekNotes[data.time.month]?.clear()
-								preparedDayNotes[data.time.month]?.clear()
-								prepareMonthNotes(data.time.month)
 								val weeksData = generateMonth(calendarDisplay)
 								currentMonth.clear()
 								currentMonth.addAll(weeksData)
 							}
 						})
 					}
-					onMouseEntered = EventHandler { img.image = createFXImage("note active.svg") }
+					onMouseEntered = EventHandler { img.image = hoveredImg }
 					onMouseExited = EventHandler { img.image = defaultImg }
 				}
 			}
@@ -393,7 +410,15 @@ fun createCellGraphics(
 				}
 				
 				anchorpane {
-					val defaultImg = if(data.notes.isNotEmpty()) createFXImage("note.svg") else createFXImage("note inactive.svg")
+					val defaultImg = if(data.notes.isEmpty())
+						createFXImage("note.svg")
+					else
+						createFXImage("note active.svg")
+					val hoveredImg = if(data.notes.isEmpty())
+						createFXImage("note hovered.svg")
+					else
+						createFXImage("note active hovered.svg")
+					
 					val img = imageview(defaultImg) {
 						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
@@ -408,10 +433,6 @@ fun createCellGraphics(
 							"WeekNotes${data.WeekOfYear}/${data.time.year}", ::createNoteTab, data, {
 								if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
 									log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
-									
-									preparedWeekNotes[data.time.month]?.clear()
-									preparedDayNotes[data.time.month]?.clear()
-									prepareMonthNotes(data.time.month)
 									val weeksData = generateMonth(calendarDisplay)
 									currentMonth.clear()
 									currentMonth.addAll(weeksData)
@@ -419,7 +440,7 @@ fun createCellGraphics(
 							}
 						)
 					}
-					onMouseEntered = EventHandler { img.image = createFXImage("img/note active.svg") }
+					onMouseEntered = EventHandler { img.image = hoveredImg }
 					onMouseExited = EventHandler { img.image = defaultImg }
 				}
 			}
@@ -547,7 +568,6 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	animations[1].addAll(closeTransitions)
 	
 	return (yCords.getOrNull(yCords.lastIndex)?.plus(sideTopMargin) ?: 0.0)
-	
 }
 
 fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<Animation>>): Double {

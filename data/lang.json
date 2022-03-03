@@ -53,6 +53,8 @@
 		// Week Tab
 		"new appointment": "New Appointment",
 		"description": "Description",
-		"start to end": "Start - End"
+		"start to end": "Start - End",
+		"remove appointment": "remove Appointment",
+		"edit appointment": "edit Appointment"
 	}
 }

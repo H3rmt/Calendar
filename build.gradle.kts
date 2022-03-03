@@ -11,6 +11,7 @@ repositories {
 	mavenCentral()
 }
 
+
 dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.0")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
@@ -23,7 +24,12 @@ dependencies {
 	implementation("com.google.code.gson:gson:2.8.9")
 	
 	implementation("org.apache.xmlgraphics:batik-transcoder:1.14")
-	implementation("com.twelvemonkeys.imageio:imageio-batik:3.7.0")
+	implementation("com.twelvemonkeys.imageio:imageio-batik:3.8.1")
+	
+	implementation("org.jetbrains.exposed:exposed-core:0.37.3")
+	implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
+	implementation("org.jetbrains.exposed:exposed-jdbc:0.36.1")
+	implementation("org.xerial:sqlite-jdbc:3.36.0.3")
 	
 	//testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
 	//testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
@@ -31,5 +37,5 @@ dependencies {
 
 javafx {
 	version = "16"
-	modules("javafx.fxml", "javafx.web", "javafx.media")
+	modules("javafx.web", "javafx.media")
 }

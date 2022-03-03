@@ -14,9 +14,9 @@ import java.util.logging.Logger
  * of webkit performance by com.sun.webkit.perf.PerfLogger
  * as this can't be turned off, the default logLevel
  * is overridden to Off so the PerfLogger created
- * will be disabled and don't print performance because the
- * PlatformLogger used for their creation has a higher level
- * than fine because they somehow use the global logging level
+ * will be disabled and doesn't print performance because the
+ * PlatformLogger used for its creation has a higher level
+ * than fine because they use the global logging level
  * as their logLevel on creation.
  */
 //var logger: Logger = Logger.getGlobal()
@@ -29,11 +29,15 @@ lateinit var fileHandler: FileHandler
 fun updateLogger() {
 	logger.level = if(getConfig(Configs.Debug)) Level.ALL else Level.CONFIG
 	
-	consoleHandler.formatter = SimpleFormatter(getConfig(Configs.Logformat))
+	consoleHandler.formatter = SimpleFormatter(if(getConfig(Configs.Debug)) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
 	fileHandler.formatter = consoleHandler.formatter
 	
-	if(!getConfig<Boolean>(Configs.Printlogs)) {
+	if(!getConfig<Boolean>(Configs.PrintLogs)) {
 		logger.removeHandler(consoleHandler)
+	}
+	
+	if(getConfig(Configs.StoreLogs)) {
+		logger.addHandler(fileHandler)
 	}
 }
 
@@ -44,16 +48,14 @@ fun initLogger() {
 		level = Level.ALL
 		
 		consoleHandler = ConsoleHandler()
-		consoleHandler.formatter = SimpleFormatter("[%1\$tF %1\$tT] |%3\$-10s %4\$s %n")
+		consoleHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		addHandler(consoleHandler)
 		log("added console Handler")
 		
 		fileHandler = FileHandler(ConfigFiles.logfile)
-		fileHandler.formatter = SimpleFormatter("[%1\$tF %1\$tT] |%3\$-10s %4\$s %n")
+		fileHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		fileHandler.level = Level.ALL
-		addHandler(fileHandler)
 		
-		fileHandler.publish(LogRecord(Level.INFO, "Logging start"))
 		log("added file Handler")
 	}
 }
@@ -76,15 +78,18 @@ fun log(message: Any?, type: LogType = LogType.NORMAL) {
 		}*/
 		callerStr += " " + caller.methodName
 		
+		
+		val mess = message.toString()
+		val messstrip = message.toString().replace("\n", "\\n")
+		
 		when(type) {
-			LogType.LOW -> log(Log(Level.CONFIG, "$message", callerStr))
-			LogType.NORMAL -> log(Log(Level.INFO, "$message", callerStr))
-			LogType.IMPORTANT -> log(Log(Important(), "$message", callerStr))
-			LogType.WARNING -> log(Log(Level.WARNING, "$message", callerStr))
-			LogType.ERROR -> log(Log(Level.SEVERE, "$message", callerStr))
+			LogType.LOW -> log(Log(Level.CONFIG, messstrip, callerStr))
+			LogType.NORMAL -> log(Log(Level.INFO, messstrip, callerStr))
+			LogType.IMPORTANT -> log(Log(Important(), messstrip, callerStr))
+			LogType.WARNING -> log(Log(Level.WARNING, messstrip, callerStr))
+			LogType.ERROR -> log(Log(Level.SEVERE, mess, callerStr))
 		}
 	}
-	return
 }
 
 class Log(level: Level, msg: String, private val caller: String): LogRecord(level, msg) {
