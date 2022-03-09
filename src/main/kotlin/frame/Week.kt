@@ -201,12 +201,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 														padding = box(0.px)
 													}
 													// appointments
-													val cellappointments = appointments.filter {
+													val cellAppointments = appointments.filter {
 														val from = LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0).toUTCEpochMinute()
-														from <= it.start + it.duration && from + 60 > it.start
+														from < it.start + it.duration && from + 60 > it.start
 													}
 													
-													for((ind, app) in cellappointments.withIndex()) {
+													for((ind, app) in cellAppointments.withIndex()) {
 														// colored box(es)
 														hbox {
 															gridpaneConstraints {
@@ -256,7 +256,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															}
 														}
 														menu(getLangString("remove appointment")) {
-															cellappointments.forEach { appointment ->
+															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
 																		NewAppointmentPopup.open(
@@ -275,7 +275,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															}
 														}
 														menu(getLangString("edit appointment")) {
-															cellappointments.forEach { appointment ->
+															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
 																	

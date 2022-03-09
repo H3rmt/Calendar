@@ -79,6 +79,5 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 		log("added week: $week", LogType.LOW)
 		weeks.add(week)
 	} while(time.month == _time.month && time.dayOfMonth > 1)
-	
 	return weeks
 }
