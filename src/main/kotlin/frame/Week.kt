@@ -335,15 +335,12 @@ class NewAppointmentPopup: Fragment() {
 		)
 	
 	private fun checkAppointment(): String? {
-		// to long (not supported today) //TODO fixit
-		if((end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()) > 43200) {
-			return "to long timespan"
-		} else if(type.value == null) { // TODO language
-			return "missing type"
+		if(type.value == "") {
+			return getLangString("missing type")
 		} else if(appointmentTitle.value.isEmpty()) {
-			return "missing title"
+			return getLangString("missing title")
 		} else if(end.value.toUTCEpochMinute() < start.value.toUTCEpochMinute()) {
-			return "start must be before end"
+			return getLangString("start must be before end")
 		}
 		return null
 	}
