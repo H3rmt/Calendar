@@ -14,9 +14,9 @@ import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
-import javafx.scene.control.Alert.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
+import javafx.scene.text.*
 import javafx.stage.*
 import listen
 import logic.LogType
@@ -247,7 +247,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1),
 																	save = { app: Appointment ->
-																		log("Created:$app") // TODO multi day
+																		log("Created:$app")
 																		week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
 																		updateTable()
 																		updateCallback()
@@ -278,7 +278,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
-																	
+																		log("not implemented")
 																	}
 																}
 															}
@@ -382,6 +382,15 @@ class NewAppointmentPopup: Fragment() {
 			}
 			
 			buttonbar {
+				textfield(error) {
+					style(append = true) {
+						backgroundColor += Color.TRANSPARENT
+						borderStyle += BorderStrokeStyle.NONE
+						textFill = Color.RED
+						fontSize = 120.percent
+						fontWeight = FontWeight.BOLD
+					}
+				}
 				button(getLangString("Cancel")) {
 					isCancelButton = true
 					action {
@@ -397,10 +406,11 @@ class NewAppointmentPopup: Fragment() {
 							savecall.invoke(appointment)
 							close()
 						} else {
-							val alert = Alert(AlertType.ERROR)  // TODO improve
-							alert.title = "Error"
-							alert.headerText = check
-							alert.show()
+							error.value = check
+//							val alert = Alert(AlertType.ERROR)
+//							alert.title = "Error"
+//							alert.headerText = check
+//							alert.show()
 						}
 					}
 				}
