@@ -63,6 +63,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 				// Table view
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
+					addClass(Styles.disableFocusDraw)
 					
 					lateinit var topMargin: DoubleProperty
 					

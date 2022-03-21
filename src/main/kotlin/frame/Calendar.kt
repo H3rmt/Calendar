@@ -78,6 +78,7 @@ fun createcalendartab(pane: TabPane): Tab {
 				// Table view
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
+					addClass(Styles.disableFocusDraw)
 					
 					lateinit var scrollbarWidth: DoubleProperty
 					
@@ -212,7 +213,7 @@ fun createcalendartab(pane: TabPane): Tab {
 											cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
 										}
 										
-										var openPreparation = false
+										var openPreparation: Boolean = false
 										
 										onMouseEntered = EventHandler {
 											if(selectedIndex.value != index) {

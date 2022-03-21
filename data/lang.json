@@ -55,6 +55,11 @@
 		"description": "Description",
 		"start to end": "Start - End",
 		"remove appointment": "remove Appointment",
-		"edit appointment": "edit Appointment"
+		"edit appointment": "edit Appointment",
+		
+		// Appointment Dialog
+		"missing type": "Missing type",
+		"missing title": "Missing title",
+		"start must be before end": "start must be before end"
 	}
 }
