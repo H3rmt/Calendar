@@ -9,7 +9,7 @@ import tornadofx.*
 class Styles: Stylesheet() {
 	
 	companion object {
-		val disableFocus by cssclass()
+		val disableFocusDraw by cssclass()
 	}
 	
 	object Menubar {
@@ -70,7 +70,7 @@ class Styles: Stylesheet() {
 	
 	
 	init {
-		disableFocus {
+		disableFocusDraw {
 			focusColor = Color.TRANSPARENT
 		}
 	}
