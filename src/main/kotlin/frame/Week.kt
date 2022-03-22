@@ -78,40 +78,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 						label("") {
 							addClass(Styles.CalendarTableView.tableItem)
 						}
-						label("Monday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Tuesday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Wednesday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Thursday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Friday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Saturday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Sunday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						for(day in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
+							label(day) {
+								addClass(Styles.CalendarTableView.tableItem)
+								addClass(Styles.WeekTab.tableTimeHeader)
+								addClass(Styles.CalendarTableView.cellHeaderLabel)
+							}
 						}
 					}
 					

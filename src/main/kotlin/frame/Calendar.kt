@@ -85,47 +85,16 @@ fun createcalendartab(pane: TabPane): Tab {
 					// Top bar
 					hbox(spacing = 5.0, alignment = Pos.CENTER) {
 						padding = Insets(3.0)
-						style(append = true) {
-//							backgroundColor += Color.WHITE
-						}
 						scrollbarWidth = paddingRightProperty
 						label("") {
 							addClass(Styles.CalendarTableView.tableItem)
 						}
-						label("Monday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Tuesday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Wednesday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Thursday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Friday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Saturday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Sunday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						for(day in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
+							label(day) {
+								addClass(Styles.CalendarTableView.tableItem)
+								addClass(Styles.CalendarTableView.tableHeader)
+								addClass(Styles.CalendarTableView.cellHeaderLabel)
+							}
 						}
 					}
 					
