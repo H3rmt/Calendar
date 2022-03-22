@@ -54,12 +54,12 @@
 		"new appointment": "New Appointment",
 		"description": "Description",
 		"start to end": "Start - End",
-		"remove appointment": "remove Appointment",
-		"edit appointment": "edit Appointment",
+		"remove appointment": "Remove Appointment",
+		"edit appointment": "Edit Appointment",
 		
 		// Appointment Dialog
 		"missing type": "Missing type",
 		"missing title": "Missing title",
-		"start must be before end": "start must be before end"
+		"start must be before end": "Start time must be before end time"
 	}
 }

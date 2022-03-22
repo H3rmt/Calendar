@@ -215,8 +215,9 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 													contextmenu {
 														item(getLangString("new appointment")) {
 															action {
-																NewAppointmentPopup.open(
+																NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"),
 																	false,
+																	null,
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1),
 																	save = { app: Appointment ->
@@ -232,17 +233,10 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
-																		NewAppointmentPopup.open(
-																			false,
-																			Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
-																			Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1),
-																			save = { app: Appointment ->
-																				log("Removed:$app") // TODO multi day
-																				week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.remove(app)
-																				updateTable()
-																				updateCallback()
-																			}
-																		)
+																		log("not implemented")
+//																		log("Removed:$app") // TODO multi day
+//																		app.remove()
+//																		week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.remove(app)
 																	}
 																}
 															}
@@ -251,7 +245,17 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
-																		log("not implemented")
+																		NewAppointmentPopup.open(getLangString("edit appointment"), getLangString("Save"),
+																			false,
+																			appointment,
+																			Timing.getNowLocal(), // irrelevant, as they get overridden by values in appointment
+																			Timing.getNowLocal(),
+																			save = { app: Appointment ->
+																				
+																				updateTable()
+																				updateCallback()
+																			}
+																		)
 																	}
 																}
 															}
@@ -284,28 +288,43 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 class NewAppointmentPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
 	
-	private var start: Property<LocalDateTime> = scope.start.toProperty()
-	private var end: Property<LocalDateTime> = scope.end.toProperty()
-	private var appointmentTitle: Property<String> = "".toProperty()
-	private var description: Property<String> = "".toProperty()
-	private var type: Property<String> = "".toProperty()
+	private var appointment: Appointment? = scope.appointment
 	
-	private var savecall: (Appointment) -> Unit = scope.save
+	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
+	private var start: Property<LocalDateTime> = (appointment?.start?.let { UTCEpochMinuteToLocalDateTime(it) } ?: scope.start).toProperty()
+	private var end: Property<LocalDateTime> = (appointment?.let { UTCEpochMinuteToLocalDateTime(it.start + it.duration) } ?: scope.end).toProperty()
+	private var appointmentTitle: Property<String> = (appointment?.title ?: "").toProperty()
+	private var description: Property<String> = (appointment?.description ?: "").toProperty()
+	private var type: Property<String> = (appointment?.type?.name ?: "").toProperty()
+	
+	private var onSave: (Appointment) -> Unit = scope.save
 	
 	private var error: Property<String> = "".toProperty()
 	
-	private lateinit var startpicker: DateTimePicker
-	private lateinit var endpicker: DateTimePicker
+	private lateinit var startPicker: DateTimePicker
+	private lateinit var endPicker: DateTimePicker
 	
-	private fun createAppointment(): Appointment =
-		Appointment.new(
-			start.value.toUTCEpochMinute(),
-			end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
-			appointmentTitle.value,
-			description.value,
-			getTypes().find { it.name == type.value }!!,
-			false
-		)
+	private var windowTitle: String = scope.title
+	private var saveTitle: String = scope.savetitle
+	
+	private fun updateAppointment() {
+		appointment?.let { app ->
+			app.title = appointmentTitle.value
+			app.description = description.value
+			app.start = start.value.toUTCEpochMinute()
+			app.duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()
+			app.type = getTypes().find { it.name == type.value }!!
+		}
+	}
+	
+	private fun createAppointment(): Appointment = Appointment.new(
+		start.value.toUTCEpochMinute(),
+		end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
+		appointmentTitle.value,
+		description.value,
+		getTypes().find { it.name == type.value }!!,
+		false
+	)
 	
 	private fun checkAppointment(): String? {
 		if(type.value == "") {
@@ -327,7 +346,7 @@ class NewAppointmentPopup: Fragment() {
 		style {
 			backgroundColor += Color.WHITE
 		}
-		fieldset(getLangString("New appointment")) {
+		fieldset(getLangString(windowTitle)) {
 			style {
 				prefHeight = Int.MAX_VALUE.px
 			}
@@ -335,8 +354,8 @@ class NewAppointmentPopup: Fragment() {
 				combobox(values = getTypes().map { it.name }, property = type)
 			}
 			field(getLangString("start to end")) {
-				startpicker = dateTimePicker(dateTime = start)
-				endpicker = dateTimePicker(dateTime = end)
+				startPicker = dateTimePicker(dateTime = start)
+				endPicker = dateTimePicker(dateTime = end)
 			}
 			field(getLangString("title")) {
 				textfield(appointmentTitle)
@@ -370,20 +389,18 @@ class NewAppointmentPopup: Fragment() {
 						close()
 					}
 				}
-				button(getLangString("Create")) {
+				button(saveTitle) {
 					isDefaultButton = true
 					action {
 						val check = checkAppointment()
 						if(check == null) {
-							val appointment = createAppointment()
-							savecall.invoke(appointment)
+							if(appointment == null)
+								appointment = createAppointment()
+							updateAppointment()
+							onSave.invoke(appointment!!)
 							close()
 						} else {
 							error.value = check
-//							val alert = Alert(AlertType.ERROR)
-//							alert.title = "Error"
-//							alert.headerText = check
-//							alert.show()
 						}
 					}
 				}
@@ -391,11 +408,12 @@ class NewAppointmentPopup: Fragment() {
 		}
 	}
 	
-	class ItemsScope(val start: LocalDateTime, val end: LocalDateTime, val save: (Appointment) -> Unit): Scope()
+	class ItemsScope(val title: String, val savetitle: String, val appointment: Appointment?, val start: LocalDateTime, val end: LocalDateTime, val save: (Appointment) -> Unit):
+		Scope()
 	
 	companion object {
-		fun open(block: Boolean, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
-			val scope = ItemsScope(start, end, save)
+		fun open(title: String, saveTitle: String, block: Boolean, appointment: Appointment?, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
+			val scope = ItemsScope(title, saveTitle, appointment, start, end, save)
 			return find<NewAppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 		}
 	}
