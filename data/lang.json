@@ -60,6 +60,9 @@
 		// Appointment Dialog
 		"missing type": "Missing type",
 		"missing title": "Missing title",
-		"start must be before end": "Start time must be before end time"
+		"start must be before end": "Start time must be before end time",
+		
+		"remove?": "Remove?",
+		"do you want to remove appointment for %s": "do you want to remove appointment for %s"
 	}
 }
