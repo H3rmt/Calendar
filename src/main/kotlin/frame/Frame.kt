@@ -4,6 +4,8 @@ package frame
 
 
 
+import calendar.Appointment
+import calendar.Timing
 import calendar.loadCalendarData
 import frame.Tabmanager.Secure
 import javafx.application.*
@@ -111,6 +113,21 @@ class MainView: View("Calendar") {
 
 fun createmenubar(pane: BorderPane): MenuBar {
 	return pane.menubar {
+		menu(getLangString("Create")) {
+			createMenuGroup(
+				createMenuItem(this@menu, "Appointment", "Strg + N") {
+					NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"),
+						false,
+						null,
+						Timing.getNowLocal(),
+						Timing.getNowLocal().plusHours(1),
+						save = { app: Appointment ->
+							log("Created:$app")
+						}
+					)
+				}
+			)
+		}
 		menu(getLangString("options")) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Reload", "F5") {
