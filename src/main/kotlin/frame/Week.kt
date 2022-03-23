@@ -233,10 +233,16 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
-																		log("not implemented")
-//																		log("Removed:$app") // TODO multi day
-//																		app.remove()
-//																		week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.remove(app)
+																		val remove = Alert(Alert.AlertType.CONFIRMATION).apply {
+																			title = getLangString("remove?")
+																			headerText = getLangString("do you want to remove appointment for %s") // TODO replace %s with title
+																		}.showAndWait().get()
+																		if(remove.buttonData == ButtonBar.ButtonData.OK_DONE) {
+																			log("Removed:$appointment") // TODO multi day
+																			week.allDays[UTCEpochMinuteToLocalDateTime(appointment.start).dayOfWeek]?.appointments?.remove(appointment)
+																			updateTable()
+																			updateCallback()
+																		}
 																	}
 																}
 															}
