@@ -95,19 +95,19 @@ class Window: App(MainView::class, Styles::class) {
 
 class MainView: View("Calendar") {
 	override val root = borderpane {
-		top = createmenubar(this)
+		top = createMenuBar(this)
 		log("created menubar", LogType.IMPORTANT)
 		
 		center = tabpane {
 			tabDragPolicy = TabPane.TabDragPolicy.REORDER
 			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
-			Tabmanager.tabpane = this@tabpane
+			Tabmanager.tabPane = this@tabpane
 		}
-		log("created tabpane", LogType.IMPORTANT)
+		log("created tabPane", LogType.IMPORTANT)
 	}
 }
 
-fun createmenubar(pane: BorderPane): MenuBar {
+fun createMenuBar(pane: BorderPane): MenuBar {
 	return pane.menubar {
 		menu(getLangString("Create")) {
 			createMenuGroup(
@@ -123,6 +123,9 @@ fun createmenubar(pane: BorderPane): MenuBar {
 					)
 				}
 			)
+			createMenuItem(this@menu, "Reminder", "Strg + R") {
+				log("not implemented", LogType.WARNING)
+			}
 		}
 		menu(getLangString("options")) {
 			createMenuGroup(
@@ -242,7 +245,7 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
  */
 object Tabmanager {
 	
-	lateinit var tabpane: TabPane
+	lateinit var tabPane: TabPane
 	
 	/**
 	 * <identifier, Tab>
@@ -255,7 +258,7 @@ object Tabmanager {
 	 * takes an identifier, a function to create the tab and arguments for that function
 	 * as arguments
 	 *
-	 * adds the tab to the tabpane if new created and sets focus on that tab
+	 * adds the tab to the tabPane if new created and sets focus on that tab
 	 *
 	 * @param identifier this should be a unique identifier for the tab
 	 *                   like the title but with some extra information
@@ -269,24 +272,24 @@ object Tabmanager {
 	 *
 	 * @param createFunction the function to create the tab
 	 *
-	 *                       must take a tabpane as its first parameter
+	 *                       must take a tabPane as its first parameter
 	 *                       and return ab Tab
 	 *
 	 *                       Examples:
 	 *                       > ::createWeekTab(fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab)
 	 *                       > ::createNoteTab(fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab)
 	 *
-	 * @param methodArgs add all extra parameters apart from the tabpane here
+	 * @param methodArgs add all extra parameters apart from the tabPane here
 	 *
 	 *                       Examples:
 	 *                       > week,day
 	 *                       > data
 	 */
 	fun openTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
-		val newTab = tabs.getOrElse(identifier) { createFunction.call(tabpane, *methodArgs).also { tabs[identifier] = it } }
+		val newTab = tabs.getOrElse(identifier) { createFunction.call(tabPane, *methodArgs).also { tabs[identifier] = it } }
 		newTab.setOnClosed { tabs.remove(identifier) }
 		
-		tabpane.selectionModel.select(newTab)
+		tabPane.selectionModel.select(newTab)
 	}
 	
 	/**
@@ -304,10 +307,10 @@ object Tabmanager {
 		fun overrideTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
 			tabs[identifier]?.close()
 			
-			val newtab = createFunction.call(tabpane, *methodArgs).also { tabs[identifier] = it }
-			newtab.setOnClosed { tabs.remove(identifier) }
+			val newTab = createFunction.call(tabPane, *methodArgs).also { tabs[identifier] = it }
+			newTab.setOnClosed { tabs.remove(identifier) }
 			
-			tabpane.selectionModel.select(newtab)
+			tabPane.selectionModel.select(newTab)
 		}
 	}
 	
