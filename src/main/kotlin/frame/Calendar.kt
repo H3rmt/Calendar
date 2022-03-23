@@ -500,7 +500,7 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 			circle(radius = circleWidth / 2) {
 				fill = appointmentEntry.key.color
 			}
-			label("${appointmentEntry.value.size}:${appointmentEntry.key.name}") {
+			label("${appointmentEntry.value}:${appointmentEntry.key.name}") {
 				addClass(Styles.CalendarTableView.cellAppointTypeLabel)
 				maxWidth = width - horizontalLeftMargin - circleWidth
 				ellipsisString = ".."

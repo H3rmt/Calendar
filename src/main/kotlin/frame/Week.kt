@@ -215,9 +215,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 													contextmenu {
 														item(getLangString("new appointment")) {
 															action {
-																NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"),
-																	false,
-																	null,
+																NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"), false, null,
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1),
 																	save = { app: Appointment ->
@@ -251,15 +249,13 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
-																		NewAppointmentPopup.open(getLangString("edit appointment"), getLangString("Save"),
-																			false,
+																		NewAppointmentPopup.open(getLangString("edit appointment"), getLangString("Save"), false,
 																			appointment,
 																			Timing.getNowLocal(), // irrelevant, as they get overridden by values in appointment
 																			Timing.getNowLocal(),
 																			save = { app: Appointment ->
-																				
+																				log("Updated:$app")
 																				updateTable()
-																				updateCallback()
 																			}
 																		)
 																	}
@@ -311,7 +307,7 @@ class NewAppointmentPopup: Fragment() {
 	private lateinit var endPicker: DateTimePicker
 	
 	private var windowTitle: String = scope.title
-	private var saveTitle: String = scope.savetitle
+	private var saveTitle: String = scope.saveTitle
 	
 	private fun updateAppointment() {
 		appointment?.let { app ->
@@ -414,8 +410,10 @@ class NewAppointmentPopup: Fragment() {
 		}
 	}
 	
-	class ItemsScope(val title: String, val savetitle: String, val appointment: Appointment?, val start: LocalDateTime, val end: LocalDateTime, val save: (Appointment) -> Unit):
-		Scope()
+	class ItemsScope(
+		val title: String, val saveTitle: String, val appointment: Appointment?,
+		val start: LocalDateTime, val end: LocalDateTime, val save: (Appointment) -> Unit
+	): Scope()
 	
 	companion object {
 		fun open(title: String, saveTitle: String, block: Boolean, appointment: Appointment?, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
