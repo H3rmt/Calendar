@@ -3,7 +3,7 @@ package logic
 import java.io.File
 import java.io.FileReader
 
-class Language(private val language: Availablelanguages) {
+class Language(private val language: AvailableLanguages) {
 	
 	/**
 	 * linking a String to a translated String
@@ -37,16 +37,13 @@ class Language(private val language: Availablelanguages) {
 	 *
 	 * @see translations
 	 */
-	operator fun get(translation: String): String {
-		try {
-			translations[translation.trim().lowercase()]!!.let {
-				return it
-			}
-		} catch(e: NullPointerException) {
-			log("translation for ${translation.trim().lowercase()} was not found (lang=$language)", LogType.WARNING)
-			return translation
-		}
+	operator fun get(translation: String): String = try {
+		translations[translation.trim().lowercase()]!!
+	} catch(e: NullPointerException) {
+		log("translation for |${translation.trim().lowercase()}| was not found (lang=$language)", LogType.WARNING)
+		translation // return requested string to translate
 	}
+	
 	
 	override fun toString(): String = "Language: $language loaded ${translations.size} Translations"
 	
@@ -57,10 +54,10 @@ class Language(private val language: Availablelanguages) {
 	 * it must be specified here
 	 */
 	@Suppress("Unused")
-	enum class Availablelanguages {
-		en,
-		de,
-		fr,
+	enum class AvailableLanguages {
+		EN,
+		DE,
+		FR,
 	}
 	
 }

@@ -50,12 +50,10 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 		MONDAY to Monday, TUESDAY to Tuesday, WEDNESDAY to Wednesday, THURSDAY to Thursday, FRIDAY to Friday, SATURDAY to Saturday, SUNDAY to Sunday
 	)
 	
-	fun getallAppointmentsSorted(): Map<Type, List<Appointment>> {
-		val list = mutableMapOf<Type, MutableList<Appointment>>()
+	fun getallAppointmentsSorted(): Map<Type, Int> {
+		val list = mutableMapOf<Type, Int>()
 		for(appointment in appointments) {
-			if(list[appointment.type] == null)
-				list[appointment.type] = mutableListOf()
-			list[appointment.type]!!.add(appointment)
+			list[appointment.type] = list[appointment.type]?.plus(1) ?: 1
 		}
 		return list
 	}

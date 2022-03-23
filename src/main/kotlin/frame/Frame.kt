@@ -4,8 +4,8 @@ package frame
 
 
 
-import calendar.loadCalendarData
 import frame.Tabmanager.Secure
+import init
 import javafx.application.*
 import javafx.event.*
 import javafx.scene.control.*
@@ -16,12 +16,9 @@ import logic.Configs
 import logic.Exit
 import logic.LogType
 import logic.Warning
-import logic.configs
 import logic.getConfig
 import logic.getLangString
-import logic.initConfigs
 import logic.log
-import logic.updateLogger
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
@@ -114,17 +111,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 		menu(getLangString("options")) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Reload", "F5") {
-					initConfigs()
-					log("read Configs:$configs", LogType.IMPORTANT)
-					
-					log("Updating Logger with config data\n", LogType.IMPORTANT)
-					updateLogger()
-					log("Updated Logger", LogType.IMPORTANT)
-					
-					log("preparing Appointments", LogType.IMPORTANT)
-					
-					log("preparing Notes", LogType.IMPORTANT)
-					loadCalendarData()
+					init()
 					Secure.overrideTab("calendar", ::createcalendartab)
 				},
 				createMenuItem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
