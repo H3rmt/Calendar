@@ -31,9 +31,12 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 						padding = box(0.px, 15.px, 0.px, 15.px)
 					}
 					button {
-						text = "Test"
-						
+						text = getLangString("New Reminder")
 						addClass(Styles.Tabs.titleButtons)
+						
+						action {
+							log("not implemented", LogType.WARNING)
+						}
 					}
 				}
 				

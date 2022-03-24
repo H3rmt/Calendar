@@ -121,11 +121,11 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 							log("Created:$app")
 						}
 					)
+				},
+				createMenuItem(this@menu, "Reminder", "Strg + R") {
+					log("not implemented", LogType.WARNING)
 				}
 			)
-			createMenuItem(this@menu, "Reminder", "Strg + R") {
-				log("not implemented", LogType.WARNING)
-			}
 		}
 		menu(getLangString("options")) {
 			createMenuGroup(
