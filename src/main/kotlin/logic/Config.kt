@@ -109,7 +109,7 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 			try {
 				return if(T::class.java.isEnum) {
 					try {
-						getJson().fromJson<T>(getJsonReader(StringReader(it as String)), T::class.java)
+						getJson().fromJson(getJsonReader(StringReader(it as String)), T::class.java)
 					} catch(e: NullPointerException) {
 						log("Unable to cast $it into element of ${T::class}", LogType.WARNING)
 						throw Exit("??????", e)
