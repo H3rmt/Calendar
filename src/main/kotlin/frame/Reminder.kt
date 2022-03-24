@@ -1,14 +1,7 @@
 package frame
 
-import calendar.Appointment
-import calendar.Day
-import calendar.Week
-import javafx.beans.property.*
+import javafx.geometry.*
 import javafx.scene.control.*
-import javafx.scene.layout.*
-import javafx.scene.paint.*
-import javafx.scene.text.*
-import javafx.stage.*
 import logic.LogType
 import logic.getLangString
 import logic.log
@@ -17,7 +10,7 @@ import tornadofx.*
 
 fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 	log("creating week tab", LogType.IMPORTANT)
-	return pane.tab("reminder") {
+	return pane.tab(getLangString("reminder")) {
 		isClosable = true
 		
 		stackpane {
@@ -26,7 +19,26 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 			}
 			
 			// main tab
-			
+			vbox {
+				addClass(Styles.Tabs.mainTab)
+				style {
+					padding = box(0.px, 0.px, 2.px, 0.px)
+				}
+				
+				hbox(spacing = 40.0, alignment = Pos.CENTER_LEFT) {
+					addClass(Styles.Tabs.topbar)
+					style {
+						padding = box(0.px, 15.px, 0.px, 15.px)
+					}
+					button {
+						text = "Test"
+						
+						addClass(Styles.Tabs.titleButtons)
+					}
+				}
+				
+				separate()
+			}
 			
 			// used to shadow the overflow from tab
 			pane {
@@ -38,6 +50,7 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 	}
 }
 
+/*
 class NewAppointmentPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
 	
@@ -133,4 +146,4 @@ class NewAppointmentPopup: Fragment() {
 		}
 	}
 	
-}
+}*/

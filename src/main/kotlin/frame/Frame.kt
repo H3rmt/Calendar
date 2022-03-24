@@ -143,8 +143,11 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 		}
 		menu(getLangString("show")) {
 			createMenuGroup(
-				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") { log("Show Reminder") },
-				createMenuItem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
+				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") {
+					log("Show Reminder")
+					Secure.overrideTab("reminder", ::createReminderTab, {})
+				},
+//				createMenuItem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
 				createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {
 					log("Show Calendar")
 					Secure.overrideTab("calendar", ::createcalendartab)
