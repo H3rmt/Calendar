@@ -15,12 +15,13 @@
 		"show": "Show",
 		"show reminder": "Show Reminder",
 		"show calendar": "Show Calendar",
-		"show todo list": "Show TODO list",
 		"github": "Github",
 		"memory usage": "Memory usage",
+		"appointment": "Appointment",
 		
 		// Tabs
 		"calender": "Calendar",
+		"reminder": "Reminder",
 		
 		// days
 		"monday": "Monday",
@@ -61,8 +62,10 @@
 		"missing type": "Missing type",
 		"missing title": "Missing title",
 		"start must be before end": "Start time must be before end time",
-		
 		"remove?": "Remove?",
-		"do you want to remove appointment for %s": "do you want to remove appointment for %s"
+		"do you want to remove appointment for %s": "do you want to remove appointment for %s",
+		
+		// Reminder Tab
+		"new reminder": "New Reminder"
 	}
 }
