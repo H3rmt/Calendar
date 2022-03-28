@@ -269,6 +269,64 @@ class File(id: EntityID<Long>): LongEntity(id) {
 }
 
 
+class Reminder(id: EntityID<Long>): LongEntity(id) {
+	
+	object Reminders: LongEntityClass<Reminder>(ReminderTable)
+	
+	companion object {
+		fun new(_time: Long, _title: String, _description: String, _type: Type): Reminder {
+			return transaction {
+				return@transaction Reminders.new {
+					time = _time
+					title = _title
+					description = _description
+					type = _type
+				}
+			}
+		}
+	}
+	
+	private var dbTime by ReminderTable.time
+	private var dbTitle by ReminderTable.title
+	private var dbDescription by ReminderTable.description
+	private var dbType by Type.Types referencedOn ReminderTable.type
+	
+	var time: Long
+		get() = transaction { dbTime }
+		set(value) = transaction { dbTime = value }
+	var title: String
+		get() = transaction { dbTitle }
+		set(value) = transaction { dbTitle = value }
+	var description: String
+		get() = transaction { dbDescription }
+		set(value) = transaction { dbDescription = value }
+	var type: Type
+		get() = transaction { dbType }
+		set(value) = transaction { dbType = value }
+	
+	fun remove() {
+		transaction {
+			delete()
+		}
+	}
+	
+	override fun toString(): String = "[{$id} $time  $type | $title: $description]"
+	
+	override fun equals(other: Any?): Boolean {
+		return if(other !is Reminder) false
+		else time == other.time && title == other.title && description == other.description && type == other.type
+	}
+	
+	override fun hashCode(): Int {
+		var result = time.hashCode()
+		result = 31 * result + title.hashCode()
+		result = 31 * result + description.hashCode()
+		result = 31 * result + type.hashCode()
+		return result
+	}
+}
+
+
 class Type(id: EntityID<Int>): IntEntity(id) {
 	
 	object Types: IntEntityClass<Type>(TypeTable)
