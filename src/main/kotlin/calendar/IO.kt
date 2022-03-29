@@ -75,6 +75,13 @@ object FileTable: LongIdTable() {
 	val note = reference("note", NoteTable)
 }
 
+object ReminderTable: LongIdTable() {
+	var time = long("time")
+	var title = text("title")
+	var description = text("description")
+	val type = reference("type", TypeTable)
+}
+
 object TypeTable: IntIdTable() {
 	val name = text("name")
 	val color = varchar("color", 20)
