@@ -268,7 +268,6 @@ class File(id: EntityID<Long>): LongEntity(id) {
 	}
 }
 
-
 class Reminder(id: EntityID<Long>): LongEntity(id) {
 	
 	object Reminders: LongEntityClass<Reminder>(ReminderTable)
