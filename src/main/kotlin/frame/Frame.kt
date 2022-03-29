@@ -4,6 +4,7 @@ package frame
 
 
 import calendar.Appointment
+import calendar.Reminder
 import calendar.Timing
 import frame.Tabmanager.Secure
 import init
@@ -123,7 +124,14 @@ fun createmenubar(pane: BorderPane): MenuBar {
 					)
 				},
 				createMenuItem(this@menu, "Reminder", "Strg + R") {
-					log("not implemented", LogType.WARNING)
+					NewReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
+						false,
+						null,
+						Timing.getNowLocal(),
+						save = { rem: Reminder ->
+							log("Created:$rem")
+						}
+					)
 				}
 			)
 		}

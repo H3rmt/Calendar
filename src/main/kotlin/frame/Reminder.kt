@@ -1,11 +1,20 @@
 package frame
 
+import calendar.Reminder
+import calendar.Timing
+import datetimepicker.dateTimePicker
+import javafx.beans.property.*
 import javafx.geometry.*
 import javafx.scene.control.*
+import javafx.scene.layout.*
+import javafx.scene.paint.*
+import javafx.scene.text.*
+import javafx.stage.*
 import logic.LogType
 import logic.getLangString
 import logic.log
 import tornadofx.*
+import java.time.LocalDateTime
 
 
 fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
@@ -53,30 +62,32 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 	}
 }
 
-/*
-class NewAppointmentPopup: Fragment() {
+
+class NewReminderPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
 	
 	private var reminder: Reminder? = scope.reminder
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
 	private var reminderTitle: Property<String> = (reminder?.title ?: "").toProperty()
+	private var end: Property<LocalDateTime> = (reminder?.let { Timing.UTCEpochMinuteToLocalDateTime(it.time) } ?: scope.end).toProperty()
+	private var reminderDescription: Property<String> = (reminder?.title ?: "").toProperty()
 	
-	private var onSave: (Appointment) -> Unit = scope.save
+	private var onSave: (Reminder) -> Unit = scope.save
 	
 	private var error: Property<String> = "".toProperty()
 	
 	private var windowTitle: String = scope.title
 	private var saveTitle: String = scope.saveTitle
 	
-	private fun updateAppointment() {
+	private fun updateReminder() {
 		reminder?.let { rem ->
-			app.title = reminderTitle.value
+			rem.title = reminderTitle.value
 		}
 	}
 	
-	private fun createAppointment(): Reminder = Reminder.new(
-		reminderTitle
+	private fun createReminder(): Reminder = Reminder.new(
+		12, reminderTitle.value, reminderDescription.value,
 	)
 	
 	private fun checkAppointment(): String? {
@@ -99,10 +110,24 @@ class NewAppointmentPopup: Fragment() {
 			style {
 				prefHeight = Int.MAX_VALUE.px
 			}
+			field(getLangString("to")) {
+				dateTimePicker(dateTime = end)
+			}
 			field(getLangString("title")) {
 				textfield(reminderTitle)
 			}
-			
+			field(getLangString("description")) {
+				style(append = true) {
+					prefHeight = Int.MAX_VALUE.px
+					minHeight = 60.px
+					padding = box(0.px, 0.px, 20.px, 0.px)
+				}
+				textarea(reminderDescription) {
+					style(append = true) {
+						prefHeight = Int.MAX_VALUE.px
+					}
+				}
+			}
 			buttonbar {
 				textfield(error) {
 					style(append = true) {
@@ -125,8 +150,8 @@ class NewAppointmentPopup: Fragment() {
 						val check = checkAppointment()
 						if(check == null) {
 							if(reminder == null)
-								reminder = createAppointment()
-							updateAppointment()
+								reminder = createReminder()
+							updateReminder()
 							onSave.invoke(reminder!!)
 							close()
 						} else {
@@ -139,14 +164,14 @@ class NewAppointmentPopup: Fragment() {
 	}
 	
 	class ItemsScope(
-		val title: String, val saveTitle: String, val reminder: Reminder?, val save: (Reminder) -> Unit
+		val title: String, val saveTitle: String, val reminder: Reminder?, val end: LocalDateTime, val save: (Reminder) -> Unit
 	): Scope()
 	
 	companion object {
-		fun open(title: String, saveTitle: String, block: Boolean, reminder: Reminder?, save: (Reminder) -> Unit): Stage? {
-			val scope = ItemsScope(title, saveTitle, reminder, save)
-			return find<NewAppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+		fun open(title: String, saveTitle: String, block: Boolean, reminder: Reminder?, end: LocalDateTime, save: (Reminder) -> Unit): Stage? {
+			val scope = ItemsScope(title, saveTitle, reminder, end, save)
+			return find<NewReminderPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 		}
 	}
 	
-}*/
+}
