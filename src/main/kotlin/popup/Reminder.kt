@@ -3,11 +3,14 @@ package popup
 import calendar.Reminder
 import calendar.Timing
 import datetimepicker.dateTimePicker
+import frame.toggleSwitch
 import javafx.beans.property.*
+import javafx.geometry.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.text.*
 import javafx.stage.*
+import listen
 import logic.getLangString
 import tornadofx.*
 import java.time.LocalDateTime
@@ -30,6 +33,24 @@ class NewReminderPopup: Fragment() {
 	private var windowTitle: String = scope.title
 	private var saveTitle: String = scope.saveTitle
 	
+	private var toggle: Property<Boolean> = true.toProperty()
+	private var toggleName: Property<String> = "".toProperty()
+	
+	init {
+		toggle.listen {
+			updateDisplay(it)
+		}
+		updateDisplay(toggle.value)
+	}
+	
+	private fun updateDisplay(toggle: Boolean) {
+		if(toggle) {
+			toggleName.value = "Appointment"
+		} else {
+			toggleName.value = "Date"
+		}
+	}
+	
 	private fun updateReminder() {
 		reminder?.let { rem ->
 			rem.title = reminderTitle.value
@@ -49,7 +70,9 @@ class NewReminderPopup: Fragment() {
 	
 	override fun onBeforeShow() {
 		modalStage?.height = 320.0
-		modalStage?.width = 400.0
+		modalStage?.width = 440.0
+		modalStage?.minWidth = 430.0
+		modalStage?.minHeight = 280.0
 	}
 	
 	override val root = form {
@@ -61,7 +84,15 @@ class NewReminderPopup: Fragment() {
 				prefHeight = Int.MAX_VALUE.px
 			}
 			field(getLangString("Finish")) {
-				dateTimePicker(dateTime = end)
+				borderpane {
+					left = dateTimePicker(dateTime = end)
+					right = hbox(alignment = Pos.CENTER_RIGHT) {
+						style {
+							paddingLeft = 5
+						}
+						toggleSwitch(toggleName, toggle)
+					}
+				}
 			}
 			field(getLangString("title")) {
 				textfield(reminderTitle)

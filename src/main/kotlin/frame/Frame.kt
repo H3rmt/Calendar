@@ -7,6 +7,8 @@ import calendar.Timing
 import frame.Tabmanager.Secure
 import init
 import javafx.application.*
+import javafx.beans.property.*
+import javafx.beans.value.*
 import javafx.event.*
 import javafx.scene.control.*
 import javafx.scene.image.*
@@ -19,6 +21,7 @@ import logic.Warning
 import logic.getConfig
 import logic.getLangString
 import logic.log
+import org.controlsfx.control.ToggleSwitch
 import popup.NewReminderPopup
 import tornadofx.*
 import java.awt.Desktop
@@ -375,4 +378,14 @@ fun EventTarget.separate() {
 		addClass(Styles.Tabs.separator)
 		useMaxWidth = true
 	}
+}
+
+
+fun EventTarget.toggleSwitch(
+	text: ObservableValue<String>? = null,
+	selected: Property<Boolean> = true.toProperty(),
+	op: ToggleSwitch.() -> Unit = {}
+) = ToggleSwitch().attachTo(this, op) {
+	it.selectedProperty().bindBidirectional(selected)
+	it.textProperty().bind(text)
 }
