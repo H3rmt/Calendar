@@ -100,15 +100,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 							// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
 							widthProperty().listen(once = true) {
 								lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-									fun update(visible: Boolean) {
+									bar.visibleProperty().listen { visible ->
 										if(visible) {
 											topMargin.value = bar.width + 2 //+ scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 										} else {
 											topMargin.value = 2.0 //scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 										}
-									}
-									bar.visibleProperty().listen { visible ->
-										update(visible)
 									}
 								}
 							}
@@ -233,7 +230,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																	action {
 																		val remove = Alert(Alert.AlertType.CONFIRMATION).apply {
 																			title = getLangString("remove?")
-																			headerText = getLangString("do you want to remove appointment for %s") // TODO replace %s with title
+																			headerText = getLangString("do you want to remove %s appointment", appointment.title) // TODO replace %s with title
 																		}.showAndWait().get()
 																		if(remove.buttonData == ButtonBar.ButtonData.OK_DONE) {
 																			log("Removed:$appointment") // TODO multi day
