@@ -1,5 +1,3 @@
-@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
-
 package frame
 
 
@@ -21,6 +19,7 @@ import logic.Warning
 import logic.getConfig
 import logic.getLangString
 import logic.log
+import popup.NewReminderPopup
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
