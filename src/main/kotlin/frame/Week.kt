@@ -217,7 +217,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															action {
 																NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"), false, null,
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
-																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1),
+																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour).plusHours(1),
 																	save = { app: Appointment ->
 																		log("Created:$app")
 																		week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
