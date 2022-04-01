@@ -35,19 +35,17 @@ class NewReminderPopup: Fragment() {
 	
 	private var toggle: Property<Boolean> = true.toProperty()
 	private var toggleName: Property<String> = "".toProperty()
-	
-	init {
-		toggle.listen {
-			updateDisplay(it)
-		}
-		updateDisplay(toggle.value)
-	}
+	private val dateTimePicker = dateTimePicker(dateTime = end)
+	private val appointmentPicker = dateTimePicker(dateTime = end)
+	private var control: BorderPane? = null
 	
 	private fun updateDisplay(toggle: Boolean) {
 		if(toggle) {
 			toggleName.value = "Appointment"
+			control?.left = appointmentPicker
 		} else {
 			toggleName.value = "Date"
+			control?.left = dateTimePicker
 		}
 	}
 	
@@ -84,8 +82,7 @@ class NewReminderPopup: Fragment() {
 				prefHeight = Int.MAX_VALUE.px
 			}
 			field(getLangString("Finish")) {
-				borderpane {
-					left = dateTimePicker(dateTime = end)
+				control = borderpane {
 					right = hbox(alignment = Pos.CENTER_RIGHT) {
 						style {
 							paddingLeft = 5
@@ -142,6 +139,14 @@ class NewReminderPopup: Fragment() {
 				}
 			}
 		}
+	}
+	
+	
+	init {
+		toggle.listen {
+			updateDisplay(it)
+		}
+		updateDisplay(toggle.value)
 	}
 	
 	class ItemsScope(
