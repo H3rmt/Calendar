@@ -1,8 +1,0 @@
-und dann kann man Erinnerungen setzen auf nächste oder übernächste Vorkommnisse von diesem Event
-und man kann auch Erledigungen mich wichtigkeiten versehen und reminder festlegen
-man hat dann auch ne Übersicht, über alle Termine mit bestimmter wichtigkeit in der nächsten Zeit man kann auch einfach nur
-	notes an die gewissen tage legen und mann sieht dann in ner woche welche Termine man hat
-	und was man bis da erledigen soll
-man kann auch reminder für die Termine machen
-
-Keinen Allround box inset mehr sondern nur rechts

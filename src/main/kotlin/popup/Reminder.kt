@@ -2,6 +2,7 @@ package popup
 
 import calendar.Reminder
 import calendar.Timing
+import calendar.Timing.toUTCEpochMinute
 import datetimepicker.dateTimePicker
 import frame.toggleSwitch
 import javafx.beans.property.*
@@ -56,7 +57,7 @@ class NewReminderPopup: Fragment() {
 	}
 	
 	private fun createReminder(): Reminder = Reminder.new(
-		12, reminderTitle.value, reminderDescription.value,
+		end.value.toUTCEpochMinute(), reminderTitle.value, reminderDescription.value,
 	)
 	
 	private fun checkAppointment(): String? {
@@ -83,11 +84,18 @@ class NewReminderPopup: Fragment() {
 			}
 			field(getLangString("Finish")) {
 				control = borderpane {
-					right = hbox(alignment = Pos.CENTER_RIGHT) {
+					right = stackpane {
+						alignment = Pos.CENTER_RIGHT
 						style {
 							paddingLeft = 5
 						}
-						toggleSwitch(toggleName, toggle)
+						label(toggleName) {
+							style {
+								paddingRight = 38
+							}
+						}
+						toggleSwitch(selected = toggle) {
+						}
 					}
 				}
 			}

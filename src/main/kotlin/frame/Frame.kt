@@ -387,5 +387,6 @@ fun EventTarget.toggleSwitch(
 	op: ToggleSwitch.() -> Unit = {}
 ) = ToggleSwitch().attachTo(this, op) {
 	it.selectedProperty().bindBidirectional(selected)
-	it.textProperty().bind(text)
+	if(text != null)
+		it.textProperty().bind(text)
 }
