@@ -6,6 +6,7 @@
 		"cancel": "Cancel",
 		"title": "Title",
 		"help": "Help",
+		"missing %s": "Missing %s",
 		
 		// Menu bar
 		"options": "Options",

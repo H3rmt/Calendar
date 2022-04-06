@@ -37,7 +37,7 @@ class NewReminderPopup: Fragment() {
 	private var toggle: Property<Boolean> = true.toProperty()
 	private var toggleName: Property<String> = "".toProperty()
 	private val dateTimePicker = dateTimePicker(dateTime = end)
-	private val appointmentPicker = dateTimePicker(dateTime = end)
+	private val appointmentPicker = label(getLangString("missing %s", "appointmentPicker"))
 	private var control: BorderPane? = null
 	
 	private fun updateDisplay(toggle: Boolean) {
@@ -60,7 +60,7 @@ class NewReminderPopup: Fragment() {
 		end.value.toUTCEpochMinute(), reminderTitle.value, reminderDescription.value,
 	)
 	
-	private fun checkAppointment(): String? {
+	private fun checkReminder(): String? {
 		if(reminderTitle.value.isEmpty()) {
 			return getLangString("missing title")
 		}
@@ -114,6 +114,9 @@ class NewReminderPopup: Fragment() {
 					}
 				}
 			}
+			field(getLangString("notify")) {
+				text(getLangString("missing %s", "Notifications"))
+			}
 			buttonbar {
 				textfield(error) {
 					style(append = true) {
@@ -133,7 +136,7 @@ class NewReminderPopup: Fragment() {
 				button(saveTitle) {
 					isDefaultButton = true
 					action {
-						val check = checkAppointment()
+						val check = checkReminder()
 						if(check == null) {
 							if(reminder == null)
 								reminder = createReminder()

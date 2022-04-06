@@ -224,7 +224,7 @@ lateinit var language: Language
  *
  * @see Language
  */
-fun getLangString(str: String, vararg args: Any?): String = language[str].format(args)
+fun getLangString(str: String, vararg args: Any?): String = language[str].format(*args)
 
 const val emptyDefault = "[\n\n]"
 
