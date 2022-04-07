@@ -16,9 +16,10 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.10")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0")
+	implementation("org.jetbrains.kotlin:kotlin-stdlib-common:1.6.10")
 	implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
 	
+	implementation("org.controlsfx:controlsfx:11.1.1")
 	implementation("no.tornado:tornadofx:1.7.20")
 	
 	implementation("com.google.code.gson:gson:2.9.0")

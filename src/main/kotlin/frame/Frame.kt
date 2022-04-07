@@ -1,13 +1,14 @@
-@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
-
 package frame
 
 
 import calendar.Appointment
+import calendar.Reminder
 import calendar.Timing
 import frame.Tabmanager.Secure
 import init
 import javafx.application.*
+import javafx.beans.property.*
+import javafx.beans.value.*
 import javafx.event.*
 import javafx.scene.control.*
 import javafx.scene.image.*
@@ -20,6 +21,8 @@ import logic.Warning
 import logic.getConfig
 import logic.getLangString
 import logic.log
+import org.controlsfx.control.ToggleSwitch
+import popup.NewReminderPopup
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
@@ -123,7 +126,14 @@ fun createmenubar(pane: BorderPane): MenuBar {
 					)
 				},
 				createMenuItem(this@menu, "Reminder", "Strg + R") {
-					log("not implemented", LogType.WARNING)
+					NewReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
+						false,
+						null,
+						Timing.getNowLocal(),
+						save = { rem: Reminder ->
+							log("Created:$rem")
+						}
+					)
 				}
 			)
 		}
@@ -368,4 +378,15 @@ fun EventTarget.separate() {
 		addClass(Styles.Tabs.separator)
 		useMaxWidth = true
 	}
+}
+
+
+fun EventTarget.toggleSwitch(
+	text: ObservableValue<String>? = null,
+	selected: Property<Boolean> = true.toProperty(),
+	op: ToggleSwitch.() -> Unit = {}
+) = ToggleSwitch().attachTo(this, op) {
+	it.selectedProperty().bindBidirectional(selected)
+	if(text != null)
+		it.textProperty().bind(text)
 }

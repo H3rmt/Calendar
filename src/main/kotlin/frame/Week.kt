@@ -8,7 +8,6 @@ import calendar.Timing.toUTCEpochMinute
 import calendar.Week
 import calendar.getTypes
 import calendar.now
-import datetimepicker.DateTimePicker
 import datetimepicker.dateTimePicker
 import javafx.beans.property.*
 import javafx.event.*
@@ -303,9 +302,6 @@ class NewAppointmentPopup: Fragment() {
 	
 	private var error: Property<String> = "".toProperty()
 	
-	private lateinit var startPicker: DateTimePicker
-	private lateinit var endPicker: DateTimePicker
-	
 	private var windowTitle: String = scope.title
 	private var saveTitle: String = scope.saveTitle
 	
@@ -356,8 +352,8 @@ class NewAppointmentPopup: Fragment() {
 				combobox(values = getTypes().map { it.name }, property = type)
 			}
 			field(getLangString("start to end")) {
-				startPicker = dateTimePicker(dateTime = start)
-				endPicker = dateTimePicker(dateTime = end)
+				dateTimePicker(dateTime = start)
+				dateTimePicker(dateTime = end)
 			}
 			field(getLangString("title")) {
 				textfield(appointmentTitle)

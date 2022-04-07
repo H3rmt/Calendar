@@ -109,7 +109,7 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 			try {
 				return if(T::class.java.isEnum) {
 					try {
-						getJson().fromJson(getJsonReader(StringReader(it as String)), T::class.java)
+						getJson().fromJson<T>(getJsonReader(StringReader(it as String)), T::class.java)
 					} catch(e: NullPointerException) {
 						log("Unable to cast $it into element of ${T::class}", LogType.WARNING)
 						throw Exit("??????", e)
@@ -224,7 +224,7 @@ lateinit var language: Language
  *
  * @see Language
  */
-fun getLangString(str: String, vararg args: Any?): String = language[str].format(args)
+fun getLangString(str: String, vararg args: Any?): String = language[str].format(*args)
 
 const val emptyDefault = "[\n\n]"
 
