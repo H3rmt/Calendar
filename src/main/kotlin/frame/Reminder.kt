@@ -1,10 +1,13 @@
 package frame
 
+import calendar.Reminder
+import calendar.Timing
 import javafx.geometry.*
 import javafx.scene.control.*
 import logic.LogType
 import logic.getLangString
 import logic.log
+import popup.NewReminderPopup
 import tornadofx.*
 
 
@@ -35,7 +38,14 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 						addClass(Styles.Tabs.titleButtons)
 						
 						action {
-							log("not implemented", LogType.WARNING)
+							NewReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
+								false,
+								null,
+								Timing.getNowLocal(),
+								save = { rem: Reminder ->
+									log("Created:$rem")
+								}
+							)
 						}
 					}
 				}
