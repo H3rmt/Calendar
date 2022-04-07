@@ -117,14 +117,23 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 								for((index, reminder) in list.withIndex()) {
 									hbox(spacing = 5.0, alignment = Pos.CENTER) {
 										style(append = true) {
-											backgroundColor += Color.ORANGE
+											backgroundColor += Color.WHITE
 										}
 										
 										val data = mutableListOf<Label>()
 										
-										data.add(label(reminder.time.toString()))
-										data.add(label(reminder.title))
-										data.add(label(reminder.description))
+										data.add(label(reminder.time.toString()) {
+											addClass(Styles.CalendarTableView.tableItem)
+											addClass(Styles.ReminderTab.TimeCell)
+										})
+										data.add(label(reminder.title) {
+											addClass(Styles.CalendarTableView.tableItem)
+											addClass(Styles.ReminderTab.TimeCell)
+										})
+										data.add(label(reminder.description) {
+											addClass(Styles.CalendarTableView.tableItem)
+											addClass(Styles.ReminderTab.TimeCell)
+										})
 									}
 								}
 							}
