@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun initDb() {
 	Database.connect("jdbc:sqlite:data/data.sqlite")
 	transaction {
-		SchemaUtils.create(AppointmentTable, FileTable, NoteTable, TypeTable)
+		SchemaUtils.create(AppointmentTable, FileTable, NoteTable, ReminderTable, TypeTable)
 	}
 }
 
@@ -79,7 +79,6 @@ object ReminderTable: LongIdTable() {
 	var time = long("time")
 	var title = text("title")
 	var description = text("description")
-	val type = reference("type", TypeTable)
 }
 
 object TypeTable: IntIdTable() {

@@ -6,6 +6,7 @@
 		"cancel": "Cancel",
 		"title": "Title",
 		"help": "Help",
+		"missing %s": "Missing %s",
 		
 		// Menu bar
 		"options": "Options",
@@ -58,7 +59,7 @@
 		"remove appointment": "Remove Appointment",
 		"edit appointment": "Edit Appointment",
 		
-		// Appointment Dialog
+		// Appointment Popup
 		"missing type": "Missing type",
 		"missing title": "Missing title",
 		"start must be before end": "Start time must be before end time",
@@ -66,6 +67,9 @@
 		"do you want to remove %s appointment": "do you want to remove %s appointment",
 		
 		// Reminder Tab
-		"new reminder": "New Reminder"
+		"new reminder": "New Reminder",
+		
+		// Reminder Popup
+		"finish": "Finish"
 	}
 }
