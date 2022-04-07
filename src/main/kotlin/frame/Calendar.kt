@@ -110,13 +110,13 @@ fun createcalendartab(pane: TabPane): Tab {
 							// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
 							widthProperty().listen(once = true) {
 								lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-									bar.visibleProperty()
-										.listen {
-											if(it)
-												scrollbarWidth.value = bar.width + 2 // 2 padding right of inner vbox
-											else
-												scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
+									bar.visibleProperty().listen { visible ->
+										if(visible) {
+											scrollbarWidth.value = bar.width + 2 // 2 padding right of inner vbox
+										} else {
+											scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
 										}
+									}
 								}
 							}
 							
@@ -129,7 +129,7 @@ fun createcalendartab(pane: TabPane): Tab {
 							vbox(spacing = 5.0, alignment = Pos.CENTER) {
 								style(append = true) {
 									backgroundColor += Color.WHITE
-									paddingRight = 2.0
+//									paddingRight = 2.0
 								}
 								for((index, week) in list.withIndex()) {
 									hbox(spacing = 5.0, alignment = Pos.CENTER) {

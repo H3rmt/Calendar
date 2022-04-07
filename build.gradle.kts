@@ -31,9 +31,11 @@ dependencies {
 	implementation("org.jetbrains.exposed:exposed-dao:0.37.3")
 	implementation("org.jetbrains.exposed:exposed-jdbc:0.37.3")
 	implementation("org.xerial:sqlite-jdbc:3.36.0.3")
+	implementation("org.slf4j:slf4j-api:1.7.36") // for logging for exposed
+	implementation("org.slf4j:slf4j-simple:1.7.36") // for logging for exposed
 }
 
 javafx {
 	version = "16"
-	modules("javafx.web", "javafx.media")
+	modules("javafx.web") // , "javafx.media"
 }
