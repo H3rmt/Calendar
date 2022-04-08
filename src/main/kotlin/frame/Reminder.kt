@@ -17,10 +17,10 @@ import popup.NewReminderPopup
 import tornadofx.*
 
 
-fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
+fun createReminderTab(pane: TabPane): Tab {
 	log("creating week tab", LogType.IMPORTANT)
-	return pane.tab(getLangString("reminder")) {
-		isClosable = true
+	return pane.tab(getLangString("reminders")) {
+		isClosable = false
 		
 		stackpane {
 			style(append = true) {

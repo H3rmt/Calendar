@@ -19,10 +19,11 @@
 		"github": "Github",
 		"memory usage": "Memory usage",
 		"appointment": "Appointment",
+		"reminder": "Reminder",
 		
 		// Tabs
 		"calender": "Calendar",
-		"reminder": "Reminder",
+		"reminders": "Reminder",
 		
 		// days
 		"monday": "Monday",
@@ -65,9 +66,11 @@
 		"start must be before end": "Start time must be before end time",
 		"remove?": "Remove?",
 		"do you want to remove %s appointment": "do you want to remove %s appointment",
+		"notify": "Notify",
 		
 		// Reminder Tab
 		"new reminder": "New Reminder",
+		"deadline": "Deadline",
 		
 		// Reminder Popup
 		"finish": "Finish"

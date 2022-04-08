@@ -93,7 +93,7 @@ class Window: App(MainView::class, Styles::class) {
 		removeLoading()
 		log("started Frame", LogType.NORMAL)
 		Tabmanager.openTab("calendar", ::createcalendartab)
-		Tabmanager.openTab("reminder", ::createReminderTab, {})
+		Tabmanager.openTab("reminders", ::createReminderTab)
 		
 	}
 }
@@ -157,7 +157,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 			createMenuGroup(
 				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") {
 					log("Show Reminder")
-					Secure.overrideTab("reminder", ::createReminderTab, {})
+					Secure.overrideTab("reminders", ::createReminderTab)
 				},
 //				createMenuItem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
 				createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {

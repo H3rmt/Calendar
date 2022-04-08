@@ -40,7 +40,8 @@ class Language(private val language: AvailableLanguages) {
 	operator fun get(translation: String): String = try {
 		translations[translation.trim().lowercase()]!!
 	} catch(e: NullPointerException) {
-		log("translation for |${translation.trim().lowercase()}| was not found (lang=$language)", LogType.WARNING)
+		val caller = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }[2] // go back to getLangString and then calling methods
+		log("translation for |${translation.trim().lowercase()}| was not found (lang=$language) in (${caller.fileName}:${caller.lineNumber})", LogType.WARNING)
 		translation // return requested string to translate
 	}
 	
