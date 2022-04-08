@@ -15,7 +15,9 @@ val now: LocalDateTime = Timing.getNowLocal()
 
 var calendarDisplay: LocalDate = Timing.getNowLocal().toLocalDate()
 
+var reminders: ObservableList<Reminder> = FXCollections.observableArrayList()
 val currentMonth: ObservableList<Week> = FXCollections.observableArrayList()
+
 val currentMonthName: SimpleStringProperty = SimpleStringProperty()
 
 /**
@@ -40,6 +42,9 @@ fun loadCalendarData() {
 	val data = generateMonth(calendarDisplay)
 	currentMonth.clear()
 	currentMonth.addAll(data)
+	
+	reminders.clear()
+	reminders.addAll(getReminders())
 }
 
 fun generateMonth(_time: LocalDate): MutableList<Week> {

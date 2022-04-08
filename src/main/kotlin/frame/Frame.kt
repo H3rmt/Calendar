@@ -93,6 +93,8 @@ class Window: App(MainView::class, Styles::class) {
 		removeLoading()
 		log("started Frame", LogType.NORMAL)
 		Tabmanager.openTab("calendar", ::createcalendartab)
+		Tabmanager.openTab("reminder", ::createReminderTab, {})
+		
 	}
 }
 

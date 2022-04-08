@@ -46,6 +46,12 @@ fun getWeekAppointments(): List<Appointment> {
 	}
 }
 
+fun getReminders(): List<Reminder> {
+	return transaction {
+		return@transaction Reminder.Reminders.all().toList()
+	}
+}
+
 fun getTypes(): List<Type> {
 	return transaction {
 		return@transaction Type.Types.all().toList()
