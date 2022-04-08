@@ -7,6 +7,7 @@ import javafx.beans.property.*
 import javafx.collections.*
 import javafx.geometry.*
 import javafx.scene.control.*
+import javafx.scene.layout.*
 import javafx.scene.paint.*
 import listen
 import logic.LogType
@@ -34,7 +35,8 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 				}
 				
 				log("creating top bar", LogType.LOW)
-				hbox(spacing = 40.0, alignment = Pos.CENTER_LEFT) {
+				// Top bar
+				hbox(spacing = 40.0, alignment = Pos.CENTER) {
 					addClass(Styles.Tabs.topbar)
 					style {
 						padding = box(0.px, 15.px, 0.px, 15.px)
@@ -59,6 +61,7 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 						minWidth = 200.0
 						alignment = Pos.CENTER
 					}
+					label("")
 				}
 				
 				separate()
@@ -73,8 +76,13 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 					// Top bar
 					hbox(spacing = 5.0, alignment = Pos.CENTER) {
 						padding = Insets(3.0)
+						style {
+							backgroundColor += Color.WHITE
+							paddingRight = 15.3
+						}
+						
 						scrollbarWidth = paddingRightProperty
-						for(day in arrayListOf("Deadline", "Title", "Description")) {
+						for(day in arrayListOf("Title", "Deadline", "Description")) {
 							label(getLangString(day)) {
 								addClass(Styles.CalendarTableView.tableItem)
 								addClass(Styles.CalendarTableView.tableHeader)
@@ -95,8 +103,8 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 							widthProperty().listen(once = true) {
 								lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 									bar.visibleProperty().listen { visible ->
-										if(visible) {
-											scrollbarWidth.value = bar.width + 2 // 2 padding right of inner vbox
+										if(visible) { // 20 on first visible;  13.33  on second visible  => hardcoded 13.3 width TODO add to calender
+											scrollbarWidth.value = 13.3 + 2.0 // bar.width + 2.0 // 2 padding right of inner vbox
 										} else {
 											scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
 										}
@@ -119,20 +127,33 @@ fun createReminderTab(pane: TabPane, updateCallback: () -> Unit): Tab {
 										style(append = true) {
 											backgroundColor += Color.WHITE
 										}
+										addClass(Styles.ReminderTab.TimeCell)
 										
 										val data = mutableListOf<Label>()
 										
-										data.add(label(reminder.time.toString()) {
-											addClass(Styles.CalendarTableView.tableItem)
-											addClass(Styles.ReminderTab.TimeCell)
-										})
 										data.add(label(reminder.title) {
 											addClass(Styles.CalendarTableView.tableItem)
-											addClass(Styles.ReminderTab.TimeCell)
+											style(append = true) {
+												borderColor += box(c(0.75, 0.75, 0.75))
+												borderStyle += BorderStrokeStyle.DOTTED
+												borderWidth += box(0.px, 2.px, 0.px, 0.px)
+											}
+										})
+										data.add(label(reminder.time.toString()) {
+											addClass(Styles.CalendarTableView.tableItem)
+											style(append = true) {
+												borderColor += box(c(0.75, 0.75, 0.75))
+												borderStyle += BorderStrokeStyle.DOTTED
+												borderWidth += box(0.px, 2.px, 0.px, 2.px)
+											}
 										})
 										data.add(label(reminder.description) {
 											addClass(Styles.CalendarTableView.tableItem)
-											addClass(Styles.ReminderTab.TimeCell)
+											style(append = true) {
+												borderColor += box(c(0.75, 0.75, 0.75))
+												borderStyle += BorderStrokeStyle.DOTTED
+												borderWidth += box(0.px, 0.px, 0.px, 2.px)
+											}
 										})
 									}
 								}
