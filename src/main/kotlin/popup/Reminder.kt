@@ -34,7 +34,7 @@ class NewReminderPopup: Fragment() {
 	private var windowTitle: String = scope.title
 	private var saveTitle: String = scope.saveTitle
 	
-	private var toggle: Property<Boolean> = true.toProperty()
+	private var toggle: Property<Boolean> = scope.timeOrAppointment.toProperty()
 	private var toggleName: Property<String> = "".toProperty()
 	private val dateTimePicker = dateTimePicker(dateTime = end)
 	private val appointmentPicker = label(getLangString("missing %s", "appointmentPicker"))
@@ -161,12 +161,12 @@ class NewReminderPopup: Fragment() {
 	}
 	
 	class ItemsScope(
-		val title: String, val saveTitle: String, val reminder: Reminder?, val end: LocalDateTime, val save: (Reminder) -> Unit
+		val title: String, val saveTitle: String, val reminder: Reminder?, val end: LocalDateTime, val save: (Reminder) -> Unit, val timeOrAppointment: Boolean
 	): Scope()
 	
 	companion object {
-		fun open(title: String, saveTitle: String, block: Boolean, reminder: Reminder?, end: LocalDateTime, save: (Reminder) -> Unit): Stage? {
-			val scope = ItemsScope(title, saveTitle, reminder, end, save)
+		fun open(title: String, saveTitle: String, block: Boolean, reminder: Reminder?, end: LocalDateTime, save: (Reminder) -> Unit, timeOrAppointment: Boolean = true): Stage? {
+			val scope = ItemsScope(title, saveTitle, reminder, end, save, timeOrAppointment)
 			return find<NewReminderPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 		}
 	}
