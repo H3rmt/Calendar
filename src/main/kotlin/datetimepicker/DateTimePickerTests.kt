@@ -69,8 +69,8 @@ open class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTi
 	
 	
 	private val popup: DateTimePickerPopup = DateTimePickerPopup(dateProperty, hourProperty, minuteProperty) {
-		button.fire()
 		dateTimeProperty.value = LocalDateTime.of(dateProperty.value, timeProperty.value)
+		button.fire()
 	}
 	
 	private lateinit var textField: TextField
