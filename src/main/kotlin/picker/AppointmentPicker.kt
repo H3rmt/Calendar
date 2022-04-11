@@ -65,7 +65,6 @@ open class AppointmentPicker(appointment: Appointment?, appointments: List<Appoi
 	
 	
 	private val popup: AppointmentPickerPopup = AppointmentPickerPopup(appointmentProperty, appointments) {
-		appointmentProperty.value = appointment
 		button.fire()
 	}
 	
