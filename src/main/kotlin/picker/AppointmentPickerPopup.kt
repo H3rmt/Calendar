@@ -2,6 +2,7 @@ package picker
 
 import calendar.Appointment
 import javafx.beans.property.*
+import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
@@ -20,7 +21,7 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, appointments: 
 					borderColor += box(Color.DIMGREY)
 					//borderRadius += box(3.px)
 					borderWidth += box(1.px)
-
+					
 					backgroundColor += Color.valueOf("#E9E9E9")
 				}
 				hbox(spacing = 5.0, alignment = Pos.CENTER) {
@@ -75,6 +76,10 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, appointments: 
 										
 										padding = box(2.px)
 									}
+								}
+								onMouseClicked = EventHandler {
+									appointment.value = app
+									save()
 								}
 							}
 						}

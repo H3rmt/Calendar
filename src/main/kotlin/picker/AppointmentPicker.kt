@@ -65,8 +65,8 @@ open class AppointmentPicker(appointment: Appointment?, appointments: List<Appoi
 	
 	
 	private val popup: AppointmentPickerPopup = AppointmentPickerPopup(appointmentProperty, appointments) {
-		button.fire()
 		appointmentProperty.value = appointment
+		button.fire()
 	}
 	
 	private lateinit var textField: TextField
