@@ -26,7 +26,7 @@ class TestMainVieww: View("Test") {
 	override val root = borderpane {
 		prefWidth = Double.MAX_VALUE
 		val list = FXCollections.observableArrayList<DropdownToggle>()
-		center = dropdownTogglePicker(list) {
+		center = dropdownTogglePicker("select", list) {
 		
 		}
 //		left = combobox(values = list)
@@ -40,17 +40,18 @@ class TestMainVieww: View("Test") {
 
 
 fun EventTarget.dropdownTogglePicker(
+	name: String,
 	list: ObservableList<DropdownToggle>,
 	op: DropdownTogglePicker.() -> Unit = {}
 ): DropdownTogglePicker {
-	val picker = DropdownTogglePicker(list) {
+	val picker = DropdownTogglePicker(name, list) {
 		printlnm("update", it)
 	}
 	return opcr(this, picker, op)
 }
 
 
-class DropdownTogglePicker(toggles: ObservableList<DropdownToggle>, change: (DropdownToggle) -> Unit): Control() {
+class DropdownTogglePicker(name: String, toggles: ObservableList<DropdownToggle>, change: (DropdownToggle) -> Unit): Control() {
 	
 	private val popup: DropdownTogglePickerPopup = DropdownTogglePickerPopup(toggles, change)
 	
@@ -75,7 +76,7 @@ class DropdownTogglePicker(toggles: ObservableList<DropdownToggle>, change: (Dro
 				
 				backgroundColor += Color.LIGHTGRAY
 			}
-			button = button("select ⯆") {
+			button = button("$name ⯆") {
 				action {
 					if(popup.isShowing) {
 						popup.hide()
