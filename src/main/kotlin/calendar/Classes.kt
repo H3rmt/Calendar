@@ -60,7 +60,7 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 	
 	val date: String
 		get() = "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
-
+	
 	fun addAppointments(list: List<Appointment>) {
 		val appointmentlist = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
 		list.forEach { appointmentlist[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
@@ -285,12 +285,16 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 	}
 	
 	private var dbTime by ReminderTable.time
+	private var dbAppointment by Appointment.Appointments optionalReferencedOn ReminderTable.appointment
 	private var dbTitle by ReminderTable.title
 	private var dbDescription by ReminderTable.description
 	
 	var time: Long
 		get() = transaction { dbTime }
 		set(value) = transaction { dbTime = value }
+	var appointment: Appointment?
+		get() = transaction { dbAppointment }
+		set(value) = transaction { dbAppointment = value }
 	var title: String
 		get() = transaction { dbTitle }
 		set(value) = transaction { dbTitle = value }
