@@ -67,8 +67,9 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, private val ap
 						style {
 							padding = box(2.px)
 						}
-						dropdownTogglePicker("filter", searchColumns) {
+						dropdownTogglePicker("filter", searchColumns, {
 							filter()
+						}) {
 						}
 					}
 					

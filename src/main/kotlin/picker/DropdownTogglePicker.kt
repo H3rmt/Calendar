@@ -1,6 +1,5 @@
 package picker
 
-import println as printlnm
 import javafx.beans.property.*
 import javafx.collections.*
 import javafx.event.*
@@ -26,8 +25,9 @@ class TestMainVieww: View("Test") {
 	override val root = borderpane {
 		prefWidth = Double.MAX_VALUE
 		val list = FXCollections.observableArrayList<DropdownToggle>()
-		center = dropdownTogglePicker("select", list) {
-		
+		center = dropdownTogglePicker("select", list, {
+			println("update $it")
+		}) {
 		}
 //		left = combobox(values = list)
 		right = button {
@@ -42,11 +42,10 @@ class TestMainVieww: View("Test") {
 fun EventTarget.dropdownTogglePicker(
 	name: String,
 	list: ObservableList<DropdownToggle>,
+	change: ((DropdownToggle) -> Unit)?,
 	op: DropdownTogglePicker.() -> Unit = {}
 ): DropdownTogglePicker {
-	val picker = DropdownTogglePicker(name, list) {
-		printlnm("update", it)
-	}
+	val picker = DropdownTogglePicker(name, list, change ?: {})
 	return opcr(this, picker, op)
 }
 
