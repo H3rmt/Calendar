@@ -39,7 +39,9 @@ class TimePicker(hourProperty: IntegerProperty, minuteProperty: IntegerProperty,
 	init {
 		vbox(spacing = 5.0) {
 			//prefWidth = 40.0
-			padding = insets(0, 3, 3, 3)
+			style(append = true) {
+				padding = box(0.px, 3.px, 3.px, 3.px)
+			}
 			
 			hbox(spacing = 3.0, alignment = Pos.CENTER) {
 				spinner(min = 0, max = 23, amountToStepBy = 1, enableScroll = true, property = hourProperty) {

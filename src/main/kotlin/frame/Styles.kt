@@ -9,7 +9,7 @@ import tornadofx.*
 class Styles: Stylesheet() {
 	
 	companion object {
-		val disableFocus by cssclass()
+		val disableFocusDraw by cssclass()
 	}
 	
 	object Menubar {
@@ -68,9 +68,14 @@ class Styles: Stylesheet() {
 		val tableTimeHeader by cssclass()
 	}
 	
+	object ReminderTab {
+		val TimeCell by cssclass()
+		val tableItem by cssclass()
+	}
+	
 	
 	init {
-		disableFocus {
+		disableFocusDraw {
 			focusColor = Color.TRANSPARENT
 		}
 	}
@@ -288,6 +293,27 @@ class Styles: Stylesheet() {
 					prefHeight = 0.px
 				}
 			}
+		}
+	}
+	
+	init {
+		ReminderTab.tableItem {
+			alignment = Pos.CENTER
+			prefWidth = Int.MAX_VALUE.px
+			
+			padding = box(2.px)
+		}
+		
+		ReminderTab.TimeCell {
+			prefHeight = 40.px
+			
+			backgroundColor += c(0.98, 0.98, 0.98)
+			backgroundRadius += box(6.px)
+			borderWidth += box(2.px)
+			
+			borderColor += box(c(0.75, 0.75, 0.75))
+			borderRadius += box(6.px)
+			borderWidth += box(2.px)
 		}
 	}
 }

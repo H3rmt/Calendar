@@ -59,7 +59,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 						isDisable = true
 						
 						// disables button if no type selected or type already added
-						addType.valueProperty().addListener { _, _, new -> isDisable = new == null || noteTabs.any { it.text == new } }
+						addType.valueProperty().addListener { _, _, new -> isDisable = (new == null) || noteTabs.any { it.text == new } }
 						addClass(Styles.Tabs.titleButtons)
 					}
 				}
@@ -72,16 +72,22 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					}
 					vbox {
 						add.action {
-							val note = Note.new(cell.time.toUTCEpochMinute(), "", getTypes().find { it.name == addType.value }!!, cell is Week)
+							var note: Note? = null
 							lateinit var tb: TitledPane
-							tb = noteTab(this, addType.value, "", {
-								note.text = it
+							tb = noteTab(this, addType.value, "", { text ->
+								if(note == null) {
+									note = Note.new(cell.time.toUTCEpochMinute(), "", getTypes().find { it.name == addType.value }!!, cell is Week)
+								}
+								note?.text = text
 								updateCallback()
 							}, {
 								this.children.remove(noteTabs.first { it == tb })
 								noteTabs.remove(tb)
+								note?.remove()
+								
+								// triggers reload of add button to check if new note can be created
+								add.isDisable = noteTabs.any { it.text == addType.value }
 								updateCallback()
-								note.remove()
 							})
 							noteTabs.add(0, tb)
 							add.isDisable = true
@@ -89,14 +95,17 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 						
 						for(note in cell.notes) {
 							lateinit var tb: TitledPane
-							tb = noteTab(this, note.type.name, note.text, {
-								note.text = (it)
+							tb = noteTab(this, note.type.name, note.text, { text ->
+								note.text = text
 								updateCallback()
 							}, {
 								this.children.remove(noteTabs.first { it == tb })
 								noteTabs.remove(tb)
-								updateCallback()
 								note.remove()
+								
+								// triggers reload of add button to check if new note can be created
+								add.isDisable = noteTabs.any { it.text == addType.value }
+								updateCallback()
 							})
 							noteTabs.add(tb)
 						}
@@ -136,7 +145,7 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 				style {
 					fontSize = 15.px
 				}
-				save = button(getLangString("save"))
+				save = button(getLangString("create"))
 				
 				button(getLangString("delete")) {
 					action { deleteFun() }
@@ -147,8 +156,8 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 		expandedProperty().addListener { _, _, new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
 		
 		htmleditor(text) {
-			//addClass(Styles.disableFocus)
 			addClass(Styles.NoteTab.texteditor)
+			addClass(Styles.disableFocusDraw)
 			save.action {
 				saveFun(this@htmleditor.htmlText)
 				save.text = getLangString("save")

@@ -1,12 +1,14 @@
-@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
-
 package frame
 
 
-
-import calendar.loadCalendarData
+import calendar.Appointment
+import calendar.Reminder
+import calendar.Timing
 import frame.Tabmanager.Secure
+import init
 import javafx.application.*
+import javafx.beans.property.*
+import javafx.beans.value.*
 import javafx.event.*
 import javafx.scene.control.*
 import javafx.scene.image.*
@@ -16,12 +18,11 @@ import logic.Configs
 import logic.Exit
 import logic.LogType
 import logic.Warning
-import logic.configs
 import logic.getConfig
 import logic.getLangString
-import logic.initConfigs
 import logic.log
-import logic.updateLogger
+import org.controlsfx.control.ToggleSwitch
+import popup.NewReminderPopup
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
@@ -92,6 +93,8 @@ class Window: App(MainView::class, Styles::class) {
 		removeLoading()
 		log("started Frame", LogType.NORMAL)
 		Tabmanager.openTab("calendar", ::createcalendartab)
+		Tabmanager.openTab("reminders", ::createReminderTab)
+		
 	}
 }
 
@@ -111,20 +114,35 @@ class MainView: View("Calendar") {
 
 fun createmenubar(pane: BorderPane): MenuBar {
 	return pane.menubar {
+		menu(getLangString("Create")) {
+			createMenuGroup(
+				createMenuItem(this@menu, "Appointment", "Strg + N") {
+					NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"),
+						false,
+						null,
+						Timing.getNowLocal(),
+						Timing.getNowLocal().plusHours(1),
+						save = { app: Appointment ->
+							log("Created:$app")
+						}
+					)
+				},
+				createMenuItem(this@menu, "Reminder", "Strg + R") {
+					NewReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
+						false,
+						null,
+						Timing.getNowLocal(),
+						save = { rem: Reminder ->
+							log("Created:$rem")
+						}
+					)
+				}
+			)
+		}
 		menu(getLangString("options")) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Reload", "F5") {
-					initConfigs()
-					log("read Configs:$configs", LogType.IMPORTANT)
-					
-					log("Updating Logger with config data\n", LogType.IMPORTANT)
-					updateLogger()
-					log("Updated Logger", LogType.IMPORTANT)
-					
-					log("preparing Appointments", LogType.IMPORTANT)
-					
-					log("preparing Notes", LogType.IMPORTANT)
-					loadCalendarData()
+					init()
 					Secure.overrideTab("calendar", ::createcalendartab)
 				},
 				createMenuItem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
@@ -137,8 +155,11 @@ fun createmenubar(pane: BorderPane): MenuBar {
 		}
 		menu(getLangString("show")) {
 			createMenuGroup(
-				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") { log("Show Reminder") },
-				createMenuItem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
+				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") {
+					log("Show Reminder")
+					Secure.overrideTab("reminders", ::createReminderTab)
+				},
+//				createMenuItem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
 				createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {
 					log("Show Calendar")
 					Secure.overrideTab("calendar", ::createcalendartab)
@@ -359,4 +380,15 @@ fun EventTarget.separate() {
 		addClass(Styles.Tabs.separator)
 		useMaxWidth = true
 	}
+}
+
+
+fun EventTarget.toggleSwitch(
+	text: ObservableValue<String>? = null,
+	selected: Property<Boolean> = true.toProperty(),
+	op: ToggleSwitch.() -> Unit = {}
+) = ToggleSwitch().attachTo(this, op) {
+	it.selectedProperty().bindBidirectional(selected)
+	if(text != null)
+		it.textProperty().bind(text)
 }

@@ -9,8 +9,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 fun initDb() {
 	Database.connect("jdbc:sqlite:data/data.sqlite")
+	// user = "myself", password = "secret")
 	transaction {
-		SchemaUtils.create(AppointmentTable, FileTable, NoteTable, TypeTable)
+		SchemaUtils.createMissingTablesAndColumns(AppointmentTable, FileTable, NoteTable, ReminderTable, TypeTable)
 	}
 }
 
@@ -30,14 +31,15 @@ fun getWeekNotes(from: Long, to: Long): List<Note> {
 	}
 }
 
+fun getAppointments(): List<Appointment> {
+	return transaction {
+		return@transaction Appointment.Appointments.all().toList()
+	}
+}
+
 fun getAppointments(from: Long, to: Long): List<Appointment> {
 	return transaction {
 		return@transaction Appointment.Appointments.all().filter {
-//			log("from:  $from   to: $to")
-//			log("start: ${it.start}  end: ${it.start + it.duration}")
-//			log("$from <= ${it.start} + ${it.duration}: ${from <= it.start + it.duration}")
-//			log("$to > ${it.start}: ${to > it.start}")
-//			log("")
 			from <= it.start + it.duration && to > it.start
 		}
 	}
@@ -48,6 +50,12 @@ fun getWeekAppointments(): List<Appointment> {
 		return@transaction Appointment.Appointments.all().filter {
 			it.week
 		}
+	}
+}
+
+fun getReminders(): List<Reminder> {
+	return transaction {
+		return@transaction Reminder.Reminders.all().toList()
 	}
 }
 
@@ -78,6 +86,13 @@ object FileTable: LongIdTable() {
 	val name = text("text")
 	val origin = text("origin")
 	val note = reference("note", NoteTable)
+}
+
+object ReminderTable: LongIdTable() {
+	val time = long("time").nullable()
+	val appointment = reference("appointment", AppointmentTable).nullable()
+	val title = text("title")
+	val description = text("description")
 }
 
 object TypeTable: IntIdTable() {

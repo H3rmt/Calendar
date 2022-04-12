@@ -50,19 +50,17 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 		MONDAY to Monday, TUESDAY to Tuesday, WEDNESDAY to Wednesday, THURSDAY to Thursday, FRIDAY to Friday, SATURDAY to Saturday, SUNDAY to Sunday
 	)
 	
-	fun getallAppointmentsSorted(): Map<Type, List<Appointment>> {
-		val list = mutableMapOf<Type, MutableList<Appointment>>()
+	fun getallAppointmentsSorted(): Map<Type, Int> {
+		val list = mutableMapOf<Type, Int>()
 		for(appointment in appointments) {
-			if(list[appointment.type] == null)
-				list[appointment.type] = mutableListOf()
-			list[appointment.type]!!.add(appointment)
+			list[appointment.type] = list[appointment.type]?.plus(1) ?: 1
 		}
 		return list
 	}
 	
 	val date: String
 		get() = "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
-
+	
 	fun addAppointments(list: List<Appointment>) {
 		val appointmentlist = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
 		list.forEach { appointmentlist[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
@@ -266,6 +264,61 @@ class File(id: EntityID<Long>): LongEntity(id) {
 		var result = data.contentHashCode()
 		result = 31 * result + name.hashCode()
 		result = 31 * result + origin.hashCode()
+		return result
+	}
+}
+
+class Reminder(id: EntityID<Long>): LongEntity(id) {
+	
+	object Reminders: LongEntityClass<Reminder>(ReminderTable)
+	
+	companion object {
+		fun new(_time: Long, _title: String, _description: String): Reminder {
+			return transaction {
+				return@transaction Reminders.new {
+					time = _time
+					title = _title
+					description = _description
+				}
+			}
+		}
+	}
+	
+	private var dbTime by ReminderTable.time
+	private var dbAppointment by Appointment.Appointments optionalReferencedOn ReminderTable.appointment
+	private var dbTitle by ReminderTable.title
+	private var dbDescription by ReminderTable.description
+	
+	var time: Long?
+		get() = transaction { dbTime }
+		set(value) = transaction { dbTime = value }
+	var appointment: Appointment?
+		get() = transaction { dbAppointment }
+		set(value) = transaction { dbAppointment = value }
+	var title: String
+		get() = transaction { dbTitle }
+		set(value) = transaction { dbTitle = value }
+	var description: String
+		get() = transaction { dbDescription }
+		set(value) = transaction { dbDescription = value }
+	
+	fun remove() {
+		transaction {
+			delete()
+		}
+	}
+	
+	override fun toString(): String = "[{$id} $time | $title: $description]"
+	
+	override fun equals(other: Any?): Boolean {
+		return if(other !is Reminder) false
+		else time == other.time && title == other.title && description == other.description
+	}
+	
+	override fun hashCode(): Int {
+		var result = time.hashCode()
+		result = 31 * result + title.hashCode()
+		result = 31 * result + description.hashCode()
 		return result
 	}
 }

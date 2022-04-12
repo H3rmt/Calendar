@@ -104,11 +104,16 @@ fun initConfigs() {
  */
 @OptIn(ExperimentalStdlibApi::class)
 inline fun <reified T: Any> getConfig(conf: Configs): T {
-	configs[conf]?.let {
-		try {
+	try {
+		configs[conf]?.let {
 			try {
 				return if(T::class.java.isEnum) {
-					getJson().fromJson(getJsonReader(StringReader(it as String)), T::class.java)
+					try {
+						getJson().fromJson<T>(getJsonReader(StringReader(it as String)), T::class.java)
+					} catch(e: NullPointerException) {
+						log("Unable to cast $it into element of ${T::class}", LogType.WARNING)
+						throw Exit("??????", e)
+					}
 				} else {
 					it as T
 				}
@@ -117,16 +122,20 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
 					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.LOW)
 					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
-				} else
+				} else {
 					throw Exit("k23d1f", e)
+				}
+			} catch(e: ClassCastException) {
+				log("Gson could not cast value: ${it::class.simpleName} to requested: ${T::class.simpleName}", LogType.WARNING)
+				throw Exit("k23d1f", e)
 			}
-		} catch(e1: ClassCastException) {
-			log("Gson could not cast value: ${it::class.simpleName} to requested: ${T::class.simpleName}", LogType.WARNING)
-			throw Exit("k23d1f", e1)
 		}
+		log("Missing Config option: $conf", LogType.WARNING)
+		throw Exit("j21ka1")
+	} catch(e: Exception) {
+		log("Error reading Config option: $conf as ${T::class}", LogType.WARNING)
+		throw Exit("??????", e)
 	}
-	log("Missing Config option: $conf", LogType.WARNING)
-	throw Exit("j21ka1")
 }
 
 /**
@@ -195,7 +204,7 @@ fun Warning(code: String, exception: Exception, log: Any) {
  */
 enum class Configs {
 	Language, Debug, PrintLogs, LogFormat, DebugLogFormat, StoreLogs, PrintStacktrace,
-	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen
+	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen, IgnoreCaseForSearch
 }
 
 object ConfigFiles {
@@ -206,12 +215,6 @@ object ConfigFiles {
 	const val languageFile = "$dataDirectory/lang.json"
 	
 	const val configFile = "$dataDirectory/config.json"
-	
-	const val weekAppointmentsFile = "$dataDirectory/Week appointments.json"
-	
-	const val appointmentsDir = "$dataDirectory/appointments"
-	
-	const val notesDir = "$dataDirectory/notes"
 }
 
 lateinit var language: Language
@@ -221,10 +224,11 @@ lateinit var language: Language
  *
  * @see Language
  */
-fun getLangString(str: String): String = language[str]
+fun getLangString(str: String, vararg args: Any?): String = language[str].format(*args)
 
 const val emptyDefault = "[\n\n]"
 
+// TODO update this before release
 const val configDefault = "{\n" +
 		  "\t\"Language\": \"en\",\n" +
 		  "\t\"debug\": false,\n" +
@@ -234,18 +238,4 @@ const val configDefault = "{\n" +
 		  "\t\"AnimationSpeed\": 300,\n" +
 		  "\t\"AnimationDelay\": 120,\n" +
 		  "\t\"MaxDayAppointments\": 8,\n" +
-		  "\t\"AppointmentTypes\": [\n" +
-		  "\t\t{\n" +
-		  "\t\t\t\"name\": \"Work\",\n" +
-		  "\t\t\t\"color\": \"BLUE\"\n" +
-		  "\t\t},\n" +
-		  "\t\t{\n" +
-		  "\t\t\t\"name\": \"Sport\",\n" +
-		  "\t\t\t\"color\": \"BLACK\"\n" +
-		  "\t\t},\n" +
-		  "\t\t{\n" +
-		  "\t\t\t\"name\": \"School\",\n" +
-		  "\t\t\t\"color\": \"RED\"\n" +
-		  "\t\t}\n" +
-		  "\t]\n" +
 		  "}"

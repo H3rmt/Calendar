@@ -2,6 +2,7 @@ package frame
 
 import calendar.CellDisplay
 import calendar.Day
+import calendar.Reminder
 import calendar.Week
 import calendar.calendarDisplay
 import calendar.changeMonth
@@ -26,6 +27,7 @@ import logic.LogType
 import logic.getConfig
 import logic.getLangString
 import logic.log
+import popup.NewReminderPopup
 import tornadofx.*
 
 
@@ -78,53 +80,23 @@ fun createcalendartab(pane: TabPane): Tab {
 				// Table view
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
+					addClass(Styles.disableFocusDraw)
 					
 					lateinit var scrollbarWidth: DoubleProperty
 					
 					// Top bar
 					hbox(spacing = 5.0, alignment = Pos.CENTER) {
 						padding = Insets(3.0)
-						style(append = true) {
-//							backgroundColor += Color.WHITE
-						}
 						scrollbarWidth = paddingRightProperty
 						label("") {
 							addClass(Styles.CalendarTableView.tableItem)
 						}
-						label("Monday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Tuesday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Wednesday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Thursday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Friday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Saturday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Sunday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.CalendarTableView.tableHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						for(day in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
+							label(day) {
+								addClass(Styles.CalendarTableView.tableItem)
+								addClass(Styles.CalendarTableView.tableHeader)
+								addClass(Styles.CalendarTableView.cellHeaderLabel)
+							}
 						}
 					}
 					
@@ -140,13 +112,13 @@ fun createcalendartab(pane: TabPane): Tab {
 							// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
 							widthProperty().listen(once = true) {
 								lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-									bar.visibleProperty()
-										.listen {
-											if(it)
-												scrollbarWidth.value = bar.width + 2 // 2 padding right of inner vbox
-											else
-												scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
+									bar.visibleProperty().listen { visible ->
+										if(visible) {
+											scrollbarWidth.value = bar.width + 2 // 2 padding right of inner vbox
+										} else {
+											scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
 										}
+									}
 								}
 							}
 							
@@ -159,7 +131,7 @@ fun createcalendartab(pane: TabPane): Tab {
 							vbox(spacing = 5.0, alignment = Pos.CENTER) {
 								style(append = true) {
 									backgroundColor += Color.WHITE
-									paddingRight = 2.0
+//									paddingRight = 2.0
 								}
 								for((index, week) in list.withIndex()) {
 									hbox(spacing = 5.0, alignment = Pos.CENTER) {
@@ -212,7 +184,7 @@ fun createcalendartab(pane: TabPane): Tab {
 											cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
 										}
 										
-										var openPreparation = false
+										var openPreparation: Boolean = false
 										
 										onMouseEntered = EventHandler {
 											if(selectedIndex.value != index) {
@@ -329,21 +301,26 @@ fun createCellGraphics(
 					padding = box(0.px, 3.px, 2.px, 3.px)
 				}
 				anchorpane {
-					val defaultImg = if(true)
-						createFXImage("remind.svg")
-					else
-						createFXImage("remind active.svg")
-					val hoveredImg = if(true)
-						createFXImage("remind hovered.svg")
-					else
-						createFXImage("remind active hovered.svg")
+					val defaultImg = createFXImage("remind.svg")
+					val hoveredImg = createFXImage("remind hovered.svg")
 					
 					val img = imageview(defaultImg) {
 						addClass(Styles.CalendarTableView.cellLabelIcon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
-					onMouseClicked = EventHandler { it.consume() }
+					onMouseClicked = EventHandler {
+						it.consume()
+						NewReminderPopup.open(
+							getLangString("new reminder"), getLangString("Create"),
+							false,
+							null,
+							data.time.atStartOfDay(),
+							save = { rem: Reminder ->
+								log("Created:$rem")
+							}, false
+						)
+					}
 					onMouseEntered = EventHandler { img.image = hoveredImg }
 					onMouseExited = EventHandler { img.image = defaultImg }
 				}
@@ -530,7 +507,7 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 			circle(radius = circleWidth / 2) {
 				fill = appointmentEntry.key.color
 			}
-			label("${appointmentEntry.value.size}:${appointmentEntry.key.name}") {
+			label("${appointmentEntry.value}:${appointmentEntry.key.name}") {
 				addClass(Styles.CalendarTableView.cellAppointTypeLabel)
 				maxWidth = width - horizontalLeftMargin - circleWidth
 				ellipsisString = ".."
