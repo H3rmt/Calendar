@@ -10,5 +10,6 @@
 	"AnimationSpeed": 200,
 	"AnimationDelay": 80,
 	"MaxDayAppointments": 8,
-	"ExpandNotesOnOpen": true
+	"ExpandNotesOnOpen": true,
+	"IgnoreCaseForSearch": true
 }

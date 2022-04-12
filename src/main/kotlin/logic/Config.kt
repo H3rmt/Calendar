@@ -204,7 +204,7 @@ fun Warning(code: String, exception: Exception, log: Any) {
  */
 enum class Configs {
 	Language, Debug, PrintLogs, LogFormat, DebugLogFormat, StoreLogs, PrintStacktrace,
-	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen
+	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen, IgnoreCaseForSearch
 }
 
 object ConfigFiles {
@@ -228,6 +228,7 @@ fun getLangString(str: String, vararg args: Any?): String = language[str].format
 
 const val emptyDefault = "[\n\n]"
 
+// TODO update this before release
 const val configDefault = "{\n" +
 		  "\t\"Language\": \"en\",\n" +
 		  "\t\"debug\": false,\n" +

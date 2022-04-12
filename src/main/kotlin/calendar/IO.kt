@@ -30,6 +30,12 @@ fun getWeekNotes(from: Long, to: Long): List<Note> {
 	}
 }
 
+fun getAppointments(): List<Appointment> {
+	return transaction {
+		return@transaction Appointment.Appointments.all().toList()
+	}
+}
+
 fun getAppointments(from: Long, to: Long): List<Appointment> {
 	return transaction {
 		return@transaction Appointment.Appointments.all().filter {

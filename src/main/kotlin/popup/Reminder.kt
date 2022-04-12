@@ -1,8 +1,10 @@
 package popup
 
+import calendar.Appointment
 import calendar.Reminder
 import calendar.Timing
 import calendar.Timing.toUTCEpochMinute
+import calendar.getAppointments
 import datetimepicker.dateTimePicker
 import frame.toggleSwitch
 import javafx.beans.property.*
@@ -13,6 +15,7 @@ import javafx.scene.text.*
 import javafx.stage.*
 import listen
 import logic.getLangString
+import picker.appointmentPicker
 import tornadofx.*
 import java.time.LocalDateTime
 
@@ -36,17 +39,25 @@ class NewReminderPopup: Fragment() {
 	
 	private var toggle: Property<Boolean> = scope.timeOrAppointment.toProperty()
 	private var toggleName: Property<String> = "".toProperty()
-	private val dateTimePicker = dateTimePicker(dateTime = end)
-	private val appointmentPicker = label(getLangString("missing %s", "appointmentPicker"))
 	private var control: BorderPane? = null
+	private var appointment: Property<Appointment?> = SimpleObjectProperty(null)
+	
+	init {
+		appointment.listen {
+			if(it != null)
+				end.value = Timing.UTCEpochMinuteToLocalDateTime(it.start)
+			else
+				end.value = scope.end
+		}
+	}
 	
 	private fun updateDisplay(toggle: Boolean) {
 		if(toggle) {
 			toggleName.value = "Appointment"
-			control?.left = appointmentPicker
+			control?.left = appointmentPicker(getAppointments(), appointment = appointment)
 		} else {
 			toggleName.value = "Date"
-			control?.left = dateTimePicker
+			control?.left = dateTimePicker(dateTime = end)
 		}
 	}
 	
