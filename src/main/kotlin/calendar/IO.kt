@@ -9,8 +9,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 fun initDb() {
 	Database.connect("jdbc:sqlite:data/data.sqlite")
+	// user = "myself", password = "secret")
 	transaction {
-		SchemaUtils.create(AppointmentTable, FileTable, NoteTable, ReminderTable, TypeTable)
+		SchemaUtils.createMissingTablesAndColumns(AppointmentTable, FileTable, NoteTable, ReminderTable, TypeTable)
 	}
 }
 
@@ -88,9 +89,10 @@ object FileTable: LongIdTable() {
 }
 
 object ReminderTable: LongIdTable() {
-	var time = long("time")
-	var title = text("title")
-	var description = text("description")
+	val time = long("time").nullable()
+	val appointment = reference("appointment", AppointmentTable).nullable()
+	val title = text("title")
+	val description = text("description")
 }
 
 object TypeTable: IntIdTable() {
