@@ -8,15 +8,14 @@ import calendar.Timing.toUTCEpochMinute
 import calendar.Week
 import calendar.getTypes
 import calendar.now
-import datetimepicker.DateTimePicker
 import datetimepicker.dateTimePicker
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
-import javafx.scene.control.Alert.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
+import javafx.scene.text.*
 import javafx.stage.*
 import listen
 import logic.LogType
@@ -63,6 +62,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 				// Table view
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
+					addClass(Styles.disableFocusDraw)
 					
 					lateinit var topMargin: DoubleProperty
 					
@@ -77,40 +77,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 						label("") {
 							addClass(Styles.CalendarTableView.tableItem)
 						}
-						label("Monday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Tuesday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Wednesday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Thursday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Friday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Saturday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
-						}
-						label("Sunday") {
-							addClass(Styles.CalendarTableView.tableItem)
-							addClass(Styles.WeekTab.tableTimeHeader)
-							addClass(Styles.CalendarTableView.cellHeaderLabel)
+						for(day in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
+							label(day) {
+								addClass(Styles.CalendarTableView.tableItem)
+								addClass(Styles.WeekTab.tableTimeHeader)
+								addClass(Styles.CalendarTableView.cellHeaderLabel)
+							}
 						}
 					}
 					
@@ -127,15 +99,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 							// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
 							widthProperty().listen(once = true) {
 								lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-									fun update(visible: Boolean) {
+									bar.visibleProperty().listen { visible ->
 										if(visible) {
 											topMargin.value = bar.width + 2 //+ scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 										} else {
 											topMargin.value = 2.0 //scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 										}
-									}
-									bar.visibleProperty().listen { visible ->
-										update(visible)
 									}
 								}
 							}
@@ -201,12 +170,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 														padding = box(0.px)
 													}
 													// appointments
-													val cellappointments = appointments.filter {
+													val cellAppointments = appointments.filter {
 														val from = LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0).toUTCEpochMinute()
-														from <= it.start + it.duration && from + 60 > it.start
+														from < it.start + it.duration && from + 60 > it.start
 													}
 													
-													for((ind, app) in cellappointments.withIndex()) {
+													for((ind, app) in cellAppointments.withIndex()) {
 														// colored box(es)
 														hbox {
 															gridpaneConstraints {
@@ -242,12 +211,11 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 													contextmenu {
 														item(getLangString("new appointment")) {
 															action {
-																NewAppointmentPopup.open(
-																	false,
+																NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"), false, null,
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
-																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1),
+																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour).plusHours(1),
 																	save = { app: Appointment ->
-																		log("Created:$app") // TODO multi day
+																		log("Created:$app")
 																		week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
 																		updateTable()
 																		updateCallback()
@@ -256,29 +224,36 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															}
 														}
 														menu(getLangString("remove appointment")) {
-															cellappointments.forEach { appointment ->
+															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
-																		NewAppointmentPopup.open(
-																			false,
-																			Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
-																			Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour + 1),
-																			save = { app: Appointment ->
-																				log("Removed:$app") // TODO multi day
-																				week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.remove(app)
-																				updateTable()
-																				updateCallback()
-																			}
-																		)
+																		val remove = Alert(Alert.AlertType.CONFIRMATION).apply {
+																			title = getLangString("remove?")
+																			headerText = getLangString("do you want to remove %s appointment", appointment.title) // TODO replace %s with title
+																		}.showAndWait().get()
+																		if(remove.buttonData == ButtonBar.ButtonData.OK_DONE) {
+																			log("Removed:$appointment") // TODO multi day
+																			week.allDays[UTCEpochMinuteToLocalDateTime(appointment.start).dayOfWeek]?.appointments?.remove(appointment)
+																			updateTable()
+																			updateCallback()
+																		}
 																	}
 																}
 															}
 														}
 														menu(getLangString("edit appointment")) {
-															cellappointments.forEach { appointment ->
+															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
-																	
+																		NewAppointmentPopup.open(getLangString("edit appointment"), getLangString("Save"), false,
+																			appointment,
+																			Timing.getNowLocal(), // irrelevant, as they get overridden by values in appointment
+																			Timing.getNowLocal(),
+																			save = { app: Appointment ->
+																				log("Updated:$app")
+																				updateTable()
+																			}
+																		)
 																	}
 																}
 															}
@@ -311,39 +286,48 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 class NewAppointmentPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
 	
-	private var start: Property<LocalDateTime> = scope.start.toProperty()
-	private var end: Property<LocalDateTime> = scope.end.toProperty()
-	private var appointmentTitle: Property<String> = "".toProperty()
-	private var description: Property<String> = "".toProperty()
-	private var type: Property<String> = "".toProperty()
+	private var appointment: Appointment? = scope.appointment
 	
-	private var savecall: (Appointment) -> Unit = scope.save
+	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
+	private var start: Property<LocalDateTime> = (appointment?.start?.let { UTCEpochMinuteToLocalDateTime(it) } ?: scope.start).toProperty()
+	private var end: Property<LocalDateTime> = (appointment?.let { UTCEpochMinuteToLocalDateTime(it.start + it.duration) } ?: scope.end).toProperty()
+	private var appointmentTitle: Property<String> = (appointment?.title ?: "").toProperty()
+	private var description: Property<String> = (appointment?.description ?: "").toProperty()
+	private var type: Property<String> = (appointment?.type?.name ?: "").toProperty()
+	
+	private var onSave: (Appointment) -> Unit = scope.save
 	
 	private var error: Property<String> = "".toProperty()
 	
-	private lateinit var startpicker: DateTimePicker
-	private lateinit var endpicker: DateTimePicker
+	private var windowTitle: String = scope.title
+	private var saveTitle: String = scope.saveTitle
 	
-	private fun createAppointment(): Appointment =
-		Appointment.new(
-			start.value.toUTCEpochMinute(),
-			end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
-			appointmentTitle.value,
-			description.value,
-			getTypes().find { it.name == type.value }!!,
-			false
-		)
+	private fun updateAppointment() {
+		appointment?.let { app ->
+			app.title = appointmentTitle.value
+			app.description = description.value
+			app.start = start.value.toUTCEpochMinute()
+			app.duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()
+			app.type = getTypes().find { it.name == type.value }!!
+		}
+	}
+	
+	private fun createAppointment(): Appointment = Appointment.new(
+		start.value.toUTCEpochMinute(),
+		end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
+		appointmentTitle.value,
+		description.value,
+		getTypes().find { it.name == type.value }!!,
+		false
+	)
 	
 	private fun checkAppointment(): String? {
-		// to long (not supported today) //TODO fixit
-		if((end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()) > 43200) {
-			return "to long timespan"
-		} else if(type.value == null) { // TODO language
-			return "missing type"
+		if(type.value == "") {
+			return getLangString("missing type")
 		} else if(appointmentTitle.value.isEmpty()) {
-			return "missing title"
+			return getLangString("missing title")
 		} else if(end.value.toUTCEpochMinute() < start.value.toUTCEpochMinute()) {
-			return "start must be before end"
+			return getLangString("start must be before end")
 		}
 		return null
 	}
@@ -357,7 +341,7 @@ class NewAppointmentPopup: Fragment() {
 		style {
 			backgroundColor += Color.WHITE
 		}
-		fieldset(getLangString("New appointment")) {
+		fieldset(getLangString(windowTitle)) {
 			style {
 				prefHeight = Int.MAX_VALUE.px
 			}
@@ -365,8 +349,8 @@ class NewAppointmentPopup: Fragment() {
 				combobox(values = getTypes().map { it.name }, property = type)
 			}
 			field(getLangString("start to end")) {
-				startpicker = dateTimePicker(dateTime = start)
-				endpicker = dateTimePicker(dateTime = end)
+				dateTimePicker(dateTime = start)
+				dateTimePicker(dateTime = end)
 			}
 			field(getLangString("title")) {
 				textfield(appointmentTitle)
@@ -385,25 +369,33 @@ class NewAppointmentPopup: Fragment() {
 			}
 			
 			buttonbar {
+				textfield(error) {
+					style(append = true) {
+						backgroundColor += Color.TRANSPARENT
+						borderStyle += BorderStrokeStyle.NONE
+						textFill = Color.RED
+						fontSize = 120.percent
+						fontWeight = FontWeight.BOLD
+					}
+				}
 				button(getLangString("Cancel")) {
 					isCancelButton = true
 					action {
 						close()
 					}
 				}
-				button(getLangString("Create")) {
+				button(saveTitle) {
 					isDefaultButton = true
 					action {
 						val check = checkAppointment()
 						if(check == null) {
-							val appointment = createAppointment()
-							savecall.invoke(appointment)
+							if(appointment == null)
+								appointment = createAppointment()
+							updateAppointment()
+							onSave.invoke(appointment!!)
 							close()
 						} else {
-							val alert = Alert(AlertType.ERROR)  // TODO improve
-							alert.title = "Error"
-							alert.headerText = check
-							alert.show()
+							error.value = check
 						}
 					}
 				}
@@ -411,11 +403,14 @@ class NewAppointmentPopup: Fragment() {
 		}
 	}
 	
-	class ItemsScope(val start: LocalDateTime, val end: LocalDateTime, val save: (Appointment) -> Unit): Scope()
+	class ItemsScope(
+		val title: String, val saveTitle: String, val appointment: Appointment?,
+		val start: LocalDateTime, val end: LocalDateTime, val save: (Appointment) -> Unit
+	): Scope()
 	
 	companion object {
-		fun open(block: Boolean, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
-			val scope = ItemsScope(start, end, save)
+		fun open(title: String, saveTitle: String, block: Boolean, appointment: Appointment?, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
+			val scope = ItemsScope(title, saveTitle, appointment, start, end, save)
 			return find<NewAppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 		}
 	}
