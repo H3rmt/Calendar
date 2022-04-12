@@ -83,7 +83,7 @@ object FileTable: LongIdTable() {
 }
 
 object ReminderTable: LongIdTable() {
-	val time = long("time")
+	val time = long("time").nullable()
 	val appointment = reference("appointment", AppointmentTable).nullable()
 	val title = text("title")
 	val description = text("description")

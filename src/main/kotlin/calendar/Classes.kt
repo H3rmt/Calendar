@@ -289,7 +289,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 	private var dbTitle by ReminderTable.title
 	private var dbDescription by ReminderTable.description
 	
-	var time: Long
+	var time: Long?
 		get() = transaction { dbTime }
 		set(value) = transaction { dbTime = value }
 	var appointment: Appointment?
