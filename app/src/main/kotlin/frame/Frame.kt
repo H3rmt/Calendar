@@ -22,6 +22,7 @@ import logic.getConfig
 import logic.getLangString
 import logic.log
 import org.controlsfx.control.ToggleSwitch
+import popup.NewAppointmentPopup
 import popup.NewReminderPopup
 import tornadofx.*
 import java.awt.Desktop

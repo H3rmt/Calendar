@@ -1,40 +1,17 @@
-package datetimepicker
+package picker.DateTimePicker
 
 import frame.createFXImage
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.scene.control.*
 import javafx.scene.paint.*
-import javafx.stage.*
-import lglisten
+import picker.dateTimePicker.DateTimePickerPopup
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-
-
-
-fun main() {
-	launch<TestWindow>()
-}
-
-class TestWindow: App(TestMainView::class) {
-	override fun start(stage: Stage) {
-		stage.height = 150.0
-		stage.width = 300.0
-		super.start(stage)
-	}
-}
-
-class TestMainView: View("Test") {
-	override val root = borderpane {
-		prefWidth = Double.MAX_VALUE
-		center = dateTimePicker { dateTimeProperty.lglisten() }
-		left = button("useless")
-	}
-}
 
 
 fun EventTarget.dateTimePicker(

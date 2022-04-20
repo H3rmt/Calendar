@@ -1,4 +1,4 @@
-package picker
+package picker.appointmentPicker
 
 import calendar.Appointment
 import frame.createFXImage
@@ -11,9 +11,9 @@ import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.text.*
 import javafx.stage.*
+import picker.dropdownTogglePicker.DropdownToggle
+import picker.dropdownTogglePicker.dropdownTogglePicker
 import tornadofx.*
-
-fun String.conditionalLowercase(bool: Boolean): String = if(bool) this.lowercase() else this
 
 class AppointmentPickerPopup(appointment: Property<Appointment?>, private val appointments: List<Appointment>, save: () -> Unit): Popup() {
 	private var replace: String? = null
@@ -27,6 +27,8 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, private val ap
 			DropdownToggle(true, "type")
 		)
 	}
+	
+	private fun String.conditionalLowercase(bool: Boolean): String = if(bool) this.lowercase() else this
 	
 	private fun filter() {
 		if(replace != null) {

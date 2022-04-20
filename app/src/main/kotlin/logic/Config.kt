@@ -226,16 +226,21 @@ lateinit var language: Language
  */
 fun getLangString(str: String, vararg args: Any?): String = language[str].format(*args)
 
-const val emptyDefault = "[\n\n]"
+const val emptyDefault = "{\n\n}"
 
 // TODO update this before release
 const val configDefault = "{\n" +
-		  "\t\"Language\": \"en\",\n" +
-		  "\t\"debug\": false,\n" +
-		  "\t\"printstacktrace\": true,\n" +
-		  "\t\"printlogs\": true,\n" +
-		  "\t\"logformat\": \"[%1\$tF %1\$tT] |%3\$-10s %4\$s %n\",\n" +
-		  "\t\"AnimationSpeed\": 300,\n" +
-		  "\t\"AnimationDelay\": 120,\n" +
+		  "\t\"Language\": \"EN\",\n" +
+		  "\t\"Debug\": false,\n" +
+		  "\t\"PrintStacktrace\": true,\n" +
+		  "\t\"PrintLogs\": true,\n" +
+		  "\t\"StoreLogs\": true,\n" +
+		  "\t\"LogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
+		  "\t\"DebugLogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
+		  "\t// \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
+		  "\t\"AnimationSpeed\": 200,\n" +
+		  "\t\"AnimationDelay\": 80,\n" +
 		  "\t\"MaxDayAppointments\": 8,\n" +
+		  "\t\"ExpandNotesOnOpen\": true,\n" +
+		  "\t\"IgnoreCaseForSearch\": true\n" +
 		  "}"

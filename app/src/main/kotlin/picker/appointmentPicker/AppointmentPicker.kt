@@ -1,51 +1,13 @@
-package picker
+package picker.appointmentPicker
 
 import calendar.Appointment
-import calendar.getAppointments
-import datetimepicker.dateTimePicker
 import frame.createFXImage
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.scene.control.*
 import javafx.scene.paint.*
-import javafx.stage.*
-import lglisten
 import listen
-import org.jetbrains.exposed.sql.Database
 import tornadofx.*
-
-
-
-fun main() {
-	launch<TestWindow>()
-}
-
-class TestWindow: App(TestMainView::class) {
-	override fun start(stage: Stage) {
-		stage.height = 150.0
-		stage.width = 300.0
-		super.start(stage)
-	}
-}
-
-class TestMainView: View("Test") {
-	init {
-		Database.connect("jdbc:sqlite:data/data.sqlite")
-	}
-	
-	private val appointments = getAppointments(0, 222222222222222).subList(1, 7)
-	
-	override val root = borderpane {
-		prefWidth = Double.MAX_VALUE
-		center = appointmentPicker(appointments) {
-			appointmentProperty.lglisten()
-		}
-		bottom = dateTimePicker {
-		
-		}
-		left = button("useless")
-	}
-}
 
 
 fun EventTarget.appointmentPicker(

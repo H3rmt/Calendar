@@ -1,4 +1,4 @@
-package picker
+package picker.dropdownTogglePicker
 
 import javafx.collections.*
 import javafx.geometry.*
@@ -8,7 +8,6 @@ import listen
 import tornadofx.*
 
 class DropdownTogglePickerPopup(toggles: ObservableList<DropdownToggle>, change: (DropdownToggle) -> Unit): Popup() {
-	
 	init {
 		content.add(
 			vbox(spacing = 0.0, alignment = Pos.CENTER) {

@@ -1,42 +1,11 @@
-package picker
+package picker.dropdownTogglePicker
 
 import javafx.beans.property.*
 import javafx.collections.*
 import javafx.event.*
 import javafx.scene.control.*
 import javafx.scene.paint.*
-import javafx.stage.*
 import tornadofx.*
-import kotlin.random.Random
-
-fun main() {
-	launch<TestWindoww>()
-}
-
-class TestWindoww: App(TestMainVieww::class) {
-	override fun start(stage: Stage) {
-		stage.height = 150.0
-		stage.width = 300.0
-		super.start(stage)
-	}
-}
-
-class TestMainVieww: View("Test") {
-	override val root = borderpane {
-		prefWidth = Double.MAX_VALUE
-		val list = FXCollections.observableArrayList<DropdownToggle>()
-		center = dropdownTogglePicker("select", list, {
-			println("update $it")
-		}) {
-		}
-//		left = combobox(values = list)
-		right = button {
-			action {
-				list.add(DropdownToggle(false, "test tes test" + Random.nextInt(1, 1124432524) + Random.nextInt(1, 1124432524)))
-			}
-		}
-	}
-}
 
 
 fun EventTarget.dropdownTogglePicker(
