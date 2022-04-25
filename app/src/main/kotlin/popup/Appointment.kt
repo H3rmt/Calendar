@@ -10,7 +10,7 @@ import javafx.scene.paint.*
 import javafx.scene.text.*
 import javafx.stage.*
 import logic.getLangString
-import picker.DateTimePicker.dateTimePicker
+import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
 import java.time.LocalDateTime
 

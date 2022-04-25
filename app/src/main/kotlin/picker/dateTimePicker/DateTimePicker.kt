@@ -1,11 +1,10 @@
-package picker.DateTimePicker
+package picker.dateTimePicker
 
 import frame.createFXImage
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.scene.control.*
 import javafx.scene.paint.*
-import picker.dateTimePicker.DateTimePickerPopup
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,7 +23,7 @@ fun EventTarget.dateTimePicker(
 	return opcr(this, picker, op)
 }
 
-open class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFormatter): Control() {
+class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFormatter): Control() {
 	
 	// this property only gets updated if the OK button is pressed
 	val dateTimeProperty: Property<LocalDateTime> = SimpleObjectProperty(dateTime)

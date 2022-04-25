@@ -5,7 +5,6 @@ import calendar.Reminder
 import calendar.Timing
 import calendar.Timing.toUTCEpochMinute
 import calendar.getAppointments
-import picker.DateTimePicker.dateTimePicker
 import frame.toggleSwitch
 import javafx.beans.property.*
 import javafx.geometry.*
@@ -16,6 +15,7 @@ import javafx.stage.*
 import listen
 import logic.getLangString
 import picker.appointmentPicker.appointmentPicker
+import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
 import java.time.LocalDateTime
 

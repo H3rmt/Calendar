@@ -20,7 +20,7 @@ fun EventTarget.appointmentPicker(
 	return opcr(this, picker, op)
 }
 
-open class AppointmentPicker(appointment: Appointment?, appointments: List<Appointment>): Control() {
+class AppointmentPicker(appointment: Appointment?, appointments: List<Appointment>): Control() {
 	
 	// this property only gets updated if the OK button is pressed
 	val appointmentProperty: Property<Appointment?> = SimpleObjectProperty(appointment)
