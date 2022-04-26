@@ -50,7 +50,7 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 		MONDAY to Monday, TUESDAY to Tuesday, WEDNESDAY to Wednesday, THURSDAY to Thursday, FRIDAY to Friday, SATURDAY to Saturday, SUNDAY to Sunday
 	)
 	
-	fun getallAppointmentsSorted(): Map<Type, Int> {
+	fun getAllAppointmentsSorted(): Map<Type, Int> {
 		val list = mutableMapOf<Type, Int>()
 		for(appointment in appointments) {
 			list[appointment.type] = list[appointment.type]?.plus(1) ?: 1
@@ -62,9 +62,9 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 		get() = "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
 	
 	fun addAppointments(list: List<Appointment>) {
-		val appointmentlist = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
-		list.forEach { appointmentlist[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
-		for((key, value) in appointmentlist) {
+		val appointmentList = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
+		list.forEach { appointmentList[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
+		for((key, value) in appointmentList) {
 			allDays[key]?.appointments?.addAll(value ?: listOf())
 		}
 	}

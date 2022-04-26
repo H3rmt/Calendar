@@ -11,6 +11,8 @@ import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.text.*
 import javafx.stage.*
+import logic.Configs
+import logic.getConfig
 import picker.dropdownTogglePicker.DropdownToggle
 import picker.dropdownTogglePicker.dropdownTogglePicker
 import tornadofx.*
@@ -32,12 +34,12 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, private val ap
 	
 	private fun filter() {
 		if(replace != null) {
-			val text = replace!!.conditionalLowercase(true)
+			val text = replace!!.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
 			appointmentsList.clear()
 			for(app: Appointment in appointments)
-				if((searchColumns.find { it.name == "title" }!!.selected.value && app.title.conditionalLowercase(true).contains(text)) ||
-					(searchColumns.find { it.name == "description" }!!.selected.value && app.description.conditionalLowercase(true).contains(text)) ||
-					(searchColumns.find { it.name == "type" }!!.selected.value && app.type.name.conditionalLowercase(true).contains(text))
+				if((searchColumns.find { it.name == "title" }!!.selected.value && app.title.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text)) ||
+					(searchColumns.find { it.name == "description" }!!.selected.value && app.description.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text)) ||
+					(searchColumns.find { it.name == "type" }!!.selected.value && app.type.name.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text))
 				) appointmentsList.add(app)
 		} else {
 			appointmentsList.clear()

@@ -11,7 +11,7 @@ import logic.updateLogger
 import kotlin.system.exitProcess
 
 fun main() {
-	println("\n\tStarting Calendar... \n")
+	println("\nStarting Calendar... \n")
 	
 	initLogger()
 	log("initialised Logger", LogType.IMPORTANT)
@@ -22,7 +22,7 @@ fun main() {
 	frameInit()
 	
 	log("exiting Frame", LogType.IMPORTANT)
-	exitProcess(1)
+	exitProcess(0)
 }
 
 fun init() {
@@ -45,10 +45,10 @@ fun <T> T.lg(): T {
 	return this
 }
 
-fun <T> ObservableValue<T>.lglisten(): ObservableValue<T> {
-	println("lglisten on: $this ")
+fun <T> ObservableValue<T>.lgListen(): ObservableValue<T> {
+	println("lgListen on: $this ")
 	this.addListener { ob, _, _ ->
-		println("lglisten:", ob)
+		println("lgListen:", ob)
 	}
 	return this
 }

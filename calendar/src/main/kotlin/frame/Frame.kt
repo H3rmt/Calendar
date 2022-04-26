@@ -27,7 +27,6 @@ import popup.NewReminderPopup
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
-import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URI
@@ -93,7 +92,7 @@ class Window: App(MainView::class, Styles::class) {
 		super.start(stage)
 		removeLoading()
 		log("started Frame", LogType.NORMAL)
-		Tabmanager.openTab("calendar", ::createcalendartab)
+		Tabmanager.openTab("calendar", ::createCalendarTab)
 		Tabmanager.openTab("reminders", ::createReminderTab)
 		
 	}
@@ -101,19 +100,19 @@ class Window: App(MainView::class, Styles::class) {
 
 class MainView: View("Calendar") {
 	override val root = borderpane {
-		top = createmenubar(this)
+		top = createMenuBar(this)
 		log("created menubar", LogType.IMPORTANT)
 		
 		center = tabpane {
 			tabDragPolicy = TabPane.TabDragPolicy.REORDER
 			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
-			Tabmanager.tabpane = this@tabpane
+			Tabmanager.pane = this@tabpane
 		}
-		log("created tabpane", LogType.IMPORTANT)
+		log("created pane", LogType.IMPORTANT)
 	}
 }
 
-fun createmenubar(pane: BorderPane): MenuBar {
+fun createMenuBar(pane: BorderPane): MenuBar {
 	return pane.menubar {
 		menu(getLangString("Create")) {
 			createMenuGroup(
@@ -144,7 +143,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 			createMenuGroup(
 				createMenuItem(this@menu, "Reload", "F5") {
 					init()
-					Secure.overrideTab("calendar", ::createcalendartab)
+					Secure.overrideTab("calendar", ::createCalendarTab)
 				},
 				createMenuItem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
 				run { separator(); return@run null },
@@ -163,7 +162,7 @@ fun createmenubar(pane: BorderPane): MenuBar {
 //				createMenuItem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
 				createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {
 					log("Show Calendar")
-					Secure.overrideTab("calendar", ::createcalendartab)
+					Secure.overrideTab("calendar", ::createCalendarTab)
 				}
 			)
 		}
@@ -261,7 +260,7 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
  */
 object Tabmanager {
 	
-	lateinit var tabpane: TabPane
+	lateinit var pane: TabPane
 	
 	/**
 	 * <identifier, Tab>
@@ -274,7 +273,7 @@ object Tabmanager {
 	 * takes an identifier, a function to create the tab and arguments for that function
 	 * as arguments
 	 *
-	 * adds the tab to the tabpane if new created and sets focus on that tab
+	 * adds the tab to the pane if new created and sets focus on that tab
 	 *
 	 * @param identifier this should be a unique identifier for the tab
 	 *                   like the title but with some extra information
@@ -288,24 +287,24 @@ object Tabmanager {
 	 *
 	 * @param createFunction the function to create the tab
 	 *
-	 *                       must take a tabpane as its first parameter
+	 *                       must take a pane as its first parameter
 	 *                       and return ab Tab
 	 *
 	 *                       Examples:
 	 *                       > ::createWeekTab(fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab)
 	 *                       > ::createNoteTab(fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab)
 	 *
-	 * @param methodArgs add all extra parameters apart from the tabpane here
+	 * @param methodArgs add all extra parameters apart from the pane here
 	 *
 	 *                       Examples:
 	 *                       > week,day
 	 *                       > data
 	 */
 	fun openTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
-		val newTab = tabs.getOrElse(identifier) { createFunction.call(tabpane, *methodArgs).also { tabs[identifier] = it } }
+		val newTab = tabs.getOrElse(identifier) { createFunction.call(pane, *methodArgs).also { tabs[identifier] = it } }
 		newTab.setOnClosed { tabs.remove(identifier) }
 		
-		tabpane.selectionModel.select(newTab)
+		pane.selectionModel.select(newTab)
 	}
 	
 	/**
@@ -323,10 +322,10 @@ object Tabmanager {
 		fun overrideTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
 			tabs[identifier]?.close()
 			
-			val newtab = createFunction.call(tabpane, *methodArgs).also { tabs[identifier] = it }
-			newtab.setOnClosed { tabs.remove(identifier) }
+			val tab = createFunction.call(pane, *methodArgs).also { tabs[identifier] = it }
+			tab.setOnClosed { tabs.remove(identifier) }
 			
-			tabpane.selectionModel.select(newtab)
+			pane.selectionModel.select(tab)
 		}
 	}
 	
@@ -345,7 +344,8 @@ fun createFXImage(name: String): Image {
 	cache[path]?.let { return it }
 	
 	val image = try {
-		ImageIO.read(File(path).takeIf { it.exists() })
+		ImageIO.read({}::class.java.classLoader.getResource(path))
+//		ImageIO.read(File(path).takeIf { it.exists() })
 	} catch(e: IllegalArgumentException) {
 		Warning("imageError", e, "file not found:$path")
 		getImageMissing()
@@ -367,11 +367,24 @@ fun createFXImage(name: String): Image {
 fun getImageMissing(): BufferedImage {
 	val im = BufferedImage(30, 30, BufferedImage.TYPE_3BYTE_BGR)
 	val g2 = im.graphics
-	for(i in 0 until 4)
-		for(j in 0 until 4) {
-			g2.color = java.awt.Color(Random.nextInt(155), Random.nextInt(155), Random.nextInt(255))
-			g2.fillRect(1 + i * 6, 1 + j * 6, 3, 3)
+	for(i in 0 until 15)
+		for(j in 0 until 15) {
+			g2.color = java.awt.Color(Random.nextInt(255), Random.nextInt(155), Random.nextInt(155))
+			g2.fillRect(1 + i * 2, 1 + j * 2, 3, 3)
 		}
+	for(i in 0 until 30) {
+		g2.color = java.awt.Color(200, 10, 50)
+		g2.fillRect(i, 0, 1, 1)
+		g2.fillRect(0, i, 1, 1)
+		g2.fillRect(29, i, 1, 1)
+		g2.fillRect(i, 29, 1, 1)
+		g2.color = java.awt.Color(200, 180, 200)
+		g2.fillRect(i, 1, 1, 1)
+		g2.fillRect(1, i, 1, 1)
+		g2.fillRect(28, i, 1, 1)
+		g2.fillRect(i, 28, 1, 1)
+	}
+	
 	g2.dispose()
 	return im
 }

@@ -40,8 +40,8 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 	
 	
 	private val dateProperty: Property<LocalDate> = dateTime.toLocalDate().toProperty()
-	protected val minuteProperty: IntegerProperty = dateTime.minute.toProperty()
-	protected val hourProperty: IntegerProperty = dateTime.hour.toProperty()
+	val minuteProperty: IntegerProperty = dateTime.minute.toProperty()
+	val hourProperty: IntegerProperty = dateTime.hour.toProperty()
 	
 	
 	private val popup: DateTimePickerPopup = DateTimePickerPopup(dateProperty, hourProperty, minuteProperty) {
