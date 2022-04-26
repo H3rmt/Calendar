@@ -86,23 +86,7 @@ fun initConfigs() {
 	log("set stacktrace $stacktrace", LogType.LOW)
 }
 
-/**
- * returns a configuration in Config enum specified in config.json
- * cast to given type
- *
- * getConfig<ConfigType>(Configs.<config>)
- *
- * ConfigType = Int / String / Boolean / Enum element
- *
- * enums get cast automatically from String,
- * other types throw errors if type doesn't match
- *
- * config = Enum Element
- *
- * @see Configs
- * @see configs
- */
-@OptIn(ExperimentalStdlibApi::class)
+
 inline fun <reified T: Any> getConfig(conf: Configs): T {
 	try {
 		configs[conf]?.let {
@@ -212,7 +196,7 @@ object ConfigFiles {
 	
 	const val dataDirectory = "data"
 	
-	const val languageFile = "$dataDirectory/lang.json"
+	const val languageFile = "lang.json"
 	
 	const val configFile = "$dataDirectory/config.json"
 }
