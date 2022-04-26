@@ -31,7 +31,7 @@ import popup.NewReminderPopup
 import tornadofx.*
 
 
-fun createcalendartab(pane: TabPane): Tab {
+fun createCalendarTab(pane: TabPane): Tab {
 	log("creating calendar tab", LogType.IMPORTANT)
 	return pane.tab(getLangString("calender")) {
 		isClosable = false
@@ -144,7 +144,7 @@ fun createcalendartab(pane: TabPane): Tab {
 										
 										val cells = mutableListOf<VBox>()
 										
-										val expand = SimpleDoubleProperty(detailspaneminHeight.toDouble())
+										val expand = SimpleDoubleProperty(detailSpanMinHeight.toDouble())
 										
 										val openAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
 										val closeAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
@@ -277,7 +277,7 @@ fun createcalendartab(pane: TabPane): Tab {
 	}
 }
 
-const val detailspaneminHeight = 8
+const val detailSpanMinHeight = 8
 
 fun createCellGraphics(
 	data: CellDisplay,
@@ -429,8 +429,8 @@ fun createCellGraphics(
 //				backgroundColor += Color.RED
 				// must be deactivated because style gets reset
 				// when any (mouse)events happen
-				prefHeight = detailspaneminHeight.px
-//				minHeight = detailspaneminHeight.px
+				prefHeight = detailSpanMinHeight.px
+//				minHeight = detailSpanMinHeight.px
 			}
 		}
 		
@@ -459,14 +459,14 @@ fun createCellGraphics(
 			closeTimeline.keyFrames.add(closeFrame)
 		})
 		
-		openTimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), detailspaneminHeight)))
+		openTimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), detailSpanMinHeight)))
 		openTimeline.keyFrames.add(openFrame)
 		
 		closeTimeline.keyFrames.add(closeFrame)
 		closeTimeline.keyFrames.add(
 			KeyFrame(
 				Duration(getConfig(Configs.AnimationSpeed)),
-				KeyValue(pane.minHeightProperty(), detailspaneminHeight)
+				KeyValue(pane.minHeightProperty(), detailSpanMinHeight)
 			)
 		)
 		
@@ -498,11 +498,11 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
 	
 	val yCords = mutableListOf<Double>()
-	for(index in 0 until week.getallAppointmentsSorted().size) {
+	for(index in 0 until week.getAllAppointmentsSorted().size) {
 		yCords.add(sideTopMargin + index * (spacing * 2 + circleWidth))
 	}
 	
-	for((index, appointmentEntry) in week.getallAppointmentsSorted().entries.withIndex()) {
+	for((index, appointmentEntry) in week.getAllAppointmentsSorted().entries.withIndex()) {
 		pane.hbox(alignment = Pos.CENTER_LEFT, spacing = spacing) {
 			circle(radius = circleWidth / 2) {
 				fill = appointmentEntry.key.color
