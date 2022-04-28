@@ -12,6 +12,15 @@ complexity:
     threshold: 6
     
 style:
+  MaxLineLength:
+    active: true
+    maxLineLength: 140
+  MagicNumber:
+    active: false
+  WildcardImport:
+    active: false
+    
+exceptions:
   TooGenericExceptionCaught:
     active: true
     exceptionNames:
@@ -19,14 +28,9 @@ style:
       - 'Exception'
       - 'RuntimeException'
       - 'Throwable'
+
+naming:
   FunctionParameterNaming:
     active: false
   ConstructorParameterNaming:
-    active: false
-  MaxLineLength:
-    active: true
-    maxLineLength: 140
-  MagicNumber:
-    active: false
-  WildcardImport:
     active: false
