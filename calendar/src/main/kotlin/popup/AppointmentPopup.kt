@@ -15,7 +15,7 @@ import tornadofx.*
 import java.time.LocalDateTime
 
 
-class NewAppointmentPopup: Fragment() {
+class AppointmentPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
 	
 	private var appointment: Appointment? = scope.appointment
@@ -141,10 +141,10 @@ class NewAppointmentPopup: Fragment() {
 	): Scope()
 	
 	companion object {
+		@Suppress("LongParameterList")
 		fun open(title: String, saveTitle: String, block: Boolean, appointment: Appointment?, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
 			val scope = ItemsScope(title, saveTitle, appointment, start, end, save)
-			return find<NewAppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+			return find<AppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 		}
 	}
-	
 }

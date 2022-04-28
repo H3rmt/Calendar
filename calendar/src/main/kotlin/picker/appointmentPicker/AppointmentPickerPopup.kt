@@ -37,6 +37,7 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, private val ap
 			val text = replace!!.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
 			appointmentsList.clear()
 			for(app: Appointment in appointments)
+				@Suppress("ComplexCondition")
 				if((searchColumns.find { it.name == "title" }!!.selected.value && app.title.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text)) ||
 					(searchColumns.find { it.name == "description" }!!.selected.value && app.description.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text)) ||
 					(searchColumns.find { it.name == "type" }!!.selected.value && app.type.name.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text))

@@ -17,7 +17,7 @@ import listen
 import logic.LogType
 import logic.getLangString
 import logic.log
-import popup.NewAppointmentPopup
+import popup.AppointmentPopup
 import tornadofx.*
 import java.time.LocalDateTime
 import java.time.temporal.IsoFields
@@ -208,7 +208,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 													contextmenu {
 														item(getLangString("new appointment")) {
 															action {
-																NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"), false, null,
+																AppointmentPopup.open(getLangString("new appointment"), getLangString("Create"), false, null,
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour).plusHours(1),
 																	save = { app: Appointment ->
@@ -242,7 +242,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															cellAppointments.forEach { appointment ->
 																item(appointment.title) {
 																	action {
-																		NewAppointmentPopup.open(getLangString("edit appointment"), getLangString("Save"), false,
+																		AppointmentPopup.open(getLangString("edit appointment"), getLangString("Save"), false,
 																			appointment,
 																			Timing.getNowLocal(), // irrelevant, as they get overridden by values in appointment
 																			Timing.getNowLocal(),

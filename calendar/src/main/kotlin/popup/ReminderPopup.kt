@@ -20,7 +20,7 @@ import tornadofx.*
 import java.time.LocalDateTime
 
 
-class NewReminderPopup: Fragment() {
+class ReminderPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
 	
 	private var reminder: Reminder? = scope.reminder
@@ -176,9 +176,10 @@ class NewReminderPopup: Fragment() {
 	): Scope()
 	
 	companion object {
+		@Suppress("LongParameterList")
 		fun open(title: String, saveTitle: String, block: Boolean, reminder: Reminder?, end: LocalDateTime, save: (Reminder) -> Unit, timeOrAppointment: Boolean = true): Stage? {
 			val scope = ItemsScope(title, saveTitle, reminder, end, save, timeOrAppointment)
-			return find<NewReminderPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+			return find<ReminderPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 		}
 	}
 }

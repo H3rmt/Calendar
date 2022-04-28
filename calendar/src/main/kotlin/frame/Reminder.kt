@@ -13,7 +13,7 @@ import listen
 import logic.LogType
 import logic.getLangString
 import logic.log
-import popup.NewReminderPopup
+import popup.ReminderPopup
 import tornadofx.*
 
 
@@ -46,7 +46,7 @@ fun createReminderTab(pane: TabPane): Tab {
 						addClass(Styles.Tabs.titleButtons)
 						
 						action {
-							NewReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
+							ReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
 								false,
 								null,
 								Timing.getNowLocal(),
@@ -122,7 +122,7 @@ fun createReminderTab(pane: TabPane): Tab {
 								style(append = true) {
 									backgroundColor += Color.WHITE
 								}
-								for((index, reminder) in list.withIndex()) {
+								for(reminder in list) {
 									hbox(spacing = 5.0, alignment = Pos.CENTER) {
 										style(append = true) {
 											backgroundColor += Color.WHITE

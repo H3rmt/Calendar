@@ -54,7 +54,7 @@ fun initConfigs() {
 			dir.mkdirs()
 		}
 		file.createNewFile()
-		file.writeText(configDefault)
+		file.writeText(CONFIG_DEFAULT)
 		log("created default config:${ConfigFiles.configFile}", LogType.WARNING)
 	}
 	
@@ -102,6 +102,7 @@ fun initConfigs() {
  * @see Configs
  * @see configs
  */
+@Suppress("NestedBlockDepth", "ThrowsCount", "TooGenericExceptionCaught")
 @OptIn(ExperimentalStdlibApi::class)
 inline fun <reified T: Any> getConfig(conf: Configs): T {
 	try {
@@ -226,10 +227,10 @@ lateinit var language: Language
  */
 fun getLangString(str: String, vararg args: Any?): String = language[str].format(*args)
 
-const val emptyDefault = "{\n\n}"
+const val EMPTY_DEFAULT = "{\n\n}"
 
 // TODO update this before release
-const val configDefault = "{\n" +
+const val CONFIG_DEFAULT = "{\n" +
 		  "\t\"Language\": \"EN\",\n" +
 		  "\t\"Debug\": false,\n" +
 		  "\t\"PrintStacktrace\": true,\n" +

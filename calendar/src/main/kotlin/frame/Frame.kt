@@ -22,11 +22,12 @@ import logic.getConfig
 import logic.getLangString
 import logic.log
 import org.controlsfx.control.ToggleSwitch
-import popup.NewAppointmentPopup
-import popup.NewReminderPopup
+import popup.AppointmentPopup
+import popup.ReminderPopup
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
+import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.URI
@@ -80,11 +81,6 @@ fun frameInit() {
 	//LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
 
-class PreloaderWindow: Preloader() {
-	override fun start(primaryStage: Stage) {
-	}
-}
-
 class Window: App(MainView::class, Styles::class) {
 	override fun start(stage: Stage) {
 		stage.height = 600.0
@@ -117,7 +113,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 		menu(getLangString("Create")) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Appointment", "Strg + N") {
-					NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"),
+					AppointmentPopup.open(getLangString("new appointment"), getLangString("Create"),
 						false,
 						null,
 						Timing.getNowLocal(),
@@ -128,7 +124,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 					)
 				},
 				createMenuItem(this@menu, "Reminder", "Strg + R") {
-					NewReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
+					ReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
 						false,
 						null,
 						Timing.getNowLocal(),
@@ -174,8 +170,8 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 						runAsync {
 							Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
 						}
-					} catch(e: Exception) {
-						log("failed to open browser", LogType.WARNING)
+					} catch(e: IOException) {
+						log("failed to open browser $e", LogType.WARNING)
 					}
 				},
 				createMenuItem(this@menu, "Memory Usage", "") {

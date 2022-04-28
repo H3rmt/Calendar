@@ -31,6 +31,7 @@ interface CellDisplay {
 	val time: LocalDate
 }
 
+@Suppress("LongParameterList")
 class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday: Day, Friday: Day, Saturday: Day, Sunday: Day, val WeekOfYear: Int): CellDisplay {
 	
 	override val time: LocalDate = _time

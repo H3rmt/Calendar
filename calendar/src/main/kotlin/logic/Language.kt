@@ -20,7 +20,7 @@ class Language(private val language: AvailableLanguages) {
 		val file = File(ConfigFiles.languageFile)
 		if(!file.exists()) {
 			file.createNewFile()
-			file.writeText(emptyDefault)
+			file.writeText(EMPTY_DEFAULT)
 		}
 		val allTranslations: Map<String, Map<String, String>> =
 			getJson().fromJson(getJsonReader(FileReader(ConfigFiles.languageFile)), Map::class.java)

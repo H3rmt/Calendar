@@ -17,7 +17,8 @@ val thread: Thread = Thread {
 	while(true) {
 		try {
 			Thread.sleep(30)
-		} catch(e: InterruptedException) {
+		} catch(_: InterruptedException) {
+			break
 		}
 		for(i in (loadingsCircles.indices)) {
 			loadingsCircles[i]++

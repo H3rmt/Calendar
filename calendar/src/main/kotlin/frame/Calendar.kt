@@ -27,7 +27,7 @@ import logic.LogType
 import logic.getConfig
 import logic.getLangString
 import logic.log
-import popup.NewReminderPopup
+import popup.ReminderPopup
 import tornadofx.*
 
 
@@ -144,7 +144,7 @@ fun createCalendarTab(pane: TabPane): Tab {
 										
 										val cells = mutableListOf<VBox>()
 										
-										val expand = SimpleDoubleProperty(detailSpanMinHeight.toDouble())
+										val expand = SimpleDoubleProperty(DETAILSPANMINHEIGHT.toDouble())
 										
 										val openAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
 										val closeAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
@@ -277,7 +277,7 @@ fun createCalendarTab(pane: TabPane): Tab {
 	}
 }
 
-const val detailSpanMinHeight = 8
+const val DETAILSPANMINHEIGHT = 8
 
 fun createCellGraphics(
 	data: CellDisplay,
@@ -311,7 +311,7 @@ fun createCellGraphics(
 					}
 					onMouseClicked = EventHandler {
 						it.consume()
-						NewReminderPopup.open(
+						ReminderPopup.open(
 							getLangString("new reminder"), getLangString("Create"),
 							false,
 							null,
@@ -429,8 +429,8 @@ fun createCellGraphics(
 //				backgroundColor += Color.RED
 				// must be deactivated because style gets reset
 				// when any (mouse)events happen
-				prefHeight = detailSpanMinHeight.px
-//				minHeight = detailSpanMinHeight.px
+				prefHeight = DETAILSPANMINHEIGHT.px
+//				minHeight = DETAILSPANMINHEIGHT.px
 			}
 		}
 		
@@ -459,14 +459,14 @@ fun createCellGraphics(
 			closeTimeline.keyFrames.add(closeFrame)
 		})
 		
-		openTimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), detailSpanMinHeight)))
+		openTimeline.keyFrames.add(KeyFrame(Duration(0.0), KeyValue(pane.minHeightProperty(), DETAILSPANMINHEIGHT)))
 		openTimeline.keyFrames.add(openFrame)
 		
 		closeTimeline.keyFrames.add(closeFrame)
 		closeTimeline.keyFrames.add(
 			KeyFrame(
 				Duration(getConfig(Configs.AnimationSpeed)),
-				KeyValue(pane.minHeightProperty(), detailSpanMinHeight)
+				KeyValue(pane.minHeightProperty(), DETAILSPANMINHEIGHT)
 			)
 		)
 		
@@ -484,12 +484,12 @@ fun createCellGraphics(
 }
 
 
-const val spacing = 4.0
-const val circleWidth = 8.0
+const val SPACING = 4.0
+const val CIRCLE_WIDTH = 8.0
 
-const val sideTopMargin = 6.0
-const val verticalTopMargin = 4.0
-const val horizontalLeftMargin = 8.0
+const val SIDE_TOP_MARGIN = 6.0
+const val VERTICAL_TOP_MARGIN = 4.0
+const val HORIZONTAL_LEFT_MARGIN = 8.0
 
 fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<Animation>>): Double {
 	pane.clear()
@@ -499,23 +499,23 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	
 	val yCords = mutableListOf<Double>()
 	for(index in 0 until week.getAllAppointmentsSorted().size) {
-		yCords.add(sideTopMargin + index * (spacing * 2 + circleWidth))
+		yCords.add(SIDE_TOP_MARGIN + index * (SPACING * 2 + CIRCLE_WIDTH))
 	}
 	
 	for((index, appointmentEntry) in week.getAllAppointmentsSorted().entries.withIndex()) {
-		pane.hbox(alignment = Pos.CENTER_LEFT, spacing = spacing) {
-			circle(radius = circleWidth / 2) {
+		pane.hbox(alignment = Pos.CENTER_LEFT, spacing = SPACING) {
+			circle(radius = CIRCLE_WIDTH / 2) {
 				fill = appointmentEntry.key.color
 			}
 			label("${appointmentEntry.value}:${appointmentEntry.key.name}") {
 				addClass(Styles.CalendarTableView.cellAppointTypeLabel)
-				maxWidth = width - horizontalLeftMargin - circleWidth
+				maxWidth = width - HORIZONTAL_LEFT_MARGIN - CIRCLE_WIDTH
 				ellipsisString = ".."
 				textOverrun = OverrunStyle.ELLIPSIS
 			}
 			
-			translateX = circleWidth / 2
-			translateY = yCords[index] - circleWidth
+			translateX = CIRCLE_WIDTH / 2
+			translateY = yCords[index] - CIRCLE_WIDTH
 			opacity = 0.0
 		}
 	}
@@ -544,7 +544,7 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	animations[1].clear()
 	animations[1].addAll(closeTransitions)
 	
-	return (yCords.getOrNull(yCords.lastIndex)?.plus(sideTopMargin) ?: 0.0)
+	return (yCords.getOrNull(yCords.lastIndex)?.plus(SIDE_TOP_MARGIN) ?: 0.0)
 }
 
 fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableList<Animation>>): Double {
@@ -558,7 +558,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	// make width even because ,5 pixel are not supported <-(AI said this)
 	val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
 	
-	val topSpacing: Double = maxOf(2.0, minOf(spacing, (((width - spacing) / appointments.size) / 3)))
+	val topSpacing: Double = maxOf(2.0, minOf(SPACING, (((width - SPACING) / appointments.size) / 3)))
 	val topCircleWidth: Double = topSpacing * 2
 	
 	val xCords = mutableListOf<Double>()
@@ -582,26 +582,26 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	for((index, appointment) in appointments.withIndex()) {
 		pane.circle(radius = topCircleWidth / 2) {
 			fill = appointment.type.color
-			centerY = verticalTopMargin
+			centerY = VERTICAL_TOP_MARGIN
 			centerX = xCords[index]
 		}
 	}
 	
 	val yCords = mutableListOf<Double>()
 	for(index in appointments.indices) {
-		yCords.add(sideTopMargin + index * (spacing + circleWidth))
+		yCords.add(SIDE_TOP_MARGIN + index * (SPACING + CIRCLE_WIDTH))
 	}
 	if(limited)
-		yCords.add(sideTopMargin + yCords.size * (spacing + circleWidth))
+		yCords.add(SIDE_TOP_MARGIN + yCords.size * (SPACING + CIRCLE_WIDTH))
 	
 	for((index, appointment) in appointments.withIndex()) {
 		pane.label(appointment.title) {
 			addClass(Styles.CalendarTableView.cellAppointLabel)
-			translateX = horizontalLeftMargin + circleWidth
-			translateY = yCords[index] - circleWidth / 1.1
+			translateX = HORIZONTAL_LEFT_MARGIN + CIRCLE_WIDTH
+			translateY = yCords[index] - CIRCLE_WIDTH / 1.1
 			opacity = 0.0
 			
-			maxWidth = width - horizontalLeftMargin - circleWidth
+			maxWidth = width - HORIZONTAL_LEFT_MARGIN - CIRCLE_WIDTH
 			ellipsisString = ".."
 			textOverrun = OverrunStyle.ELLIPSIS
 		}
@@ -613,11 +613,11 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 			style {
 				fontWeight = FontWeight.BOLD
 			}
-			translateX = horizontalLeftMargin
-			translateY = yCords[yCords.size - 1] - circleWidth //- spacing
+			translateX = HORIZONTAL_LEFT_MARGIN
+			translateY = yCords[yCords.size - 1] - CIRCLE_WIDTH //- SPACING
 			opacity = 0.0
 			
-			maxWidth = width - horizontalLeftMargin
+			maxWidth = width - HORIZONTAL_LEFT_MARGIN
 			ellipsisString = ""
 			textOverrun = OverrunStyle.ELLIPSIS
 		}
@@ -631,10 +631,10 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 		val label = pane.getChildList()?.filterIsInstance<Label>()?.get(index)
 		
 		val openPath = Path()
-		openPath.elements.add(MoveTo(xCords[index], sideTopMargin))
+		openPath.elements.add(MoveTo(xCords[index], SIDE_TOP_MARGIN))
 		openPath.elements.add(
 			CubicCurveTo(
-				xCords[index], sideTopMargin, horizontalLeftMargin * 1.8, sideTopMargin * 1.8, horizontalLeftMargin, yCords[index]
+				xCords[index], SIDE_TOP_MARGIN, HORIZONTAL_LEFT_MARGIN * 1.8, SIDE_TOP_MARGIN * 1.8, HORIZONTAL_LEFT_MARGIN, yCords[index]
 			),
 		)
 		openTransitions.add(PathTransition(Duration(getConfig(Configs.AnimationSpeed)), openPath, circle))
@@ -647,10 +647,10 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 		openTransitions.add(openFadeTransition)
 		
 		val closePath = Path()
-		closePath.elements.add(MoveTo(horizontalLeftMargin, yCords[index]))
+		closePath.elements.add(MoveTo(HORIZONTAL_LEFT_MARGIN, yCords[index]))
 		closePath.elements.add(
 			CubicCurveTo(
-				horizontalLeftMargin, yCords[index], xCords[index], yCords[index], xCords[index], verticalTopMargin
+				HORIZONTAL_LEFT_MARGIN, yCords[index], xCords[index], yCords[index], xCords[index], VERTICAL_TOP_MARGIN
 			)
 		)
 		closeTransitions.add(PathTransition(Duration(getConfig(Configs.AnimationSpeed)), closePath, circle))
@@ -685,5 +685,5 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	animations[1].clear()
 	animations[1].addAll(closeTransitions)
 	
-	return (yCords.getOrNull(yCords.lastIndex)?.plus(sideTopMargin) ?: 0.0)
+	return (yCords.getOrNull(yCords.lastIndex)?.plus(SIDE_TOP_MARGIN) ?: 0.0)
 }
