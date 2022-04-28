@@ -1,7 +1,8 @@
 # Calendar
 
-[![Main Branch Test](https://github.com/H3rmt/Calendar/actions/workflows/main.yml/badge.svg "Main Build status")](https://github.com/H3rmt/Calendar/actions/workflows/main.yml)
-[![Next Branch Tests](https://github.com/H3rmt/Calendar/actions/workflows/next.yml/badge.svg "Next Build status")](https://github.com/H3rmt/Calendar/actions/workflows/next.yml)
+[![Gradle Build Main](https://github.com/H3rmt/Calendar/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/H3rmt/Calendar/actions/workflows/build.yml)
+[![Gradle Build Next](https://github.com/H3rmt/Calendar/actions/workflows/build.yml/badge.svg?branch=next)](https://github.com/H3rmt/Calendar/actions/workflows/build.yml)
+[![Scan with Detekt](https://github.com/H3rmt/Calendar/actions/workflows/detekt.yml/badge.svg?branch=main)](https://github.com/H3rmt/Calendar/actions/workflows/detekt.yml)
 
 A desktop calendar written in [Kotlin](https://github.com/edvin/tornadofx) with [Tornadofx](https://github.com/edvin/tornadofx) with appointments, notes and reminders
 
