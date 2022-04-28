@@ -4,7 +4,7 @@ on:
   push:
     branches: [ next, main ]
   pull_request:
-    branches: [ next, main ]
+    branches: [ next, main, release ]
 
 jobs:
   scan:
