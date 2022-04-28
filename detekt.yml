@@ -10,6 +10,8 @@ complexity:
   ComplexCondition:
     active: true
     threshold: 6
+    
+style:
   TooGenericExceptionCaught:
     active: true
     exceptionNames:
