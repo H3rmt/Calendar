@@ -1,7 +1,7 @@
 package calendar
 
 import calendar.File.Files.referrersOn
-import calendar.Timing.UTCEpochMinuteToLocalDateTime
+import calendar.Timing.fromUTCEpochMinuteToLocalDateTime
 import javafx.scene.paint.*
 import logic.Configs
 import logic.getConfig
@@ -64,7 +64,7 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 	
 	fun addAppointments(list: List<Appointment>) {
 		val appointmentList = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
-		list.forEach { appointmentList[UTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
+		list.forEach { appointmentList[fromUTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
 		for((key, value) in appointmentList) {
 			allDays[key]?.appointments?.addAll(value ?: listOf())
 		}

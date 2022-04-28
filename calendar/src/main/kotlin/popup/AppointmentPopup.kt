@@ -21,8 +21,8 @@ class AppointmentPopup: Fragment() {
 	private var appointment: Appointment? = scope.appointment
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
-	private var start: Property<LocalDateTime> = (appointment?.start?.let { Timing.UTCEpochMinuteToLocalDateTime(it) } ?: scope.start).toProperty()
-	private var end: Property<LocalDateTime> = (appointment?.let { Timing.UTCEpochMinuteToLocalDateTime(it.start + it.duration) } ?: scope.end).toProperty()
+	private var start: Property<LocalDateTime> = (appointment?.start?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it) } ?: scope.start).toProperty()
+	private var end: Property<LocalDateTime> = (appointment?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it.start + it.duration) } ?: scope.end).toProperty()
 	private var appointmentTitle: Property<String> = (appointment?.title ?: "").toProperty()
 	private var description: Property<String> = (appointment?.description ?: "").toProperty()
 	private var type: Property<String> = (appointment?.type?.name ?: "").toProperty()
@@ -53,6 +53,7 @@ class AppointmentPopup: Fragment() {
 		false
 	)
 	
+	@Suppress("ReturnCount")
 	private fun checkAppointment(): String? {
 		if(type.value == "") {
 			return getLangString("missing type")

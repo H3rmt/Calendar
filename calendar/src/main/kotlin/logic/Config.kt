@@ -173,6 +173,7 @@ class Exit(private val code: String, private val exception: Exception? = null): 
 	override fun toString(): String = "Exit <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
 }
 
+
 /**
  * Custom Warning with Custom error code
  * (doesn't stop the code)
@@ -188,6 +189,7 @@ class Exit(private val code: String, private val exception: Exception? = null): 
  * @see Exception
  *
  */
+@Suppress("FunctionNaming", "UnusedPrivateMember")
 fun Warning(code: String, exception: Exception, log: Any) {
 	log(log, LogType.WARNING)
 	val writer = StringWriter()

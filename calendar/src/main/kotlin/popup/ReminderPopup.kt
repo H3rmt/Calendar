@@ -27,7 +27,7 @@ class ReminderPopup: Fragment() {
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
 	private var reminderTitle: Property<String> = (reminder?.title ?: "").toProperty()
-	private var end: Property<LocalDateTime> = (reminder?.let { it.time?.let { it1 -> Timing.UTCEpochMinuteToLocalDateTime(it1) } } ?: scope.end).toProperty()
+	private var end: Property<LocalDateTime> = (reminder?.let { it.time?.let { it1 -> Timing.fromUTCEpochMinuteToLocalDateTime(it1) } } ?: scope.end).toProperty()
 	private var reminderDescription: Property<String> = (reminder?.title ?: "").toProperty()
 	
 	private var onSave: (Reminder) -> Unit = scope.save
@@ -45,7 +45,7 @@ class ReminderPopup: Fragment() {
 	init {
 		appointment.listen {
 			if(it != null)
-				end.value = Timing.UTCEpochMinuteToLocalDateTime(it.start)
+				end.value = Timing.fromUTCEpochMinuteToLocalDateTime(it.start)
 			else
 				end.value = scope.end
 		}

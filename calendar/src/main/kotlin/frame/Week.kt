@@ -3,7 +3,7 @@ package frame
 import calendar.Appointment
 import calendar.Day
 import calendar.Timing
-import calendar.Timing.UTCEpochMinuteToLocalDateTime
+import calendar.Timing.fromUTCEpochMinuteToLocalDateTime
 import calendar.Timing.toUTCEpochMinute
 import calendar.Week
 import calendar.now
@@ -213,7 +213,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																	Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour).plusHours(1),
 																	save = { app: Appointment ->
 																		log("Created:$app")
-																		week.allDays[UTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
+																		week.allDays[fromUTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
 																		updateTable()
 																		updateCallback()
 																	}
@@ -230,7 +230,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																		}.showAndWait().get()
 																		if(remove.buttonData == ButtonBar.ButtonData.OK_DONE) {
 																			log("Removed:$appointment") // TODO multi day
-																			week.allDays[UTCEpochMinuteToLocalDateTime(appointment.start).dayOfWeek]?.appointments?.remove(appointment)
+																			week.allDays[fromUTCEpochMinuteToLocalDateTime(appointment.start).dayOfWeek]?.appointments?.remove(appointment)
 																			updateTable()
 																			updateCallback()
 																		}
