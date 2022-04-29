@@ -7,6 +7,8 @@ import calendar.Timing.UTCEpochMinuteToLocalDateTime
 import calendar.Timing.toUTCEpochMinute
 import calendar.Week
 import calendar.now
+import frame.styles.GlobalStyles
+import frame.styles.TabStyles
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*
@@ -36,30 +38,33 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 			
 			// mainTab
 			vbox {
-				addClass(Styles.Tabs.mainTab)
+				addClass(TabStyles.tabContent)
 				style {
 					padding = box(0.px, 0.px, 2.px, 0.px)
 				}
 				
 				hbox(spacing = 40.0, alignment = Pos.CENTER_LEFT) {
-					addClass(Styles.Tabs.topbar)
+					addClass(TabStyles.topbar)
 					style {
 						padding = box(0.px, 15.px, 0.px, 15.px)
 					}
 					button {
 						text = "Test"
 						
-						addClass(Styles.Tabs.titleButtons)
+						addClass(TabStyles.titleButton)
 					}
 				}
 				
-				separate()
+				label {
+					addClass(TabStyles.separator)
+					useMaxWidth = true
+				}
 				
 				log("creating table view", LogType.LOW)
 				// Table view
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
-					addClass(Styles.disableFocusDraw)
+					addClass(GlobalStyles.disableFocusDraw)
 					
 					lateinit var topMargin: DoubleProperty
 					
@@ -274,7 +279,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 			// used to shadow the overflow from tab
 			pane {
 				isMouseTransparent = true
-				addClass(Styles.Tabs.shadowBorder)
+				addClass(TabStyles.shadowBorder)
 			}
 		}
 	}

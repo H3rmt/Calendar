@@ -10,6 +10,8 @@ import calendar.currentMonth
 import calendar.currentMonthName
 import calendar.generateMonth
 import calendar.now
+import frame.styles.GlobalStyles
+import frame.styles.TabStyles
 import javafx.animation.*
 import javafx.beans.property.*
 import javafx.collections.*
@@ -43,7 +45,7 @@ fun createCalendarTab(pane: TabPane): Tab {
 			
 			// mainTab
 			vbox {
-				addClass(Styles.Tabs.mainTab)
+				addClass(TabStyles.tabContent)
 				style {
 					padding = box(0.px, 0.px, 2.px, 0.px)
 				}
@@ -51,36 +53,39 @@ fun createCalendarTab(pane: TabPane): Tab {
 				log("creating top bar", LogType.LOW)
 				// Top bar
 				hbox(spacing = 40.0, alignment = Pos.CENTER) {
-					addClass(Styles.Tabs.topbar)
+					addClass(TabStyles.topbar)
 					style {
 						padding = box(0.px, 15.px, 0.px, 15.px)
 					}
 					button("<") {
-						addClass(Styles.Tabs.titleButtons)
+						addClass(TabStyles.titleButton)
 						action {
 							changeMonth(false)
 						}
 					}
 					label(currentMonthName) {
-						addClass(Styles.Tabs.title)
+						addClass(TabStyles.title)
 						minWidth = 200.0
 						alignment = Pos.CENTER
 					}
 					button(">") {
-						addClass(Styles.Tabs.titleButtons)
+						addClass(TabStyles.titleButton)
 						action {
 							changeMonth(true)
 						}
 					}
 				}
 				
-				separate()
+				label {
+					addClass(TabStyles.separator)
+					useMaxWidth = true
+				}
 				
 				log("creating table view", LogType.LOW)
 				// Table view
 				vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 					addClass(Styles.CalendarTableView.table)
-					addClass(Styles.disableFocusDraw)
+					addClass(GlobalStyles.disableFocusDraw)
 					
 					lateinit var scrollbarWidth: DoubleProperty
 					
@@ -234,7 +239,7 @@ fun createCalendarTab(pane: TabPane): Tab {
 														week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
 													}", LogType.LOW
 												)
-												Tabmanager.openTab(
+												TabManager.openTab(
 													"Week${week.date}/${week.time.year}",
 													::createWeekTab,
 													week,
@@ -271,7 +276,7 @@ fun createCalendarTab(pane: TabPane): Tab {
 			// used to shadow the overflow from tab
 			pane {
 				isMouseTransparent = true
-				addClass(Styles.Tabs.shadowBorder)
+				addClass(TabStyles.shadowBorder)
 			}
 		}
 	}
@@ -351,7 +356,7 @@ fun createCellGraphics(
 					}
 					onMouseClicked = EventHandler {
 						it.consume()
-						Tabmanager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createNoteTab, data, {
+						TabManager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createNoteTab, data, {
 							if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
 								log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
 								val weeksData = generateMonth(calendarDisplay)
@@ -406,7 +411,7 @@ fun createCellGraphics(
 					}
 					onMouseClicked = EventHandler {
 						it.consume()
-						Tabmanager.openTab(
+						TabManager.openTab(
 							"WeekNotes${data.WeekOfYear}/${data.time.year}", ::createNoteTab, data, {
 								if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
 									log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
@@ -426,7 +431,7 @@ fun createCellGraphics(
 		// appointments / WeekDetails
 		val pane = pane {
 			style(append = true) {
-//				backgroundColor += Color.RED
+//				BGColor += Color.RED
 				// must be deactivated because style gets reset
 				// when any (mouse)events happen
 				prefHeight = DETAILSPANMINHEIGHT.px
