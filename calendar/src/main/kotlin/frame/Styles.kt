@@ -8,28 +8,6 @@ import tornadofx.*
 
 class Styles: Stylesheet() {
 	
-	companion object {
-		val disableFocusDraw by cssclass()
-	}
-	
-	object Menubar {
-		val itemShortcut by cssclass()
-		val itemName by cssclass()
-		val gridPane by cssclass()
-	}
-	
-	object Tabs {
-		val title by cssclass()
-		val titleButtons by cssclass()
-		
-		val mainTab by cssclass()
-		val separator by cssclass()
-		
-		val topbar by cssclass()
-		
-		val shadowBorder by cssclass()
-	}
-	
 	object CalendarTableView {
 		val table by cssclass()
 		val tableItem by cssclass()
@@ -50,10 +28,6 @@ class Styles: Stylesheet() {
 		val cellLabelIcon by cssclass()
 	}
 	
-	object NoteTab {
-		val texteditor by cssclass()
-	}
-	
 	object WeekTab {
 		val tableDay by cssclass()
 		val TimeCell by cssclass()
@@ -66,74 +40,6 @@ class Styles: Stylesheet() {
 		val invisibleScrollbar by cssclass()
 		
 		val tableTimeHeader by cssclass()
-	}
-	
-	object ReminderTab {
-		val TimeCell by cssclass()
-		val tableItem by cssclass()
-	}
-	
-	
-	init {
-		disableFocusDraw {
-			focusColor = Color.TRANSPARENT
-		}
-	}
-	
-	init {
-		Menubar.itemShortcut {
-			fontSize = 9.px
-			fontWeight = FontWeight.THIN
-			textFill = Color.DARKGRAY
-		}
-		
-		Menubar.itemName {
-			fontSize = 12.px
-			fontWeight = FontWeight.NORMAL
-			textFill = Color.BLACK
-		}
-		
-		Menubar.gridPane {
-			maxWidth = 300.px
-		}
-	}
-	
-	init {
-		Tabs.title {
-			fontSize = 26.px
-			fontWeight = FontWeight.BOLD
-			textFill = Color.BLACK
-		}
-		
-		Tabs.titleButtons {
-			focusColor = Color.BLACK
-			fontWeight = FontWeight.BOLD
-		}
-		
-		Tabs.mainTab {
-			borderColor += box(Color.TRANSPARENT)
-			borderWidth += box(5.px)
-			borderRadius += box(10.px)
-		}
-		
-		Tabs.separator {
-			backgroundColor += Color.BLACK
-			prefHeight = 2.px
-			maxHeight = 2.px
-			minHeight = 2.px
-		}
-		
-		Tabs.topbar {
-			minHeight = 50.px
-			maxHeight = 50.px
-			backgroundColor += Color.DODGERBLUE
-		}
-		
-		Tabs.shadowBorder {
-			borderColor += box(Color.BLACK)
-			borderWidth += box(5.px)
-			borderRadius += box(10.px)
-		}
 	}
 	
 	init {
@@ -223,14 +129,6 @@ class Styles: Stylesheet() {
 	}
 	
 	init {
-		NoteTab.texteditor {
-			maxHeight = 300.px
-			minHeight = 140.px
-		}
-		
-	}
-	
-	init {
 		WeekTab.tableDay {
 			prefWidth = Int.MAX_VALUE.px
 			
@@ -293,27 +191,6 @@ class Styles: Stylesheet() {
 					prefHeight = 0.px
 				}
 			}
-		}
-	}
-	
-	init {
-		ReminderTab.tableItem {
-			alignment = Pos.CENTER
-			prefWidth = Int.MAX_VALUE.px
-			
-			padding = box(2.px)
-		}
-		
-		ReminderTab.TimeCell {
-			prefHeight = 40.px
-			
-			backgroundColor += c(0.98, 0.98, 0.98)
-			backgroundRadius += box(6.px)
-			borderWidth += box(2.px)
-			
-			borderColor += box(c(0.75, 0.75, 0.75))
-			borderRadius += box(6.px)
-			borderWidth += box(2.px)
 		}
 	}
 }
