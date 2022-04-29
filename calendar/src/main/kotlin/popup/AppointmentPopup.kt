@@ -9,9 +9,11 @@ import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.text.*
 import javafx.stage.*
+import listen
 import logic.getLangString
 import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -30,28 +32,65 @@ class AppointmentPopup: Fragment() {
 	private var onSave: (Appointment) -> Unit = scope.save
 	
 	private var error: Property<String> = "".toProperty()
+	private var wholeDay: Property<Boolean> = false.toProperty()
+	private var control: BorderPane? = null
+	private var day: Property<LocalDate> = (appointment?.start?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it).toLocalDate() } ?: scope.start.toLocalDate()).toProperty()
 	
 	private var windowTitle: String = scope.title
 	private var saveTitle: String = scope.saveTitle
 	
-	private fun updateAppointment() {
-		appointment?.let { app ->
-			app.title = appointmentTitle.value
-			app.description = description.value
-			app.start = start.value.toUTCEpochMinute()
-			app.duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()
-			app.type = getTypes().find { it.name == type.value }!!
+	private fun updateDisplay(toggle: Boolean) {
+		control?.left = if(toggle) {
+			field(getLangString("start to end")) {
+				datepicker(property = day)
+			}
+		} else {
+			field(getLangString("start to end")) {
+				dateTimePicker(dateTime = start)
+				dateTimePicker(dateTime = end)
+			}
 		}
 	}
 	
-	private fun createAppointment(): Appointment = Appointment.new(
-		start.value.toUTCEpochMinute(),
-		end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
-		appointmentTitle.value,
-		description.value,
-		getTypes().find { it.name == type.value }!!,
-		false
-	)
+	private fun updateAppointment() {
+		if(wholeDay.value) {
+			appointment?.let { app ->
+				app.title = appointmentTitle.value
+				app.description = description.value
+				app.start = day.value.toUTCEpochMinute()
+				app.duration = 1439
+				app.type = getTypes().find { it.name == type.value }!!
+			}
+		} else {
+			appointment?.let { app ->
+				app.title = appointmentTitle.value
+				app.description = description.value
+				app.start = start.value.toUTCEpochMinute()
+				app.duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()
+				app.type = getTypes().find { it.name == type.value }!!
+			}
+		}
+	}
+	
+	private fun createAppointment(): Appointment = if(wholeDay.value) {
+		Appointment.new(
+			day.value.atStartOfDay().toUTCEpochMinute(),
+			1439, // 1440 - 1 minutes
+			appointmentTitle.value,
+			description.value,
+			getTypes().find { it.name == type.value }!!,
+			false
+		)
+	} else {
+		Appointment.new(
+			start.value.toUTCEpochMinute(),
+			end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
+			appointmentTitle.value,
+			description.value,
+			getTypes().find { it.name == type.value }!!,
+			false
+		)
+	}
 	
 	@Suppress("ReturnCount")
 	private fun checkAppointment(): String? {
@@ -80,10 +119,10 @@ class AppointmentPopup: Fragment() {
 			}
 			field("Type") {
 				combobox(values = getTypes().map { it.name }, property = type)
+				checkbox(getLangString("Whole day"), property = wholeDay)
 			}
-			field(getLangString("start to end")) {
-				dateTimePicker(dateTime = start)
-				dateTimePicker(dateTime = end)
+			control = borderpane {
+			
 			}
 			field(getLangString("title")) {
 				textfield(appointmentTitle)
@@ -134,6 +173,13 @@ class AppointmentPopup: Fragment() {
 				}
 			}
 		}
+	}
+	
+	init {
+		wholeDay.listen {
+			updateDisplay(it)
+		}
+		updateDisplay(wholeDay.value)
 	}
 	
 	class ItemsScope(
