@@ -41,7 +41,7 @@ class AppointmentPopup: Fragment() {
 	
 	private fun updateDisplay(toggle: Boolean) {
 		control?.left = if(toggle) {
-			field(getLangString("start to end")) {
+			field(getLangString("day")) {
 				datepicker(property = day)
 			}
 		} else {
@@ -104,7 +104,7 @@ class AppointmentPopup: Fragment() {
 	
 	override fun onBeforeShow() {
 		modalStage?.height = 320.0
-		modalStage?.width = 400.0
+		modalStage?.width = 500.0
 	}
 	
 	override val root = form {
@@ -117,7 +117,11 @@ class AppointmentPopup: Fragment() {
 			}
 			field("Type") {
 				combobox(values = getTypes().map { it.name }, property = type)
-				checkbox(getLangString("Whole day"), property = wholeDay)
+				checkbox(getLangString("Whole day"), property = wholeDay) {
+					style {
+						padding = box(0.px, 0.px, 0.px, 40.px)
+					}
+				}
 			}
 			control = borderpane()
 			field(getLangString("title")) {
@@ -127,7 +131,6 @@ class AppointmentPopup: Fragment() {
 				style(append = true) {
 					prefHeight = Int.MAX_VALUE.px
 					minHeight = 60.px
-					padding = box(0.px, 0.px, 20.px, 0.px)
 				}
 				textarea(description) {
 					style(append = true) {
