@@ -8,7 +8,7 @@
 - (Add Milestone, like `UI` or `Time-related`)
 
 ## New big Project
-- Create Project with `ToDo`, `Next`, `In progress`, `Done` columns
+- Create Project with `ToDo`, `Next`, `In progress`, `Done` columns with default automation for all except `Next`
 - Create Milestone (Due date)
 - Create Issues like mentioned in **New Bug, Feature, Request**
 - Add Project to Issues
