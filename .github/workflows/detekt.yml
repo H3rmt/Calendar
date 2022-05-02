@@ -1,8 +1,6 @@
 name: Scan with Detekt
 
 on:
-  push:
-    branches: [ next, main ]
   pull_request:
     branches: [ next, main, release ]
 
