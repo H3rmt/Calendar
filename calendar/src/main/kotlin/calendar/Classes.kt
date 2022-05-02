@@ -92,7 +92,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 	
 	companion object {
-		fun new(_start: Long, _duration: Long, _title: String, _description: String, _type: Type, _week: Boolean): Appointment {
+		fun new(_start: Long, _duration: Long, _title: String, _description: String, _type: Type, _addDay: Boolean = false, _week: Boolean = false): Appointment {
 			return transaction {
 				return@transaction Appointments.new {
 					start = _start
@@ -100,6 +100,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 					title = _title
 					description = _description
 					type = _type
+					allDay = _addDay
 					week = _week
 				}
 			}
@@ -110,6 +111,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	private var dbDuration by AppointmentTable.duration
 	private var dbTitle by AppointmentTable.title
 	private var dbDescription by AppointmentTable.description
+	private var dbAllDay by AppointmentTable.allDay
 	private var dbType by Type.Types referencedOn AppointmentTable.type
 	private var dbWeek by AppointmentTable.week
 	
@@ -125,6 +127,9 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	var description: String
 		get() = transaction { dbDescription }
 		set(value) = transaction { dbDescription = value }
+	var allDay: Boolean
+		get() = transaction { dbAllDay }
+		set(value) = transaction { dbAllDay = value }
 	var type: Type
 		get() = transaction { dbType }
 		set(value) = transaction { dbType = value }

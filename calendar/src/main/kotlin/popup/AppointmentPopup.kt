@@ -32,7 +32,7 @@ class AppointmentPopup: Fragment() {
 	private var onSave: (Appointment) -> Unit = scope.save
 	
 	private var error: Property<String> = "".toProperty()
-	private var wholeDay: Property<Boolean> = false.toProperty()
+	private var wholeDay: Property<Boolean> = (appointment?.allDay ?: false).toProperty()
 	private var control: BorderPane? = null
 	private var day: Property<LocalDate> = (appointment?.start?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it).toLocalDate() } ?: scope.start.toLocalDate()).toProperty()
 	
@@ -60,6 +60,7 @@ class AppointmentPopup: Fragment() {
 				app.start = day.value.toUTCEpochMinute()
 				app.duration = 1439
 				app.type = getTypes().find { it.name == type.value }!!
+				app.allDay = true
 			}
 		} else {
 			appointment?.let { app ->
@@ -68,27 +69,24 @@ class AppointmentPopup: Fragment() {
 				app.start = start.value.toUTCEpochMinute()
 				app.duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()
 				app.type = getTypes().find { it.name == type.value }!!
+				app.allDay = false
 			}
 		}
 	}
 	
 	private fun createAppointment(): Appointment = if(wholeDay.value) {
-		Appointment.new(
-			day.value.atStartOfDay().toUTCEpochMinute(),
-			1439, // 1440 - 1 minutes
-			appointmentTitle.value,
-			description.value,
-			getTypes().find { it.name == type.value }!!,
-			false
+		Appointment.new( // duration irrelevant
+			_start = day.value.atStartOfDay().toUTCEpochMinute(),
+			_duration = 1439, _title = appointmentTitle.value,
+			_description = description.value, _type = getTypes().find { it.name == type.value }!!,
+			_addDay = true
 		)
 	} else {
 		Appointment.new(
-			start.value.toUTCEpochMinute(),
-			end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
-			appointmentTitle.value,
-			description.value,
-			getTypes().find { it.name == type.value }!!,
-			false
+			_start = start.value.toUTCEpochMinute(),
+			_duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
+			_title = appointmentTitle.value,
+			_description = description.value, _type = getTypes().find { it.name == type.value }!!
 		)
 	}
 	
@@ -121,9 +119,7 @@ class AppointmentPopup: Fragment() {
 				combobox(values = getTypes().map { it.name }, property = type)
 				checkbox(getLangString("Whole day"), property = wholeDay)
 			}
-			control = borderpane {
-			
-			}
+			control = borderpane()
 			field(getLangString("title")) {
 				textfield(appointmentTitle)
 			}

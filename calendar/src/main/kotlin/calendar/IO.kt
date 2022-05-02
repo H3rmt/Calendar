@@ -71,6 +71,7 @@ object AppointmentTable: LongIdTable() {
 	val title = text("title")
 	val description = text("description")
 	val week = bool("week")
+	val allDay = bool("allDay").default(false)
 	val type = reference("type", TypeTable)
 }
 
