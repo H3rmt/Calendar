@@ -312,7 +312,7 @@ fun createCellGraphics(
 					onMouseClicked = EventHandler {
 						it.consume()
 						NewReminderPopup.open(
-							getLangString("new reminder"), getLangString("Create"),
+							getLangString("new reminder"), getLangString("create"),
 							false,
 							null,
 							data.time.atStartOfDay(),

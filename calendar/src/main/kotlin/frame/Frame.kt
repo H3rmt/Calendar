@@ -114,10 +114,10 @@ class MainView: View("Calendar") {
 
 fun createMenuBar(pane: BorderPane): MenuBar {
 	return pane.menubar {
-		menu(getLangString("Create")) {
+		menu(getLangString("create")) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Appointment", "Strg + N") {
-					NewAppointmentPopup.open(getLangString("new appointment"), getLangString("Create"),
+					NewAppointmentPopup.open(getLangString("new appointment"), getLangString("create"),
 						false,
 						null,
 						Timing.getNowLocal(),
@@ -128,7 +128,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 					)
 				},
 				createMenuItem(this@menu, "Reminder", "Strg + R") {
-					NewReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
+					NewReminderPopup.open(getLangString("new reminder"), getLangString("create"),
 						false,
 						null,
 						Timing.getNowLocal(),

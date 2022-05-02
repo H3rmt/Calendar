@@ -93,7 +93,7 @@ class NewReminderPopup: Fragment() {
 			style {
 				prefHeight = Int.MAX_VALUE.px
 			}
-			field(getLangString("Finish")) {
+			field(getLangString("finish")) {
 				control = borderpane {
 					right = stackpane {
 						alignment = Pos.CENTER_RIGHT
@@ -138,7 +138,7 @@ class NewReminderPopup: Fragment() {
 						fontWeight = FontWeight.BOLD
 					}
 				}
-				button(getLangString("Cancel")) {
+				button(getLangString("cancel")) {
 					isCancelButton = true
 					action {
 						close()

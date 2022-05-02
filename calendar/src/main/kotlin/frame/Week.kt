@@ -226,7 +226,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																	action {
 																		val remove = Alert(Alert.AlertType.CONFIRMATION).apply {
 																			title = getLangString("remove?")
-																			headerText = getLangString("do you want to remove %s appointment", appointment.title) // TODO replace %s with title
+																			headerText = getLangString("do you want to remove %s appointment", appointment.title)
 																		}.showAndWait().get()
 																		if(remove.buttonData == ButtonBar.ButtonData.OK_DONE) {
 																			log("Removed:$appointment") // TODO multi day
