@@ -2,8 +2,6 @@ name: Gradle Build Tests
 
 on:
   push:
-    branches: [ next, main ]
-  pull_request:
     branches: [ next, main, release ]
 
 jobs:
