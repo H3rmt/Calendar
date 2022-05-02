@@ -105,5 +105,4 @@ fun createReminderTab(pane: TabPane): Tab {
 			}
 		}
 	}
-	
 }

@@ -94,7 +94,7 @@ class Window: App(MainView::class, GlobalStyles::class, MenubarStyles::class, Ta
 		super.start(stage)
 		removeLoading()
 		log("started Frame", LogType.NORMAL)
-		TabManager.openTab("calendar", ::createCalendarTab)
+		TabManager.openTab("calendar", ::createOverviewTab)
 		TabManager.openTab("reminders", ::createReminderTab)
 		
 	}
@@ -145,7 +145,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 			createMenuGroup(
 				createMenuItem(this@menu, "Reload", "F5") {
 					init()
-					Secure.overrideTab("calendar", ::createCalendarTab)
+					Secure.overrideTab("calendar", ::createOverviewTab)
 				},
 				createMenuItem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
 				run { separator(); return@run null },
@@ -163,7 +163,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 				},
 				createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {
 					log("Show Calendar")
-					Secure.overrideTab("calendar", ::createCalendarTab)
+					Secure.overrideTab("calendar", ::createOverviewTab)
 				}
 			)
 		}
