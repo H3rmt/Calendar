@@ -18,7 +18,7 @@
 - Create Branch from Issue from `next` branch with pattern `{id}-name` in GitHub
 - Link Branch to Issue
 - Mention Issue with in every commit `#{id} Commit Description`
-- Create Pull request from Branch into next with name equal to issue's name and add `Fixes #{id}` to close issue on merge [IDE]  (Github breaks link to branch)
+- Create Pull request from Branch into next with name equal to issue's name and add `Fixes #{id}` to close issue on merge [IDE]  (GitHub breaks link to branch)
 - Link Pull request to issue
 - Merge into `next` with top comment as Merge message [IDE] 
 - Link `next` Pull request to issue
