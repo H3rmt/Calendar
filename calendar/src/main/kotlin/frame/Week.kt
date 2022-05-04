@@ -59,7 +59,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 						addClass(GlobalStyles.tableItem_)
 					}
 					for(day in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
-						label(day) {
+						label(getLangString(day)) {
 							addClass(GlobalStyles.tableItem_)
 							addClass(GlobalStyles.tableHeaderItem_)
 							addClass(WeekStyles.tableTimeHeader_)
