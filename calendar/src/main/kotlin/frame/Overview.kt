@@ -37,58 +37,58 @@ fun createOverviewTab(pane: TabPane): Tab {
 	log("creating overview tab", LogType.IMPORTANT)
 	return pane.tab(getLangString("calender")) {
 		isClosable = false
-		addClass(TabStyles.tab)
+		addClass(TabStyles.tab_)
 		
 		vbox {
-			addClass(TabStyles.content)
+			addClass(TabStyles.content_)
 			log("creating top bar", LogType.LOW)
 			// Top bar
 			hbox(spacing = 20.0, alignment = Pos.CENTER) {
-				addClass(TabStyles.topbar)
+				addClass(TabStyles.topbar_)
 				button("<") {
-					addClass(TabStyles.titleButton)
+					addClass(TabStyles.titleButton_)
 					action {
 						changeMonth(false)
 					}
 				}
 				label(currentMonthName) {
-					addClass(TabStyles.title)
+					addClass(TabStyles.title_)
 					minWidth = 200.0
 					alignment = Pos.CENTER
 				}
 				button(">") {
-					addClass(TabStyles.titleButton)
+					addClass(TabStyles.titleButton_)
 					action {
 						changeMonth(true)
 					}
 				}
 			}
 			
-			log("creating table view", LogType.LOW)
+			log("creating table_ view", LogType.LOW)
 			
 			
 			vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
-				addClass(GlobalStyles.disableFocusDraw)
-				addClass(GlobalStyles.table)
+				addClass(GlobalStyles.disableFocusDraw_)
+				addClass(GlobalStyles.table_)
 				
 				lateinit var scrollbarWidth: DoubleProperty
 				
 				// Top bar
 				hbox(spacing = 5.0, alignment = Pos.CENTER) {
-					addClass(GlobalStyles.tableHeader)
+					addClass(GlobalStyles.tableHeader_)
 					
 					scrollbarWidth = paddingRightProperty
 					label("") {
-						addClass(GlobalStyles.tableItem)
+						addClass(GlobalStyles.tableItem_)
 						style {
 							minWidth = 85.px // TODO get from cell (split cell)
 						}
 					}
 					for(header in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
 						label(header) {
-							addClass(GlobalStyles.tableItem)
-							addClass(GlobalStyles.tableHeaderItem)
-							addClass(OverviewStyles.headerItem)
+							addClass(GlobalStyles.tableItem_)
+							addClass(GlobalStyles.tableHeaderItem_)
+							addClass(OverviewStyles.headerItem_)
 						}
 					}
 				}
@@ -97,13 +97,13 @@ fun createOverviewTab(pane: TabPane): Tab {
 				
 				fun updateTable(list: ObservableList<out Week>) {
 					children.remove(table)
-					log("updated table view", LogType.LOW)
+					log("updated table_ view", LogType.LOW)
 					val selectedIndex = SimpleIntegerProperty(-1)
 					
 					table = scrollpane(fitToWidth = true, fitToHeight = true) {
-						addClass(GlobalStyles.disableFocusDraw)
-						addClass(GlobalStyles.maxHeight)
-						addClass(GlobalStyles.background)
+						addClass(GlobalStyles.disableFocusDraw_)
+						addClass(GlobalStyles.maxHeight_)
+						addClass(GlobalStyles.background_)
 						isPannable = true
 						
 						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
@@ -121,7 +121,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 						
 						// gets stretched across whole scrollpane
 						vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
-							addClass(GlobalStyles.background)
+							addClass(GlobalStyles.background_)
 							for((index, week) in list.withIndex()) {
 								hbox(spacing = 5.0, alignment = Pos.CENTER) {
 									val openTimeline = Timeline()
@@ -146,7 +146,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 										cells.add(graphic[0] as VBox)
 										
 										if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
-											(graphic[0] as VBox).addClass(OverviewStyles.markedCell)
+											(graphic[0] as VBox).addClass(OverviewStyles.markedCell_)
 										
 										@Suppress("UNCHECKED_CAST")
 										openAppointmentOpenAnimations.add(graphic[1] as MutableList<Animation>)
@@ -159,11 +159,11 @@ fun createOverviewTab(pane: TabPane): Tab {
 									
 									for((cellIndex, cell) in cells.withIndex()) {
 										cell.onMouseEntered = EventHandler {
-											cell.addClass(OverviewStyles.hoveredCell)
+											cell.addClass(OverviewStyles.hoveredCell_)
 											hoveredCell.value = cellIndex
 										}
 										cell.onMouseExited = EventHandler {
-											cell.removeClass(OverviewStyles.hoveredCell)
+											cell.removeClass(OverviewStyles.hoveredCell_)
 											hoveredCell.value = -1
 										}
 										cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
@@ -208,10 +208,10 @@ fun createOverviewTab(pane: TabPane): Tab {
 									onMouseClicked = EventHandler {
 										if(selectedIndex.value != index) {
 											selectedIndex.value = index
-											addClass(OverviewStyles.toggledRow)
+											addClass(OverviewStyles.toggledRow_)
 										} else {
 											selectedIndex.value = -1
-											removeClass(OverviewStyles.toggledRow)
+											removeClass(OverviewStyles.toggledRow_)
 										}
 										if(it.clickCount > 1) {
 											log(
@@ -233,7 +233,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 									
 									selectedIndex.addListener(ChangeListener { _, old, new ->
 										if(new != index) {
-											removeClass(OverviewStyles.toggledRow)
+											removeClass(OverviewStyles.toggledRow_)
 											if(old == index && (new != -1)) {
 												onMouseExited.handle(null)
 											}
@@ -266,12 +266,12 @@ fun createCellGraphics(
 ): Array<Any> {
 	val animations: Array<MutableList<Animation>> = arrayOf(mutableListOf(), mutableListOf())
 	val graphicContainer = source.vbox {
-		addClass(GlobalStyles.tableItem)
-		addClass(OverviewStyles.cell)
+		addClass(GlobalStyles.tableItem_)
+		addClass(OverviewStyles.cell_)
 		
 		if(data is Day) {
 			if(!data.partOfMonth)
-				addClass(OverviewStyles.disabledCell)
+				addClass(OverviewStyles.disabledCell_)
 			
 			gridpane {
 				style {
@@ -283,7 +283,7 @@ fun createCellGraphics(
 					val hoveredImg = createFXImage("remind hovered.svg")
 					
 					val img = imageview(defaultImg) {
-						addClass(OverviewStyles.cellIcon)
+						addClass(OverviewStyles.cellIcon_)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
@@ -307,7 +307,7 @@ fun createCellGraphics(
 					gridpaneConstraints {
 						columnRowIndex(1, 0)
 					}
-					addClass(OverviewStyles.cellLabel)
+					addClass(OverviewStyles.cellLabel_)
 				}
 				anchorpane {
 					val defaultImg = if(data.notes.isEmpty())
@@ -320,7 +320,7 @@ fun createCellGraphics(
 						createFXImage("note active hovered.svg")
 					
 					val img = imageview(defaultImg) {
-						addClass(OverviewStyles.cellIcon)
+						addClass(OverviewStyles.cellIcon_)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
@@ -344,7 +344,7 @@ fun createCellGraphics(
 			}
 			
 		} else if(data is Week) {
-			addClass(OverviewStyles.disabledCell)
+			addClass(OverviewStyles.disabledCell_)
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px
@@ -361,7 +361,7 @@ fun createCellGraphics(
 					gridpaneConstraints {
 						columnRowIndex(1, 0)
 					}
-					addClass(OverviewStyles.cellLabel)
+					addClass(OverviewStyles.cellLabel_)
 				}
 				
 				anchorpane {
@@ -375,7 +375,7 @@ fun createCellGraphics(
 						createFXImage("note active hovered.svg")
 					
 					val img = imageview(defaultImg) {
-						addClass(OverviewStyles.cellIcon)
+						addClass(OverviewStyles.cellIcon_)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
@@ -486,7 +486,7 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 				fill = appointmentEntry.key.color
 			}
 			label("${appointmentEntry.value}:${appointmentEntry.key.name}") {
-				addClass(OverviewStyles.cellAppointTypeLabel)
+				addClass(OverviewStyles.cellAppointTypeLabel_)
 				maxWidth = width - HORIZONTAL_LEFT_MARGIN - CIRCLE_WIDTH
 				ellipsisString = ".."
 				textOverrun = OverrunStyle.ELLIPSIS
@@ -574,7 +574,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	for((index, appointment) in appointments.withIndex()) {
 		pane.label(appointment.title) {
-			addClass(OverviewStyles.cellAppointLabel)
+			addClass(OverviewStyles.cellAppointLabel_)
 			translateX = HORIZONTAL_LEFT_MARGIN + CIRCLE_WIDTH
 			translateY = yCords[index] - CIRCLE_WIDTH / 1.1
 			opacity = 0.0
@@ -587,7 +587,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	if(limited) {
 		pane.label("· · · · · · · · · · · · · · · · · · · · · · · ·") {
-			addClass(OverviewStyles.cellAppointTypeLabel)
+			addClass(OverviewStyles.cellAppointTypeLabel_)
 			style {
 				fontWeight = FontWeight.BOLD
 			}

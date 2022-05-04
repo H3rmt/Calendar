@@ -87,9 +87,9 @@ class ReminderPopup: Fragment() {
 	}
 	
 	override val root = form {
-		addClass(GlobalStyles.background)
+		addClass(GlobalStyles.background_)
 		fieldset(getLangString(windowTitle)) {
-			addClass(GlobalStyles.maxHeight)
+			addClass(GlobalStyles.maxHeight_)
 			field(getLangString("Finish")) {
 				control = borderpane {
 					right = stackpane {
@@ -111,13 +111,13 @@ class ReminderPopup: Fragment() {
 				textfield(reminderTitle)
 			}
 			field(getLangString("description")) {
-				addClass(GlobalStyles.maxHeight)
+				addClass(GlobalStyles.maxHeight_)
 				style(append = true) {
 					minHeight = 60.px
 					padding = box(0.px, 0.px, 20.px, 0.px)
 				}
 				textarea(reminderDescription) {
-					addClass(GlobalStyles.maxHeight)
+					addClass(GlobalStyles.maxHeight_)
 				}
 			}
 			field(getLangString("notify")) {

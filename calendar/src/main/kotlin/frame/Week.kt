@@ -30,55 +30,55 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab(week.date) {
 		isClosable = true
-		addClass(TabStyles.tab)
+		addClass(TabStyles.tab_)
 		
 		// mainTab
 		vbox {
 			hbox(spacing = 40.0, alignment = Pos.CENTER) {
-				addClass(TabStyles.topbar)
+				addClass(TabStyles.topbar_)
 				label(getLangString("Week")) {
-					addClass(TabStyles.title)
+					addClass(TabStyles.title_)
 					alignment = Pos.CENTER
 				}
 			}
 			
-			log("creating table view", LogType.LOW)
+			log("creating table_ view", LogType.LOW)
 			// Table view
 			vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
-				addClass(GlobalStyles.disableFocusDraw)
-				addClass(GlobalStyles.table)
+				addClass(GlobalStyles.disableFocusDraw_)
+				addClass(GlobalStyles.table_)
 				
 				lateinit var scrollbarWidth: DoubleProperty
 				
 				// Top bar
 				hbox(spacing = 2.0, alignment = Pos.CENTER) {
-					addClass(GlobalStyles.tableHeader)
+					addClass(GlobalStyles.tableHeader_)
 					
 					scrollbarWidth = paddingRightProperty
 					label("") {
-						addClass(GlobalStyles.tableItem)
+						addClass(GlobalStyles.tableItem_)
 					}
 					for(day in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
 						label(day) {
-							addClass(GlobalStyles.tableItem)
-							addClass(GlobalStyles.tableHeaderItem)
-							addClass(WeekStyles.tableTimeHeader)
+							addClass(GlobalStyles.tableItem_)
+							addClass(GlobalStyles.tableHeaderItem_)
+							addClass(WeekStyles.tableTimeHeader_)
 						}
 					}
 				}
 				
 				var table: ScrollPane? = null
 				
-				// table
+				// table_
 				fun updateTable() {
 					children.remove(table)
-					log("updated table view", LogType.LOW)
+					log("updated table_ view", LogType.LOW)
 					var scrollToHour = 0
 					
 					table = scrollpane(fitToWidth = true, fitToHeight = true) {
-						addClass(GlobalStyles.disableFocusDraw)
-						addClass(GlobalStyles.maxHeight)
-						addClass(GlobalStyles.background)
+						addClass(GlobalStyles.disableFocusDraw_)
+						addClass(GlobalStyles.maxHeight_)
+						addClass(GlobalStyles.background_)
 						isPannable = true
 						
 						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
@@ -95,12 +95,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 						}
 						
 						hbox {
-							addClass(GlobalStyles.background)
+							addClass(GlobalStyles.background_)
 							vbox(alignment = Pos.TOP_CENTER) {
-								addClass(WeekStyles.tableDay)
+								addClass(WeekStyles.tableDay_)
 								for(hour in 0..23) {
 									vbox(alignment = Pos.CENTER) {
-										addClass(WeekStyles.TimeCell)
+										addClass(WeekStyles.TimeCell_)
 										if(hour != 23) { // remove border on last element
 											style(append = true) {
 												borderColor += box(c(0.75, 0.75, 0.75))
@@ -110,7 +110,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 										}
 										
 										if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) && week.time.year == now.year)
-											addClass(WeekStyles.ActiveTimeCell)
+											addClass(WeekStyles.ActiveTimeCell_)
 										
 										label {
 											style {
@@ -126,17 +126,17 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 								log("Day: $dayOfWeek: $appointments", LogType.LOW)
 								
 								vbox(alignment = Pos.TOP_CENTER) {
-									addClass(WeekStyles.tableDay)
+									addClass(WeekStyles.tableDay_)
 									
 									for(hour in 0..23) {
 										// outer tableCell with border
 										hbox {
-											addClass(WeekStyles.TimeCell)
+											addClass(WeekStyles.TimeCell_)
 											if(hour != 23)  // remove border on last element
-												addClass(WeekStyles.TimeCellBorder)
+												addClass(WeekStyles.TimeCellBorder_)
 											
 											if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) && week.time.year == now.year) {
-												addClass(WeekStyles.ActiveTimeCell)
+												addClass(WeekStyles.ActiveTimeCell_)
 												scrollToHour = hour
 											}
 											
@@ -163,7 +163,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															// val height = ((app.start + app.duration) - hour * 60).coerceAtMost(60).toInt()
 															
 															// prefHeight = 20.px//height * (this@gridpane.height / 60).px
-															// maxHeight = prefHeight
+															// maxHeight_ = prefHeight
 															// minHeight = prefHeight
 															
 															// translateY = -10.px
@@ -174,12 +174,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 													}
 												}
 												
-												addClass(WeekStyles.UnHoveredInnerTimeCell)
+												addClass(WeekStyles.UnHoveredInnerTimeCell_)
 												onMouseEntered = EventHandler {
-													addClass(WeekStyles.HoveredInnerTimeCell)
+													addClass(WeekStyles.HoveredInnerTimeCell_)
 												}
 												onMouseExited = EventHandler {
-													removeClass(WeekStyles.HoveredInnerTimeCell)
+													removeClass(WeekStyles.HoveredInnerTimeCell_)
 												}
 												
 												contextmenu {

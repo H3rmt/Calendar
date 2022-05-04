@@ -227,23 +227,23 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 	var grid: GridPane? = null
 	menu.customitem {
 		grid = gridpane {
-			addClass(MenubarStyles.gridPane)
+			addClass(MenubarStyles.gridPane_)
 			
 			label(getLangString(name)) {
-				addClass(MenubarStyles.itemName)
+				addClass(MenubarStyles.itemName_)
 				gridpaneConstraints {
 					columnRowIndex(0, 0)
 				}
 			}
 			label {
-				addClass(MenubarStyles.spacing)
+				addClass(MenubarStyles.spacing_)
 				gridpaneConstraints {
 					columnRowIndex(1, 0)
 					hGrow = Priority.ALWAYS
 				}
 			}
 			label(shortcut) {
-				addClass(MenubarStyles.shortcut)
+				addClass(MenubarStyles.shortcut_)
 				gridpaneConstraints {
 					columnRowIndex(2, 0)
 				}

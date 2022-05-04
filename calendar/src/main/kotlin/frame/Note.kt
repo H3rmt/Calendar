@@ -32,17 +32,17 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 			else -> ""
 		}
 		isClosable = true
-		addClass(TabStyles.tab)
+		addClass(TabStyles.tab_)
 		
 		vbox {
-			addClass(TabStyles.content)
+			addClass(TabStyles.content_)
 			lateinit var add: Button
 			lateinit var addType: ComboBox<String>
 			
 			val noteTabs = mutableListOf<TitledPane>()
 			
 			hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
-				addClass(TabStyles.topbar)
+				addClass(TabStyles.topbar_)
 				
 				addType = combobox {
 					items = getTypes().map { it.name }.toObservable()
@@ -53,19 +53,19 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					
 					// disables button if no type selected or type already added
 					addType.valueProperty().addListener { _, _, new -> isDisable = (new == null) || noteTabs.any { it.text == new } }
-					addClass(TabStyles.titleButton)
+					addClass(TabStyles.titleButton_)
 				}
 			}
 			
 			scrollpane(fitToWidth = true, fitToHeight = true) {
-				addClass(GlobalStyles.disableFocusDraw)
-				addClass(GlobalStyles.maxHeight)
-				addClass(GlobalStyles.background)
+				addClass(GlobalStyles.disableFocusDraw_)
+				addClass(GlobalStyles.maxHeight_)
+				addClass(GlobalStyles.background_)
 				isPannable = true
 				
 				// gets stretched across whole scrollpane
 				vbox(spacing = 2.0, alignment = Pos.TOP_CENTER) {
-					addClass(GlobalStyles.background)
+					addClass(GlobalStyles.background_)
 					
 					add.action {
 						var note: Note? = null
@@ -118,12 +118,12 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 	pane.apply {
 		setText(title)
 		isExpanded = getConfig(Configs.ExpandNotesOnOpen)
-		addClass(NoteTabStyles.notesPane)
+		addClass(NoteTabStyles.notesPane_)
 		
 		lateinit var save: Button
 		
 		graphic = toolbar {
-			addClass(NoteTabStyles.paneToolbar)
+			addClass(NoteTabStyles.paneToolbar_)
 			hbox(spacing = 20.0) {
 				style {
 					fontSize = 15.px
@@ -139,8 +139,8 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 		expandedProperty().listen { new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
 		
 		htmleditor(text) {
-			addClass(GlobalStyles.disableFocusDraw)
-			addClass(NoteTabStyles.editor)
+			addClass(GlobalStyles.disableFocusDraw_)
+			addClass(NoteTabStyles.editor_)
 			this.getChildList()
 			save.action {
 				saveFun(this@htmleditor.htmlText)

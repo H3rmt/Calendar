@@ -7,30 +7,30 @@ import tornadofx.*
 
 class ReminderStyles: Stylesheet() {
 	companion object {
-		val tableItemLeft by cssclass()
-		val tableItemRight by cssclass()
-		val tableItemMiddle by cssclass()
-		val reminderRow by cssclass()
-		val tableHeaderItem by cssclass()
+		val tableItemLeft_ by cssclass()
+		val tableItemRight_ by cssclass()
+		val tableItemMiddle_ by cssclass()
+		val reminderRow_ by cssclass()
+		val tableHeaderItem_ by cssclass()
 	}
 	
 	init {
-		tableItemLeft {
+		tableItemLeft_ {
 			borderColor += box(Color.SILVER)
 			borderStyle += BorderStrokeStyle.DOTTED
 			borderWidth += box(0.px, 2.px, 0.px, 0.px)
 		}
-		tableItemRight {
+		tableItemRight_ {
 			borderColor += box(Color.SILVER)
 			borderStyle += BorderStrokeStyle.DOTTED
 			borderWidth += box(0.px, 0.px, 0.px, 2.px)
 		}
-		tableItemMiddle {
+		tableItemMiddle_ {
 			borderColor += box(Color.SILVER)
 			borderStyle += BorderStrokeStyle.DOTTED
 			borderWidth += box(0.px, 2.px, 0.px, 2.px)
 		}
-		reminderRow {
+		reminderRow_ {
 			prefHeight = 40.px
 			
 			+BGColor
@@ -41,7 +41,7 @@ class ReminderStyles: Stylesheet() {
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)
 		}
-		tableHeaderItem {
+		tableHeaderItem_ {
 			borderColor += box(Color.SILVER)
 			borderRadius += box(10.px, 10.px, 0.px, 0.px)
 			borderWidth += box(2.px)

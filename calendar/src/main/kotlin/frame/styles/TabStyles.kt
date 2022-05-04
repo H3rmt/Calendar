@@ -7,37 +7,37 @@ import tornadofx.*
 
 class TabStyles: Stylesheet() {
 	companion object {
-		val tab by cssclass()
-		val title by cssclass()
-		val titleButton by cssclass()
-		val tabContainer by cssclass()
-		val topbar by cssclass()
-		val content by cssclass()
+		val tab_ by cssclass()
+		val title_ by cssclass()
+		val titleButton_ by cssclass()
+		val tabContainer_ by cssclass()
+		val topbar_ by cssclass()
+		val content_ by cssclass()
 	}
 	
 	init {
-		tab {
+		tab_ {
 			+SecColor
-//			borderColor += box(backgroundColor.elements[0]) // equal to background
+//			borderColor += box(backgroundColor.elements[0]) // equal to background_
 //			borderWidth += box(0.px, 0.px, 1.px, 0.px)  // TODO do this if tab open
 		}
 		
-		title {
+		title_ {
 			fontSize = 26.px
 			fontWeight = FontWeight.BOLD
 			textFill = Color.BLACK
 		}
 		
-		titleButton {
+		titleButton_ {
 			focusColor = Color.BLACK
 			fontWeight = FontWeight.BOLD
 		}
 		
-		tabContainer {
+		tabContainer_ {
 			padding = box(0.px)
 		}
 		
-		topbar {
+		topbar_ {
 			minHeight = 50.px
 			maxHeight = 50.px
 			+SecColor
@@ -48,7 +48,7 @@ class TabStyles: Stylesheet() {
 			padding = box(0.px, 15.px)
 		}
 		
-		content {
+		content_ {
 //			backgroundColor += Color.BLUE
 		}
 	}

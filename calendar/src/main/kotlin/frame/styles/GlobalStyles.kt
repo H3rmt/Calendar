@@ -9,16 +9,16 @@ import tornadofx.*
 
 class GlobalStyles: Stylesheet() {
 	companion object {
-		val background by cssclass()
-		val secBackground by cssclass()
+		val background_ by cssclass()
+		val secBackground_ by cssclass()
 		
-		val disableFocusDraw by cssclass()
-		val maxHeight by cssclass()
+		val disableFocusDraw_ by cssclass()
+		val maxHeight_ by cssclass()
 		
-		val table by cssclass()
-		val tableHeader by cssclass()
-		val tableItem by cssclass()
-		val tableHeaderItem by cssclass()
+		val table_ by cssclass()
+		val tableHeader_ by cssclass()
+		val tableItem_ by cssclass()
+		val tableHeaderItem_ by cssclass()
 	}
 	
 	object Mixins {
@@ -31,35 +31,35 @@ class GlobalStyles: Stylesheet() {
 	}
 	
 	init {
-		background {
+		background_ {
 			+BGColor
 		}
-		secBackground {
+		secBackground_ {
 			+SecColor
 		}
-		disableFocusDraw {
+		disableFocusDraw_ {
 			focusColor = Color.TRANSPARENT
 		}
-		maxHeight {
+		maxHeight_ {
 			prefHeight = Int.MAX_VALUE.px
 		}
 		
-		table {
+		table_ {
 			+BGColor
 			prefHeight = Int.MAX_VALUE.px
 			padding = box(2.px)
 		}
-		tableHeader {
+		tableHeader_ {
 			+BGColor
 			padding = box(8.px, 3.px, 3.px, 3.px) // 15.3 because of scrollbar width (fixed initial scrollbar)
 		}
-		tableItem {
+		tableItem_ {
 			alignment = Pos.CENTER
 			prefWidth = Int.MAX_VALUE.px
 			
 			padding = box(2.px)
 		}
-		tableHeaderItem {
+		tableHeaderItem_ {
 			prefHeight = 30.px
 			minHeight = prefHeight
 			

@@ -6,30 +6,30 @@ import tornadofx.*
 
 class MenubarStyles: Stylesheet() {
 	companion object {
-		val shortcut by cssclass()
-		val itemName by cssclass()
-		val gridPane by cssclass()
-		val spacing by cssclass()
+		val shortcut_ by cssclass()
+		val itemName_ by cssclass()
+		val gridPane_ by cssclass()
+		val spacing_ by cssclass()
 	}
 	
 	init {
-		shortcut {
+		shortcut_ {
 			fontSize = 9.px
 			fontWeight = FontWeight.THIN
 			textFill = Color.DARKGRAY
 		}
 		
-		itemName {
+		itemName_ {
 			fontSize = 12.px
 			fontWeight = FontWeight.NORMAL
 			textFill = Color.BLACK
 		}
 		
-		gridPane {
+		gridPane_ {
 			maxWidth = 300.px
 		}
 		
-		spacing {
+		spacing_ {
 			minWidth = 15.px
 		}
 	}
