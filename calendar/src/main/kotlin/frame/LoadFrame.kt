@@ -54,10 +54,10 @@ class LoadingScreen: JFrame() {
 	
 	override fun paint(g: Graphics) {
 		val g2 = g as Graphics2D
-		g2.color = Color(0, 0, 0, 20)
+		g2.color = Color(0, 0, 0, 15)
 		g2.fillRect(0, 0, width, height)
 		
-		g2.color = Color(0, 170, 170, 160)
+		g2.color = Color(60, 210, 0, 100)
 		g2.stroke = BasicStroke(15F)
 		
 		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[0], 40.0, Arc2D.OPEN))
@@ -65,10 +65,12 @@ class LoadingScreen: JFrame() {
 		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[2], 40.0, Arc2D.OPEN))
 		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[3], 40.0, Arc2D.OPEN))
 		
-		g2.stroke = BasicStroke(7F)
-		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[0], 50.0, Arc2D.OPEN))
-		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[1], 50.0, Arc2D.OPEN))
-		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[2], 50.0, Arc2D.OPEN))
+		
+		g2.color = Color(60, 210, 0, 160)
+		g2.stroke = BasicStroke(5F)
+		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[0], 50.0, Arc2D.PIE))
+		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[1], 50.0, Arc2D.PIE))
+		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[2], 50.0, Arc2D.PIE))
 		
 	}
 }

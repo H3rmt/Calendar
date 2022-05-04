@@ -1,5 +1,6 @@
 package frame.styles
 
+import frame.styles.GlobalStyles.Mixins.BGColor
 import javafx.scene.paint.*
 import tornadofx.*
 
@@ -35,6 +36,8 @@ class WeekStyles: Stylesheet() {
 			prefHeight = 40.px
 			minHeight = prefHeight
 			maxHeight = prefHeight
+			
+			+BGColor
 		}
 		
 		TimeCellBorder {

@@ -40,6 +40,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 		addClass(TabStyles.tab)
 		
 		vbox {
+			addClass(TabStyles.content)
 			log("creating top bar", LogType.LOW)
 			// Top bar
 			hbox(spacing = 20.0, alignment = Pos.CENTER) {
@@ -79,6 +80,9 @@ fun createOverviewTab(pane: TabPane): Tab {
 					scrollbarWidth = paddingRightProperty
 					label("") {
 						addClass(GlobalStyles.tableItem)
+						style {
+							minWidth = 85.px // TODO get from cell (split cell)
+						}
 					}
 					for(header in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
 						label(header) {
@@ -96,17 +100,18 @@ fun createOverviewTab(pane: TabPane): Tab {
 					log("updated table view", LogType.LOW)
 					val selectedIndex = SimpleIntegerProperty(-1)
 					
-					table = scrollpane(fitToWidth = true) {
+					table = scrollpane(fitToWidth = true, fitToHeight = true) {
 						addClass(GlobalStyles.disableFocusDraw)
 						addClass(GlobalStyles.maxHeight)
 						addClass(GlobalStyles.background)
+						isPannable = true
 						
 						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
 						widthProperty().listen(once = true) {
 							lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 								bar.visibleProperty().listen { visible ->
 									if(visible) {
-										scrollbarWidth.value = 13.3 + 2 // 2 padding right of inner vbox
+										scrollbarWidth.value = 13.3 + 2 // 13.3 scrollbar  2 padding right of inner vbox
 									} else {
 										scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
 									}
@@ -114,6 +119,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 							}
 						}
 						
+						// gets stretched across whole scrollpane
 						vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
 							addClass(GlobalStyles.background)
 							for((index, week) in list.withIndex()) {
@@ -227,7 +233,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 									
 									selectedIndex.addListener(ChangeListener { _, old, new ->
 										if(new != index) {
-											removeClass(OverviewStyles.selectedColumn)
+											removeClass(OverviewStyles.toggledRow)
 											if(old == index && (new != -1)) {
 												onMouseExited.handle(null)
 											}
@@ -314,7 +320,7 @@ fun createCellGraphics(
 						createFXImage("note active hovered.svg")
 					
 					val img = imageview(defaultImg) {
-						addClass(OverviewStyles.icon)
+						addClass(OverviewStyles.cellIcon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}

@@ -58,10 +58,11 @@ fun createReminderTab(pane: TabPane): Tab {
 					children.remove(table)
 					log("updated table view", LogType.LOW)
 					
-					table = scrollpane(fitToWidth = true) {
+					table = scrollpane(fitToWidth = true, fitToHeight = true) {
 						addClass(GlobalStyles.disableFocusDraw)
 						addClass(GlobalStyles.maxHeight)
 						addClass(GlobalStyles.background)
+						isPannable = true
 						
 						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
 						widthProperty().listen(once = true) {
@@ -76,7 +77,8 @@ fun createReminderTab(pane: TabPane): Tab {
 							}
 						}
 						
-						vbox(spacing = 5.0, alignment = Pos.CENTER) {
+						// gets stretched across whole scrollpane
+						vbox(spacing = 2.0, alignment = Pos.TOP_CENTER) {
 							addClass(GlobalStyles.background)
 							for(reminder in list) {
 								hbox(spacing = 5.0, alignment = Pos.CENTER) {

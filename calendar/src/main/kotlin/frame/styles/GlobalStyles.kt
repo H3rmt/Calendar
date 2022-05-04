@@ -23,10 +23,10 @@ class GlobalStyles: Stylesheet() {
 	
 	object Mixins {
 		val BGColor = mixin {
-			backgroundColor += Color.WHITE
+			backgroundColor += Color.LIGHTGREY
 		}
 		val SecColor = mixin {
-			backgroundColor += Color.LIGHTGREY
+			backgroundColor += Color.DARKGRAY
 		}
 	}
 	

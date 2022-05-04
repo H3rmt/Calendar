@@ -1,5 +1,6 @@
 package frame.styles
 
+import frame.styles.GlobalStyles.Mixins.BGColor
 import javafx.scene.layout.*
 import javafx.scene.paint.*
 import tornadofx.*
@@ -32,7 +33,7 @@ class ReminderStyles: Stylesheet() {
 		reminderRow {
 			prefHeight = 40.px
 			
-			backgroundColor += c(0.98, 0.98, 0.98)
+			+BGColor
 			backgroundRadius += box(6.px)
 			borderWidth += box(2.px)
 			

@@ -35,6 +35,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 		addClass(TabStyles.tab)
 		
 		vbox {
+			addClass(TabStyles.content)
 			lateinit var add: Button
 			lateinit var addType: ComboBox<String>
 			
@@ -56,12 +57,14 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 				}
 			}
 			
-			scrollpane(fitToWidth = true) {
+			scrollpane(fitToWidth = true, fitToHeight = true) {
 				addClass(GlobalStyles.disableFocusDraw)
 				addClass(GlobalStyles.maxHeight)
 				addClass(GlobalStyles.background)
+				isPannable = true
 				
-				vbox {
+				// gets stretched across whole scrollpane
+				vbox(spacing = 2.0, alignment = Pos.TOP_CENTER) {
 					addClass(GlobalStyles.background)
 					
 					add.action {

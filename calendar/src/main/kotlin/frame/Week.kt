@@ -15,7 +15,6 @@ import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
-import javafx.scene.paint.*
 import listen
 import logic.LogType
 import logic.getLangString
@@ -35,15 +34,11 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 		
 		// mainTab
 		vbox {
-			hbox(spacing = 40.0, alignment = Pos.CENTER_LEFT) {
+			hbox(spacing = 40.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar)
-				style {
-					padding = box(0.px, 15.px, 0.px, 15.px)
-				}
-				button {
-					text = "Test"
-					
-					addClass(TabStyles.titleButton)
+				label(getLangString("Week")) {
+					addClass(TabStyles.title)
+					alignment = Pos.CENTER
 				}
 			}
 			
@@ -80,7 +75,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 					log("updated table view", LogType.LOW)
 					var scrollToHour = 0
 					
-					table = scrollpane(fitToWidth = true) {
+					table = scrollpane(fitToWidth = true, fitToHeight = true) {
 						addClass(GlobalStyles.disableFocusDraw)
 						addClass(GlobalStyles.maxHeight)
 						addClass(GlobalStyles.background)
@@ -91,7 +86,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 							lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 								bar.visibleProperty().listen { visible ->
 									if(visible) {
-										scrollbarWidth.value = bar.width + 2 //+ scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+										scrollbarWidth.value = 13.3 + 2 // 13.3 = scrollpane  scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 									} else {
 										scrollbarWidth.value = 2.0 //scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 									}
@@ -99,10 +94,8 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 							}
 						}
 						
-						hbox(spacing = 2.0, alignment = Pos.CENTER) {
-							style(append = true) {
-								backgroundColor += Color.WHITE
-							}
+						hbox {
+							addClass(GlobalStyles.background)
 							vbox(alignment = Pos.TOP_CENTER) {
 								addClass(WeekStyles.tableDay)
 								for(hour in 0..23) {
@@ -149,7 +142,6 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 											
 											// inner tableCell
 											hbox(spacing = 2.0, alignment = Pos.CENTER) {
-												addClass(GlobalStyles.background)
 												
 												// appointments
 												val cellAppointments = appointments.filter {
