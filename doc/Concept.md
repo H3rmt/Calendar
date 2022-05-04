@@ -20,13 +20,13 @@
 - Mention Issue with in every commit `#{id} Commit Description`
 - Create Pull request from Branch into next with name equal to issue's name and add `Fixes #{id}` to close issue on merge [IDE]
 - Link Pull request to issue
-- Merge into `next` with top comment as Merge message [IDE] 
+- Merge into `next` [IDE] 
 - Link `next` Pull request to issue
 
 ## New feature (Merge into main branch)
 - check build status on `next` branch (no broken allowed in `main`)
 - edit top comment containing summary of most relevant added features
-- Merge into `main` [IDE]
+- Merge into `main`  with top comment as Merge message [IDE]
 - close fished Projects
 - add new `Next` Pull request with empty top comment
 
