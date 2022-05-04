@@ -10,9 +10,11 @@ import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.text.*
 import javafx.stage.*
+import listen
 import logic.getLangString
 import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 
@@ -31,28 +33,63 @@ class AppointmentPopup: Fragment() {
 	private var onSave: (Appointment) -> Unit = scope.save
 	
 	private var error: Property<String> = "".toProperty()
+	private var wholeDay: Property<Boolean> = (appointment?.allDay ?: false).toProperty()
+	private var control: BorderPane? = null
+	private var day: Property<LocalDate> = (appointment?.start?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it).toLocalDate() } ?: scope.start.toLocalDate()).toProperty()
 	
 	private var windowTitle: String = scope.title
 	private var saveTitle: String = scope.saveTitle
 	
-	private fun updateAppointment() {
-		appointment?.let { app ->
-			app.title = appointmentTitle.value
-			app.description = description.value
-			app.start = start.value.toUTCEpochMinute()
-			app.duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()
-			app.type = getTypes().find { it.name == type.value }!!
+	private fun updateDisplay(toggle: Boolean) {
+		control?.left = if(toggle) {
+			field(getLangString("day")) {
+				datepicker(property = day)
+			}
+		} else {
+			field(getLangString("start to end")) {
+				dateTimePicker(dateTime = start)
+				dateTimePicker(dateTime = end)
+			}
 		}
 	}
 	
-	private fun createAppointment(): Appointment = Appointment.new(
-		start.value.toUTCEpochMinute(),
-		end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
-		appointmentTitle.value,
-		description.value,
-		getTypes().find { it.name == type.value }!!,
-		false
-	)
+	private fun updateAppointment() {
+		if(wholeDay.value) {
+			appointment?.let { app ->
+				app.title = appointmentTitle.value
+				app.description = description.value
+				app.start = day.value.toUTCEpochMinute()
+				app.duration = 1439
+				app.type = getTypes().find { it.name == type.value }!!
+				app.allDay = true
+			}
+		} else {
+			appointment?.let { app ->
+				app.title = appointmentTitle.value
+				app.description = description.value
+				app.start = start.value.toUTCEpochMinute()
+				app.duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()
+				app.type = getTypes().find { it.name == type.value }!!
+				app.allDay = false
+			}
+		}
+	}
+	
+	private fun createAppointment(): Appointment = if(wholeDay.value) {
+		Appointment.new( // duration irrelevant
+			_start = day.value.atStartOfDay().toUTCEpochMinute(),
+			_duration = 1439, _title = appointmentTitle.value,
+			_description = description.value, _type = getTypes().find { it.name == type.value }!!,
+			_addDay = true
+		)
+	} else {
+		Appointment.new(
+			_start = start.value.toUTCEpochMinute(),
+			_duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
+			_title = appointmentTitle.value,
+			_description = description.value, _type = getTypes().find { it.name == type.value }!!
+		)
+	}
 	
 	@Suppress("ReturnCount")
 	private fun checkAppointment(): String? {
@@ -68,7 +105,7 @@ class AppointmentPopup: Fragment() {
 	
 	override fun onBeforeShow() {
 		modalStage?.height = 320.0
-		modalStage?.width = 400.0
+		modalStage?.width = 500.0
 	}
 	
 	override val root = form {
@@ -77,11 +114,13 @@ class AppointmentPopup: Fragment() {
 			addClass(GlobalStyles.maxHeight_)
 			field("Type") {
 				combobox(values = getTypes().map { it.name }, property = type)
+				checkbox(getLangString("Whole day"), property = wholeDay) {
+					style {
+						padding = box(0.px, 0.px, 0.px, 40.px)
+					}
+				}
 			}
-			field(getLangString("start to end")) {
-				dateTimePicker(dateTime = start)
-				dateTimePicker(dateTime = end)
-			}
+			control = borderpane()
 			field(getLangString("title")) {
 				textfield(appointmentTitle)
 			}
@@ -89,7 +128,6 @@ class AppointmentPopup: Fragment() {
 				addClass(GlobalStyles.maxHeight_)
 				style(append = true) {
 					minHeight = 60.px
-					padding = box(0.px, 0.px, 20.px, 0.px)
 				}
 				textarea(description) {
 					addClass(GlobalStyles.maxHeight_)
@@ -129,6 +167,13 @@ class AppointmentPopup: Fragment() {
 				}
 			}
 		}
+	}
+	
+	init {
+		wholeDay.listen {
+			updateDisplay(it)
+		}
+		updateDisplay(wholeDay.value)
 	}
 	
 	class ItemsScope(
