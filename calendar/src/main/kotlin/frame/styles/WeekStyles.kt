@@ -1,18 +1,11 @@
-package frame
+package frame.styles
 
 import javafx.scene.paint.*
 import tornadofx.*
 
-
-class Styles: Stylesheet() {
+class WeekStyles: Stylesheet() {
 	
-	object CalendarTableView {
-		val table by cssclass()
-		val tableItem by cssclass()
-		val cellHeaderLabel by cssclass()
-	}
-	
-	object WeekTab {
+	companion object {
 		val tableDay by cssclass()
 		val TimeCell by cssclass()
 		val TimeCellBorder by cssclass()
@@ -27,7 +20,7 @@ class Styles: Stylesheet() {
 	}
 	
 	init {
-		WeekTab.tableDay {
+		tableDay {
 			prefWidth = Int.MAX_VALUE.px
 			
 			backgroundColor += c(0.98, 0.98, 0.98)
@@ -38,22 +31,22 @@ class Styles: Stylesheet() {
 			borderWidth += box(2.px)
 		}
 		
-		WeekTab.TimeCell {
+		TimeCell {
 			prefHeight = 40.px
 			minHeight = prefHeight
 			maxHeight = prefHeight
 		}
 		
-		WeekTab.TimeCellBorder {
+		TimeCellBorder {
 			borderColor += box(c(0.75, 0.75, 0.75))
 			borderWidth += box(0.px, 0.px, 2.px, 0.px)
 		}
 		
-		WeekTab.ActiveTimeCell {
+		ActiveTimeCell {
 			backgroundColor += Color.DARKGRAY
 		}
 		
-		WeekTab.UnHoveredInnerTimeCell {
+		UnHoveredInnerTimeCell {
 			prefWidth = Int.MAX_VALUE.px
 			prefHeight = 38.px    // - padding  - border bottom
 			minHeight = prefHeight
@@ -65,11 +58,11 @@ class Styles: Stylesheet() {
 			borderWidth += box(2.px)
 		}
 		
-		WeekTab.HoveredInnerTimeCell {
+		HoveredInnerTimeCell {
 			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
 		}
 		
-		WeekTab.tableTimeHeader {
+		tableTimeHeader {
 			prefHeight = 28.px
 			minHeight = prefHeight
 			
@@ -78,7 +71,7 @@ class Styles: Stylesheet() {
 			borderWidth += box(2.px)
 		}
 		
-		WeekTab.invisibleScrollbar {
+		invisibleScrollbar {
 			scrollBar {
 				backgroundColor += Color.WHITE
 				
