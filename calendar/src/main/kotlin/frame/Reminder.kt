@@ -20,6 +20,7 @@ fun createReminderTab(pane: TabPane): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab(getLangString("reminders")) {
 		isClosable = false
+		addClass(TabStyles.tab)
 		
 		vbox {
 			hbox(spacing = 20.0, alignment = Pos.CENTER) {
@@ -76,6 +77,7 @@ fun createReminderTab(pane: TabPane): Tab {
 						}
 						
 						vbox(spacing = 5.0, alignment = Pos.CENTER) {
+							addClass(GlobalStyles.background)
 							for(reminder in list) {
 								hbox(spacing = 5.0, alignment = Pos.CENTER) {
 									addClass(ReminderStyles.reminderRow)

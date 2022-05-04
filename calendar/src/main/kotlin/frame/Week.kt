@@ -84,6 +84,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 						addClass(GlobalStyles.disableFocusDraw)
 						addClass(GlobalStyles.maxHeight)
 						addClass(GlobalStyles.background)
+						isPannable = true
 						
 						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
 						widthProperty().listen(once = true) {

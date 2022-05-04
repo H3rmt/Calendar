@@ -37,11 +37,12 @@ fun createOverviewTab(pane: TabPane): Tab {
 	log("creating overview tab", LogType.IMPORTANT)
 	return pane.tab(getLangString("calender")) {
 		isClosable = false
+		addClass(TabStyles.tab)
 		
 		vbox {
 			log("creating top bar", LogType.LOW)
 			// Top bar
-			hbox(spacing = 40.0, alignment = Pos.CENTER) {
+			hbox(spacing = 20.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar)
 				button("<") {
 					addClass(TabStyles.titleButton)
@@ -73,8 +74,9 @@ fun createOverviewTab(pane: TabPane): Tab {
 				
 				// Top bar
 				hbox(spacing = 5.0, alignment = Pos.CENTER) {
-					scrollbarWidth = paddingRightProperty
+					addClass(GlobalStyles.tableHeader)
 					
+					scrollbarWidth = paddingRightProperty
 					label("") {
 						addClass(GlobalStyles.tableItem)
 					}
@@ -82,7 +84,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 						label(header) {
 							addClass(GlobalStyles.tableItem)
 							addClass(GlobalStyles.tableHeaderItem)
-							addClass(OverviewStyles.tableHeaderItem)
+							addClass(OverviewStyles.headerItem)
 						}
 					}
 				}
@@ -112,12 +114,10 @@ fun createOverviewTab(pane: TabPane): Tab {
 							}
 						}
 						
-						vbox(spacing = 5.0, alignment = Pos.CENTER) {
+						vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
 							addClass(GlobalStyles.background)
 							for((index, week) in list.withIndex()) {
 								hbox(spacing = 5.0, alignment = Pos.CENTER) {
-									addClass(GlobalStyles.background)
-									
 									val openTimeline = Timeline()
 									val closeTimeline = Timeline()
 									
@@ -140,7 +140,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 										cells.add(graphic[0] as VBox)
 										
 										if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
-											(graphic[0] as VBox).addClass(OverviewStyles.markedTableCell)
+											(graphic[0] as VBox).addClass(OverviewStyles.markedCell)
 										
 										@Suppress("UNCHECKED_CAST")
 										openAppointmentOpenAnimations.add(graphic[1] as MutableList<Animation>)
@@ -153,11 +153,11 @@ fun createOverviewTab(pane: TabPane): Tab {
 									
 									for((cellIndex, cell) in cells.withIndex()) {
 										cell.onMouseEntered = EventHandler {
-											cell.addClass(OverviewStyles.hoveredTableCell)
+											cell.addClass(OverviewStyles.hoveredCell)
 											hoveredCell.value = cellIndex
 										}
 										cell.onMouseExited = EventHandler {
-											cell.removeClass(OverviewStyles.hoveredTableCell)
+											cell.removeClass(OverviewStyles.hoveredCell)
 											hoveredCell.value = -1
 										}
 										cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
@@ -202,10 +202,10 @@ fun createOverviewTab(pane: TabPane): Tab {
 									onMouseClicked = EventHandler {
 										if(selectedIndex.value != index) {
 											selectedIndex.value = index
-											addClass(OverviewStyles.selectedColumn)
+											addClass(OverviewStyles.toggledRow)
 										} else {
 											selectedIndex.value = -1
-											removeClass(OverviewStyles.selectedColumn)
+											removeClass(OverviewStyles.toggledRow)
 										}
 										if(it.clickCount > 1) {
 											log(
@@ -277,7 +277,7 @@ fun createCellGraphics(
 					val hoveredImg = createFXImage("remind hovered.svg")
 					
 					val img = imageview(defaultImg) {
-						addClass(OverviewStyles.icon)
+						addClass(OverviewStyles.cellIcon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
@@ -369,7 +369,7 @@ fun createCellGraphics(
 						createFXImage("note active hovered.svg")
 					
 					val img = imageview(defaultImg) {
-						addClass(OverviewStyles.icon)
+						addClass(OverviewStyles.cellIcon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}

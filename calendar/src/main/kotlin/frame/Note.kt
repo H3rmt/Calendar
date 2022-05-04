@@ -32,6 +32,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 			else -> ""
 		}
 		isClosable = true
+		addClass(TabStyles.tab)
 		
 		vbox {
 			lateinit var add: Button

@@ -1,6 +1,7 @@
 package frame.styles
 
 import frame.styles.GlobalStyles.Mixins.BGColor
+import frame.styles.GlobalStyles.Mixins.SecColor
 import javafx.geometry.*
 import javafx.scene.paint.*
 import javafx.scene.text.*
@@ -9,6 +10,7 @@ import tornadofx.*
 class GlobalStyles: Stylesheet() {
 	companion object {
 		val background by cssclass()
+		val secBackground by cssclass()
 		
 		val disableFocusDraw by cssclass()
 		val maxHeight by cssclass()
@@ -23,11 +25,17 @@ class GlobalStyles: Stylesheet() {
 		val BGColor = mixin {
 			backgroundColor += Color.WHITE
 		}
+		val SecColor = mixin {
+			backgroundColor += Color.LIGHTGREY
+		}
 	}
 	
 	init {
 		background {
 			+BGColor
+		}
+		secBackground {
+			+SecColor
 		}
 		disableFocusDraw {
 			focusColor = Color.TRANSPARENT
@@ -43,7 +51,7 @@ class GlobalStyles: Stylesheet() {
 		}
 		tableHeader {
 			+BGColor
-			padding = box(3.px, 15.3.px, 3.px, 3.px) // 15.3 because of scrollbar width
+			padding = box(8.px, 3.px, 3.px, 3.px) // 15.3 because of scrollbar width (fixed initial scrollbar)
 		}
 		tableItem {
 			alignment = Pos.CENTER
