@@ -1,0 +1,25 @@
+name: Gradle Build Tests
+
+on:
+  push:
+    branches: [ next, main, release ]
+  pull_request:
+    branches: [ next, main, release ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v3
+      - name: Set up JDK 16
+        uses: actions/setup-java@v2
+        with:
+          java-version: '16'
+          distribution: 'adopt'
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew build

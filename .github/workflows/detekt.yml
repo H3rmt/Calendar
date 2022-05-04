@@ -1,0 +1,19 @@
+name: Scan with Detekt
+
+on:
+  pull_request:
+    branches: [ main, release ]
+
+jobs:
+  scan:
+    name: Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v3
+
+      - name: "detekt"
+        uses: natiginfo/action-detekt-all@1.20.0
+        with:
+          args: --build-upon-default-config --config detekt.yml

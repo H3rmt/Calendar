@@ -6,10 +6,13 @@ import calendar.Note
 import calendar.Timing.toUTCEpochMinute
 import calendar.Week
 import calendar.getTypes
+import frame.styles.GlobalStyles
+import frame.styles.NoteTabStyles
+import frame.styles.TabStyles
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
-import javafx.scene.paint.*
+import listen
 import logic.Configs
 import logic.LogType
 import logic.getConfig
@@ -23,100 +26,86 @@ import java.time.temporal.ChronoField
 fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit): Tab {
 	log("creating note tab", LogType.IMPORTANT)
 	return pane.tab("") {
-		if(cell is Day)
-			text = "Notes for ${cell.time.dayOfMonth}. ${getLangString(cell.time.month.name)}"
-		else if(cell is Week)
-			text = "Notes for ${cell.time.get(ChronoField.ALIGNED_WEEK_OF_MONTH)}. Week in ${getLangString(cell.time.month.name)}"
-		
+		text = when(cell) {
+			is Day -> "Notes for ${cell.time.dayOfMonth}. ${getLangString(cell.time.month.name)}"
+			is Week -> "Notes for ${cell.time.get(ChronoField.ALIGNED_WEEK_OF_MONTH)}. Week in ${getLangString(cell.time.month.name)}"
+			else -> ""
+		}
 		isClosable = true
-		stackpane {
-			style(append = true) {
-				padding = box(6.px)
+		addClass(TabStyles.tab_)
+		
+		vbox {
+			addClass(TabStyles.content_)
+			lateinit var add: Button
+			lateinit var addType: ComboBox<String>
+			
+			val noteTabs = mutableListOf<TitledPane>()
+			
+			hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
+				addClass(TabStyles.topbar_)
+				
+				addType = combobox {
+					items = getTypes().map { it.name }.toObservable()
+				}
+				add = button {
+					text = "Add"
+					isDisable = true
+					
+					// disables button if no type selected or type already added
+					addType.valueProperty().addListener { _, _, new -> isDisable = (new == null) || noteTabs.any { it.text == new } }
+					addClass(TabStyles.titleButton_)
+				}
 			}
 			
-			vbox {
-				addClass(Styles.Tabs.mainTab)
-				style {
-					padding = box(0.px, 0.px, 2.px, 0.px)
-				}
+			scrollpane(fitToWidth = true, fitToHeight = true) {
+				addClass(GlobalStyles.disableFocusDraw_)
+				addClass(GlobalStyles.maxHeight_)
+				addClass(GlobalStyles.background_)
+				isPannable = true
 				
-				lateinit var add: Button
-				lateinit var addType: ComboBox<String>
-				
-				val noteTabs = mutableListOf<TitledPane>()
-				
-				hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
-					addClass(Styles.Tabs.topbar)
-					style {
-						padding = box(0.px, 15.px, 0.px, 15.px)
+				// gets stretched across whole scrollpane
+				vbox(spacing = 2.0, alignment = Pos.TOP_CENTER) {
+					addClass(GlobalStyles.background_)
+					
+					add.action {
+						var note: Note? = null
+						lateinit var tb: TitledPane
+						tb = noteTab(this, addType.value, "", { text ->
+							if(note == null) {
+								note = Note.new(cell.time.toUTCEpochMinute(), "", getTypes().find { it.name == addType.value }!!, cell is Week)
+							}
+							note?.text = text
+							updateCallback()
+						}, {
+							this.children.remove(noteTabs.first { it == tb })
+							noteTabs.remove(tb)
+							note?.remove()
+							
+							// triggers reload of add button to check if new note can be created
+							add.isDisable = noteTabs.any { it.text == addType.value }
+							updateCallback()
+						})
+						noteTabs.add(0, tb)
+						add.isDisable = true
 					}
 					
-					addType = combobox {
-						items = getTypes().map { it.name }.toObservable()
-					}
-					add = button {
-						text = "Add"
-						isDisable = true
-						
-						// disables button if no type selected or type already added
-						addType.valueProperty().addListener { _, _, new -> isDisable = (new == null) || noteTabs.any { it.text == new } }
-						addClass(Styles.Tabs.titleButtons)
-					}
-				}
-				
-				separate()
-				
-				scrollpane(fitToWidth = true) {
-					style {
-						prefHeight = Int.MAX_VALUE.px
-					}
-					vbox {
-						add.action {
-							var note: Note? = null
-							lateinit var tb: TitledPane
-							tb = noteTab(this, addType.value, "", { text ->
-								if(note == null) {
-									note = Note.new(cell.time.toUTCEpochMinute(), "", getTypes().find { it.name == addType.value }!!, cell is Week)
-								}
-								note?.text = text
-								updateCallback()
-							}, {
-								this.children.remove(noteTabs.first { it == tb })
-								noteTabs.remove(tb)
-								note?.remove()
-								
-								// triggers reload of add button to check if new note can be created
-								add.isDisable = noteTabs.any { it.text == addType.value }
-								updateCallback()
-							})
-							noteTabs.add(0, tb)
-							add.isDisable = true
-						}
-						
-						for(note in cell.notes) {
-							lateinit var tb: TitledPane
-							tb = noteTab(this, note.type.name, note.text, { text ->
-								note.text = text
-								updateCallback()
-							}, {
-								this.children.remove(noteTabs.first { it == tb })
-								noteTabs.remove(tb)
-								note.remove()
-								
-								// triggers reload of add button to check if new note can be created
-								add.isDisable = noteTabs.any { it.text == addType.value }
-								updateCallback()
-							})
-							noteTabs.add(tb)
-						}
+					for(note in cell.notes) {
+						lateinit var tb: TitledPane
+						tb = noteTab(this, note.type.name, note.text, { text ->
+							note.text = text
+							updateCallback()
+						}, {
+							this.children.remove(noteTabs.first { it == tb })
+							noteTabs.remove(tb)
+							note.remove()
+							
+							// triggers reload of add button to check if new note can be created
+							add.isDisable = noteTabs.any { it.text == addType.value }
+							updateCallback()
+						})
+						noteTabs.add(tb)
 					}
 				}
-			}
-			
-			// used to shadow the overflow from tab
-			pane {
-				isMouseTransparent = true
-				addClass(Styles.Tabs.shadowBorder)
 			}
 		}
 	}
@@ -129,18 +118,12 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 	pane.apply {
 		setText(title)
 		isExpanded = getConfig(Configs.ExpandNotesOnOpen)
-		
-		style {
-			padding = box(1.px)
-		}
+		addClass(NoteTabStyles.notesPane_)
 		
 		lateinit var save: Button
 		
 		graphic = toolbar {
-			style {
-				backgroundColor += Color.TRANSPARENT
-				padding = box(0.px, 0.px, 0.px, 20.px)
-			}
+			addClass(NoteTabStyles.paneToolbar_)
 			hbox(spacing = 20.0) {
 				style {
 					fontSize = 15.px
@@ -153,11 +136,12 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 			}
 		}
 		contentDisplay = ContentDisplay.RIGHT
-		expandedProperty().addListener { _, _, new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
+		expandedProperty().listen { new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
 		
 		htmleditor(text) {
-			addClass(Styles.NoteTab.texteditor)
-			addClass(Styles.disableFocusDraw)
+			addClass(GlobalStyles.disableFocusDraw_)
+			addClass(NoteTabStyles.editor_)
+			this.getChildList()
 			save.action {
 				saveFun(this@htmleditor.htmlText)
 				save.text = getLangString("save")

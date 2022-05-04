@@ -17,6 +17,11 @@ class Language(private val language: AvailableLanguages) {
 	 * in translations Map
 	 */
 	init {
+		val file = File(ConfigFiles.languageFile)
+		if(!file.exists()) {
+			file.createNewFile()
+			file.writeText(EMPTY_DEFAULT)
+		}
 		val allTranslations: Map<String, Map<String, String>> =
 			getJson().fromJson(getJsonReader(FileReader(File({}::class.java.classLoader.getResource(ConfigFiles.languageFile).toURI()))), Map::class.java)
 		translations = allTranslations["$language"] ?: mapOf()

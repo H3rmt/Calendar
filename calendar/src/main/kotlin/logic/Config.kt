@@ -54,7 +54,7 @@ fun initConfigs() {
 			dir.mkdirs()
 		}
 		file.createNewFile()
-		file.writeText(configDefault)
+		file.writeText(CONFIG_DEFAULT)
 		log("created default config:${ConfigFiles.configFile}", LogType.WARNING)
 	}
 	
@@ -86,7 +86,24 @@ fun initConfigs() {
 	log("set stacktrace $stacktrace", LogType.LOW)
 }
 
-
+/**
+ * returns a configuration in Config enum specified in config.json
+ * cast to given type
+ *
+ * getConfig<ConfigType>(Configs.<config>)
+ *
+ * ConfigType = Int / String / Boolean / Enum element
+ *
+ * enums get cast automatically from String,
+ * other types throw errors if type doesn't match
+ *
+ * config = Enum Element
+ *
+ * @see Configs
+ * @see configs
+ */
+@Suppress("NestedBlockDepth", "ThrowsCount", "TooGenericExceptionCaught")
+@OptIn(ExperimentalStdlibApi::class)
 inline fun <reified T: Any> getConfig(conf: Configs): T {
 	try {
 		configs[conf]?.let {
@@ -156,6 +173,7 @@ class Exit(private val code: String, private val exception: Exception? = null): 
 	override fun toString(): String = "Exit <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
 }
 
+
 /**
  * Custom Warning with Custom error code
  * (doesn't stop the code)
@@ -171,6 +189,7 @@ class Exit(private val code: String, private val exception: Exception? = null): 
  * @see Exception
  *
  */
+@Suppress("FunctionNaming", "UnusedPrivateMember")
 fun Warning(code: String, exception: Exception, log: Any) {
 	log(log, LogType.WARNING)
 	val writer = StringWriter()
@@ -210,10 +229,10 @@ lateinit var language: Language
  */
 fun getLangString(str: String, vararg args: Any?): String = language[str].format(*args)
 
-const val emptyDefault = "{\n\n}"
+const val EMPTY_DEFAULT = "{\n\n}"
 
 // TODO update this before release
-const val configDefault = "{\n" +
+const val CONFIG_DEFAULT = "{\n" +
 		  "\t\"Language\": \"EN\",\n" +
 		  "\t\"Debug\": false,\n" +
 		  "\t\"PrintStacktrace\": true,\n" +

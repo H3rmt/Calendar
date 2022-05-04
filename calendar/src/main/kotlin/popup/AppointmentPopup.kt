@@ -4,6 +4,7 @@ import calendar.Appointment
 import calendar.Timing
 import calendar.Timing.toUTCEpochMinute
 import calendar.getTypes
+import frame.styles.GlobalStyles
 import javafx.beans.property.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
@@ -15,14 +16,14 @@ import tornadofx.*
 import java.time.LocalDateTime
 
 
-class NewAppointmentPopup: Fragment() {
+class AppointmentPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
 	
 	private var appointment: Appointment? = scope.appointment
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
-	private var start: Property<LocalDateTime> = (appointment?.start?.let { Timing.UTCEpochMinuteToLocalDateTime(it) } ?: scope.start).toProperty()
-	private var end: Property<LocalDateTime> = (appointment?.let { Timing.UTCEpochMinuteToLocalDateTime(it.start + it.duration) } ?: scope.end).toProperty()
+	private var start: Property<LocalDateTime> = (appointment?.start?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it) } ?: scope.start).toProperty()
+	private var end: Property<LocalDateTime> = (appointment?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it.start + it.duration) } ?: scope.end).toProperty()
 	private var appointmentTitle: Property<String> = (appointment?.title ?: "").toProperty()
 	private var description: Property<String> = (appointment?.description ?: "").toProperty()
 	private var type: Property<String> = (appointment?.type?.name ?: "").toProperty()
@@ -53,6 +54,7 @@ class NewAppointmentPopup: Fragment() {
 		false
 	)
 	
+	@Suppress("ReturnCount")
 	private fun checkAppointment(): String? {
 		if(type.value == "") {
 			return getLangString("missing type")
@@ -70,13 +72,9 @@ class NewAppointmentPopup: Fragment() {
 	}
 	
 	override val root = form {
-		style {
-			backgroundColor += Color.WHITE
-		}
+		addClass(GlobalStyles.background_)
 		fieldset(getLangString(windowTitle)) {
-			style {
-				prefHeight = Int.MAX_VALUE.px
-			}
+			addClass(GlobalStyles.maxHeight_)
 			field("Type") {
 				combobox(values = getTypes().map { it.name }, property = type)
 			}
@@ -88,15 +86,13 @@ class NewAppointmentPopup: Fragment() {
 				textfield(appointmentTitle)
 			}
 			field(getLangString("description")) {
+				addClass(GlobalStyles.maxHeight_)
 				style(append = true) {
-					prefHeight = Int.MAX_VALUE.px
 					minHeight = 60.px
 					padding = box(0.px, 0.px, 20.px, 0.px)
 				}
 				textarea(description) {
-					style(append = true) {
-						prefHeight = Int.MAX_VALUE.px
-					}
+					addClass(GlobalStyles.maxHeight_)
 				}
 			}
 			
@@ -141,10 +137,10 @@ class NewAppointmentPopup: Fragment() {
 	): Scope()
 	
 	companion object {
+		@Suppress("LongParameterList")
 		fun open(title: String, saveTitle: String, block: Boolean, appointment: Appointment?, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
 			val scope = ItemsScope(title, saveTitle, appointment, start, end, save)
-			return find<NewAppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+			return find<AppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
 		}
 	}
-	
 }
