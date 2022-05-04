@@ -1,76 +1,76 @@
 {
 	"EN": {
 		// General
-		"cancel": "Cancel", // checked
-		"title": "Title", // checked
-		"help": "Help", // checked
-		"missing %s": "Missing %s", // checked
+		"cancel": "Cancel",
+		"title": "Title",
+		"help": "Help",
+		"missing %s": "Missing %s",
 		
 		// Menu bar
-		"options": "Options", // checked
-		"reload": "Reload", // checked
-		"preferences": "Preferences", // checked
-		"quit": "Quit", // checked
-		"view": "View", // checked
-		"show reminder": "Show Reminder", // checked
-		"show calendar": "Show Calendar", // checked
-		"github": "Github", // checked
-		"memory usage": "Memory usage", // checked
-		"appointment": "Appointment", // checked
-		"reminder": "Reminder", // checked
+		"options": "Options",
+		"reload": "Reload",
+		"preferences": "Preferences",
+		"quit": "Quit",
+		"view": "View",
+		"show reminder": "Show Reminder",
+		"show calendar": "Show Calendar",
+		"github": "Github",
+		"memory usage": "Memory usage",
+		"appointment": "Appointment",
+		"reminder": "Reminder",
 		
 		// Tabs (tabpane name)
-		"calender": "Calendar", // checked
-		"reminders": "Reminder", // checked
+		"calender": "Calendar",
+		"reminders": "Reminder",
 		
 		// days
-		"monday": "Monday", // checked
-		"tuesday": "Tuesday", // checked
-		"wednesday": "Wednesday", // checked
-		"thursday": "Thursday", // checked
-		"friday": "Friday", // checked
-		"saturday": "Saturday", // checked
-		"sunday": "Sunday", // checked
+		"monday": "Monday",
+		"tuesday": "Tuesday",
+		"wednesday": "Wednesday",
+		"thursday": "Thursday",
+		"friday": "Friday",
+		"saturday": "Saturday",
+		"sunday": "Sunday",
 		
 		// months (Week.date, calendartab title)
-		"january": "January", // checked
-		"february": "February", // checked
-		"march": "March", // checked
-		"april": "April", // checked
-		"may": "May", // checked
-		"june": "June", // checked
-		"july": "July", // checked
-		"august": "August", // checked
-		"september": "September", // checked
-		"october": "October", // checked
-		"november": "November",// checked
-		"december": "December", // checked
+		"january": "January",
+		"february": "February",
+		"march": "March",
+		"april": "April",
+		"may": "May",
+		"june": "June",
+		"july": "July",
+		"august": "August",
+		"september": "September",
+		"october": "October",
+		"november": "November",
+		"december": "December",
 		
 		// Note Tab
-		"save": "Save", // checked
-		"create": "Create", // checked
-		"delete": "Delete", // checked
+		"save": "Save",
+		"create": "Create",
+		"delete": "Delete",
 		
 		// Week Tab
-		"new appointment": "New Appointment", // checked
-		"description": "Description", // checked
-		"start to end": "Start - End", // checked
-		"remove appointment": "Remove Appointment", // checked
-		"edit appointment": "Edit Appointment", // checked
+		"new appointment": "New Appointment",
+		"description": "Description",
+		"start to end": "Start - End",
+		"remove appointment": "Remove Appointment",
+		"edit appointment": "Edit Appointment",
 		
 		// Appointment Popup
-		"missing type": "Missing type", // checked
-		"missing title": "Missing title", // checked
-		"start must be before end": "Start time must be before end time", // checked
-		"do you want to remove %s appointment": "do you want to remove %s appointment", // checked
-		"remove?": "Remove?", // checked
-		"notify": "Notify", // checked
+		"missing type": "Missing type",
+		"missing title": "Missing title",
+		"start must be before end": "Start time must be before end time",
+		"do you want to remove %s appointment": "do you want to remove %s appointment",
+		"remove?": "Remove?",
+		"notify": "Notify",
 		
 		// Reminder Tab
-		"new reminder": "New Reminder", // checked
-		"deadline": "Deadline", // checked
+		"new reminder": "New Reminder",
+		"deadline": "Deadline",
 		
 		// Reminder Popup
-		"finish": "Finish" // checked
+		"finish": "Finish"
 	}
 }
