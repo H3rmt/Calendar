@@ -5,6 +5,7 @@ import calendar.Reminder
 import calendar.Timing
 import calendar.Timing.toUTCEpochMinute
 import calendar.getAppointments
+import frame.styles.GlobalStyles
 import frame.toggleSwitch
 import javafx.beans.property.*
 import javafx.geometry.*
@@ -86,13 +87,9 @@ class ReminderPopup: Fragment() {
 	}
 	
 	override val root = form {
-		style {
-			backgroundColor += Color.WHITE
-		}
+		addClass(GlobalStyles.background_)
 		fieldset(getLangString(windowTitle)) {
-			style {
-				prefHeight = Int.MAX_VALUE.px
-			}
+			addClass(GlobalStyles.maxHeight_)
 			field(getLangString("Finish")) {
 				control = borderpane {
 					right = stackpane {
@@ -114,15 +111,13 @@ class ReminderPopup: Fragment() {
 				textfield(reminderTitle)
 			}
 			field(getLangString("description")) {
+				addClass(GlobalStyles.maxHeight_)
 				style(append = true) {
-					prefHeight = Int.MAX_VALUE.px
 					minHeight = 60.px
 					padding = box(0.px, 0.px, 20.px, 0.px)
 				}
 				textarea(reminderDescription) {
-					style(append = true) {
-						prefHeight = Int.MAX_VALUE.px
-					}
+					addClass(GlobalStyles.maxHeight_)
 				}
 			}
 			field(getLangString("notify")) {

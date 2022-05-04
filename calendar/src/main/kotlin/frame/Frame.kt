@@ -4,7 +4,14 @@ package frame
 import calendar.Appointment
 import calendar.Reminder
 import calendar.Timing
-import frame.Tabmanager.Secure
+import frame.TabManager.Secure
+import frame.styles.GlobalStyles
+import frame.styles.MenubarStyles
+import frame.styles.NoteTabStyles
+import frame.styles.OverviewStyles
+import frame.styles.ReminderStyles
+import frame.styles.TabStyles
+import frame.styles.WeekStyles
 import init
 import javafx.application.*
 import javafx.beans.property.*
@@ -81,15 +88,21 @@ fun frameInit() {
 	//LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
 
-class Window: App(MainView::class, Styles::class) {
+class Window: App(
+	MainView::class,
+	GlobalStyles::class, MenubarStyles::class, TabStyles::class,
+	NoteTabStyles::class, ReminderStyles::class, OverviewStyles::class,
+	WeekStyles::class
+) {
+	
 	override fun start(stage: Stage) {
 		stage.height = 600.0
 		stage.width = 800.0
 		super.start(stage)
 		removeLoading()
 		log("started Frame", LogType.NORMAL)
-		Tabmanager.openTab("calendar", ::createCalendarTab)
-		Tabmanager.openTab("reminders", ::createReminderTab)
+		TabManager.openTab("calendar", ::createOverviewTab)
+		TabManager.openTab("reminders", ::createReminderTab)
 		
 	}
 }
@@ -102,7 +115,7 @@ class MainView: View("Calendar") {
 		center = tabpane {
 			tabDragPolicy = TabPane.TabDragPolicy.REORDER
 			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
-			Tabmanager.pane = this@tabpane
+			TabManager.pane = this@tabpane
 		}
 		log("created pane", LogType.IMPORTANT)
 	}
@@ -139,7 +152,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 			createMenuGroup(
 				createMenuItem(this@menu, "Reload", "F5") {
 					init()
-					Secure.overrideTab("calendar", ::createCalendarTab)
+					Secure.overrideTab("calendar", ::createOverviewTab)
 				},
 				createMenuItem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
 				run { separator(); return@run null },
@@ -149,16 +162,15 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 				}
 			)
 		}
-		menu(getLangString("show")) {
+		menu(getLangString("view")) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") {
 					log("Show Reminder")
 					Secure.overrideTab("reminders", ::createReminderTab)
 				},
-//				createMenuItem(this@menu, "Show TODO List", "Strg + Shift + T") { log("Show TODO List") },
 				createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {
 					log("Show Calendar")
-					Secure.overrideTab("calendar", ::createCalendarTab)
+					Secure.overrideTab("calendar", ::createOverviewTab)
 				}
 			)
 		}
@@ -191,7 +203,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 
 fun createMenuGroup(vararg panes: GridPane?) {
 	log("creating MenuGroup with ${panes.size} elements", LogType.LOW)
-	var maxWidth = 10.0
+	var currentWidth = 10.0
 	val items = panes.filterNotNull()
 	val changed = mutableListOf<GridPane>()
 	items.forEach { item ->
@@ -199,11 +211,11 @@ fun createMenuGroup(vararg panes: GridPane?) {
 			widthProperty().addListener(ChangeListener { _, _, newWidth ->
 				if(!changed.contains(this))
 					changed.add(this)
-				if(newWidth.toDouble() > maxWidth)
-					maxWidth = newWidth.toDouble()
+				if(newWidth.toDouble() > currentWidth)
+					currentWidth = newWidth.toDouble()
 				if(changed.size == items.size)
 					items.forEach {
-						it.prefWidth = maxWidth
+						it.prefWidth = currentWidth
 					}
 			})
 		}
@@ -215,25 +227,23 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 	var grid: GridPane? = null
 	menu.customitem {
 		grid = gridpane {
-			addClass(Styles.Menubar.gridPane)
+			addClass(MenubarStyles.gridPane_)
 			
 			label(getLangString(name)) {
-				addClass(Styles.Menubar.itemName)
+				addClass(MenubarStyles.itemName_)
 				gridpaneConstraints {
 					columnRowIndex(0, 0)
 				}
 			}
 			label {
+				addClass(MenubarStyles.spacing_)
 				gridpaneConstraints {
 					columnRowIndex(1, 0)
 					hGrow = Priority.ALWAYS
-					style {
-						minWidth = 15.px
-					}
 				}
 			}
 			label(shortcut) {
-				addClass(Styles.Menubar.itemShortcut)
+				addClass(MenubarStyles.shortcut_)
 				gridpaneConstraints {
 					columnRowIndex(2, 0)
 				}
@@ -254,7 +264,7 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
  *
  * @see Secure
  */
-object Tabmanager {
+object TabManager {
 	
 	lateinit var pane: TabPane
 	
@@ -341,7 +351,6 @@ fun createFXImage(name: String): Image {
 	
 	val image = try {
 		ImageIO.read({}::class.java.classLoader.getResource(path))
-//		ImageIO.read(File(path).takeIf { it.exists() })
 	} catch(e: IllegalArgumentException) {
 		Warning("imageError", e, "file not found:$path")
 		getImageMissing()
@@ -383,13 +392,6 @@ fun getImageMissing(): BufferedImage {
 	
 	g2.dispose()
 	return im
-}
-
-fun EventTarget.separate() {
-	label {
-		addClass(Styles.Tabs.separator)
-		useMaxWidth = true
-	}
 }
 
 
