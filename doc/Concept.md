@@ -22,6 +22,7 @@
 - Link Pull request to issue (done automatically by mention)
 - Merge into `next` [IDE] 
 - Link `next` Pull request to issue
+- Delete issue branch
 
 ## New feature (Merge into main branch)
 - check build status on `next` branch (no broken allowed in `main`)
