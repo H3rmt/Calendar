@@ -11,7 +11,7 @@
 		"reload": "Reload", // checked
 		"preferences": "Preferences", // checked
 		"quit": "Quit", // checked
-		"show": "Show", // checked
+		"view": "View", // checked
 		"show reminder": "Show Reminder", // checked
 		"show calendar": "Show Calendar", // checked
 		"github": "Github", // checked
