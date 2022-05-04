@@ -18,6 +18,8 @@ class TabStyles: Stylesheet() {
 	init {
 		tab {
 			+SecColor
+//			borderColor += box(backgroundColor.elements[0]) // equal to background
+//			borderWidth += box(0.px, 0.px, 1.px, 0.px)  // TODO do this if tab open
 		}
 		
 		title {

@@ -4,6 +4,7 @@ import calendar.Appointment
 import calendar.Timing
 import calendar.Timing.toUTCEpochMinute
 import calendar.getTypes
+import frame.styles.GlobalStyles
 import javafx.beans.property.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
@@ -70,13 +71,9 @@ class AppointmentPopup: Fragment() {
 	}
 	
 	override val root = form {
-		style {
-			backgroundColor += Color.WHITE
-		}
+		addClass(GlobalStyles.background)
 		fieldset(getLangString(windowTitle)) {
-			style {
-				prefHeight = Int.MAX_VALUE.px
-			}
+			addClass(GlobalStyles.maxHeight)
 			field("Type") {
 				combobox(values = getTypes().map { it.name }, property = type)
 			}
@@ -88,15 +85,13 @@ class AppointmentPopup: Fragment() {
 				textfield(appointmentTitle)
 			}
 			field(getLangString("description")) {
+				addClass(GlobalStyles.maxHeight)
 				style(append = true) {
-					prefHeight = Int.MAX_VALUE.px
 					minHeight = 60.px
 					padding = box(0.px, 0.px, 20.px, 0.px)
 				}
 				textarea(description) {
-					style(append = true) {
-						prefHeight = Int.MAX_VALUE.px
-					}
+					addClass(GlobalStyles.maxHeight)
 				}
 			}
 			
