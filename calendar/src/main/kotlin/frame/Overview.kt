@@ -76,7 +76,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 					scrollbarWidth = paddingRightProperty
 					
 					label("") {
-						addClass(Styles.CalendarTableView.tableItem)
+						addClass(GlobalStyles.tableItem)
 					}
 					for(header in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
 						label(header) {
@@ -104,7 +104,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 							lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 								bar.visibleProperty().listen { visible ->
 									if(visible) {
-										scrollbarWidth.value = bar.width + 2 // 2 padding right of inner vbox
+										scrollbarWidth.value = 13.3 + 2 // 2 padding right of inner vbox
 									} else {
 										scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
 									}
@@ -117,7 +117,6 @@ fun createOverviewTab(pane: TabPane): Tab {
 							for((index, week) in list.withIndex()) {
 								hbox(spacing = 5.0, alignment = Pos.CENTER) {
 									addClass(GlobalStyles.background)
-									// addClass(ReminderStyles.reminderRow)
 									
 									val openTimeline = Timeline()
 									val closeTimeline = Timeline()
@@ -141,7 +140,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 										cells.add(graphic[0] as VBox)
 										
 										if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
-											(graphic[0] as VBox).addClass(Styles.CalendarTableView.markedTableCell)
+											(graphic[0] as VBox).addClass(OverviewStyles.markedTableCell)
 										
 										@Suppress("UNCHECKED_CAST")
 										openAppointmentOpenAnimations.add(graphic[1] as MutableList<Animation>)
@@ -154,11 +153,11 @@ fun createOverviewTab(pane: TabPane): Tab {
 									
 									for((cellIndex, cell) in cells.withIndex()) {
 										cell.onMouseEntered = EventHandler {
-											cell.addClass(Styles.CalendarTableView.hoveredTableCell)
+											cell.addClass(OverviewStyles.hoveredTableCell)
 											hoveredCell.value = cellIndex
 										}
 										cell.onMouseExited = EventHandler {
-											cell.removeClass(Styles.CalendarTableView.hoveredTableCell)
+											cell.removeClass(OverviewStyles.hoveredTableCell)
 											hoveredCell.value = -1
 										}
 										cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
@@ -278,7 +277,7 @@ fun createCellGraphics(
 					val hoveredImg = createFXImage("remind hovered.svg")
 					
 					val img = imageview(defaultImg) {
-						addClass(Styles.CalendarTableView.cellLabelIcon)
+						addClass(OverviewStyles.icon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
@@ -302,7 +301,7 @@ fun createCellGraphics(
 					gridpaneConstraints {
 						columnRowIndex(1, 0)
 					}
-					addClass(Styles.CalendarTableView.cellLabel)
+					addClass(OverviewStyles.cellLabel)
 				}
 				anchorpane {
 					val defaultImg = if(data.notes.isEmpty())
@@ -315,7 +314,7 @@ fun createCellGraphics(
 						createFXImage("note active hovered.svg")
 					
 					val img = imageview(defaultImg) {
-						addClass(Styles.CalendarTableView.cellLabelIcon)
+						addClass(OverviewStyles.icon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
@@ -339,7 +338,7 @@ fun createCellGraphics(
 			}
 			
 		} else if(data is Week) {
-			addClass(Styles.CalendarTableView.disabledTableCell)
+			addClass(OverviewStyles.disabledCell)
 			gridpane {
 				style {
 					prefWidth = Int.MAX_VALUE.px
@@ -356,7 +355,7 @@ fun createCellGraphics(
 					gridpaneConstraints {
 						columnRowIndex(1, 0)
 					}
-					addClass(Styles.CalendarTableView.cellLabel)
+					addClass(OverviewStyles.cellLabel)
 				}
 				
 				anchorpane {
@@ -370,7 +369,7 @@ fun createCellGraphics(
 						createFXImage("note active hovered.svg")
 					
 					val img = imageview(defaultImg) {
-						addClass(Styles.CalendarTableView.cellLabelIcon)
+						addClass(OverviewStyles.icon)
 						fitHeight = 21.5
 						fitWidth = 21.5
 					}
@@ -481,7 +480,7 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 				fill = appointmentEntry.key.color
 			}
 			label("${appointmentEntry.value}:${appointmentEntry.key.name}") {
-				addClass(Styles.CalendarTableView.cellAppointTypeLabel)
+				addClass(OverviewStyles.cellAppointTypeLabel)
 				maxWidth = width - HORIZONTAL_LEFT_MARGIN - CIRCLE_WIDTH
 				ellipsisString = ".."
 				textOverrun = OverrunStyle.ELLIPSIS
@@ -569,7 +568,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	for((index, appointment) in appointments.withIndex()) {
 		pane.label(appointment.title) {
-			addClass(Styles.CalendarTableView.cellAppointLabel)
+			addClass(OverviewStyles.cellAppointLabel)
 			translateX = HORIZONTAL_LEFT_MARGIN + CIRCLE_WIDTH
 			translateY = yCords[index] - CIRCLE_WIDTH / 1.1
 			opacity = 0.0
@@ -582,7 +581,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	if(limited) {
 		pane.label("· · · · · · · · · · · · · · · · · · · · · · · ·") {
-			addClass(Styles.CalendarTableView.cellAppointTypeLabel)
+			addClass(OverviewStyles.cellAppointTypeLabel)
 			style {
 				fontWeight = FontWeight.BOLD
 			}

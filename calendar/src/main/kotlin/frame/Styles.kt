@@ -1,8 +1,6 @@
 package frame
 
-import javafx.geometry.*
 import javafx.scene.paint.*
-import javafx.scene.text.*
 import tornadofx.*
 
 
@@ -11,21 +9,7 @@ class Styles: Stylesheet() {
 	object CalendarTableView {
 		val table by cssclass()
 		val tableItem by cssclass()
-		
-		val tableCell by cssclass()
-		val disabledTableCell by cssclass()
-		val hoveredTableCell by cssclass()
-		val markedTableCell by cssclass()
-		
-		val tableHeader by cssclass()
-		val selectedColumn by cssclass()
-		
-		val cellLabel by cssclass()
 		val cellHeaderLabel by cssclass()
-		val cellAppointLabel by cssclass()
-		val cellAppointTypeLabel by cssclass()
-		
-		val cellLabelIcon by cssclass()
 	}
 	
 	object WeekTab {
@@ -40,92 +24,6 @@ class Styles: Stylesheet() {
 		val invisibleScrollbar by cssclass()
 		
 		val tableTimeHeader by cssclass()
-	}
-	
-	init {
-		CalendarTableView.table {
-			prefHeight = Int.MAX_VALUE.px
-			backgroundColor += Color.WHITE
-			padding = box(2.px)
-		}
-		
-		CalendarTableView.selectedColumn {
-			backgroundColor += c(0.92, 0.92, 0.90)
-			backgroundRadius += box(6.px)
-		}
-		
-		CalendarTableView.tableItem {
-			alignment = Pos.CENTER
-			prefWidth = Int.MAX_VALUE.px
-			
-			padding = box(2.px)
-		}
-		
-		CalendarTableView.tableHeader {
-			prefHeight = 30.px
-			minHeight = prefHeight
-			
-			borderColor += box(c(0.75, 0.75, 0.75))
-			borderRadius += box(10.px, 10.px, 0.px, 0.px)
-			borderWidth += box(2.px)
-		}
-		
-		CalendarTableView.tableCell {
-			prefHeight = 40.px
-			
-			backgroundColor += c(0.89, 0.89, 0.89)
-			backgroundRadius += box(6.px)
-			
-			borderColor += box(c(0.75, 0.75, 0.75))
-			borderRadius += box(6.px)
-			borderWidth += box(2.px)
-		}
-		
-		CalendarTableView.disabledTableCell {
-			backgroundColor += c(0.98, 0.98, 0.98)
-			backgroundRadius += box(6.px)
-			borderWidth += box(2.px)
-		}
-		
-		CalendarTableView.hoveredTableCell {
-			borderColor += box(c(0, 151, 190), c(0, 136, 204), c(0, 151, 190), c(0, 136, 204))
-			borderRadius += box(6.px)
-			borderWidth += box(2.px)
-		}
-		
-		CalendarTableView.markedTableCell {
-			backgroundColor += Color.CORNFLOWERBLUE
-			
-			borderColor += box(Color.BLUE)
-			borderRadius += box(6.px)
-			borderWidth += box(2.px)
-		}
-		
-		CalendarTableView.cellHeaderLabel {
-			fontSize = 13.px
-			fontWeight = FontWeight.BOLD
-		}
-		
-		CalendarTableView.cellLabel {
-			fontSize = 14.px
-			fontWeight = FontWeight.BOLD
-			
-			prefWidth = Int.MAX_VALUE.px
-			alignment = Pos.CENTER
-		}
-		
-		CalendarTableView.cellLabelIcon {
-			prefHeight = 14.px
-			prefWidth = 14.px
-		}
-		
-		CalendarTableView.cellAppointLabel {
-			fontSize = 10.px
-		}
-		
-		CalendarTableView.cellAppointTypeLabel {
-			fontSize = 11.px
-		}
 	}
 	
 	init {

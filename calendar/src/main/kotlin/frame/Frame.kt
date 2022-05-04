@@ -8,6 +8,7 @@ import frame.TabManager.Secure
 import frame.styles.GlobalStyles
 import frame.styles.MenubarStyles
 import frame.styles.NoteTabStyles
+import frame.styles.OverviewStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
 import init
@@ -86,7 +87,7 @@ fun frameInit() {
 	//LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
 
-class Window: App(MainView::class, GlobalStyles::class, MenubarStyles::class, TabStyles::class, NoteTabStyles::class, ReminderStyles::class) {
+class Window: App(MainView::class, GlobalStyles::class, MenubarStyles::class, TabStyles::class, NoteTabStyles::class, ReminderStyles::class, OverviewStyles::class) {
 	
 	override fun start(stage: Stage) {
 		stage.height = 600.0
