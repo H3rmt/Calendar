@@ -1,0 +1,15 @@
+{
+	"frame.WeekKt": {
+		"": ""
+	},
+	"frame.FrameKt": {
+		"create": "Create",
+		"appointment": "Appointment"
+	},
+	"frame.OverviewKt": {
+		"": ""
+	},
+	"frame.ReminderKt": {
+		"": ""
+	}
+}

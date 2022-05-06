@@ -1,4 +1,4 @@
-package popup
+package frame.popup
 
 import calendar.Appointment
 import calendar.Reminder

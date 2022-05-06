@@ -5,7 +5,6 @@ import calendar.Timing.fromUTCEpochMinuteToLocalDateTime
 import javafx.scene.paint.*
 import logic.Configs
 import logic.getConfig
-import logic.getLangString
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.LongEntity
@@ -58,9 +57,6 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 		}
 		return list
 	}
-	
-	val date: String
-		get() = "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
 	
 	fun addAppointments(list: List<Appointment>) {
 		val appointmentList = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()

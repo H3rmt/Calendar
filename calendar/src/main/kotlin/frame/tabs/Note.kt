@@ -1,4 +1,4 @@
-package frame
+package frame.tabs
 
 import calendar.CellDisplay
 import calendar.Day

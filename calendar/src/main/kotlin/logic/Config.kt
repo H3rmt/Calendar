@@ -215,7 +215,7 @@ object ConfigFiles {
 	
 	const val dataDirectory = "data"
 	
-	const val languageFile = "lang.json"
+	const val languageFiles = "lang"
 	
 	const val configFile = "$dataDirectory/config.json"
 }
@@ -228,6 +228,8 @@ lateinit var language: Language
  * @see Language
  */
 fun getLangString(str: String, vararg args: Any?): String = language[str].format(*args)
+
+fun String.translate(vararg args: Any?) = language[this].format(*args)
 
 const val EMPTY_DEFAULT = "{\n\n}"
 

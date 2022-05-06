@@ -1,4 +1,4 @@
-package frame
+package frame.tabs
 
 import calendar.CellDisplay
 import calendar.Day
@@ -10,6 +10,9 @@ import calendar.currentMonth
 import calendar.currentMonthName
 import calendar.generateMonth
 import calendar.now
+import frame.TabManager
+import frame.createFXImage
+import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
 import frame.styles.OverviewStyles
 import frame.styles.TabStyles
@@ -29,13 +32,13 @@ import logic.LogType
 import logic.getConfig
 import logic.getLangString
 import logic.log
-import popup.ReminderPopup
 import tornadofx.*
 
 
 fun createOverviewTab(pane: TabPane): Tab {
 	log("creating overview tab", LogType.IMPORTANT)
-	return pane.tab(getLangString("calender")) {
+	return pane.tab("") { // if inside constructor lang doesn't find classname
+		text = getLangString("calender")
 		isClosable = false
 		addClass(TabStyles.tab_)
 		
@@ -219,8 +222,8 @@ fun createOverviewTab(pane: TabPane): Tab {
 													week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
 												}", LogType.LOW
 											)
-											TabManager.openTab(
-												"Week${week.date}/${week.time.year}",
+											TabManager.openTab( // "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
+												"Week${week.time.dayOfMonth}/${week.time.year}",
 												::createWeekTab,
 												week,
 												week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {

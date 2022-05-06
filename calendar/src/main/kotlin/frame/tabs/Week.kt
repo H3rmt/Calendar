@@ -1,4 +1,4 @@
-package frame
+package frame.tabs
 
 import calendar.Appointment
 import calendar.Day
@@ -7,6 +7,7 @@ import calendar.Timing.fromUTCEpochMinuteToLocalDateTime
 import calendar.Timing.toUTCEpochMinute
 import calendar.Week
 import calendar.now
+import frame.popup.AppointmentPopup
 import frame.styles.GlobalStyles
 import frame.styles.TabStyles
 import frame.styles.WeekStyles
@@ -19,7 +20,6 @@ import listen
 import logic.LogType
 import logic.getLangString
 import logic.log
-import popup.AppointmentPopup
 import tornadofx.*
 import java.time.LocalDateTime
 import java.time.temporal.IsoFields
@@ -28,7 +28,8 @@ import java.time.temporal.IsoFields
 
 fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> Unit): Tab {
 	log("creating week tab", LogType.IMPORTANT)
-	return pane.tab(week.date) {
+	return pane.tab("") {
+		text = "${week.time.dayOfMonth} - ${week.time.plusDays(6).dayOfMonth} / ${getLangString(week.time.month.name)}"
 		isClosable = true
 		addClass(TabStyles.tab_)
 		

@@ -5,6 +5,8 @@ import calendar.Appointment
 import calendar.Reminder
 import calendar.Timing
 import frame.TabManager.Secure
+import frame.popup.AppointmentPopup
+import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
 import frame.styles.MenubarStyles
 import frame.styles.NoteTabStyles
@@ -12,6 +14,8 @@ import frame.styles.OverviewStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
 import frame.styles.WeekStyles
+import frame.tabs.createOverviewTab
+import frame.tabs.createReminderTab
 import init
 import javafx.application.*
 import javafx.beans.property.*
@@ -28,9 +32,8 @@ import logic.Warning
 import logic.getConfig
 import logic.getLangString
 import logic.log
+import logic.translate
 import org.controlsfx.control.ToggleSwitch
-import popup.AppointmentPopup
-import popup.ReminderPopup
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
@@ -403,4 +406,14 @@ fun EventTarget.toggleSwitch(
 	it.selectedProperty().bindBidirectional(selected)
 	if(text != null)
 		it.textProperty().bind(text)
+}
+
+
+class TranslatingSimpleStringProperty(initialValue: String, private vararg val args: Any): SimpleStringProperty(initialValue) {
+	override fun set(newValue: String?) {
+		super.set(newValue)
+	}
+	
+	override fun get(): String = super.get().translate(args)
+	
 }

@@ -35,8 +35,6 @@ fun changeMonth(right: Boolean) {
  */
 fun loadCalendarData() {
 	currentMonthName.set(getLangString(calendarDisplay.month.name))
-	if(calendarDisplay.year != now.year)
-		currentMonthName.value += "  " + calendarDisplay.year
 	log("set Month to ${calendarDisplay.month.name}")
 	
 	val data = generateMonth(calendarDisplay)

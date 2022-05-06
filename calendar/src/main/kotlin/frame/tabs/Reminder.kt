@@ -1,4 +1,4 @@
-package frame
+package frame.tabs
 
 import calendar.Reminder
 import calendar.reminders
@@ -18,7 +18,8 @@ import tornadofx.*
 
 fun createReminderTab(pane: TabPane): Tab {
 	log("creating week tab", LogType.IMPORTANT)
-	return pane.tab(getLangString("reminders")) {
+	return pane.tab("") {
+		text = getLangString("reminders")
 		isClosable = false
 		addClass(TabStyles.tab_)
 		
