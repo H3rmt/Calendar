@@ -1,85 +1,13 @@
 package calendar
 
 import calendar.File.Files.referrersOn
-import calendar.Timing.fromUTCEpochMinuteToLocalDateTime
 import javafx.scene.paint.*
-import logic.Configs
-import logic.getConfig
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.DayOfWeek
-import java.time.DayOfWeek.FRIDAY
-import java.time.DayOfWeek.MONDAY
-import java.time.DayOfWeek.SATURDAY
-import java.time.DayOfWeek.SUNDAY
-import java.time.DayOfWeek.THURSDAY
-import java.time.DayOfWeek.TUESDAY
-import java.time.DayOfWeek.WEDNESDAY
-import java.time.LocalDate
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
-
-interface CellDisplay {
-	val notes: MutableList<Note>
-	
-	val time: LocalDate
-}
-
-@Suppress("LongParameterList")
-class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday: Day, Friday: Day, Saturday: Day, Sunday: Day, val WeekOfYear: Int): CellDisplay {
-	
-	override val time: LocalDate = _time
-	
-	override val notes: MutableList<Note> = mutableListOf()
-	
-	val appointments: List<Appointment>
-		get() {
-			val list = mutableListOf<Appointment>()
-			for(day in allDays.values) {
-				list.addAll(day.appointments)
-			}
-			return list
-		}
-	
-	val allDays: Map<DayOfWeek, Day> = mapOf(
-		MONDAY to Monday, TUESDAY to Tuesday, WEDNESDAY to Wednesday, THURSDAY to Thursday, FRIDAY to Friday, SATURDAY to Saturday, SUNDAY to Sunday
-	)
-	
-	fun getAllAppointmentsSorted(): Map<Type, Int> {
-		val list = mutableMapOf<Type, Int>()
-		for(appointment in appointments) {
-			list[appointment.type] = list[appointment.type]?.plus(1) ?: 1
-		}
-		return list
-	}
-	
-	fun addAppointments(list: List<Appointment>) {
-		val appointmentList = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
-		list.forEach { appointmentList[fromUTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
-		for((key, value) in appointmentList) {
-			allDays[key]?.appointments?.addAll(value ?: listOf())
-		}
-	}
-	
-	override fun toString(): String = "$time $notes $allDays"
-}
-
-
-data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisplay {
-	
-	var appointments: MutableList<Appointment> = mutableListOf()
-	
-	override var notes: MutableList<Note> = mutableListOf()
-	
-	fun getAppointmentsLimited(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
-	
-	override fun toString(): String = "$time $notes $appointments"
-}
 
 
 

@@ -115,7 +115,7 @@ class AppointmentPopup: Fragment() {
 			addClass(GlobalStyles.maxHeight_)
 			field("Type") {
 				combobox(values = getTypes().map { it.name }, property = type)
-				checkbox(getLangString("Whole day"), property = wholeDay) {
+				checkbox("whole day".translate(Language.TranslationTypes.AppointmentPopup), property = wholeDay) {
 					style {
 						padding = box(0.px, 0.px, 0.px, 40.px)
 					}

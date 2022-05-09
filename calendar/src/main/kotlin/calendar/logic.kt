@@ -1,11 +1,15 @@
 package calendar
 
 import calendar.Timing.toUTCEpochMinute
+import frame.Day
 import frame.TranslatingSimpleStringProperty
+import frame.Week
 import javafx.collections.*
+import javafx.collections.FXCollections.*
 import logic.Language
 import logic.LogType
 import logic.log
+import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.IsoFields
@@ -13,33 +17,30 @@ import java.time.temporal.IsoFields
 
 val now: LocalDateTime = Timing.getNowLocal()
 
-var calendarDisplay: LocalDate = Timing.getNowLocal().toLocalDate()
+val reminders: ObservableList<Reminder> = observableArrayList()
+val appointments: ObservableList<Appointment> = observableArrayList()
 
-var reminders: ObservableList<Reminder> = FXCollections.observableArrayList()
-val currentMonth: ObservableList<Week> = FXCollections.observableArrayList()
-
-val currentMonthName: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty(type = Language.TranslationTypes.Global)
+var overviewTime: LocalDate = Timing.getNowLocal().toLocalDate()
+val overviewWeeks: ObservableList<Week> = observableArrayList()
+val overviewTitle: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty(type = Language.TranslationTypes.Global)
 
 /**
  * called by buttons in calendar tab
  * and on startup
  */
 fun changeMonth(right: Boolean) {
-	calendarDisplay = calendarDisplay.plusMonths(if(right) 1 else -1)
+	overviewTime = overviewTime.plusMonths(if(right) 1 else -1)
 	loadCalendarData()
 }
 
-/**
- * called at initialization
- * and loads 3 months and week appointments
- */
+
 fun loadCalendarData() {
-	currentMonthName.set(calendarDisplay.month.name)
-	log("set Month to ${calendarDisplay.month.name}")
+	overviewTitle.set(overviewTime.month.name)
+	log("set Month to ${overviewTime.month.name}")
 	
-	val data = generateMonth(calendarDisplay)
-	currentMonth.clear()
-	currentMonth.addAll(data)
+	val data = generateMonth(overviewTime)
+	overviewWeeks.clear()
+	overviewWeeks.addAll(data)
 	
 	reminders.clear()
 	reminders.addAll(getReminders())
@@ -51,6 +52,8 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 	val month = time.month
 	
 	val dayOffset = time.dayOfWeek.value
+	
+	// set start to beging of week
 	time = time.minusDays((dayOffset - 1).toLong())
 	
 	val weeks: MutableList<Week> = mutableListOf()
@@ -60,7 +63,7 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 		do {
 			val day = Day(time, time.month == month)
 			
-			day.notes = getNotes(time.toUTCEpochMinute()).toMutableList()
+			day.notes = getNotes(time.toUTCEpochMinute()).toMutableList().toObservable()
 //			log(time.dayOfWeek, LogType.IMPORTANT)
 			day.appointments = getAppointments(time.toUTCEpochMinute(), time.plusDays(1).toUTCEpochMinute()).toMutableList()
 //			log(day.appointments, LogType.WARNING)
@@ -76,9 +79,7 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 			startTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 		)
 		week.addAppointments(getWeekAppointments().toMutableList())
-		week.notes.addAll(getWeekNotes(startTime.toUTCEpochMinute(), startTime.plusWeeks(1).toUTCEpochMinute()))
-		// week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
-		
+		week.notes.addAll(getWeekNotes(startTime.toUTCEpochMinute(), time.toUTCEpochMinute()))
 		log("added week: $week", LogType.LOW)
 		weeks.add(week)
 	} while(time.month == _time.month && time.dayOfMonth > 1)

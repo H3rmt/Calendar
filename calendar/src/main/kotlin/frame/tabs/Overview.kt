@@ -1,16 +1,16 @@
 package frame.tabs
 
-import calendar.CellDisplay
-import calendar.Day
 import calendar.Reminder
-import calendar.Week
-import calendar.calendarDisplay
 import calendar.changeMonth
-import calendar.currentMonth
-import calendar.currentMonthName
 import calendar.generateMonth
 import calendar.now
+import calendar.overviewTime
+import calendar.overviewTitle
+import calendar.overviewWeeks
+import frame.CellDisplay
+import frame.Day
 import frame.TabManager
+import frame.Week
 import frame.createFXImage
 import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
@@ -54,7 +54,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 						changeMonth(false)
 					}
 				}
-				label(currentMonthName) {
+				label(overviewTitle) {
 					addClass(TabStyles.title_)
 					minWidth = 200.0
 					alignment = Pos.CENTER
@@ -172,7 +172,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 										cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
 									}
 									
-									var openPreparation = false
+									var openPreparation: Boolean
 									
 									onMouseEntered = EventHandler {
 										if(selectedIndex.value != index) {
@@ -228,7 +228,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 												week,
 												week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
 													log("update from Week triggered")
-													updateTable(currentMonth)
+													updateTable(overviewWeeks)
 												}
 											)
 										}
@@ -248,11 +248,11 @@ fun createOverviewTab(pane: TabPane): Tab {
 					}
 				}
 				
-				currentMonth.addListener(ListChangeListener {
+				overviewWeeks.addListener(ListChangeListener {
 					updateTable(it.list)
 				})
 				
-				updateTable(currentMonth)
+				updateTable(overviewWeeks)
 			}
 		}
 	}
@@ -334,11 +334,11 @@ fun createCellGraphics(
 					onMouseClicked = EventHandler {
 						it.consume()
 						TabManager.openTab("DayNotes${data.time.dayOfMonth}/${data.time.month}/${data.time.year}", ::createNoteTab, data, {
-							if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
+							if(overviewTime.month == data.time.month || overviewTime.month == data.time.plusMonths(1).month || overviewTime.month == data.time.minusMonths(1).month) {
 								log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
-								val weeksData = generateMonth(calendarDisplay)
-								currentMonth.clear()
-								currentMonth.addAll(weeksData)
+								val weeksData = generateMonth(overviewTime)
+								overviewWeeks.clear()
+								overviewWeeks.addAll(weeksData)
 							}
 						})
 					}
@@ -390,11 +390,11 @@ fun createCellGraphics(
 						it.consume()
 						TabManager.openTab(
 							"WeekNotes${data.WeekOfYear}/${data.time.year}", ::createNoteTab, data, {
-								if(calendarDisplay.month == data.time.month || calendarDisplay.month == data.time.plusMonths(1).month || calendarDisplay.month == data.time.minusMonths(1).month) {
+								if(overviewTime.month == data.time.month || overviewTime.month == data.time.plusMonths(1).month || overviewTime.month == data.time.minusMonths(1).month) {
 									log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
-									val weeksData = generateMonth(calendarDisplay)
-									currentMonth.clear()
-									currentMonth.addAll(weeksData)
+									val weeksData = generateMonth(overviewTime)
+									overviewWeeks.clear()
+									overviewWeeks.addAll(weeksData)
 								}
 							}
 						)

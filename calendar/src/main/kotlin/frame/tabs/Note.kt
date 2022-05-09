@@ -1,11 +1,11 @@
 package frame.tabs
 
-import calendar.CellDisplay
-import calendar.Day
 import calendar.Note
 import calendar.Timing.toUTCEpochMinute
-import calendar.Week
 import calendar.getTypes
+import frame.CellDisplay
+import frame.Day
+import frame.Week
 import frame.styles.GlobalStyles
 import frame.styles.NoteStyles
 import frame.styles.TabStyles
