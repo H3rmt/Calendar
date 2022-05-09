@@ -293,8 +293,8 @@ fun createCellGraphics(
 					onMouseClicked = EventHandler {
 						it.consume()
 						ReminderPopup.open(
-							"new reminder".translate(Language.TranslationTypes.Overview),
-							"create".translate(Language.TranslationTypes.Overview),
+							"new reminder".translate(Language.TranslationTypes.ReminderPopup),
+							"create".translate(Language.TranslationTypes.ReminderPopup),
 							false,
 							null,
 							data.time.atStartOfDay(),

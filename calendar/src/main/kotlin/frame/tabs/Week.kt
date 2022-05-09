@@ -187,9 +187,10 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 												contextmenu {
 													item("new appointment".translate(Language.TranslationTypes.Week)) {
 														action {
-															AppointmentPopup.open(
-																"new appointment".translate(Language.TranslationTypes.AppointmentPopup),
-																"create".translate(Language.TranslationTypes.AppointmentPopup), false, null,
+															AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.AppointmentPopup),
+																"create".translate(Language.TranslationTypes.AppointmentPopup),
+																false,
+																null,
 																Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
 																Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour).plusHours(1),
 																save = { app: Appointment ->
@@ -223,8 +224,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 														cellAppointments.forEach { appointment ->
 															item(appointment.title) {
 																action {
-																	AppointmentPopup.open(
-																		"edit appointment".translate(Language.TranslationTypes.AppointmentPopup),
+																	AppointmentPopup.open("edit appointment".translate(Language.TranslationTypes.AppointmentPopup),
 																		"save".translate(Language.TranslationTypes.AppointmentPopup), false,
 																		appointment,
 																		Timing.getNowLocal(), // irrelevant, as they get overridden by values in appointment

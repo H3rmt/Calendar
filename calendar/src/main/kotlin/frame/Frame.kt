@@ -129,7 +129,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 		menu("create".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Appointment", "Strg + N") {
-					AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.Menubar), "create".translate(Language.TranslationTypes.Menubar),
+					AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.AppointmentPopup), "create".translate(Language.TranslationTypes.AppointmentPopup),
 						false,
 						null,
 						Timing.getNowLocal(),
@@ -140,7 +140,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 					)
 				},
 				createMenuItem(this@menu, "Reminder", "Strg + R") {
-					ReminderPopup.open("new reminder".translate(Language.TranslationTypes.Menubar), "create".translate(Language.TranslationTypes.Menubar),
+					ReminderPopup.open("new reminder".translate(Language.TranslationTypes.ReminderPopup), "create".translate(Language.TranslationTypes.ReminderPopup),
 						false,
 						null,
 						Timing.getNowLocal(),
