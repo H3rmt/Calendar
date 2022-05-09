@@ -9,7 +9,7 @@ import frame.popup.AppointmentPopup
 import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
 import frame.styles.MenubarStyles
-import frame.styles.NoteTabStyles
+import frame.styles.NoteStyles
 import frame.styles.OverviewStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
@@ -27,6 +27,7 @@ import javafx.scene.layout.*
 import javafx.stage.*
 import logic.Configs
 import logic.Exit
+import logic.Language
 import logic.LogType
 import logic.Warning
 import logic.getConfig
@@ -94,7 +95,7 @@ fun frameInit() {
 class Window: App(
 	MainView::class,
 	GlobalStyles::class, MenubarStyles::class, TabStyles::class,
-	NoteTabStyles::class, ReminderStyles::class, OverviewStyles::class,
+	NoteStyles::class, ReminderStyles::class, OverviewStyles::class,
 	WeekStyles::class
 ) {
 	
@@ -409,11 +410,11 @@ fun EventTarget.toggleSwitch(
 }
 
 
-class TranslatingSimpleStringProperty(initialValue: String, private vararg val args: Any): SimpleStringProperty(initialValue) {
+class TranslatingSimpleStringProperty(initialValue: String = "", private val type: Language.TranslationTypes, private vararg val args: Any): SimpleStringProperty(initialValue) {
 	override fun set(newValue: String?) {
 		super.set(newValue)
 	}
 	
-	override fun get(): String = super.get().translate(args)
+	override fun get(): String = super.get().translate(type, args)
 	
 }
