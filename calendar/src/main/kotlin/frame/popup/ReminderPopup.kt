@@ -14,7 +14,8 @@ import javafx.scene.paint.*
 import javafx.scene.text.*
 import javafx.stage.*
 import listen
-import logic.getLangString
+import logic.Language
+import logic.translate
 import picker.appointmentPicker.appointmentPicker
 import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
@@ -74,7 +75,7 @@ class ReminderPopup: Fragment() {
 	
 	private fun checkReminder(): String? {
 		if(reminderTitle.value.isEmpty()) {
-			return getLangString("missing title")
+			return "missing title".translate(Language.TranslationTypes.ReminderPopup)
 		}
 		return null
 	}
@@ -88,9 +89,9 @@ class ReminderPopup: Fragment() {
 	
 	override val root = form {
 		addClass(GlobalStyles.background_)
-		fieldset(getLangString(windowTitle)) {
+		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
-			field(getLangString("finish")) {
+			field("finish".translate(Language.TranslationTypes.ReminderPopup)) {
 				control = borderpane {
 					right = stackpane {
 						alignment = Pos.CENTER_RIGHT
@@ -107,10 +108,10 @@ class ReminderPopup: Fragment() {
 					}
 				}
 			}
-			field(getLangString("title")) {
+			field("title".translate(Language.TranslationTypes.ReminderPopup)) {
 				textfield(reminderTitle)
 			}
-			field(getLangString("description")) {
+			field("description".translate(Language.TranslationTypes.ReminderPopup)) {
 				addClass(GlobalStyles.maxHeight_)
 				style(append = true) {
 					minHeight = 60.px
@@ -120,8 +121,8 @@ class ReminderPopup: Fragment() {
 					addClass(GlobalStyles.maxHeight_)
 				}
 			}
-			field(getLangString("notify")) {
-				text(getLangString("missing %s", "Notifications"))
+			field("notify".translate(Language.TranslationTypes.ReminderPopup)) {
+				text("missing %s".translate(Language.TranslationTypes.ReminderPopup, "Notifications"))
 			}
 			buttonbar {
 				textfield(error) {
@@ -133,7 +134,7 @@ class ReminderPopup: Fragment() {
 						fontWeight = FontWeight.BOLD
 					}
 				}
-				button(getLangString("cancel")) {
+				button("cancel".translate(Language.TranslationTypes.ReminderPopup)) {
 					isCancelButton = true
 					action {
 						close()

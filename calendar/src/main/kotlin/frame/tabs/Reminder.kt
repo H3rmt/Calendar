@@ -10,23 +10,23 @@ import javafx.collections.*
 import javafx.geometry.*
 import javafx.scene.control.*
 import listen
+import logic.Language
 import logic.LogType
-import logic.getLangString
 import logic.log
+import logic.translate
 import tornadofx.*
 
 
 fun createReminderTab(pane: TabPane): Tab {
 	log("creating week tab", LogType.IMPORTANT)
-	return pane.tab("") {
-		text = getLangString("reminders")
+	return pane.tab("reminders".translate(Language.TranslationTypes.Reminder)) {
 		isClosable = false
 		addClass(TabStyles.tab_)
 		
 		vbox {
 			hbox(spacing = 20.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar_)
-				label(getLangString("reminder")) {
+				label("reminder".translate(Language.TranslationTypes.Reminder)) {
 					addClass(TabStyles.title_)
 					minWidth = 200.0
 					alignment = Pos.CENTER
@@ -45,7 +45,7 @@ fun createReminderTab(pane: TabPane): Tab {
 					
 					scrollbarWidth = paddingRightProperty
 					for(header in arrayListOf("Title", "Deadline", "Description")) {
-						label(getLangString(header)) {
+						label(header.translate(Language.TranslationTypes.Reminder)) {
 							addClass(GlobalStyles.tableItem_)
 							addClass(GlobalStyles.tableHeaderItem_)
 							addClass(ReminderStyles.tableHeaderItem_)

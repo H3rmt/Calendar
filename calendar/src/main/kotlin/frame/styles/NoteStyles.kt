@@ -3,7 +3,7 @@ package frame.styles
 import javafx.scene.paint.*
 import tornadofx.*
 
-class NoteTabStyles: Stylesheet() {
+class NoteStyles: Stylesheet() {
 	companion object {
 		val notesPane_ by cssclass()
 		val paneToolbar_ by cssclass()

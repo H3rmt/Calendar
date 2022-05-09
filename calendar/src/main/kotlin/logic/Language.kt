@@ -6,11 +6,11 @@ import java.io.FileReader
 class Language(private val language: AvailableLanguages) {
 	
 	/**
-	 * linking a String to a translated String
+	 * Map<Category, Map<string, translation>>
+	 *
+	 * linking a String to a translated String, split by Category
 	 */
-	private var translations: Map<String, Map<String, String>>
-	
-	private var translation: Map<TranslationTypes, Map<String, String>>
+	private var translations: Map<TranslationTypes, Map<String, String>>
 	
 	/**
 	 * creates json file if it didn't exist
@@ -22,42 +22,25 @@ class Language(private val language: AvailableLanguages) {
 		val file = File({}::class.java.classLoader.getResource("${ConfigFiles.languageFiles}/$language.json").toURI())
 		if(!file.exists()) {
 			file.createNewFile()
-			file.writeText(EMPTY_DEFAULT)
+			file.writeText(EMPTY_LANGUAGE)
 		}
-		val allTranslations: Map<String, Map<String, String>> = getJson().fromJson(getJsonReader(FileReader(file)), Map::class.java)
-		translations = allTranslations
-		translation = (getJson().fromJson<Map<String, Map<String, String>>>(getJsonReader(FileReader(file)), Map::class.java)).mapKeys { TranslationTypes.valueOf(it.key) }
+		translations = (getJson().fromJson<Map<String, Map<String, String>>>(getJsonReader(FileReader(file)), Map::class.java)).mapKeys { TranslationTypes.valueOf(it.key) }
 	}
+	
 	
 	/**
 	 * finds the corresponding translated String to a
 	 * String
 	 *
-	 * @param translation String to translate
+	 * @param tr String to translate
 	 *
 	 * @return translated String
 	 *
 	 * @see translations
 	 */
-	operator fun get(translation: String): String = try {
-		val caller = transformClassname(StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }[2].className)
-		translations[caller]!![translation.trim().lowercase()]!!
-	} catch(e: NullPointerException) {
-		val caller = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }[2] // go back to getLangString and then calling methods
-		log(
-			"translation for |${
-				translation.trim().lowercase()
-			}| was not found (lang=$language) in (${caller.fileName}:${caller.lineNumber})  [caller:${
-				transformClassname(caller.className)
-			}]",
-			LogType.WARNING
-		)
-		translation // return requested string to translate
-	}
-	
 	fun getTranslation(tr: String, type: TranslationTypes): String {
 		return try {
-			translation[type]!![tr]!!
+			translations[type]!![tr]!!
 		} catch(e: NullPointerException) {
 			val caller = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }[2] // go back to getLangString and then calling methods
 			log(
@@ -75,7 +58,7 @@ class Language(private val language: AvailableLanguages) {
 		name.length
 	)
 	
-	fun info(): String = "Language: $language loaded ${translation.values.sumOf { it.size }} Translations"
+	fun info(): String = "Language: $language loaded ${translations.values.sumOf { it.size }} Translations"
 	
 	/**
 	 * all different types of available Languages
@@ -97,7 +80,8 @@ class Language(private val language: AvailableLanguages) {
 		Overview,
 		Reminder,
 		Week,
-		Tab,
+		AppointmentPopup,
+		ReminderPopup,
 	}
 }
 

@@ -14,10 +14,11 @@ import javafx.scene.control.*
 import javafx.scene.layout.*
 import listen
 import logic.Configs
+import logic.Language
 import logic.LogType
 import logic.getConfig
-import logic.getLangString
 import logic.log
+import logic.translate
 import tornadofx.*
 import java.time.temporal.ChronoField
 
@@ -27,8 +28,8 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 	log("creating note tab", LogType.IMPORTANT)
 	return pane.tab("") {
 		text = when(cell) {
-			is Day -> "Notes for ${cell.time.dayOfMonth}. ${getLangString(cell.time.month.name)}"
-			is Week -> "Notes for ${cell.time.get(ChronoField.ALIGNED_WEEK_OF_MONTH)}. Week in ${getLangString(cell.time.month.name)}"
+			is Day -> "Notes for ${cell.time.dayOfMonth}. ${cell.time.month.name.translate(Language.TranslationTypes.Global)}"
+			is Week -> "Notes for ${cell.time.get(ChronoField.ALIGNED_WEEK_OF_MONTH)}. Week in ${cell.time.month.name.translate(Language.TranslationTypes.Global)}"
 			else -> ""
 		}
 		isClosable = true
@@ -128,9 +129,9 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 				style {
 					fontSize = 15.px
 				}
-				save = button(getLangString("create"))
+				save = button("create".translate(Language.TranslationTypes.Note))
 				
-				button(getLangString("delete")) {
+				button("delete".translate(Language.TranslationTypes.Note)) {
 					action { deleteFun() }
 				}
 			}
@@ -144,7 +145,7 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 			this.getChildList()
 			save.action {
 				saveFun(this@htmleditor.htmlText)
-				save.text = getLangString("save")
+				save.text = "save".translate(Language.TranslationTypes.Note)
 			}
 		}
 	}

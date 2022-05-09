@@ -28,17 +28,17 @@ import javafx.scene.text.*
 import javafx.util.*
 import listen
 import logic.Configs
+import logic.Language
 import logic.LogType
 import logic.getConfig
-import logic.getLangString
 import logic.log
+import logic.translate
 import tornadofx.*
 
 
 fun createOverviewTab(pane: TabPane): Tab {
 	log("creating overview tab", LogType.IMPORTANT)
-	return pane.tab("") { // if inside constructor lang doesn't find classname
-		text = getLangString("calender")
+	return pane.tab("calender".translate(Language.TranslationTypes.Overview)) {
 		isClosable = false
 		addClass(TabStyles.tab_)
 		
@@ -88,7 +88,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 						}
 					}
 					for(header in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
-						label(getLangString(header)) {
+						label(header.translate(Language.TranslationTypes.Note)) {
 							addClass(GlobalStyles.tableItem_)
 							addClass(GlobalStyles.tableHeaderItem_)
 							addClass(OverviewStyles.headerItem_)
@@ -293,7 +293,8 @@ fun createCellGraphics(
 					onMouseClicked = EventHandler {
 						it.consume()
 						ReminderPopup.open(
-							getLangString("new reminder"), getLangString("create"),
+							"new reminder".translate(Language.TranslationTypes.Overview),
+							"create".translate(Language.TranslationTypes.Overview),
 							false,
 							null,
 							data.time.atStartOfDay(),

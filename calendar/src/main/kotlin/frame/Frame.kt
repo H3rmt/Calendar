@@ -31,7 +31,6 @@ import logic.Language
 import logic.LogType
 import logic.Warning
 import logic.getConfig
-import logic.getLangString
 import logic.log
 import logic.translate
 import org.controlsfx.control.ToggleSwitch
@@ -127,10 +126,10 @@ class MainView: View("Calendar") {
 
 fun createMenuBar(pane: BorderPane): MenuBar {
 	return pane.menubar {
-		menu(getLangString("create")) {
+		menu("create".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Appointment", "Strg + N") {
-					AppointmentPopup.open(getLangString("new appointment"), getLangString("create"),
+					AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.Menubar), "create".translate(Language.TranslationTypes.Menubar),
 						false,
 						null,
 						Timing.getNowLocal(),
@@ -141,7 +140,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 					)
 				},
 				createMenuItem(this@menu, "Reminder", "Strg + R") {
-					ReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
+					ReminderPopup.open("new reminder".translate(Language.TranslationTypes.Menubar), "create".translate(Language.TranslationTypes.Menubar),
 						false,
 						null,
 						Timing.getNowLocal(),
@@ -152,13 +151,15 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 				}
 			)
 		}
-		menu(getLangString("options")) {
+		menu("options".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Reload", "F5") {
 					init()
 					Secure.overrideTab("calendar", ::createOverviewTab)
 				},
-				createMenuItem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
+				createMenuItem(this@menu, "Preferences", "Strg + ,") {
+					log("Preferences")
+				},
 				run { separator(); return@run null },
 				createMenuItem(this@menu, "Quit", "Strg + Q") {
 					log("exiting Program via quit", LogType.IMPORTANT)
@@ -166,7 +167,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 				}
 			)
 		}
-		menu(getLangString("view")) {
+		menu("view".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") {
 					log("Show Reminder")
@@ -178,7 +179,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 				}
 			)
 		}
-		menu(getLangString("help")) {
+		menu("help".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Github", "") {
 					log("Open Github", LogType.IMPORTANT)
@@ -233,7 +234,7 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 		grid = gridpane {
 			addClass(MenubarStyles.gridPane_)
 			
-			label(getLangString(name)) {
+			label(name.translate(Language.TranslationTypes.Menubar)) {
 				addClass(MenubarStyles.itemName_)
 				gridpaneConstraints {
 					columnRowIndex(0, 0)
@@ -255,7 +256,6 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 		}
 		action(action)
 	}
-	
 	return grid
 }
 

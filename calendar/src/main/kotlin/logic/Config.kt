@@ -221,14 +221,7 @@ object ConfigFiles {
 
 lateinit var language: Language
 
-/**
- * returns a String that was translated into the general Language
- *
- * @see Language
- */
-fun getLangString(str: String, vararg args: Any?): String = language[str].format(*args)
-
-const val EMPTY_DEFAULT = "{\n\n}"
+const val EMPTY_LANGUAGE = "{\n\n}"
 
 // TODO update this before release
 const val CONFIG_DEFAULT = "{\n" +
