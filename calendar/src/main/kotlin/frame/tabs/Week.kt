@@ -1,4 +1,4 @@
-package frame
+package frame.tabs
 
 import calendar.Appointment
 import calendar.Day
@@ -7,6 +7,7 @@ import calendar.Timing.fromUTCEpochMinuteToLocalDateTime
 import calendar.Timing.toUTCEpochMinute
 import calendar.Week
 import calendar.now
+import frame.popup.AppointmentPopup
 import frame.styles.GlobalStyles
 import frame.styles.TabStyles
 import frame.styles.WeekStyles
@@ -16,10 +17,10 @@ import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import listen
+import logic.Language
 import logic.LogType
-import logic.getLangString
 import logic.log
-import popup.AppointmentPopup
+import logic.translate
 import tornadofx.*
 import java.time.LocalDateTime
 import java.time.temporal.IsoFields
@@ -28,7 +29,8 @@ import java.time.temporal.IsoFields
 
 fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> Unit): Tab {
 	log("creating week tab", LogType.IMPORTANT)
-	return pane.tab(week.date) {
+	return pane.tab("") {
+		text = "${week.time.dayOfMonth} - ${week.time.plusDays(6).dayOfMonth} / ${week.time.month.name.translate(Language.TranslationTypes.Global)}"
 		isClosable = true
 		addClass(TabStyles.tab_)
 		
@@ -36,7 +38,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 		vbox {
 			hbox(spacing = 40.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar_)
-				label(getLangString("Week")) {
+				label("Week".translate(Language.TranslationTypes.Week)) {
 					addClass(TabStyles.title_)
 					alignment = Pos.CENTER
 				}
@@ -58,8 +60,8 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 					label("") {
 						addClass(GlobalStyles.tableItem_)
 					}
-					for(day in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
-						label(getLangString(day)) {
+					for(header in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
+						label(header.translate(Language.TranslationTypes.Week)) {
 							addClass(GlobalStyles.tableItem_)
 							addClass(GlobalStyles.tableHeaderItem_)
 							addClass(WeekStyles.tableTimeHeader_)
@@ -183,9 +185,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 												}
 												
 												contextmenu {
-													item(getLangString("new appointment")) {
+													item("new appointment".translate(Language.TranslationTypes.Week)) {
 														action {
-															AppointmentPopup.open(getLangString("new appointment"), getLangString("Create"), false, null,
+															AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.AppointmentPopup),
+																"create".translate(Language.TranslationTypes.AppointmentPopup),
+																false,
+																null,
 																Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour),
 																Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour).plusHours(1),
 																save = { app: Appointment ->
@@ -197,13 +202,13 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															)
 														}
 													}
-													menu(getLangString("remove appointment")) {
+													menu("remove appointment".translate(Language.TranslationTypes.Week)) {
 														cellAppointments.forEach { appointment ->
 															item(appointment.title) {
 																action {
 																	val remove = Alert(Alert.AlertType.CONFIRMATION).apply {
-																		title = getLangString("remove?")
-																		headerText = getLangString("do you want to remove %s appointment", appointment.title) // TODO replace %s with title
+																		title = "remove?".translate(Language.TranslationTypes.Week)
+																		headerText = "do you want to remove %s appointment".translate(Language.TranslationTypes.Week, appointment.title)
 																	}.showAndWait().get()
 																	if(remove.buttonData == ButtonBar.ButtonData.OK_DONE) {
 																		log("Removed:$appointment") // TODO multi day
@@ -215,11 +220,12 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															}
 														}
 													}
-													menu(getLangString("edit appointment")) {
+													menu("edit appointment".translate(Language.TranslationTypes.Week)) {
 														cellAppointments.forEach { appointment ->
 															item(appointment.title) {
 																action {
-																	AppointmentPopup.open(getLangString("edit appointment"), getLangString("Save"), false,
+																	AppointmentPopup.open("edit appointment".translate(Language.TranslationTypes.AppointmentPopup),
+																		"save".translate(Language.TranslationTypes.AppointmentPopup), false,
 																		appointment,
 																		Timing.getNowLocal(), // irrelevant, as they get overridden by values in appointment
 																		Timing.getNowLocal(),

@@ -1,4 +1,4 @@
-package frame
+package frame.tabs
 
 import calendar.CellDisplay
 import calendar.Day
@@ -10,6 +10,9 @@ import calendar.currentMonth
 import calendar.currentMonthName
 import calendar.generateMonth
 import calendar.now
+import frame.TabManager
+import frame.createFXImage
+import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
 import frame.styles.OverviewStyles
 import frame.styles.TabStyles
@@ -25,17 +28,17 @@ import javafx.scene.text.*
 import javafx.util.*
 import listen
 import logic.Configs
+import logic.Language
 import logic.LogType
 import logic.getConfig
-import logic.getLangString
 import logic.log
-import popup.ReminderPopup
+import logic.translate
 import tornadofx.*
 
 
 fun createOverviewTab(pane: TabPane): Tab {
 	log("creating overview tab", LogType.IMPORTANT)
-	return pane.tab(getLangString("calender")) {
+	return pane.tab("calender".translate(Language.TranslationTypes.Overview)) {
 		isClosable = false
 		addClass(TabStyles.tab_)
 		
@@ -85,7 +88,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 						}
 					}
 					for(header in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
-						label(getLangString(header)) {
+						label(header.translate(Language.TranslationTypes.Note)) {
 							addClass(GlobalStyles.tableItem_)
 							addClass(GlobalStyles.tableHeaderItem_)
 							addClass(OverviewStyles.headerItem_)
@@ -219,8 +222,8 @@ fun createOverviewTab(pane: TabPane): Tab {
 													week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
 												}", LogType.LOW
 											)
-											TabManager.openTab(
-												"Week${week.date}/${week.time.year}",
+											TabManager.openTab( // "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
+												"Week${week.time.dayOfMonth}/${week.time.year}",
 												::createWeekTab,
 												week,
 												week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
@@ -290,7 +293,8 @@ fun createCellGraphics(
 					onMouseClicked = EventHandler {
 						it.consume()
 						ReminderPopup.open(
-							getLangString("new reminder"), getLangString("Create"),
+							"new reminder".translate(Language.TranslationTypes.ReminderPopup),
+							"create".translate(Language.TranslationTypes.ReminderPopup),
 							false,
 							null,
 							data.time.atStartOfDay(),

@@ -1,4 +1,4 @@
-package popup
+package frame.popup
 
 import calendar.Appointment
 import calendar.Timing
@@ -11,7 +11,8 @@ import javafx.scene.paint.*
 import javafx.scene.text.*
 import javafx.stage.*
 import listen
-import logic.getLangString
+import logic.Language
+import logic.translate
 import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
 import java.time.LocalDate
@@ -42,11 +43,11 @@ class AppointmentPopup: Fragment() {
 	
 	private fun updateDisplay(toggle: Boolean) {
 		control?.left = if(toggle) {
-			field(getLangString("day")) {
+			field("day".translate(Language.TranslationTypes.AppointmentPopup)) {
 				datepicker(property = day)
 			}
 		} else {
-			field(getLangString("start to end")) {
+			field("start to end".translate(Language.TranslationTypes.AppointmentPopup)) {
 				dateTimePicker(dateTime = start)
 				dateTimePicker(dateTime = end)
 			}
@@ -94,11 +95,11 @@ class AppointmentPopup: Fragment() {
 	@Suppress("ReturnCount")
 	private fun checkAppointment(): String? {
 		if(type.value == "") {
-			return getLangString("missing type")
+			return "missing type".translate(Language.TranslationTypes.AppointmentPopup)
 		} else if(appointmentTitle.value.isEmpty()) {
-			return getLangString("missing title")
+			return "missing title".translate(Language.TranslationTypes.AppointmentPopup)
 		} else if(end.value.toUTCEpochMinute() < start.value.toUTCEpochMinute()) {
-			return getLangString("start must be before end")
+			return "start must be before end".translate(Language.TranslationTypes.AppointmentPopup)
 		}
 		return null
 	}
@@ -110,7 +111,7 @@ class AppointmentPopup: Fragment() {
 	
 	override val root = form {
 		addClass(GlobalStyles.background_)
-		fieldset(getLangString(windowTitle)) {
+		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
 			field("Type") {
 				combobox(values = getTypes().map { it.name }, property = type)
@@ -121,10 +122,10 @@ class AppointmentPopup: Fragment() {
 				}
 			}
 			control = borderpane()
-			field(getLangString("title")) {
+			field("title".translate(Language.TranslationTypes.AppointmentPopup)) {
 				textfield(appointmentTitle)
 			}
-			field(getLangString("description")) {
+			field("description".translate(Language.TranslationTypes.AppointmentPopup)) {
 				addClass(GlobalStyles.maxHeight_)
 				style(append = true) {
 					minHeight = 60.px
@@ -144,7 +145,7 @@ class AppointmentPopup: Fragment() {
 						fontWeight = FontWeight.BOLD
 					}
 				}
-				button(getLangString("Cancel")) {
+				button("cancel".translate(Language.TranslationTypes.AppointmentPopup)) {
 					isCancelButton = true
 					action {
 						close()

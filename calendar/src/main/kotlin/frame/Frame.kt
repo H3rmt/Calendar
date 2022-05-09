@@ -5,13 +5,17 @@ import calendar.Appointment
 import calendar.Reminder
 import calendar.Timing
 import frame.TabManager.Secure
+import frame.popup.AppointmentPopup
+import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
 import frame.styles.MenubarStyles
-import frame.styles.NoteTabStyles
+import frame.styles.NoteStyles
 import frame.styles.OverviewStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
 import frame.styles.WeekStyles
+import frame.tabs.createOverviewTab
+import frame.tabs.createReminderTab
 import init
 import javafx.application.*
 import javafx.beans.property.*
@@ -23,14 +27,13 @@ import javafx.scene.layout.*
 import javafx.stage.*
 import logic.Configs
 import logic.Exit
+import logic.Language
 import logic.LogType
 import logic.Warning
 import logic.getConfig
-import logic.getLangString
 import logic.log
+import logic.translate
 import org.controlsfx.control.ToggleSwitch
-import popup.AppointmentPopup
-import popup.ReminderPopup
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
@@ -91,7 +94,7 @@ fun frameInit() {
 class Window: App(
 	MainView::class,
 	GlobalStyles::class, MenubarStyles::class, TabStyles::class,
-	NoteTabStyles::class, ReminderStyles::class, OverviewStyles::class,
+	NoteStyles::class, ReminderStyles::class, OverviewStyles::class,
 	WeekStyles::class
 ) {
 	
@@ -123,10 +126,10 @@ class MainView: View("Calendar") {
 
 fun createMenuBar(pane: BorderPane): MenuBar {
 	return pane.menubar {
-		menu(getLangString("Create")) {
+		menu("create".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Appointment", "Strg + N") {
-					AppointmentPopup.open(getLangString("new appointment"), getLangString("Create"),
+					AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.AppointmentPopup), "create".translate(Language.TranslationTypes.AppointmentPopup),
 						false,
 						null,
 						Timing.getNowLocal(),
@@ -137,7 +140,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 					)
 				},
 				createMenuItem(this@menu, "Reminder", "Strg + R") {
-					ReminderPopup.open(getLangString("new reminder"), getLangString("Create"),
+					ReminderPopup.open("new reminder".translate(Language.TranslationTypes.ReminderPopup), "create".translate(Language.TranslationTypes.ReminderPopup),
 						false,
 						null,
 						Timing.getNowLocal(),
@@ -148,13 +151,15 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 				}
 			)
 		}
-		menu(getLangString("options")) {
+		menu("options".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Reload", "F5") {
 					init()
 					Secure.overrideTab("calendar", ::createOverviewTab)
 				},
-				createMenuItem(this@menu, "Preferences", "Strg + ,") { log("Preferences") },
+				createMenuItem(this@menu, "Preferences", "Strg + ,") {
+					log("Preferences")
+				},
 				run { separator(); return@run null },
 				createMenuItem(this@menu, "Quit", "Strg + Q") {
 					log("exiting Program via quit", LogType.IMPORTANT)
@@ -162,7 +167,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 				}
 			)
 		}
-		menu(getLangString("view")) {
+		menu("view".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") {
 					log("Show Reminder")
@@ -174,7 +179,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 				}
 			)
 		}
-		menu(getLangString("help")) {
+		menu("help".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(
 				createMenuItem(this@menu, "Github", "") {
 					log("Open Github", LogType.IMPORTANT)
@@ -229,7 +234,7 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 		grid = gridpane {
 			addClass(MenubarStyles.gridPane_)
 			
-			label(getLangString(name)) {
+			label(name.translate(Language.TranslationTypes.Menubar)) {
 				addClass(MenubarStyles.itemName_)
 				gridpaneConstraints {
 					columnRowIndex(0, 0)
@@ -251,7 +256,6 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 		}
 		action(action)
 	}
-	
 	return grid
 }
 
@@ -403,4 +407,14 @@ fun EventTarget.toggleSwitch(
 	it.selectedProperty().bindBidirectional(selected)
 	if(text != null)
 		it.textProperty().bind(text)
+}
+
+
+class TranslatingSimpleStringProperty(initialValue: String = "", private val type: Language.TranslationTypes, private vararg val args: Any): SimpleStringProperty(initialValue) {
+	override fun set(newValue: String?) {
+		super.set(newValue)
+	}
+	
+	override fun get(): String = super.get().translate(type, args)
+	
 }

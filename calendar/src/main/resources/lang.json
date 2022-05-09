@@ -1,8 +1,6 @@
 {
 	"EN": {
 		// General
-		"start": "Start",
-		"end": "End",
 		"cancel": "Cancel",
 		"title": "Title",
 		"help": "Help",
@@ -22,7 +20,7 @@
 		"appointment": "Appointment",
 		"reminder": "Reminder",
 		
-		// Tabs
+		// Tabs (tabpane name)
 		"calender": "Calendar",
 		"reminders": "Reminder",
 		
@@ -35,7 +33,7 @@
 		"saturday": "Saturday",
 		"sunday": "Sunday",
 		
-		// months
+		// months (Week.date, calendartab title)
 		"january": "January",
 		"february": "February",
 		"march": "March",
@@ -65,8 +63,8 @@
 		"missing type": "Missing type",
 		"missing title": "Missing title",
 		"start must be before end": "Start time must be before end time",
-		"remove?": "Remove?",
 		"do you want to remove %s appointment": "do you want to remove %s appointment",
+		"remove?": "Remove?",
 		"notify": "Notify",
 		
 		// Reminder Tab
