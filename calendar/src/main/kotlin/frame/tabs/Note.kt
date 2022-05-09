@@ -7,7 +7,7 @@ import calendar.Timing.toUTCEpochMinute
 import calendar.Week
 import calendar.getTypes
 import frame.styles.GlobalStyles
-import frame.styles.NoteTabStyles
+import frame.styles.NoteStyles
 import frame.styles.TabStyles
 import javafx.geometry.*
 import javafx.scene.control.*
@@ -118,12 +118,12 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 	pane.apply {
 		setText(title)
 		isExpanded = getConfig(Configs.ExpandNotesOnOpen)
-		addClass(NoteTabStyles.notesPane_)
+		addClass(NoteStyles.notesPane_)
 		
 		lateinit var save: Button
 		
 		graphic = toolbar {
-			addClass(NoteTabStyles.paneToolbar_)
+			addClass(NoteStyles.paneToolbar_)
 			hbox(spacing = 20.0) {
 				style {
 					fontSize = 15.px
@@ -140,7 +140,7 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 		
 		htmleditor(text) {
 			addClass(GlobalStyles.disableFocusDraw_)
-			addClass(NoteTabStyles.editor_)
+			addClass(NoteStyles.editor_)
 			this.getChildList()
 			save.action {
 				saveFun(this@htmleditor.htmlText)

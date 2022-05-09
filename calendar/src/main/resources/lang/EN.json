@@ -1,15 +1,23 @@
 {
-	"frame.WeekKt": {
-		"": ""
+	"Global": {
+		"fef": "e"
 	},
-	"frame.FrameKt": {
-		"create": "Create",
-		"appointment": "Appointment"
+	"Menubar": {
+	
 	},
-	"frame.OverviewKt": {
-		"": ""
+	"Note": {
+	
 	},
-	"frame.ReminderKt": {
-		"": ""
+	"Overview": {
+	
+	},
+	"Reminder": {
+	
+	},
+	"Week": {
+	
+	},
+	"Tab": {
+	
 	}
 }

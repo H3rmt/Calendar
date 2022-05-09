@@ -80,7 +80,7 @@ fun initConfigs() {
 	}
 	
 	language = Language(getConfig(Configs.Language))
-	log("loaded language $language", LogType.LOW)
+	log("loaded language ${language.info()}", LogType.LOW)
 	
 	stacktrace = getConfig(Configs.PrintStacktrace)
 	log("set stacktrace $stacktrace", LogType.LOW)
@@ -103,7 +103,6 @@ fun initConfigs() {
  * @see configs
  */
 @Suppress("NestedBlockDepth", "ThrowsCount", "TooGenericExceptionCaught")
-@OptIn(ExperimentalStdlibApi::class)
 inline fun <reified T: Any> getConfig(conf: Configs): T {
 	try {
 		configs[conf]?.let {
@@ -228,8 +227,6 @@ lateinit var language: Language
  * @see Language
  */
 fun getLangString(str: String, vararg args: Any?): String = language[str].format(*args)
-
-fun String.translate(vararg args: Any?) = language[this].format(*args)
 
 const val EMPTY_DEFAULT = "{\n\n}"
 

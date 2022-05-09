@@ -10,6 +10,8 @@ class Language(private val language: AvailableLanguages) {
 	 */
 	private var translations: Map<String, Map<String, String>>
 	
+	private var translation: Map<TranslationTypes, Map<String, String>>
+	
 	/**
 	 * creates json file if it didn't exist
 	 *
@@ -24,6 +26,7 @@ class Language(private val language: AvailableLanguages) {
 		}
 		val allTranslations: Map<String, Map<String, String>> = getJson().fromJson(getJsonReader(FileReader(file)), Map::class.java)
 		translations = allTranslations
+		translation = (getJson().fromJson<Map<String, Map<String, String>>>(getJsonReader(FileReader(file)), Map::class.java)).mapKeys { TranslationTypes.valueOf(it.key) }
 	}
 	
 	/**
@@ -52,14 +55,27 @@ class Language(private val language: AvailableLanguages) {
 		translation // return requested string to translate
 	}
 	
+	fun getTranslation(tr: String, type: TranslationTypes): String {
+		return try {
+			translation[type]!![tr]!!
+		} catch(e: NullPointerException) {
+			val caller = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }[2] // go back to getLangString and then calling methods
+			log(
+				"translation for |${
+					tr.trim().lowercase()
+				}| was not found (lang=$language) in (${caller.fileName}:${caller.lineNumber})",
+				LogType.WARNING
+			)
+			tr // return requested string to translate
+		}
+	}
+	
 	private fun transformClassname(name: String) = name.removeRange(
 		name.indexOf('$').let { return@let if(it == -1) 0 else it },
 		name.length
 	)
 	
-	
-	
-	override fun toString(): String = "Language: $language loaded ${translations.size} Translations"
+	fun info(): String = "Language: $language loaded ${translation.values.sumOf { it.size }} Translations"
 	
 	/**
 	 * all different types of available Languages
@@ -74,4 +90,15 @@ class Language(private val language: AvailableLanguages) {
 		FR,
 	}
 	
+	enum class TranslationTypes {
+		Global,
+		Menubar,
+		Note,
+		Overview,
+		Reminder,
+		Week,
+		Tab,
+	}
 }
+
+fun String.translate(type: Language.TranslationTypes, vararg args: Any?) = language.getTranslation(this, type).format(*args)

@@ -1,10 +1,10 @@
 package calendar
 
 import calendar.Timing.toUTCEpochMinute
-import javafx.beans.property.*
+import frame.TranslatingSimpleStringProperty
 import javafx.collections.*
+import logic.Language
 import logic.LogType
-import logic.getLangString
 import logic.log
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -18,7 +18,7 @@ var calendarDisplay: LocalDate = Timing.getNowLocal().toLocalDate()
 var reminders: ObservableList<Reminder> = FXCollections.observableArrayList()
 val currentMonth: ObservableList<Week> = FXCollections.observableArrayList()
 
-val currentMonthName: SimpleStringProperty = SimpleStringProperty()
+val currentMonthName: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty(type = Language.TranslationTypes.Global)
 
 /**
  * called by buttons in calendar tab
@@ -34,7 +34,7 @@ fun changeMonth(right: Boolean) {
  * and loads 3 months and week appointments
  */
 fun loadCalendarData() {
-	currentMonthName.set(getLangString(calendarDisplay.month.name))
+	currentMonthName.set(calendarDisplay.month.name)
 	log("set Month to ${calendarDisplay.month.name}")
 	
 	val data = generateMonth(calendarDisplay)
