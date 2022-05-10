@@ -20,6 +20,7 @@ import java.time.DayOfWeek.THURSDAY
 import java.time.DayOfWeek.TUESDAY
 import java.time.DayOfWeek.WEDNESDAY
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -84,7 +85,6 @@ data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisp
 
 
 class Appointment(id: EntityID<Long>): LongEntity(id) {
-	
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 	
 	companion object {
@@ -159,7 +159,6 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 
 
 class Note(id: EntityID<Long>): LongEntity(id) {
-	
 	object Notes: LongEntityClass<Note>(NoteTable)
 	
 	companion object {
@@ -220,16 +219,15 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 }
 
 class File(id: EntityID<Long>): LongEntity(id) {
-	
 	object Files: LongEntityClass<File>(FileTable)
 	
 	companion object {
 		fun new(_data: ByteArray, _name: String, _origin: String): File {
 			return transaction {
 				return@transaction Files.new {
-					data = _data
-					name = _name
-					origin = _origin
+					data.set(_data)
+					name.set(_name)
+					origin.set(_origin)
 				}
 			}
 		}
@@ -239,15 +237,12 @@ class File(id: EntityID<Long>): LongEntity(id) {
 	private var dbName by FileTable.name
 	private var dbOrigin by FileTable.origin
 	
-	var data: ByteArray
-		get() = transaction { dbData.encodeToByteArray() }
-		set(value) = transaction { dbData = value.decodeToString() }
-	var name: String
-		get() = transaction { dbName }
-		set(value) = transaction { dbName = value }
-	var origin: String
-		get() = transaction { dbOrigin }
-		set(value) = transaction { dbOrigin = value }
+	var data: DBObservableD<ByteArray, String> = object: DBObservableD<ByteArray, String>(dbData) {
+		override fun convertFrom(value: ByteArray?): String? = value?.decodeToString()
+		override fun convertTo(value: String?): ByteArray? = value?.encodeToByteArray()
+	}
+	var name: DBObservable<String> = DBObservable(dbName)
+	var origin: DBObservable<String> = DBObservable(dbOrigin)
 	
 	fun remove() {
 		transaction {
@@ -255,15 +250,15 @@ class File(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	override fun toString(): String = "[{$id} $name ${data.size} $origin]"
+	override fun toString(): String = "[{$id} $name ${data.value.size} $origin]"
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is File) false
-		else other.name == name && data.contentEquals(other.data) && origin == other.origin
+		else other.name == name && data.value.contentEquals(other.data.value) && origin == other.origin
 	}
 	
 	override fun hashCode(): Int {
-		var result = data.contentHashCode()
+		var result = data.value.contentHashCode()
 		result = 31 * result + name.hashCode()
 		result = 31 * result + origin.hashCode()
 		return result
@@ -271,16 +266,15 @@ class File(id: EntityID<Long>): LongEntity(id) {
 }
 
 class Reminder(id: EntityID<Long>): LongEntity(id) {
-	
 	object Reminders: LongEntityClass<Reminder>(ReminderTable)
 	
 	companion object {
-		fun new(_time: Long, _title: String, _description: String): Reminder {
+		fun new(_time: LocalDateTime, _title: String, _description: String): Reminder {
 			return transaction {
 				return@transaction Reminders.new {
-					time = _time
-					title = _title
-					description = _description
+					time.set(_time)
+					title.set(_title)
+					description.set(_description)
 				}
 			}
 		}
@@ -291,18 +285,10 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 	private var dbTitle by ReminderTable.title
 	private var dbDescription by ReminderTable.description
 	
-	var time: Long?
-		get() = transaction { dbTime }
-		set(value) = transaction { dbTime = value }
-	var appointment: Appointment?
-		get() = transaction { dbAppointment }
-		set(value) = transaction { dbAppointment = value }
-	var title: String
-		get() = transaction { dbTitle }
-		set(value) = transaction { dbTitle = value }
-	var description: String
-		get() = transaction { dbDescription }
-		set(value) = transaction { dbDescription = value }
+	val time: DBDateTimeObservable = DBDateTimeObservable(dbTime)
+	val appointment: DBObservable<Appointment> = DBObservable(dbAppointment)
+	val title: DBObservable<String> = DBObservable(dbTitle)
+	val description: DBObservable<String> = DBObservable(dbDescription)
 	
 	fun remove() {
 		transaction {
@@ -334,8 +320,8 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 		fun new(_name: String, _color: Color): Type {
 			return transaction {
 				return@transaction Types.new {
-					name = _name
-					color = _color
+					name.set(_name)
+					color.set(_color)
 				}
 			}
 		}
@@ -344,12 +330,11 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 	private var dbName by TypeTable.name
 	private var dbColor by TypeTable.color
 	
-	var name: String
-		get() = transaction { dbName }
-		set(value) = transaction { dbName = value }
-	var color: Color
-		get() = transaction { Color.valueOf(dbColor) }
-		set(value) = transaction { dbColor = value.toString() }
+	val name: DBObservable<String> = DBObservable(dbName)
+	val color: DBObservableD<Color, String> = object: DBObservableD<Color, String>(dbColor) {
+		override fun convertFrom(value: Color?): String = value.toString()
+		override fun convertTo(value: String?): Color? = Color.valueOf(value)
+	}
 	
 	
 	fun remove() {

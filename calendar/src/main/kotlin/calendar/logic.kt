@@ -2,10 +2,12 @@ package calendar
 
 import calendar.Timing.toUTCEpochMinute
 import frame.TranslatingSimpleStringProperty
+import javafx.beans.property.*
 import javafx.collections.*
 import logic.Language
 import logic.LogType
 import logic.log
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.IsoFields
@@ -83,4 +85,44 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 		weeks.add(week)
 	} while(time.month == _time.month && time.dayOfMonth > 1)
 	return weeks
+}
+
+class DBObservable<T>(col: T?): DBObservableD<T, T>(col) {
+	override fun convertFrom(value: T?): T? = value
+	
+	override fun convertTo(value: T?): T? = value
+	
+}
+
+class DBDateObservable(col: Long?): DBObservableD<LocalDate, Long>(col) {
+	override fun convertFrom(value: LocalDate?): Long? = value?.toUTCEpochMinute()
+	override fun convertTo(value: Long?): LocalDate? = if(value != null) Timing.fromUTCEpochMinuteToLocalDateTime(value).toLocalDate() else null
+}
+
+class DBDateTimeObservable(col: Long?): DBObservableD<LocalDateTime, Long>(col) {
+	override fun convertFrom(value: LocalDateTime?): Long? = value?.toUTCEpochMinute()
+	override fun convertTo(value: Long?): LocalDateTime? = if(value != null) Timing.fromUTCEpochMinuteToLocalDateTime(value) else null
+}
+
+abstract class DBObservableD<T, DB>(private var col: DB?): ObjectPropertyBase<T>() {
+	override fun getBean(): Any = TODO("Not yet implemented")
+	
+	override fun getName(): String = TODO("Not yet implemented")
+	
+	fun reload() {
+		transaction {
+			set(convertTo(col))
+		}
+	}
+	
+	override fun set(newValue: T?) {
+		transaction {
+			col = convertFrom(newValue)
+		}
+		super.set(newValue)
+	}
+	
+	abstract fun convertFrom(value: T?): DB?
+	
+	abstract fun convertTo(value: DB?): T?
 }
