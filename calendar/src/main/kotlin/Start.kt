@@ -63,6 +63,16 @@ fun <T> ObservableValue<T>.listen(once: Boolean = false, listener: (new: T) -> U
 	this.addListener(lst)
 }
 
+fun <T> ObservableValue<T>.listen2(once: Boolean = false, listener: (new: T, old: T) -> Unit) {
+	lateinit var lst: ChangeListener<T>
+	lst = ChangeListener<T> { _, oldValue, newValue ->
+		listener(newValue, oldValue)
+		if(once)
+			this.removeListener(lst)
+	}
+	this.addListener(lst)
+}
+
 fun println(vararg any: Any) {
 	any.forEach { print("$it ") }
 	kotlin.io.println()
