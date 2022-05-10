@@ -1,7 +1,6 @@
 package calendar
 
 import calendar.File.Files.referrersOn
-import calendar.Timing.fromUTCEpochMinuteToLocalDateTime
 import javafx.scene.paint.*
 import logic.Configs
 import logic.getConfig
@@ -10,6 +9,7 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.SizedIterable
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.DayOfWeek
 import java.time.DayOfWeek.FRIDAY
@@ -54,14 +54,14 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 	fun getAllAppointmentsSorted(): Map<Type, Int> {
 		val list = mutableMapOf<Type, Int>()
 		for(appointment in appointments) {
-			list[appointment.type] = list[appointment.type]?.plus(1) ?: 1
+			list[appointment.type.value] = list[appointment.type.value]?.plus(1) ?: 1
 		}
 		return list
 	}
 	
 	fun addAppointments(list: List<Appointment>) {
 		val appointmentList = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
-		list.forEach { appointmentList[fromUTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
+		list.forEach { appointmentList[it.start.value.dayOfWeek]?.add(it) ?: listOf(it) }
 		for((key, value) in appointmentList) {
 			allDays[key]?.appointments?.addAll(value ?: listOf())
 		}
@@ -88,50 +88,36 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 	
 	companion object {
-		fun new(_start: Long, _duration: Long, _title: String, _description: String, _type: Type, _addDay: Boolean = false, _week: Boolean = false): Appointment {
+		fun new(_start: LocalDateTime, _end: LocalDateTime, _title: String, _description: String, _type: Type, _addDay: Boolean = false, _week: Boolean = false): Appointment {
 			return transaction {
 				return@transaction Appointments.new {
-					start = _start
-					duration = _duration
-					title = _title
-					description = _description
-					type = _type
-					allDay = _addDay
-					week = _week
+					start.set(_start)
+					end.set(_end)
+					title.set(_title)
+					description.set(_description)
+					type.set(_type)
+					allDay.set(_addDay)
+					week.set(_week)
 				}
 			}
 		}
 	}
 	
 	private var dbStart by AppointmentTable.start
-	private var dbDuration by AppointmentTable.duration
+	private var dbEnd by AppointmentTable.end
 	private var dbTitle by AppointmentTable.title
 	private var dbDescription by AppointmentTable.description
 	private var dbAllDay by AppointmentTable.allDay
 	private var dbType by Type.Types referencedOn AppointmentTable.type
 	private var dbWeek by AppointmentTable.week
 	
-	var start: Long
-		get() = transaction { dbStart }
-		set(value) = transaction { dbStart = value }
-	var duration
-		get() = transaction { dbDuration }
-		set(value) = transaction { dbDuration = value }
-	var title: String
-		get() = transaction { dbTitle }
-		set(value) = transaction { dbTitle = value }
-	var description: String
-		get() = transaction { dbDescription }
-		set(value) = transaction { dbDescription = value }
-	var allDay: Boolean
-		get() = transaction { dbAllDay }
-		set(value) = transaction { dbAllDay = value }
-	var type: Type
-		get() = transaction { dbType }
-		set(value) = transaction { dbType = value }
-	var week: Boolean
-		get() = transaction { dbWeek }
-		set(value) = transaction { dbWeek = value }
+	val start: DBDateTimeObservable = DBDateTimeObservable(dbStart)
+	val end: DBDateTimeObservable = DBDateTimeObservable(dbEnd)
+	val title: DBObservable<String> = DBObservable(dbTitle)
+	val description: DBObservable<String> = DBObservable(dbDescription)
+	val allDay: DBObservable<Boolean> = DBObservable(dbAllDay)
+	val type: DBObservable<Type> = DBObservable(dbType)
+	val week: DBObservable<Boolean> = DBObservable(dbWeek)
 	
 	fun remove() {
 		transaction {
@@ -139,16 +125,16 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	override fun toString(): String = "[${if(week) "Week" else "Day"}{$id} $start - $duration  $type | $title: $description]"
+	override fun toString(): String = "[${if(week.value) "Week" else "Day"}{$id} $start - $end  $type | $title: $description]"
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Appointment) false
-		else start == other.start && duration == other.duration && title == other.title && description == other.description && type == other.type && week == other.week
+		else start == other.start && end == other.end && title == other.title && description == other.description && type == other.type && week == other.week
 	}
 	
 	override fun hashCode(): Int {
 		var result = start.hashCode()
-		result = 31 * result + duration.hashCode()
+		result = 31 * result + end.hashCode()
 		result = 31 * result + title.hashCode()
 		result = 31 * result + description.hashCode()
 		result = 31 * result + type.hashCode()
@@ -162,13 +148,13 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	object Notes: LongEntityClass<Note>(NoteTable)
 	
 	companion object {
-		fun new(_time: Long, _text: String, _type: Type, _week: Boolean): Note {
+		fun new(_time: LocalDate, _text: String, _type: Type, _week: Boolean): Note {
 			return transaction {
 				return@transaction Notes.new {
-					time = _time
-					text = _text
-					type = _type
-					week = _week
+					time.set(_time)
+					text.set(_text)
+					type.set(_type)
+					week.set(_week)
 				}
 			}
 		}
@@ -180,20 +166,11 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	private var dbWeek by NoteTable.week
 	private val dbFiles by File.Files referrersOn FileTable.note
 	
-	var time: Long
-		get() = transaction { dbTime }
-		set(value) = transaction { dbTime = value }
-	var text: String
-		get() = transaction { dbText }
-		set(value) = transaction { dbText = value }
-	var type: Type
-		get() = transaction { dbType }
-		set(value) = transaction { dbType = value }
-	var week: Boolean
-		get() = transaction { dbWeek }
-		set(value) = transaction { dbWeek = value }
-	val files: List<File>
-		get() = transaction { dbFiles.toList() }
+	val time: DBDateObservable = DBDateObservable(dbTime)
+	val text: DBObservable<String> = DBObservable(dbText)
+	val type: DBObservable<Type> = DBObservable(dbType)
+	val week: DBObservable<Boolean> = DBObservable(dbWeek)
+	val files: DBObservable<SizedIterable<File>> = DBObservable(dbFiles)
 	
 	fun remove() {
 		transaction {
@@ -286,7 +263,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 	private var dbDescription by ReminderTable.description
 	
 	val time: DBDateTimeObservable = DBDateTimeObservable(dbTime)
-	val appointment: DBObservable<Appointment> = DBObservable(dbAppointment)
+	val appointment: DBObservable<Appointment?> = DBObservable(dbAppointment)
 	val title: DBObservable<String> = DBObservable(dbTitle)
 	val description: DBObservable<String> = DBObservable(dbDescription)
 	

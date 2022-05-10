@@ -5,6 +5,8 @@ import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 fun initDb() {
@@ -15,18 +17,18 @@ fun initDb() {
 	}
 }
 
-fun getNotes(at: Long): List<Note> {
+fun getNotes(at: LocalDate): List<Note> {
 	return transaction {
 		return@transaction Note.Notes.all().filter {
-			!it.week && at == it.time
+			!it.week.value && at == it.time.value
 		}
 	}
 }
 
-fun getWeekNotes(from: Long, to: Long): List<Note> {
+fun getWeekNotes(from: LocalDate, to: LocalDate): List<Note> {
 	return transaction {
 		return@transaction Note.Notes.all().filter {
-			it.week && from < it.time && it.time < to
+			it.week.value && from < it.time.value && it.time.value < to
 		}
 	}
 }
@@ -37,10 +39,10 @@ fun getAppointments(): List<Appointment> {
 	}
 }
 
-fun getAppointments(from: Long, to: Long): List<Appointment> {
+fun getAppointments(from: LocalDateTime, to: LocalDateTime): List<Appointment> {
 	return transaction {
 		return@transaction Appointment.Appointments.all().filter {
-			from <= it.start + it.duration && to > it.start
+			it.start.value >= from && it.end.value <= to
 		}
 	}
 }
@@ -48,7 +50,7 @@ fun getAppointments(from: Long, to: Long): List<Appointment> {
 fun getWeekAppointments(): List<Appointment> {
 	return transaction {
 		return@transaction Appointment.Appointments.all().filter {
-			it.week
+			it.week.value
 		}
 	}
 }
@@ -67,7 +69,7 @@ fun getTypes(): List<Type> {
 
 object AppointmentTable: LongIdTable() {
 	val start = long("start")
-	val duration = long("duration")
+	val end = long("end")
 	val title = text("title")
 	val description = text("description")
 	val week = bool("week")

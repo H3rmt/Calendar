@@ -62,9 +62,9 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 		do {
 			val day = Day(time, time.month == month)
 			
-			day.notes = getNotes(time.toUTCEpochMinute()).toMutableList()
+			day.notes = getNotes(time).toMutableList()
 //			log(time.dayOfWeek, LogType.IMPORTANT)
-			day.appointments = getAppointments(time.toUTCEpochMinute(), time.plusDays(1).toUTCEpochMinute()).toMutableList()
+			day.appointments = getAppointments(time.atStartOfDay(), time.atStartOfDay().plusDays(1)).toMutableList()
 //			log(day.appointments, LogType.WARNING)
 			days.add(day)
 			time = time.plusDays(1)
@@ -78,7 +78,7 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 			startTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 		)
 		week.addAppointments(getWeekAppointments().toMutableList())
-		week.notes.addAll(getWeekNotes(startTime.toUTCEpochMinute(), startTime.plusWeeks(1).toUTCEpochMinute()))
+		week.notes.addAll(getWeekNotes(startTime, startTime.plusWeeks(1)))
 		// week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 		
 		log("added week: $week", LogType.LOW)
@@ -125,4 +125,20 @@ abstract class DBObservableD<T, DB>(private var col: DB?): ObjectPropertyBase<T>
 	abstract fun convertFrom(value: T?): DB?
 	
 	abstract fun convertTo(value: DB?): T?
+	
+	override fun hashCode(): Int = value.hashCode()
+	
+	/**
+	 * used for equals methods of DB Classes
+	 */
+	override fun equals(other: Any?): Boolean {
+		if(this === other)
+			return true
+		if(other !is DBObservableD<*, *>)
+			return false
+		if(value != other.value)
+			return false
+		
+		return true
+	}
 }
