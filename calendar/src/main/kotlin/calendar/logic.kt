@@ -7,7 +7,10 @@ import javafx.collections.*
 import logic.Language
 import logic.LogType
 import logic.log
+import org.jetbrains.exposed.dao.Entity
+import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.sql.transactions.transaction
+import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.IsoFields
@@ -17,7 +20,6 @@ val now: LocalDateTime = Timing.getNowLocal()
 
 var calendarDisplay: LocalDate = Timing.getNowLocal().toLocalDate()
 
-var reminders: ObservableList<Reminder> = FXCollections.observableArrayList()
 val currentMonth: ObservableList<Week> = FXCollections.observableArrayList()
 
 val currentMonthName: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty(type = Language.TranslationTypes.Global)
@@ -122,6 +124,10 @@ abstract class DBObservableD<T, DB>(private var col: DB?): ObjectPropertyBase<T>
 		super.set(newValue)
 	}
 	
+	fun set(v: Property<T>) {
+		set(v.value)
+	}
+	
 	abstract fun convertFrom(value: T?): DB?
 	
 	abstract fun convertTo(value: DB?): T?
@@ -140,5 +146,21 @@ abstract class DBObservableD<T, DB>(private var col: DB?): ObjectPropertyBase<T>
 			return false
 		
 		return true
+	}
+	
+	fun clone(): Property<T> = SimpleObjectProperty(value)
+}
+
+open class DBObservableList<T: Entity<*>>(private val table: EntityClass<*, T>): ListPropertyBase<T>() {
+	override fun getBean(): Any = TODO("Not yet implemented")
+	override fun getName(): String = TODO("Not yet implemented")
+	private fun reload() {
+		return transaction {
+			set(observableListOf(table.all().toList()))
+		}
+	}
+	
+	init {
+		reload()
 	}
 }

@@ -88,7 +88,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 	
 	companion object {
-		fun new(_start: LocalDateTime, _end: LocalDateTime, _title: String, _description: String, _type: Type, _addDay: Boolean = false, _week: Boolean = false): Appointment {
+		fun new(_start: LocalDateTime, _end: LocalDateTime, _title: String, _description: String, _type: Type, _allDay: Boolean = false, _week: Boolean = false): Appointment {
 			return transaction {
 				return@transaction Appointments.new {
 					start.set(_start)
@@ -96,7 +96,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 					title.set(_title)
 					description.set(_description)
 					type.set(_type)
-					allDay.set(_addDay)
+					allDay.set(_allDay)
 					week.set(_week)
 				}
 			}
@@ -202,7 +202,7 @@ class File(id: EntityID<Long>): LongEntity(id) {
 		fun new(_data: ByteArray, _name: String, _origin: String): File {
 			return transaction {
 				return@transaction Files.new {
-					data.set(_data)
+//					data.set(_data)
 					name.set(_name)
 					origin.set(_origin)
 				}
@@ -210,14 +210,14 @@ class File(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	private var dbData by FileTable.data
+//	private var dbData by FileTable.data
 	private var dbName by FileTable.name
 	private var dbOrigin by FileTable.origin
 	
-	var data: DBObservableD<ByteArray, String> = object: DBObservableD<ByteArray, String>(dbData) {
-		override fun convertFrom(value: ByteArray?): String? = value?.decodeToString()
-		override fun convertTo(value: String?): ByteArray? = value?.encodeToByteArray()
-	}
+//	var data: DBObservableD<ByteArray, String> = object: DBObservableD<ByteArray, String>(dbData) {
+//		override fun convertFrom(value: ByteArray?): String? = value?.decodeToString()
+//		override fun convertTo(value: String?): ByteArray? = value?.encodeToByteArray()
+//	}
 	var name: DBObservable<String> = DBObservable(dbName)
 	var origin: DBObservable<String> = DBObservable(dbOrigin)
 	
@@ -227,16 +227,15 @@ class File(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	override fun toString(): String = "[{$id} $name ${data.value.size} $origin]"
+	override fun toString(): String = "[{$id} $name $origin]"
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is File) false
-		else other.name == name && data.value.contentEquals(other.data.value) && origin == other.origin
+		else other.name == name && origin == other.origin
 	}
 	
 	override fun hashCode(): Int {
-		var result = data.value.contentHashCode()
-		result = 31 * result + name.hashCode()
+		var result = name.hashCode()
 		result = 31 * result + origin.hashCode()
 		return result
 	}
@@ -246,10 +245,11 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 	object Reminders: LongEntityClass<Reminder>(ReminderTable)
 	
 	companion object {
-		fun new(_time: LocalDateTime, _title: String, _description: String): Reminder {
+		fun new(_time: LocalDateTime, _appointment: Appointment?, _title: String, _description: String): Reminder {
 			return transaction {
 				return@transaction Reminders.new {
 					time.set(_time)
+					appointment.set(_appointment)
 					title.set(_title)
 					description.set(_description)
 				}
