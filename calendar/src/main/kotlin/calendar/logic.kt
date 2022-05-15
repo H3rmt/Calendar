@@ -40,11 +40,11 @@ fun changeMonth(right: Boolean) {
  */
 fun loadCalendarData() {
 	// load everything
-	Appointments.lgListen().reload()
-	Notes.lgListen().reload()
-	Files.lgListen().reload()
-	Reminders.lgListen().reload()
-	Types.lgListen().reload()
+	Appointments.lgListen("Appointments").reload()
+	Notes.lgListen("Notes").reload()
+	Files.lgListen("Files").reload()
+	Reminders.lgListen("Reminders").reload()
+	Types.lgListen("Types").reload()
 	
 	
 	// Overview TODO move this somewhere else

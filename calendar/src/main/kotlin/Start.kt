@@ -70,23 +70,22 @@ fun <F, T: ObservableList<F>> T.listen(listener: (new: ListChangeListener.Change
 	})
 }
 
-fun <T: ObservableList<*>> T.lgListen(): T {
+fun <T: ObservableList<*>> T.lgListen(name: String): T {
 	addListener(ListChangeListener { change ->
-		print("change ($this): ")
+		println("change ${name.ifEmpty { "ObservableValue" }} ($this): ")
 		while(change.next()) {
 			when(true) {
 				change.wasAdded() -> {
-					print("added ${change.addedSubList} ")
+					println("\tadded ${change.addedSubList} ")
 				}
 				change.wasRemoved() -> {
-					print("removed ${change.removed} ")
+					println("\tremoved ${change.removed} ")
 				}
 				change.wasUpdated() -> {
-					print("updated ${change.list}")
+					println("\tupdated ${change.list}")
 				}
 				else -> {}
 			}
-			println()
 		}
 	})
 	return this

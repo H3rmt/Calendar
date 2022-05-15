@@ -82,7 +82,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 					type.set(_type)
 					allDay.set(_allDay)
 					week.set(_week)
-				}
+				}.also { calendar.Appointments.add(it) }
 			}
 		}
 	}
@@ -141,10 +141,10 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	fun remove() {
 		transaction {
 			delete()
-		}
+		}.also { calendar.Appointments.remove(this) }
 	}
 	
-	override fun toString(): String = "[${if(week.value) "Week" else "Day"}{$id} $start - $end  $type | $title: $description]"
+	override fun toString(): String = "[{${id.value}} ${start.value} - ${end.value}  ${type.value} ${if(week.value) "Week" else "Day"} | ${title.value}: ${description.value}]"
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Appointment) false
@@ -174,7 +174,7 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 					text.set(_text)
 					type.set(_type)
 					week.set(_week)
-				}
+				}.also { calendar.Notes.add(it) }
 			}
 		}
 	}
@@ -204,7 +204,8 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	val files = arrayListOf<File>() // TODO not implemented
-//	val files: DBObservable<SizedIterable<File>> = object: DBObservable<SizedIterable<File>>() {
+	
+	//	val files: DBObservable<SizedIterable<File>> = object: DBObservable<SizedIterable<File>>() {
 //		override fun abstractGet(): SizedIterable<File> = dbFiles
 //		override fun abstractSet(dat: SizedIterable<File>) {
 //			TODO("TODO Not implemented")
@@ -220,10 +221,10 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	fun remove() {
 		transaction {
 			delete()
-		}
+		}.also { calendar.Notes.remove(this) }
 	}
 	
-	override fun toString(): String = "[{$id} $time $type |$files| ]"
+	override fun toString(): String = "[{${id.value}} ${time.value} ${type.value} |$files| ]"
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Note) false
@@ -250,7 +251,7 @@ class File(id: EntityID<Long>): LongEntity(id) {
 //					data.set(_data)
 					name.set(_name)
 					origin.set(_origin)
-				}
+				}.also { calendar.Files.add(it) }
 			}
 		}
 	}
@@ -279,10 +280,10 @@ class File(id: EntityID<Long>): LongEntity(id) {
 	fun remove() {
 		transaction {
 			delete()
-		}
+		}.also { calendar.Files.remove(this) }
 	}
 	
-	override fun toString(): String = "[{$id} $name $origin]"
+	override fun toString(): String = "[{${id.value}} ${name.value} ${origin.value}]"
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is File) false
@@ -307,7 +308,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 					appointment.set(_appointment)
 					title.set(_title)
 					description.set(_description)
-				}
+				}.also { calendar.Reminders.add(it) }
 			}
 		}
 	}
@@ -345,10 +346,10 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 	fun remove() {
 		transaction {
 			delete()
-		}
+		}.also { calendar.Reminders.remove(this) }
 	}
 	
-	override fun toString(): String = "[{$id} $time | $title: $description]"
+	override fun toString(): String = "[{${id.value}} ${time.value} | ${title.value}: ${description.value}]"
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Reminder) false
@@ -374,7 +375,7 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 				return@transaction Types.new {
 					name.set(_name)
 					color.set(_color)
-				}
+				}.also { calendar.Types.add(it) }
 			}
 		}
 	}
@@ -403,10 +404,10 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 	fun remove() {
 		transaction {
 			delete()
-		}
+		}.also { calendar.Types.remove(this) }
 	}
 	
-	override fun toString(): String = "[{$id} $name $color]"
+	override fun toString(): String = "[{${id.value}} ${name.value} ${color.value}]"
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Type) false
