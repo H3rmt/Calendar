@@ -84,7 +84,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 					label("") {
 						addClass(GlobalStyles.tableItem_)
 						style {
-							minWidth = 85.px // TODO get from cell (split cell)
+							minWidth = 85.px // TODO get from cell (split cell styles)
 						}
 					}
 					for(header in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {

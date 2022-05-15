@@ -2,6 +2,7 @@ import calendar.initDb
 import calendar.loadCalendarData
 import frame.frameInit
 import javafx.beans.value.*
+import javafx.collections.*
 import logic.LogType
 import logic.configs
 import logic.initConfigs
@@ -46,8 +47,8 @@ fun <T> T.lg(): T {
 
 fun <T: ObservableValue<*>> T.lgListen(): T {
 	println("lgListen on: $this ")
-	this.addListener { ob, _, _ ->
-		println("lgListen:", ob)
+	listen2 { old, new ->
+		println("lgListen ($this): $old -> $new")
 	}
 	return this
 }
@@ -58,8 +59,37 @@ fun <T> ObservableValue<T>.listen(once: Boolean = false, listener: (new: T) -> U
 		listener(newValue)
 		if(once)
 			this.removeListener(lst)
+		
 	}
-	this.addListener(lst)
+	addListener(lst)
+}
+
+fun <F, T: ObservableList<F>> T.listen(listener: (new: ListChangeListener.Change<out F>) -> Unit) {
+	addListener(ListChangeListener { change ->
+		listener(change)
+	})
+}
+
+fun <T: ObservableList<*>> T.lgListen(): T {
+	addListener(ListChangeListener { change ->
+		print("change ($this): ")
+		while(change.next()) {
+			when(true) {
+				change.wasAdded() -> {
+					print("added ${change.addedSubList} ")
+				}
+				change.wasRemoved() -> {
+					print("removed ${change.removed} ")
+				}
+				change.wasUpdated() -> {
+					print("updated ${change.list}")
+				}
+				else -> {}
+			}
+			println()
+		}
+	})
+	return this
 }
 
 fun <T> ObservableValue<T>.listen2(once: Boolean = false, listener: (new: T, old: T) -> Unit) {

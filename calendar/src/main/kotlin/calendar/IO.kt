@@ -2,7 +2,6 @@ package calendar
 
 import javafx.collections.*
 import listen
-import listen2
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Database
@@ -12,6 +11,7 @@ import tornadofx.*
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
+
 
 
 fun initDb() {
@@ -45,6 +45,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	 * listeners for any new Appointments added after creation of the list get added automatically
 	 */
 	fun getWeekAppointments(): ObservableList<Appointment> { // probably needed for configuration of week appointments
+		// condition to check if appointment fulfills condition to be in returned list
 		val condition: (Appointment) -> Boolean = {
 			it.week.value
 		}
@@ -53,19 +54,20 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		val list = observableListOf<Appointment>(this.filter(condition))
 		
 		// adds or removes appointment from/to returned list based on condition
-		val check: (Appointment) -> Unit = { appointment ->
-			if(condition(appointment)) { // if appointment fulfills condition
+		// either gets called when any relevant value on appointment changes or new appointments get added
+		val check = { appointment: Appointment ->
+			if(condition(appointment)) {
 				if(!list.contains(appointment))
-					list.remove(appointment)  // remove not if on list
-			} else { // if appointment doesn't fulfill condition
-				if(list.contains(appointment))
 					list.add(appointment)  // add appointment if not on list
+			} else {
+				if(list.contains(appointment))
+					list.remove(appointment)  // remove appointment if on list
 			}
 		}
 		
 		// add listener to every value of appointment that is evaluated in condition
 		// to check again if appointment should be added or removed from returned list
-		val addChecks: (Appointment) -> Unit = { appointment ->
+		val addChangeChecks: (Appointment) -> Unit = { appointment ->
 			appointment.start.listen {
 				check(appointment)
 			}
@@ -78,22 +80,19 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		}
 		
 		// add checks to all current appointments in list
-		forEach(addChecks)
+		forEach(addChangeChecks)
 		
-		// runs if new appointment is created or removed
-		listen2 { new, old ->
-			val oldAppointments = old.toSet().minus(new) // filter out removed appointments
-			list.removeAll(oldAppointments) // remove old appointments to returned list
-			val newAppointments = new.toSet().minus(old) // filter out added appointments
-			list.addAll(newAppointments)  // add new appointments to returned list
-
-//			list.setAll(new) // triggers listeners only once, but clears whole list first TODO test this
-			
-			// add checks to all new appointments in list
-			newAppointments.forEach(addChecks)
+		// runs if new appointments were created or removed
+		listen { event ->
+			while(event.next()) {
+				list.removeAll(event.removed) // remove all removed appointments
+				list.addAll(event.addedSubList.filter(condition)) // add new appointments if they fulfill condition
+				
+				// add checks to all new appointments in list
+				event.addedSubList.forEach(addChangeChecks)
+			}
 		}
 		return list
-		
 	}
 	
 	/**
@@ -104,6 +103,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	 * listeners for any new Appointments added after creation of the list get added automatically
 	 */
 	fun getAppointmentsFromTo(from: LocalDateTime, to: LocalDateTime, day: DayOfWeek): ObservableList<Appointment> {
+		// condition to check if appointment fulfills condition to be in returned list
 		val condition: (Appointment) -> Boolean = {
 			(!it.week.value && it.start.value >= from && it.end.value <= to) || (it.week.value && day in it.start.value.dayOfWeek..it.end.value.dayOfWeek)
 		}
@@ -112,19 +112,20 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		val list = observableListOf<Appointment>(this.filter(condition))
 		
 		// adds or removes appointment from/to returned list based on condition
-		val check: (Appointment) -> Unit = { appointment ->
-			if(condition(appointment)) { // if appointment fulfills condition
+		// either gets called when any relevant value on appointment changes or new appointments get added
+		val check = { appointment: Appointment ->
+			if(condition(appointment)) {
 				if(!list.contains(appointment))
-					list.remove(appointment)  // remove not if on list
-			} else { // if appointment doesn't fulfill condition
-				if(list.contains(appointment))
 					list.add(appointment)  // add appointment if not on list
+			} else {
+				if(list.contains(appointment))
+					list.remove(appointment)  // remove appointment if on list
 			}
 		}
 		
 		// add listener to every value of appointment that is evaluated in condition
 		// to check again if appointment should be added or removed from returned list
-		val addChecks: (Appointment) -> Unit = { appointment ->
+		val addChangeChecks: (Appointment) -> Unit = { appointment ->
 			appointment.start.listen {
 				check(appointment)
 			}
@@ -137,19 +138,17 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		}
 		
 		// add checks to all current appointments in list
-		forEach(addChecks)
+		forEach(addChangeChecks)
 		
-		// runs if new appointment is created or removed
-		listen2 { new, old ->
-			val oldAppointments = old.toSet().minus(new) // filter out removed appointments
-			list.removeAll(oldAppointments) // remove old appointments to returned list
-			val newAppointments = new.toSet().minus(old) // filter out added appointments
-			list.addAll(newAppointments)  // add new appointments to returned list
-
-//			list.setAll(new) // triggers listeners only once, but clears whole list first TODO test this
-			
-			// add checks to all new appointments in list
-			newAppointments.forEach(addChecks)
+		// runs if new appointments were created or removed
+		listen { event ->
+			while(event.next()) {
+				list.removeAll(event.removed) // remove all removed appointments
+				list.addAll(event.addedSubList.filter(condition)) // add new appointments if they fulfill condition
+				
+				// add checks to all new appointments in list
+				event.addedSubList.forEach(addChangeChecks)
+			}
 		}
 		return list
 	}
@@ -174,27 +173,29 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 	 * listeners for any new Notes added after creation of the list get added automatically
 	 */
 	fun getNotesAt(at: LocalDate): ObservableList<Note> {
+		// condition to check if note fulfills condition to be in returned list
 		val condition: (Note) -> Boolean = {
 			!it.week.value && at == it.time.value
 		}
 		
 		// populate list
-		val list = observableListOf<Note>(filter(condition))
+		val list = observableListOf<Note>(this.filter(condition))
 		
-		// adds or removes note from/to returned list based on condition
-		val check: (Note) -> Unit = { note: Note ->
-			if(condition(note)) { // if note fulfills condition
+		// adds or removes notes from/to returned list based on condition
+		// either gets called when any relevant value on note changes or new notes get added
+		val check = { note: Note ->
+			if(condition(note)) {
 				if(!list.contains(note))
-					list.remove(note)  // remove not if on list
-			} else { // if note doesn't fulfill condition
-				if(list.contains(note))
 					list.add(note)  // add note if not on list
+			} else {
+				if(list.contains(note))
+					list.remove(note)  // remove note if on list
 			}
 		}
 		
 		// add listener to every value of note that is evaluated in condition
 		// to check again if note should be added or removed from returned list
-		val addChecks: (Note) -> Unit = { note ->
+		val addChangeChecks: (Note) -> Unit = { note ->
 			note.time.listen {
 				check(note)
 			}
@@ -204,19 +205,17 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		}
 		
 		// add checks to all current notes in list
-		forEach(addChecks)
+		forEach(addChangeChecks)
 		
-		// runs if new appointment is created or removed
-		listen2 { new, old ->
-			val oldNotes = old.toSet().minus(new) // filter out removed notes
-			list.removeAll(oldNotes) // remove old notes to returned list
-			val newNotes = new.toSet().minus(old) // filter out added notes
-			list.addAll(newNotes)  // add new notes to returned list
-
-//			list.setAll(new) // triggers listeners only once, but clears whole list first TODO test this
-			
-			// add checks to all new notes in list
-			newNotes.forEach(addChecks)
+		// runs if new notes were created or removed
+		listen { event ->
+			while(event.next()) {
+				list.removeAll(event.removed) // remove all removed notes
+				list.addAll(event.addedSubList.filter(condition)) // add new notes if they fulfill condition
+				
+				// add checks to all new notes in list
+				event.addedSubList.forEach(addChangeChecks)
+			}
 		}
 		return list
 	}
@@ -229,7 +228,6 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 	 * listeners for any new Notes added after creation of the list get added automatically
 	 */
 	fun getWeekNotesFromTo(from: LocalDate, to: LocalDate): ObservableList<Note> {
-		
 		// condition to check if note fulfills condition to be in returned list
 		val condition: (Note) -> Boolean = {
 			it.week.value && from < it.time.value && it.time.value < to
@@ -238,20 +236,21 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		// populate list
 		val list = observableListOf<Note>(this.filter(condition))
 		
-		// adds or removes note from/to returned list based on condition
-		val check: (Note) -> Unit = { note: Note ->
-			if(condition(note)) { // if note fulfills condition
+		// adds or removes notes from/to returned list based on condition
+		// either gets called when any relevant value on note changes or new notes get added
+		val check = { note: Note ->
+			if(condition(note)) {
 				if(!list.contains(note))
-					list.remove(note)  // remove not if on list
-			} else { // if note doesn't fulfill condition
-				if(list.contains(note))
 					list.add(note)  // add note if not on list
+			} else {
+				if(list.contains(note))
+					list.remove(note)  // remove note if on list
 			}
 		}
 		
 		// add listener to every value of note that is evaluated in condition
 		// to check again if note should be added or removed from returned list
-		val addChecks: (Note) -> Unit = { note ->
+		val addChangeChecks: (Note) -> Unit = { note ->
 			note.time.listen {
 				check(note)
 			}
@@ -261,19 +260,17 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		}
 		
 		// add checks to all current notes in list
-		forEach(addChecks)
+		forEach(addChangeChecks)
 		
-		// runs if new appointment is created or removed
-		listen2 { new, old ->
-			val oldNotes = old.toSet().minus(new) // filter out removed notes
-			list.removeAll(oldNotes) // remove old notes to returned list
-			val newNotes = new.toSet().minus(old) // filter out added notes
-			list.addAll(newNotes)  // add new notes to returned list
-
-//			list.setAll(new) // triggers listeners only once, but clears whole list first TODO test this
-			
-			// add checks to all new notes in list
-			newNotes.forEach(addChecks)
+		// runs if new notes were created or removed
+		listen { event ->
+			while(event.next()) {
+				list.removeAll(event.removed) // remove all removed notes
+				list.addAll(event.addedSubList.filter(condition)) // add new notes if they fulfill condition
+				
+				// add checks to all new notes in list
+				event.addedSubList.forEach(addChangeChecks)
+			}
 		}
 		return list
 	}
@@ -307,5 +304,5 @@ object TypeTable: IntIdTable() {
 }
 
 object Types: DBObservableList<Type>(Type.Types) {
-	fun random(): Type = get().random()
+	fun getRandom(): Type = random()
 }

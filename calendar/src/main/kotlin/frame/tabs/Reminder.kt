@@ -6,7 +6,6 @@ import frame.styles.GlobalStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
 import javafx.beans.property.*
-import javafx.collections.*
 import javafx.geometry.*
 import javafx.scene.control.*
 import listen
@@ -55,7 +54,7 @@ fun createReminderTab(pane: TabPane): Tab {
 				
 				var table: ScrollPane? = null
 				
-				fun updateTable(list: ObservableList<out Reminder>) {
+				fun updateTable(list: List<Reminder>) {
 					children.remove(table)
 					log("updated table_ view", LogType.LOW)
 					
@@ -88,7 +87,7 @@ fun createReminderTab(pane: TabPane): Tab {
 										addClass(GlobalStyles.tableItem_)
 										addClass(ReminderStyles.tableItemLeft_)
 									}
-									label(reminder.time.toString()) {
+									label(reminder.time) {
 										addClass(GlobalStyles.tableItem_)
 										addClass(ReminderStyles.tableItemMiddle_)
 									}
@@ -103,7 +102,7 @@ fun createReminderTab(pane: TabPane): Tab {
 				}
 				
 				Reminders.listen {
-					updateTable(it)
+					updateTable(it.list)
 				}
 				
 				updateTable(Reminders)

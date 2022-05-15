@@ -1,6 +1,7 @@
 package calendar
 
 import calendar.Timing.toUTCEpochMinute
+import com.sun.javafx.collections.ObservableListWrapper
 import frame.TranslatingSimpleStringProperty
 import javafx.beans.property.*
 import javafx.collections.*
@@ -11,7 +12,6 @@ import logic.log
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.sql.transactions.transaction
-import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.IsoFields
@@ -161,27 +161,14 @@ abstract class DBObservableD<T, DB>: ObjectPropertyBase<T>() {
  *
  * set and setValue are also blocked, only remove and add
  */
-open class DBObservableList<T: Entity<*>>(private val table: EntityClass<*, T>): ListPropertyBase<T>() {
-	override fun getBean(): Any = ""//TODO("Not yet implemented")
+open class DBObservableList<T: Entity<*>>(private val table: EntityClass<*, T>): ObservableListWrapper<T>(mutableListOf()) {
+	private var loaded = false
 	
-	// sometimes gets called if value has name property and code wasn't updated
-	override fun getName(): String = ""//TODO("Not yet implemented")
 	fun reload() {
-		table.apply {
-			return transaction {
-				super.set(observableListOf(all().toList()))
-			}
+		return transaction {
+			super.setAll(table.all().toList())
 		}
 	}
 	
-	override fun setValue(newValue: ObservableList<T>?) {
-		throw Throwable("setValue not allowed on DBObservableList (only add and remove)")
-	}
-	
-	override fun set(newValue: ObservableList<T>?) {
-		throw Throwable("set not allowed on DBObservableList (only add and remove)")
-	}
-	
-	
-	override fun toString(): String = """DBObservableList [${if(isBound) "bound," else ""} value: ${super.get()}]]"""
+	override fun toString(): String = "[DBObservableList value: ${super.toString()}]"
 }
