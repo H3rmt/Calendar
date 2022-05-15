@@ -1,6 +1,6 @@
 package calendar
 
-import calendar.File.Files.referrersOn
+import javafx.collections.*
 import javafx.scene.paint.*
 import logic.Configs
 import logic.getConfig
@@ -9,7 +9,6 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.SizedIterable
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.DayOfWeek
 import java.time.DayOfWeek.FRIDAY
@@ -21,8 +20,6 @@ import java.time.DayOfWeek.TUESDAY
 import java.time.DayOfWeek.WEDNESDAY
 import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.collections.set
 
 interface CellDisplay {
@@ -31,12 +28,7 @@ interface CellDisplay {
 	val time: LocalDate
 }
 
-@Suppress("LongParameterList")
-class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday: Day, Friday: Day, Saturday: Day, Sunday: Day, val WeekOfYear: Int): CellDisplay {
-	
-	override val time: LocalDate = _time
-	
-	override val notes: MutableList<Note> = mutableListOf()
+class Week(override val time: LocalDate, days: List<Day>, val WeekOfYear: Int, override val notes: ObservableList<Note>): CellDisplay {
 	
 	val appointments: List<Appointment>
 		get() {
@@ -48,7 +40,7 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 		}
 	
 	val allDays: Map<DayOfWeek, Day> = mapOf(
-		MONDAY to Monday, TUESDAY to Tuesday, WEDNESDAY to Wednesday, THURSDAY to Thursday, FRIDAY to Friday, SATURDAY to Saturday, SUNDAY to Sunday
+		MONDAY to days[0], TUESDAY to days[1], WEDNESDAY to days[2], THURSDAY to days[3], FRIDAY to days[4], SATURDAY to days[5], SUNDAY to days[6]
 	)
 	
 	fun getAllAppointmentsSorted(): Map<Type, Int> {
@@ -57,14 +49,6 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 			list[appointment.type.value] = list[appointment.type.value]?.plus(1) ?: 1
 		}
 		return list
-	}
-	
-	fun addAppointments(list: List<Appointment>) {
-		val appointmentList = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
-		list.forEach { appointmentList[it.start.value.dayOfWeek]?.add(it) ?: listOf(it) }
-		for((key, value) in appointmentList) {
-			allDays[key]?.appointments?.addAll(value ?: listOf())
-		}
 	}
 	
 	override fun toString(): String = "$time $notes $allDays"
@@ -111,13 +95,48 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	private var dbType by Type.Types referencedOn AppointmentTable.type
 	private var dbWeek by AppointmentTable.week
 	
-	val start: DBDateTimeObservable = DBDateTimeObservable(dbStart)
-	val end: DBDateTimeObservable = DBDateTimeObservable(dbEnd)
-	val title: DBObservable<String> = DBObservable(dbTitle)
-	val description: DBObservable<String> = DBObservable(dbDescription)
-	val allDay: DBObservable<Boolean> = DBObservable(dbAllDay)
-	val type: DBObservable<Type> = DBObservable(dbType)
-	val week: DBObservable<Boolean> = DBObservable(dbWeek)
+	val start: DBDateTimeObservable = object: DBDateTimeObservable() {
+		override fun abstractGet(): Long = dbStart
+		override fun abstractSet(dat: Long) {
+			dbStart = dat
+		}
+	}
+	val end: DBDateTimeObservable = object: DBDateTimeObservable() {
+		override fun abstractGet(): Long = dbEnd
+		override fun abstractSet(dat: Long) {
+			dbEnd = dat
+		}
+	}
+	val title: DBObservable<String> = object: DBObservable<String>() {
+		override fun abstractGet(): String = dbTitle
+		override fun abstractSet(dat: String) {
+			dbTitle = dat
+		}
+	}
+	val description: DBObservable<String> = object: DBObservable<String>() {
+		override fun abstractGet(): String = dbDescription
+		override fun abstractSet(dat: String) {
+			dbDescription = dat
+		}
+	}
+	val allDay: DBObservable<Boolean> = object: DBObservable<Boolean>() {
+		override fun abstractGet(): Boolean = dbAllDay
+		override fun abstractSet(dat: Boolean) {
+			dbAllDay = dat
+		}
+	}
+	val type: DBObservable<Type> = object: DBObservable<Type>() {
+		override fun abstractGet(): Type = dbType
+		override fun abstractSet(dat: Type) {
+			dbType = dat
+		}
+	}
+	val week: DBObservable<Boolean> = object: DBObservable<Boolean>() {
+		override fun abstractGet(): Boolean = dbWeek
+		override fun abstractSet(dat: Boolean) {
+			dbWeek = dat
+		}
+	}
 	
 	fun remove() {
 		transaction {
@@ -164,13 +183,39 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	private var dbText by NoteTable.text
 	private var dbType by Type.Types referencedOn NoteTable.type
 	private var dbWeek by NoteTable.week
-	private val dbFiles by File.Files referrersOn FileTable.note
+//	private val dbFiles by File.Files referrersOn FileTable.note
 	
-	val time: DBDateObservable = DBDateObservable(dbTime)
-	val text: DBObservable<String> = DBObservable(dbText)
-	val type: DBObservable<Type> = DBObservable(dbType)
-	val week: DBObservable<Boolean> = DBObservable(dbWeek)
-	val files: DBObservable<SizedIterable<File>> = DBObservable(dbFiles)
+	val time: DBDateObservable = object: DBDateObservable() {
+		override fun abstractGet(): Long = dbTime
+		override fun abstractSet(dat: Long) {
+			dbTime = dat
+		}
+	}
+	val text: DBObservable<String> = object: DBObservable<String>() {
+		override fun abstractGet(): String = dbText
+		override fun abstractSet(dat: String) {
+			dbText = dat
+		}
+	}
+	val type: DBObservable<Type> = object: DBObservable<Type>() {
+		override fun abstractGet(): Type = dbType
+		override fun abstractSet(dat: Type) {
+			dbType = dat
+		}
+	}
+	val files = arrayListOf<File>() // TODO not implemented
+//	val files: DBObservable<SizedIterable<File>> = object: DBObservable<SizedIterable<File>>() {
+//		override fun abstractGet(): SizedIterable<File> = dbFiles
+//		override fun abstractSet(dat: SizedIterable<File>) {
+//			TODO("TODO Not implemented")
+//		}
+//	}
+	val week: DBObservable<Boolean> = object: DBObservable<Boolean>() {
+		override fun abstractGet(): Boolean = dbWeek
+		override fun abstractSet(dat: Boolean) {
+			dbWeek = dat
+		}
+	}
 	
 	fun remove() {
 		transaction {
@@ -210,16 +255,26 @@ class File(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-//	private var dbData by FileTable.data
+	//	private var dbData by FileTable.data
 	private var dbName by FileTable.name
 	private var dbOrigin by FileTable.origin
 	
-//	var data: DBObservableD<ByteArray, String> = object: DBObservableD<ByteArray, String>(dbData) {
+	//	var data: DBObservableD<ByteArray, String> = object: DBObservableD<ByteArray, String>(dbData) {
 //		override fun convertFrom(value: ByteArray?): String? = value?.decodeToString()
 //		override fun convertTo(value: String?): ByteArray? = value?.encodeToByteArray()
 //	}
-	var name: DBObservable<String> = DBObservable(dbName)
-	var origin: DBObservable<String> = DBObservable(dbOrigin)
+	var name: DBObservable<String> = object: DBObservable<String>() {
+		override fun abstractGet(): String = dbName
+		override fun abstractSet(dat: String) {
+			dbName = dat
+		}
+	}
+	var origin: DBObservable<String> = object: DBObservable<String>() {
+		override fun abstractGet(): String = dbOrigin
+		override fun abstractSet(dat: String) {
+			dbOrigin = dat
+		}
+	}
 	
 	fun remove() {
 		transaction {
@@ -262,10 +317,30 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 	private var dbTitle by ReminderTable.title
 	private var dbDescription by ReminderTable.description
 	
-	val time: DBDateTimeObservable = DBDateTimeObservable(dbTime)
-	val appointment: DBObservable<Appointment?> = DBObservable(dbAppointment)
-	val title: DBObservable<String> = DBObservable(dbTitle)
-	val description: DBObservable<String> = DBObservable(dbDescription)
+	val time: DBDateTimeObservable = object: DBDateTimeObservable() {
+		override fun abstractGet(): Long = dbTime
+		override fun abstractSet(dat: Long) {
+			dbTime = dat
+		}
+	}
+	val appointment: DBObservable<Appointment?> = object: DBObservable<Appointment?>() {
+		override fun abstractGet(): Appointment? = dbAppointment
+		override fun abstractSet(dat: Appointment?) {
+			dbAppointment = dat
+		}
+	}
+	val title: DBObservable<String> = object: DBObservable<String>() {
+		override fun abstractGet(): String = dbTitle
+		override fun abstractSet(dat: String) {
+			dbTitle = dat
+		}
+	}
+	val description: DBObservable<String> = object: DBObservable<String>() {
+		override fun abstractGet(): String = dbDescription
+		override fun abstractSet(dat: String) {
+			dbDescription = dat
+		}
+	}
 	
 	fun remove() {
 		transaction {
@@ -307,10 +382,21 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 	private var dbName by TypeTable.name
 	private var dbColor by TypeTable.color
 	
-	val name: DBObservable<String> = DBObservable(dbName)
-	val color: DBObservableD<Color, String> = object: DBObservableD<Color, String>(dbColor) {
-		override fun convertFrom(value: Color?): String = value.toString()
-		override fun convertTo(value: String?): Color? = Color.valueOf(value)
+	val name: DBObservable<String> = object: DBObservable<String>() {
+		override fun abstractGet(): String = dbName
+		
+		override fun abstractSet(dat: String) {
+			dbName = dat
+		}
+		
+	}
+	val color: DBObservableD<Color, String> = object: DBObservableD<Color, String>() {
+		override fun convertFrom(value: Color): String = value.toString()
+		override fun convertTo(value: String): Color = Color.valueOf(value)
+		override fun abstractGet(): String = dbColor
+		override fun abstractSet(dat: String) {
+			dbColor = dat
+		}
 	}
 	
 	

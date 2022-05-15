@@ -1,8 +1,8 @@
 package frame.popup
 
 import calendar.Appointment
+import calendar.Appointments
 import calendar.Reminder
-import calendar.getAppointments
 import frame.styles.GlobalStyles
 import frame.toggleSwitch
 import javafx.beans.property.*
@@ -53,7 +53,7 @@ class ReminderPopup: Fragment() {
 	private fun updateDisplay(toggle: Boolean) {
 		if(toggle) {
 			toggleName.value = "Appointment"
-			control?.left = appointmentPicker(getAppointments(), appointment = appointment)
+			control?.left = appointmentPicker(Appointments, appointment = appointment)
 		} else {
 			toggleName.value = "Date"
 			control?.left = dateTimePicker(dateTime = time)

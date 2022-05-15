@@ -3,7 +3,7 @@ package frame.popup
 import calendar.Appointment
 import calendar.Timing.toUTCEpochMinute
 import calendar.Type
-import calendar.getTypes
+import calendar.Types
 import frame.styles.GlobalStyles
 import javafx.beans.property.*
 import javafx.scene.control.*
@@ -31,7 +31,7 @@ class AppointmentPopup: Fragment() {
 	private var end: Property<LocalDateTime> = appointment?.end?.clone() ?: scope.end.toProperty()
 	private var appointmentTitle: Property<String> = appointment?.title?.clone() ?: "".toProperty()
 	private var description: Property<String> = appointment?.description?.clone() ?: "".toProperty()
-	private var type: Property<Type> = appointment?.type?.clone() ?: getTypes()[0].toProperty()
+	private var type: Property<Type> = appointment?.type?.clone() ?: Types.random().toProperty()
 	private var wholeDay: Property<Boolean> = appointment?.allDay?.clone() ?: false.toProperty()
 	
 	private var onSave: (Appointment) -> Unit = scope.save
@@ -118,8 +118,8 @@ class AppointmentPopup: Fragment() {
 		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
 			field("Type") {
-				combobox(values = getTypes(), property = type) {
-					setCellFactory { p ->
+				combobox(values = Types, property = type) {
+					setCellFactory { _ ->
 						return@setCellFactory object: ListCell<Type>() {
 							override fun updateItem(item: Type, empty: Boolean) {
 								super.updateItem(item, empty)

@@ -35,8 +35,7 @@ fun init() {
 	
 	initDb()
 	
-	log("preparing Appointments", LogType.IMPORTANT)
-	log("preparing Notes", LogType.IMPORTANT)
+	log("preparing Data", LogType.IMPORTANT)
 	loadCalendarData()
 }
 
@@ -45,7 +44,7 @@ fun <T> T.lg(): T {
 	return this
 }
 
-fun <T> ObservableValue<T>.lgListen(): ObservableValue<T> {
+fun <T: ObservableValue<*>> T.lgListen(): T {
 	println("lgListen on: $this ")
 	this.addListener { ob, _, _ ->
 		println("lgListen:", ob)

@@ -1,7 +1,7 @@
 package frame.tabs
 
 import calendar.Reminder
-import calendar.reminders
+import calendar.Reminders
 import frame.styles.GlobalStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
@@ -102,11 +102,11 @@ fun createReminderTab(pane: TabPane): Tab {
 					}
 				}
 				
-				reminders.addListener(ListChangeListener {
-					updateTable(it.list)
-				})
+				Reminders.listen {
+					updateTable(it)
+				}
 				
-				updateTable(reminders)
+				updateTable(Reminders)
 			}
 		}
 	}
