@@ -108,11 +108,12 @@ abstract class DBDateTimeObservable: DBObservableD<LocalDateTime, Long>() {
 }
 
 abstract class DBObservableD<T, DB>: ObjectPropertyBase<T>() {
+	private var loaded = false
 	override fun getBean(): Any = ""//TODO("Not yet implemented")
 	
 	override fun getName(): String = ""//TODO("Not yet implemented")
 	
-	fun reload() {
+	private fun reload() {
 		transaction {
 			set(convertTo(abstractGet()))
 		}
@@ -121,6 +122,12 @@ abstract class DBObservableD<T, DB>: ObjectPropertyBase<T>() {
 	abstract fun abstractGet(): DB
 	
 	abstract fun abstractSet(dat: DB)
+	
+	override fun get(): T {
+		if(!loaded)
+			reload()
+		return super.get()
+	}
 	
 	override fun set(newValue: T) {
 		transaction {
@@ -154,6 +161,8 @@ abstract class DBObservableD<T, DB>: ObjectPropertyBase<T>() {
 	}
 	
 	fun clone(): Property<T> = SimpleObjectProperty(value)
+	
+	override fun toString(): String = "[DBObservable value: ${get()}]"
 }
 
 /**
