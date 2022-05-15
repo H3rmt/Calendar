@@ -69,8 +69,8 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 			val day = Day(time, time.month == month)
 			
 			// both notes and appointments get updated automatically
-			day.notes = Notes.getNotesAt(time)
-			day.appointments = Appointments.getAppointmentsFromTo(time.atStartOfDay(), time.atStartOfDay().plusDays(1), time.atStartOfDay().dayOfWeek)
+			day.notes = Notes.getNotesAt(time).lgListen("notes")
+			day.appointments = Appointments.getAppointmentsFromTo(time.atStartOfDay(), time.atStartOfDay().plusDays(1), time.atStartOfDay().dayOfWeek).lgListen("day appointments")
 			
 			days.add(day)
 			time = time.plusDays(1)
@@ -81,7 +81,7 @@ fun generateMonth(_time: LocalDate): MutableList<Week> {
 		val week = Week(
 			startTime, days,
 			startTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR),
-			Notes.getWeekNotesFromTo(startTime, startTime.plusWeeks(1))
+			Notes.getWeekNotesFromTo(startTime, startTime.plusWeeks(1)).lgListen("week notes")
 		)
 		
 		log("added week: $week", LogType.LOW)

@@ -70,7 +70,7 @@ fun <F, T: ObservableList<F>> T.listen(listener: (new: ListChangeListener.Change
 	})
 }
 
-fun <T: ObservableList<*>> T.lgListen(name: String): T {
+fun <T: ObservableList<*>> T.lgListen(name: String = ""): T {
 	addListener(ListChangeListener { change ->
 		println("change ${name.ifEmpty { "ObservableValue" }} ($this): ")
 		while(change.next()) {
