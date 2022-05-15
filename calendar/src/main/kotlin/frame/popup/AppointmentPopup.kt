@@ -5,8 +5,8 @@ import calendar.Timing.toUTCEpochMinute
 import calendar.Type
 import calendar.Types
 import frame.styles.GlobalStyles
+import frame.typeCombobox
 import javafx.beans.property.*
-import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
 import javafx.scene.text.*
@@ -118,16 +118,7 @@ class AppointmentPopup: Fragment() {
 		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
 			field("Type") {
-				combobox(values = Types, property = type) {
-					setCellFactory { _ ->
-						return@setCellFactory object: ListCell<Type>() {
-							override fun updateItem(item: Type, empty: Boolean) {
-								super.updateItem(item, empty)
-								text = item.name.value
-							}
-						}
-					}
-				}
+				typeCombobox(type)
 				checkbox("whole day".translate(Language.TranslationTypes.AppointmentPopup), property = wholeDay) {
 					style {
 						padding = box(0.px, 0.px, 0.px, 40.px)

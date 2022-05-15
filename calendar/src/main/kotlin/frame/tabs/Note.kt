@@ -4,11 +4,11 @@ import calendar.CellDisplay
 import calendar.Day
 import calendar.Note
 import calendar.Type
-import calendar.Types
 import calendar.Week
 import frame.styles.GlobalStyles
 import frame.styles.NoteStyles
 import frame.styles.TabStyles
+import frame.typeCombobox
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
@@ -45,16 +45,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 			hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
 				addClass(TabStyles.topbar_)
 				
-				addType = combobox(values = Types) {
-					setCellFactory { _ ->
-						return@setCellFactory object: ListCell<Type>() {
-							override fun updateItem(item: Type, empty: Boolean) {
-								super.updateItem(item, empty)
-								text = item.name.value
-							}
-						}
-					}
-				}
+				addType = typeCombobox()
 				add = button {
 					text = "Add"
 					isDisable = true

@@ -162,7 +162,7 @@ abstract class DBObservableD<T, DB>: ObjectPropertyBase<T>() {
 	
 	fun clone(): Property<T> = SimpleObjectProperty(value)
 	
-	override fun toString(): String = "[DBObservable value: ${get()}]"
+	override fun toString(): String = "[DBO(${get()})]"
 }
 
 /**
