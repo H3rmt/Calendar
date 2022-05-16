@@ -2,7 +2,7 @@ name: Scan with Detekt
 
 on:
   pull_request:
-    branches: [ main, release ]
+    branches: [ main, release, next ]
 
 jobs:
   scan:
