@@ -119,6 +119,7 @@ abstract class DBObservableD<T, DB>: ObjectPropertyBase<T>() {
 		transaction {
 			set(convertTo(abstractGet()))
 		}
+		loaded = true
 	}
 	
 	abstract fun abstractGet(): DB
