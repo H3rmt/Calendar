@@ -4,6 +4,7 @@ import calendar.Appointment
 import calendar.Timing
 import calendar.Timing.fromUTCEpochMinuteToLocalDateTime
 import calendar.Timing.toUTCEpochMinute
+import calendar.Week
 import calendar.now
 import frame.Day
 import frame.Week
@@ -111,8 +112,9 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 											}
 										}
 										
-										if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) && week.time.year == now.year)
-											addClass(WeekStyles.ActiveTimeCell_)
+										if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) && week.time.year == now.year) addClass(
+											WeekStyles.ActiveTimeCell_
+										)
 										
 										label {
 											style {
@@ -147,8 +149,9 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 												
 												// appointments
 												val cellAppointments = appointments.filter {
-													val from = LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0).toUTCEpochMinute()
-													from < it.start + it.duration && from + 60 > it.start
+													val cellTimeStart = LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0)
+													val cellTimeEnd = LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0).plusHours(1)
+													cellTimeEnd > it.start.value && cellTimeStart < it.end.value
 												}
 												
 												for((ind, app) in cellAppointments.withIndex()) {
@@ -171,7 +174,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															// translateY = -10.px
 															
 															padding = box(2.px)
-															backgroundColor += app.type.color
+															backgroundColor += app.type.value.color.value // TODO repaint
 														}
 													}
 												}
@@ -195,11 +198,10 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																Timing.getNowUTC(week.time.year, week.time.month, day.time.dayOfMonth, hour).plusHours(1),
 																save = { app: Appointment ->
 																	log("Created:$app")
-																	week.allDays[fromUTCEpochMinuteToLocalDateTime(app.start).dayOfWeek]?.appointments?.add(app)
+																	week.allDays[app.start.value.dayOfWeek]?.appointments?.add(app) // TODO replace this
 																	updateTable()
 																	updateCallback()
-																}
-															)
+																})
 														}
 													}
 													menu("remove appointment".translate(Language.TranslationTypes.Week)) {
@@ -212,7 +214,8 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																	}.showAndWait().get()
 																	if(remove.buttonData == ButtonBar.ButtonData.OK_DONE) {
 																		log("Removed:$appointment") // TODO multi day
-																		week.allDays[fromUTCEpochMinuteToLocalDateTime(appointment.start).dayOfWeek]?.appointments?.remove(appointment)
+																		week.allDays[appointment.start.value.dayOfWeek]?.appointments?.remove(appointment) // TODO replace same here
+																		appointment.remove()
 																		updateTable()
 																		updateCallback()
 																	}
@@ -225,15 +228,15 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 															item(appointment.title) {
 																action {
 																	AppointmentPopup.open("edit appointment".translate(Language.TranslationTypes.AppointmentPopup),
-																		"save".translate(Language.TranslationTypes.AppointmentPopup), false,
+																		"save".translate(Language.TranslationTypes.AppointmentPopup),
+																		false,
 																		appointment,
 																		Timing.getNowLocal(), // irrelevant, as they get overridden by values in appointment
 																		Timing.getNowLocal(),
 																		save = { app: Appointment ->
 																			log("Updated:$app")
 																			updateTable()
-																		}
-																	)
+																		})
 																}
 															}
 														}

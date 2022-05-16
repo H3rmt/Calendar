@@ -38,9 +38,12 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, private val ap
 			appointmentsList.clear()
 			for(app: Appointment in appointments)
 				@Suppress("ComplexCondition")
-				if((searchColumns.find { it.name == "title" }!!.selected.value && app.title.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text)) ||
-					(searchColumns.find { it.name == "description" }!!.selected.value && app.description.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text)) ||
-					(searchColumns.find { it.name == "type" }!!.selected.value && app.type.name.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text))
+				if((searchColumns.find { it.name == "title" }!!.selected.value &&
+							  app.title.value.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text)) ||
+					(searchColumns.find { it.name == "description" }!!.selected.value &&
+							  app.description.value.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text)) ||
+					(searchColumns.find { it.name == "type" }!!.selected.value &&
+							  app.type.value.name.value.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch)).contains(text))
 				) appointmentsList.add(app)
 		} else {
 			appointmentsList.clear()
@@ -117,7 +120,7 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, private val ap
 									}
 									textflow {
 										if(replace != null && searchColumns.find { it.name == "title" }!!.selected.value) {
-											val strings = app.title.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
+											val strings = app.title.value.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
 											for((index, text) in strings.withIndex()) {
 												text(text)
 												if(index != strings.size - 1)
@@ -137,7 +140,7 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, private val ap
 									}
 									textflow {
 										if(replace != null && searchColumns.find { it.name == "description" }!!.selected.value) {
-											val strings = app.description.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
+											val strings = app.description.value.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
 											for((index, text) in strings.withIndex()) {
 												text(text)
 												if(index != strings.size - 1)
@@ -157,7 +160,7 @@ class AppointmentPickerPopup(appointment: Property<Appointment?>, private val ap
 									}
 									textflow {
 										if(replace != null && searchColumns.find { it.name == "type" }!!.selected.value) {
-											val strings = app.type.name.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
+											val strings = app.type.value.name.value.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
 											for((index, text) in strings.withIndex()) {
 												text(text)
 												if(index != strings.size - 1)

@@ -1,14 +1,14 @@
 package frame.tabs
 
+import calendar.CellDisplay
+import calendar.Day
 import calendar.Note
-import calendar.Timing.toUTCEpochMinute
-import calendar.getTypes
-import frame.CellDisplay
-import frame.Day
-import frame.Week
+import calendar.Type
+import calendar.Week
 import frame.styles.GlobalStyles
 import frame.styles.NoteStyles
 import frame.styles.TabStyles
+import frame.typeCombobox
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
@@ -38,22 +38,20 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 		vbox {
 			addClass(TabStyles.content_)
 			lateinit var add: Button
-			lateinit var addType: ComboBox<String>
+			lateinit var addType: ComboBox<Type>
 			
 			val noteTabs = mutableListOf<TitledPane>()
 			
 			hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
 				addClass(TabStyles.topbar_)
 				
-				addType = combobox {
-					items = getTypes().map { it.name }.toObservable()
-				}
+				addType = typeCombobox()
 				add = button {
 					text = "Add"
 					isDisable = true
 					
 					// disables button if no type selected or type already added
-					addType.valueProperty().addListener { _, _, new -> isDisable = (new == null) || noteTabs.any { it.text == new } }
+					addType.valueProperty().listen { new -> isDisable = (new == null) || noteTabs.any { it.text == new.name.value } }
 					addClass(TabStyles.titleButton_)
 				}
 			}
@@ -71,11 +69,11 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					add.action {
 						var note: Note? = null
 						lateinit var tb: TitledPane
-						tb = noteTab(this, addType.value, "", { text ->
+						tb = noteTab(this, addType.value.name.value, "", { text ->
 							if(note == null) {
-								note = Note.new(cell.time.toUTCEpochMinute(), "", getTypes().find { it.name == addType.value }!!, cell is Week)
+								note = Note.new(cell.time, "", addType.value, cell is Week)
 							}
-							note?.text = text
+							note?.text?.set(text)
 							updateCallback()
 						}, {
 							this.children.remove(noteTabs.first { it == tb })
@@ -83,7 +81,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 							note?.remove()
 							
 							// triggers reload of add button to check if new note can be created
-							add.isDisable = noteTabs.any { it.text == addType.value }
+							add.isDisable = noteTabs.any { it.text == addType.value.name.value }
 							updateCallback()
 						})
 						noteTabs.add(0, tb)
@@ -92,8 +90,8 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					
 					for(note in cell.notes) {
 						lateinit var tb: TitledPane
-						tb = noteTab(this, note.type.name, note.text, { text ->
-							note.text = text
+						tb = noteTab(this, note.type.name, note.text.value, { text ->
+							note.text.set(text)
 							updateCallback()
 						}, {
 							this.children.remove(noteTabs.first { it == tb })
@@ -101,7 +99,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 							note.remove()
 							
 							// triggers reload of add button to check if new note can be created
-							add.isDisable = noteTabs.any { it.text == addType.value }
+							add.isDisable = noteTabs.any { it.text == addType.value.name.value }
 							updateCallback()
 						})
 						noteTabs.add(tb)

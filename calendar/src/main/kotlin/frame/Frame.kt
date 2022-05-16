@@ -4,6 +4,8 @@ package frame
 import calendar.Appointment
 import calendar.Reminder
 import calendar.Timing
+import calendar.Type
+import calendar.Types
 import frame.TabManager.Secure
 import frame.popup.AppointmentPopup
 import frame.popup.ReminderPopup
@@ -417,4 +419,33 @@ class TranslatingSimpleStringProperty(initialValue: String = "", private val typ
 	
 	override fun get(): String = super.get().translate(type, args)
 	
+}
+
+fun EventTarget.typeCombobox(type: Property<Type>? = null): ComboBox<Type> {
+	return combobox(values = Types, property = type) {
+		buttonCell = object: ListCell<Type>() {
+			override fun updateItem(item: Type?, empty: Boolean) {
+				super.updateItem(item, empty)
+				if(empty || item == null) {
+					text = null
+					graphic = null
+				} else {
+					text = item.name.value
+				}
+			}
+		}
+		setCellFactory {
+			return@setCellFactory object: ListCell<Type>() {
+				override fun updateItem(item: Type?, empty: Boolean) {
+					super.updateItem(item, empty)
+					if(empty || item == null) {
+						text = null
+						graphic = null
+					} else {
+						text = item.name.value
+					}
+				}
+			}
+		}
+	}
 }
