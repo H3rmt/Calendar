@@ -1,13 +1,10 @@
 package frame.tabs
 
+import Day
+import Week
 import calendar.Appointment
 import calendar.Timing
-import calendar.Timing.fromUTCEpochMinuteToLocalDateTime
-import calendar.Timing.toUTCEpochMinute
-import calendar.Week
 import calendar.now
-import frame.Day
-import frame.Week
 import frame.popup.AppointmentPopup
 import frame.styles.GlobalStyles
 import frame.styles.TabStyles

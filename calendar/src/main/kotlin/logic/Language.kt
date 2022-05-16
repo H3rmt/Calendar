@@ -53,11 +53,6 @@ class Language(private val language: AvailableLanguages) {
 		}
 	}
 	
-	private fun transformClassname(name: String) = name.removeRange(
-		name.indexOf('$').let { return@let if(it == -1) 0 else it },
-		name.length
-	)
-	
 	fun info(): String = "Language: $language loaded ${translations.values.sumOf { it.size }} Translations"
 	
 	/**

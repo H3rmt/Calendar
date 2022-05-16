@@ -15,7 +15,9 @@
 	
 	},
 	"Week": {
-	
+		"edit appointment": "edit appointment",
+		"remove appointment": "remove appointment",
+		"new appointment": "new appointment"
 	},
 	"AppointmentPopup": {
 	

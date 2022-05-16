@@ -1,5 +1,8 @@
 package frame.tabs
 
+import CellDisplay
+import Day
+import Week
 import calendar.Reminder
 import calendar.changeMonth
 import calendar.generateMonth
@@ -7,10 +10,7 @@ import calendar.now
 import calendar.overviewTime
 import calendar.overviewTitle
 import calendar.overviewWeeks
-import frame.CellDisplay
-import frame.Day
 import frame.TabManager
-import frame.Week
 import frame.createFXImage
 import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles

@@ -1,10 +1,10 @@
 package frame.tabs
 
-import calendar.CellDisplay
-import calendar.Day
+import CellDisplay
+import Day
+import Week
 import calendar.Note
 import calendar.Type
-import calendar.Week
 import frame.styles.GlobalStyles
 import frame.styles.NoteStyles
 import frame.styles.TabStyles

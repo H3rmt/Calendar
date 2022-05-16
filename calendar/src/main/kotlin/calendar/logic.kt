@@ -1,8 +1,9 @@
 package calendar
 
+import Day
+import Week
 import calendar.Timing.toUTCEpochMinute
 import com.sun.javafx.collections.ObservableListWrapper
-import frame.Day
 import frame.TranslatingSimpleStringProperty
 import javafx.beans.property.*
 import javafx.collections.*
@@ -20,9 +21,9 @@ import java.time.temporal.IsoFields
 
 val now: LocalDateTime = Timing.getNowLocal()
 
-val currentMonth: ObservableList<Week> = FXCollections.observableArrayList()
-
-val currentMonthName: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty(type = Language.TranslationTypes.Global)
+var overviewTime: LocalDate = Timing.getNowLocal().toLocalDate()
+val overviewWeeks: ObservableList<Week> = FXCollections.observableArrayList()
+val overviewTitle: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty(type = Language.TranslationTypes.Global)
 
 /**
  * called by buttons in calendar tab
@@ -47,9 +48,9 @@ fun loadCalendarData() {
 	
 	
 	// Overview TODO move this somewhere else
-	currentMonthName.set(calendarDisplay.month.name)
-	log("set Month to ${calendarDisplay.month.name}")
-	currentMonth.setAll(generateMonth(calendarDisplay))
+	overviewTitle.set(overviewTime.month.name)
+	log("set Month to ${overviewTime.month.name}")
+	overviewWeeks.setAll(generateMonth(overviewTime))
 }
 
 fun generateMonth(_time: LocalDate): MutableList<Week> {

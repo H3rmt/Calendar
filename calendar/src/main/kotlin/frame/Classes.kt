@@ -1,8 +1,5 @@
-package frame
-
 import calendar.Appointment
 import calendar.Note
-import calendar.Timing
 import calendar.Type
 import javafx.collections.*
 import logic.Configs
@@ -10,19 +7,13 @@ import logic.getConfig
 import java.time.DayOfWeek
 import java.time.LocalDate
 
-
 interface CellDisplay {
-	val notes: ObservableList<Note>
+	val notes: MutableList<Note>
 	
 	val time: LocalDate
 }
 
-@Suppress("LongParameterList")
-class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday: Day, Friday: Day, Saturday: Day, Sunday: Day, val WeekOfYear: Int): CellDisplay {
-	
-	override val time: LocalDate = _time
-	
-	override val notes: ObservableList<Note> = FXCollections.observableArrayList()
+class Week(override val time: LocalDate, days: List<Day>, val WeekOfYear: Int, override val notes: ObservableList<Note>): CellDisplay {
 	
 	val appointments: List<Appointment>
 		get() {
@@ -34,29 +25,21 @@ class Week(_time: LocalDate, Monday: Day, Tuesday: Day, Wednesday: Day, Thursday
 		}
 	
 	val allDays: Map<DayOfWeek, Day> = mapOf(
-		DayOfWeek.MONDAY to Monday,
-		DayOfWeek.TUESDAY to Tuesday,
-		DayOfWeek.WEDNESDAY to Wednesday,
-		DayOfWeek.THURSDAY to Thursday,
-		DayOfWeek.FRIDAY to Friday,
-		DayOfWeek.SATURDAY to Saturday,
-		DayOfWeek.SUNDAY to Sunday
+		DayOfWeek.MONDAY to days[0],
+		DayOfWeek.TUESDAY to days[1],
+		DayOfWeek.WEDNESDAY to days[2],
+		DayOfWeek.THURSDAY to days[3],
+		DayOfWeek.FRIDAY to days[4],
+		DayOfWeek.SATURDAY to days[5],
+		DayOfWeek.SUNDAY to days[6]
 	)
 	
 	fun getAllAppointmentsSorted(): Map<Type, Int> {
 		val list = mutableMapOf<Type, Int>()
 		for(appointment in appointments) {
-			list[appointment.type] = list[appointment.type]?.plus(1) ?: 1
+			list[appointment.type.value] = list[appointment.type.value]?.plus(1) ?: 1
 		}
 		return list
-	}
-	
-	fun addAppointments(list: List<Appointment>) {
-		val appointmentList = mutableMapOf<DayOfWeek, MutableList<Appointment>?>()
-		list.forEach { appointmentList[Timing.fromUTCEpochMinuteToLocalDateTime(it.start).dayOfWeek]?.add(it) ?: listOf(it) }
-		for((key, value) in appointmentList) {
-			allDays[key]?.appointments?.addAll(value ?: listOf())
-		}
 	}
 	
 	override fun toString(): String = "$time $notes $allDays"
@@ -67,7 +50,7 @@ data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisp
 	
 	var appointments: MutableList<Appointment> = mutableListOf()
 	
-	override var notes: ObservableList<Note> = FXCollections.observableArrayList()
+	override var notes: MutableList<Note> = mutableListOf()
 	
 	fun getAppointmentsLimited(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
 	

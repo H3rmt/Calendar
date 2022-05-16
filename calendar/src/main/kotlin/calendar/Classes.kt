@@ -1,7 +1,5 @@
 package calendar
 
-import calendar.File.Files.referrersOn
-import javafx.collections.*
 import javafx.scene.paint.*
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -9,63 +7,8 @@ import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.DayOfWeek
-import java.time.DayOfWeek.FRIDAY
-import java.time.DayOfWeek.MONDAY
-import java.time.DayOfWeek.SATURDAY
-import java.time.DayOfWeek.SUNDAY
-import java.time.DayOfWeek.THURSDAY
-import java.time.DayOfWeek.TUESDAY
-import java.time.DayOfWeek.WEDNESDAY
 import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlin.collections.set
-
-interface CellDisplay {
-	val notes: MutableList<Note>
-	
-	val time: LocalDate
-}
-
-class Week(override val time: LocalDate, days: List<Day>, val WeekOfYear: Int, override val notes: ObservableList<Note>): CellDisplay {
-	
-	val appointments: List<Appointment>
-		get() {
-			val list = mutableListOf<Appointment>()
-			for(day in allDays.values) {
-				list.addAll(day.appointments)
-			}
-			return list
-		}
-	
-	val allDays: Map<DayOfWeek, Day> = mapOf(
-		MONDAY to days[0], TUESDAY to days[1], WEDNESDAY to days[2], THURSDAY to days[3], FRIDAY to days[4], SATURDAY to days[5], SUNDAY to days[6]
-	)
-	
-	fun getAllAppointmentsSorted(): Map<Type, Int> {
-		val list = mutableMapOf<Type, Int>()
-		for(appointment in appointments) {
-			list[appointment.type.value] = list[appointment.type.value]?.plus(1) ?: 1
-		}
-		return list
-	}
-	
-	override fun toString(): String = "$time $notes $allDays"
-}
-
-
-data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisplay {
-	
-	var appointments: MutableList<Appointment> = mutableListOf()
-	
-	override var notes: MutableList<Note> = mutableListOf()
-	
-	fun getAppointmentsLimited(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
-	
-	override fun toString(): String = "$time $notes $appointments"
-}
-
-
 
 class Appointment(id: EntityID<Long>): LongEntity(id) {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)

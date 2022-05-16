@@ -1,7 +1,6 @@
 package calendar
 
 import javafx.collections.*
-import javafx.scene.control.*
 import listen
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
@@ -284,9 +283,7 @@ object FileTable: LongIdTable() {
 	val note = reference("note", NoteTable)
 }
 
-object Files: DBObservableList<File>(File.Files) {
-
-}
+object Files: DBObservableList<File>(File.Files)
 
 object ReminderTable: LongIdTable() {
 	val time = long("time") //.nullable() // not nullable, TODO clone appointment time and always use it (ask when editing appointment if reminder should be moved)
@@ -295,9 +292,7 @@ object ReminderTable: LongIdTable() {
 	val description = text("description")
 }
 
-object Reminders: DBObservableList<Reminder>(Reminder.Reminders) {
-
-}
+object Reminders: DBObservableList<Reminder>(Reminder.Reminders)
 
 object TypeTable: IntIdTable() {
 	val name = text("name")
