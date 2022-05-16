@@ -84,7 +84,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 					label("") {
 						addClass(GlobalStyles.tableItem_)
 						style {
-							minWidth = 85.px // TODO get from cell (split cell)
+							minWidth = 85.px // TODO get from cell (split cell styles)
 						}
 					}
 					for(header in arrayListOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")) {
@@ -487,7 +487,7 @@ fun generateWeekGraphic(week: Week, pane: Pane, animations: Array<MutableList<An
 	for((index, appointmentEntry) in week.getAllAppointmentsSorted().entries.withIndex()) {
 		pane.hbox(alignment = Pos.CENTER_LEFT, spacing = SPACING) {
 			circle(radius = CIRCLE_WIDTH / 2) {
-				fill = appointmentEntry.key.color
+				fill = appointmentEntry.key.color.value // TODO bind
 			}
 			label("${appointmentEntry.value}:${appointmentEntry.key.name}") {
 				addClass(OverviewStyles.cellAppointTypeLabel_)
@@ -563,7 +563,7 @@ fun generateAppointmentsGraphic(day: Day, pane: Pane, animations: Array<MutableL
 	
 	for((index, appointment) in appointments.withIndex()) {
 		pane.circle(radius = topCircleWidth / 2) {
-			fill = appointment.type.color
+			fill = appointment.type.value.color.value // bind
 			centerY = VERTICAL_TOP_MARGIN
 			centerX = xCords[index]
 		}

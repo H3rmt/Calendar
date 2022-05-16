@@ -11,7 +11,7 @@ import tornadofx.*
 
 
 fun EventTarget.appointmentPicker(
-	appointments: List<Appointment>,
+	appointments: List<Appointment>, // TODO make this observable
 	appointment: Property<Appointment?> = SimpleObjectProperty<Appointment?>(null),
 	op: AppointmentPicker.() -> Unit = {}
 ): AppointmentPicker {

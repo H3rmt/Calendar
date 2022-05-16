@@ -1,10 +1,11 @@
 package frame.popup
 
 import calendar.Appointment
-import calendar.Timing
 import calendar.Timing.toUTCEpochMinute
-import calendar.getTypes
+import calendar.Type
+import calendar.Types
 import frame.styles.GlobalStyles
+import frame.typeCombobox
 import javafx.beans.property.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*
@@ -19,24 +20,25 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 
+
 class AppointmentPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
 	
 	private var appointment: Appointment? = scope.appointment
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
-	private var start: Property<LocalDateTime> = (appointment?.start?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it) } ?: scope.start).toProperty()
-	private var end: Property<LocalDateTime> = (appointment?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it.start + it.duration) } ?: scope.end).toProperty()
-	private var appointmentTitle: Property<String> = (appointment?.title ?: "").toProperty()
-	private var description: Property<String> = (appointment?.description ?: "").toProperty()
-	private var type: Property<String> = (appointment?.type?.name ?: "").toProperty()
+	private var start: Property<LocalDateTime> = appointment?.start?.clone() ?: scope.start.toProperty()
+	private var end: Property<LocalDateTime> = appointment?.end?.clone() ?: scope.end.toProperty()
+	private var appointmentTitle: Property<String> = appointment?.title?.clone() ?: "".toProperty()
+	private var description: Property<String> = appointment?.description?.clone() ?: "".toProperty()
+	private var type: Property<Type> = appointment?.type?.clone() ?: Types.random().toProperty()
+	private var wholeDay: Property<Boolean> = appointment?.allDay?.clone() ?: false.toProperty()
 	
 	private var onSave: (Appointment) -> Unit = scope.save
 	
 	private var error: Property<String> = "".toProperty()
-	private var wholeDay: Property<Boolean> = (appointment?.allDay ?: false).toProperty()
 	private var control: BorderPane? = null
-	private var day: Property<LocalDate> = (appointment?.start?.let { Timing.fromUTCEpochMinuteToLocalDateTime(it).toLocalDate() } ?: scope.start.toLocalDate()).toProperty()
+	private var day: Property<LocalDate> = (appointment?.start?.value ?: scope.start).toLocalDate().toProperty()
 	
 	private var windowTitle: String = scope.title
 	private var saveTitle: String = scope.saveTitle
@@ -57,46 +59,48 @@ class AppointmentPopup: Fragment() {
 	private fun updateAppointment() {
 		if(wholeDay.value) {
 			appointment?.let { app ->
-				app.title = appointmentTitle.value
-				app.description = description.value
-				app.start = day.value.toUTCEpochMinute()
-				app.duration = 1439
-				app.type = getTypes().find { it.name == type.value }!!
-				app.allDay = true
+				app.start.set(day.value.atStartOfDay())
+				app.end.set(day.value.plusDays(1).atStartOfDay().minusMinutes(1))
+				app.title.set(appointmentTitle)
+				app.description.set(description)
+				app.type.set(type)
+				app.allDay.set(true)
 			}
 		} else {
 			appointment?.let { app ->
-				app.title = appointmentTitle.value
-				app.description = description.value
-				app.start = start.value.toUTCEpochMinute()
-				app.duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute()
-				app.type = getTypes().find { it.name == type.value }!!
-				app.allDay = false
+				app.start.set(start)
+				app.end.set(end)
+				app.title.set(appointmentTitle)
+				app.description.set(description)
+				app.type.set(type)
+				app.allDay.set(true)
 			}
 		}
 	}
 	
 	private fun createAppointment(): Appointment = if(wholeDay.value) {
-		Appointment.new( // duration irrelevant
-			_start = day.value.atStartOfDay().toUTCEpochMinute(),
-			_duration = 1439, _title = appointmentTitle.value,
-			_description = description.value, _type = getTypes().find { it.name == type.value }!!,
-			_addDay = true
+		Appointment.new(
+			_start = day.value.atStartOfDay(),
+			_end = day.value.plusDays(1).atStartOfDay().minusMinutes(1),
+			_title = appointmentTitle.value,
+			_description = description.value,
+			_type = type.value,
+			_allDay = true
 		)
 	} else {
 		Appointment.new(
-			_start = start.value.toUTCEpochMinute(),
-			_duration = end.value.toUTCEpochMinute() - start.value.toUTCEpochMinute(),
+			_start = start.value,
+			_end = end.value,
 			_title = appointmentTitle.value,
-			_description = description.value, _type = getTypes().find { it.name == type.value }!!
+			_description = description.value,
+			_type = type.value,
+			_allDay = false
 		)
 	}
 	
 	@Suppress("ReturnCount")
 	private fun checkAppointment(): String? {
-		if(type.value == "") {
-			return "missing type".translate(Language.TranslationTypes.AppointmentPopup)
-		} else if(appointmentTitle.value.isEmpty()) {
+		if(appointmentTitle.value.isEmpty()) {
 			return "missing title".translate(Language.TranslationTypes.AppointmentPopup)
 		} else if(end.value.toUTCEpochMinute() < start.value.toUTCEpochMinute()) {
 			return "start must be before end".translate(Language.TranslationTypes.AppointmentPopup)
@@ -114,8 +118,8 @@ class AppointmentPopup: Fragment() {
 		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
 			field("Type") {
-				combobox(values = getTypes().map { it.name }, property = type)
-				checkbox(getLangString("Whole day"), property = wholeDay) {
+				typeCombobox(type)
+				checkbox("whole day".translate(Language.TranslationTypes.AppointmentPopup), property = wholeDay) {
 					style {
 						padding = box(0.px, 0.px, 0.px, 40.px)
 					}

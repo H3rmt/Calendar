@@ -29,9 +29,15 @@ dependencies {
 	implementation 'org.jetbrains.exposed:exposed-jdbc:0.37.3'
 	implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
 	implementation 'org.slf4j:slf4j-api:1.7.36' // for logging for exposed
-	implementation 'org.slf4j:slf4j-simple:1.7.36' // for logging for exposed
+	implementation 'org.slf4j:slf4j-simple:1.7.36'
+	implementation 'org.junit.jupiter:junit-jupiter:5.8.1'// for logging for exposed
+
+	testImplementation 'org.jetbrains.kotlin:kotlin-test'
 }
 
+test {
+	useJUnitPlatform()
+}
 
 application {
 	mainClass = 'StartKt'

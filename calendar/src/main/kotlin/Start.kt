@@ -2,6 +2,7 @@ import calendar.initDb
 import calendar.loadCalendarData
 import frame.frameInit
 import javafx.beans.value.*
+import javafx.collections.*
 import logic.LogType
 import logic.configs
 import logic.initConfigs
@@ -35,8 +36,7 @@ fun init() {
 	
 	initDb()
 	
-	log("preparing Appointments", LogType.IMPORTANT)
-	log("preparing Notes", LogType.IMPORTANT)
+	log("preparing Data", LogType.IMPORTANT)
 	loadCalendarData()
 }
 
@@ -45,10 +45,10 @@ fun <T> T.lg(): T {
 	return this
 }
 
-fun <T> ObservableValue<T>.lgListen(): ObservableValue<T> {
+fun <T: ObservableValue<*>> T.lgListen(): T {
 	println("lgListen on: $this ")
-	this.addListener { ob, _, _ ->
-		println("lgListen:", ob)
+	listen2 { old, new ->
+		println("lgListen ($this): $old -> $new")
 	}
 	return this
 }
@@ -57,6 +57,44 @@ fun <T> ObservableValue<T>.listen(once: Boolean = false, listener: (new: T) -> U
 	lateinit var lst: ChangeListener<T>
 	lst = ChangeListener<T> { _, _, newValue ->
 		listener(newValue)
+		if(once)
+			this.removeListener(lst)
+		
+	}
+	addListener(lst)
+}
+
+fun <F, T: ObservableList<F>> T.listen(listener: (new: ListChangeListener.Change<out F>) -> Unit) {
+	addListener(ListChangeListener { change ->
+		listener(change)
+	})
+}
+
+fun <T: ObservableList<*>> T.lgListen(name: String = ""): T {
+	addListener(ListChangeListener { change ->
+		println("change ${name.ifEmpty { "ObservableValue" }} ($this): ")
+		while(change.next()) {
+			when(true) {
+				change.wasAdded() -> {
+					println("\tadded ${change.addedSubList} ")
+				}
+				change.wasRemoved() -> {
+					println("\tremoved ${change.removed} ")
+				}
+				change.wasUpdated() -> {
+					println("\tupdated ${change.list}")
+				}
+				else -> {}
+			}
+		}
+	})
+	return this
+}
+
+fun <T> ObservableValue<T>.listen2(once: Boolean = false, listener: (new: T, old: T) -> Unit) {
+	lateinit var lst: ChangeListener<T>
+	lst = ChangeListener<T> { _, oldValue, newValue ->
+		listener(newValue, oldValue)
 		if(once)
 			this.removeListener(lst)
 	}

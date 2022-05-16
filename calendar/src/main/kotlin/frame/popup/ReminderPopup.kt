@@ -1,10 +1,8 @@
 package frame.popup
 
 import calendar.Appointment
+import calendar.Appointments
 import calendar.Reminder
-import calendar.Timing
-import calendar.Timing.toUTCEpochMinute
-import calendar.getAppointments
 import frame.styles.GlobalStyles
 import frame.toggleSwitch
 import javafx.beans.property.*
@@ -28,49 +26,54 @@ class ReminderPopup: Fragment() {
 	private var reminder: Reminder? = scope.reminder
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
-	private var reminderTitle: Property<String> = (reminder?.title ?: "").toProperty()
-	private var end: Property<LocalDateTime> = (reminder?.let { it.time?.let { it1 -> Timing.fromUTCEpochMinuteToLocalDateTime(it1) } } ?: scope.end).toProperty()
-	private var reminderDescription: Property<String> = (reminder?.title ?: "").toProperty()
+	private var time: Property<LocalDateTime> = reminder?.time?.clone() ?: scope.end.toProperty()
+	private var reminderTitle: Property<String> = reminder?.title?.clone() ?: "".toProperty()
+	private var description: Property<String> = reminder?.description?.clone() ?: "".toProperty()
+	private var appointment: Property<Appointment?> = reminder?.appointment?.clone() ?: SimpleObjectProperty()
 	
 	private var onSave: (Reminder) -> Unit = scope.save
 	
 	private var error: Property<String> = "".toProperty()
-	
 	private var windowTitle: String = scope.title
-	private var saveTitle: String = scope.saveTitle
 	
+	private var saveTitle: String = scope.saveTitle
 	private var toggle: Property<Boolean> = scope.timeOrAppointment.toProperty()
 	private var toggleName: Property<String> = "".toProperty()
 	private var control: BorderPane? = null
-	private var appointment: Property<Appointment?> = SimpleObjectProperty(null)
 	
 	init {
 		appointment.listen {
 			if(it != null)
-				end.value = Timing.fromUTCEpochMinuteToLocalDateTime(it.start)
+				time.value = it.start.value
 			else
-				end.value = scope.end
+				time.value = scope.end
 		}
 	}
 	
 	private fun updateDisplay(toggle: Boolean) {
 		if(toggle) {
 			toggleName.value = "Appointment"
-			control?.left = appointmentPicker(getAppointments(), appointment = appointment)
+			control?.left = appointmentPicker(Appointments, appointment = appointment)
 		} else {
 			toggleName.value = "Date"
-			control?.left = dateTimePicker(dateTime = end)
+			control?.left = dateTimePicker(dateTime = time)
 		}
 	}
 	
 	private fun updateReminder() {
 		reminder?.let { rem ->
-			rem.title = reminderTitle.value
+			rem.time.set(time)
+			rem.title.set(reminderTitle)
+			rem.description.set(description)
+			rem.appointment.set(appointment)
 		}
 	}
 	
 	private fun createReminder(): Reminder = Reminder.new(
-		end.value.toUTCEpochMinute(), reminderTitle.value, reminderDescription.value,
+		_time = time.value,
+		_appointment = appointment.value,
+		_title = reminderTitle.value,
+		_description = description.value,
 	)
 	
 	private fun checkReminder(): String? {
@@ -117,7 +120,7 @@ class ReminderPopup: Fragment() {
 					minHeight = 60.px
 					padding = box(0.px, 0.px, 20.px, 0.px)
 				}
-				textarea(reminderDescription) {
+				textarea(description) {
 					addClass(GlobalStyles.maxHeight_)
 				}
 			}
