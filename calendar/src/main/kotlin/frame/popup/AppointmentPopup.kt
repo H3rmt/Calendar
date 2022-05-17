@@ -175,9 +175,9 @@ class AppointmentPopup: Fragment() {
 	}
 	
 	init {
-		wholeDay.listen {
+		wholeDay.listen({
 			updateDisplay(it)
-		}
+		})
 		updateDisplay(wholeDay.value)
 	}
 	

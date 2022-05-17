@@ -4,11 +4,8 @@ import Day
 import Week
 import calendar.Timing.toUTCEpochMinute
 import com.sun.javafx.collections.ObservableListWrapper
-import frame.TranslatingSimpleStringProperty
 import javafx.beans.property.*
-import javafx.collections.*
 import lgListen
-import logic.Language
 import logic.LogType
 import logic.log
 import org.jetbrains.exposed.dao.Entity
@@ -19,25 +16,6 @@ import java.time.LocalDateTime
 import java.time.temporal.IsoFields
 
 
-val now: LocalDateTime = Timing.getNowLocal()
-
-var overviewTime: LocalDate = Timing.getNowLocal().toLocalDate()
-val overviewWeeks: ObservableList<Week> = FXCollections.observableArrayList()
-val overviewTitle: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty(type = Language.TranslationTypes.Global)
-
-/**
- * called by buttons in calendar tab
- * and on startup
- */
-fun changeMonth(right: Boolean) {
-	overviewTime = overviewTime.plusMonths(if(right) 1 else -1)
-	loadCalendarData()
-}
-
-/**
- * called at initialization
- * and loads 3 months and week appointments
- */
 fun loadCalendarData() {
 	// load everything
 	Appointments.lgListen("Appointments").reload()
@@ -45,12 +23,6 @@ fun loadCalendarData() {
 	Files.lgListen("Files").reload()
 	Reminders.lgListen("Reminders").reload()
 	Types.lgListen("Types").reload()
-	
-	
-	// Overview TODO move this somewhere else
-	overviewTitle.set(overviewTime.month.name)
-	log("set Month to ${overviewTime.month.name}")
-	overviewWeeks.setAll(generateMonth(overviewTime))
 }
 
 fun generateMonth(_time: LocalDate): MutableList<Week> {

@@ -42,12 +42,12 @@ class ReminderPopup: Fragment() {
 	private var control: BorderPane? = null
 	
 	init {
-		appointment.listen {
+		appointment.listen({
 			if(it != null)
 				time.value = it.start.value
 			else
 				time.value = scope.end
-		}
+		})
 	}
 	
 	private fun updateDisplay(toggle: Boolean) {
@@ -164,9 +164,9 @@ class ReminderPopup: Fragment() {
 	
 	
 	init {
-		toggle.listen {
+		toggle.listen({
 			updateDisplay(it)
-		}
+		})
 		updateDisplay(toggle.value)
 	}
 	

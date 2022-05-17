@@ -79,9 +79,9 @@ class AppointmentPicker(appointment: Appointment?, appointments: List<Appointmen
 			}
 		}
 		
-		appointmentProperty.listen {
+		appointmentProperty.listen({
 			textField.text = "${it?.title ?: ""} ${it?.description ?: ""}"
-		}
+		})
 		
 		popup.autoHideProperty().set(true)
 	}

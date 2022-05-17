@@ -4,7 +4,6 @@ import Day
 import Week
 import calendar.Appointment
 import calendar.Timing
-import calendar.now
 import frame.popup.AppointmentPopup
 import frame.styles.GlobalStyles
 import frame.styles.TabStyles
@@ -82,17 +81,17 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 						isPannable = true
 						
 						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-						widthProperty().listen(once = true) {
+						widthProperty().listen({
 							lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-								bar.visibleProperty().listen { visible ->
+								bar.visibleProperty().listen({ visible ->
 									if(visible) {
 										scrollbarWidth.value = 13.3 + 2 // 13.3 = scrollpane  scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 									} else {
 										scrollbarWidth.value = 2.0 //scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
 									}
-								}
+								})
 							}
-						}
+						}, once = true)
 						
 						hbox {
 							addClass(GlobalStyles.background_)

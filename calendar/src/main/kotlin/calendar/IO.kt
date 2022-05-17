@@ -68,15 +68,15 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		// add listener to every value of appointment that is evaluated in condition
 		// to check again if appointment should be added or removed from returned list
 		val addChangeChecks: (Appointment) -> Unit = { appointment ->
-			appointment.start.listen {
+			appointment.start.listen({
 				check(appointment)
-			}
-			appointment.end.listen {
+			})
+			appointment.end.listen({
 				check(appointment)
-			}
-			appointment.week.listen {
+			})
+			appointment.week.listen({
 				check(appointment)
-			}
+			})
 		}
 		
 		// add checks to all current appointments in list
@@ -96,7 +96,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	}
 	
 	/**
-	 * returns an observable List containing non Week Appointments within timespan that gets updated every time
+	 * returns an observable List containing non Week Appointments within timespan and Week Appointments at that day that gets updated every time
 	 * - the list of Notes change
 	 * - time of any note changes and it (Note) fulfills the timespan condition
 	 *
@@ -126,15 +126,15 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		// add listener to every value of appointment that is evaluated in condition
 		// to check again if appointment should be added or removed from returned list
 		val addChangeChecks: (Appointment) -> Unit = { appointment ->
-			appointment.start.listen {
+			appointment.start.listen({
 				check(appointment)
-			}
-			appointment.end.listen {
+			})
+			appointment.end.listen({
 				check(appointment)
-			}
-			appointment.week.listen {
+			})
+			appointment.week.listen({
 				check(appointment)
-			}
+			})
 		}
 		
 		// add checks to all current appointments in list
@@ -168,7 +168,7 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 	/**
 	 * returns an observable List containing non Week Notes at this time that gets updated every time
 	 * - the list of Notes change
-	 * - time of any note changes and it (Note) fulfills the timespan condition
+	 * - time of any note changes and it (Note) fulfills the time condition
 	 *
 	 * listeners for any new Notes added after creation of the list get added automatically
 	 */
@@ -196,12 +196,12 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		// add listener to every value of note that is evaluated in condition
 		// to check again if note should be added or removed from returned list
 		val addChangeChecks: (Note) -> Unit = { note ->
-			note.time.listen {
+			note.time.listen({
 				check(note)
-			}
-			note.week.listen {
+			})
+			note.week.listen({
 				check(note)
-			}
+			})
 		}
 		
 		// add checks to all current notes in list
@@ -251,12 +251,12 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		// add listener to every value of note that is evaluated in condition
 		// to check again if note should be added or removed from returned list
 		val addChangeChecks: (Note) -> Unit = { note ->
-			note.time.listen {
+			note.time.listen({
 				check(note)
-			}
-			note.week.listen {
+			})
+			note.week.listen({
 				check(note)
-			}
+			})
 		}
 		
 		// add checks to all current notes in list

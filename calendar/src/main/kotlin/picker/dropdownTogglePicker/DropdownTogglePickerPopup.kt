@@ -30,9 +30,9 @@ class DropdownTogglePickerPopup(toggles: ObservableList<DropdownToggle>, change:
 							}
 							for(toggle in toggles) {
 								checkbox(toggle.name, toggle.selected)
-								toggle.selected.listen {
+								toggle.selected.listen({
 									change(toggle)
-								}
+								})
 							}
 						}
 					}

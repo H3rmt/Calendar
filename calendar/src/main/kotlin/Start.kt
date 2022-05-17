@@ -53,7 +53,8 @@ fun <T: ObservableValue<*>> T.lgListen(): T {
 	return this
 }
 
-fun <T> ObservableValue<T>.listen(once: Boolean = false, listener: (new: T) -> Unit) {
+// TODO add run instantly
+fun <T> ObservableValue<T>.listen(listener: (new: T) -> Unit, once: Boolean = false) {
 	lateinit var lst: ChangeListener<T>
 	lst = ChangeListener<T> { _, _, newValue ->
 		listener(newValue)

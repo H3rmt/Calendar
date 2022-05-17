@@ -51,7 +51,7 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					isDisable = true
 					
 					// disables button if no type selected or type already added
-					addType.valueProperty().listen { new -> isDisable = (new == null) || noteTabs.any { it.text == new.name.value } }
+					addType.valueProperty().listen({ new -> isDisable = (new == null) || noteTabs.any { it.text == new.name.value } })
 					addClass(TabStyles.titleButton_)
 				}
 			}
@@ -135,7 +135,7 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 			}
 		}
 		contentDisplay = ContentDisplay.RIGHT
-		expandedProperty().listen { new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
+		expandedProperty().listen({ new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY })
 		
 		htmleditor(text) {
 			addClass(GlobalStyles.disableFocusDraw_)

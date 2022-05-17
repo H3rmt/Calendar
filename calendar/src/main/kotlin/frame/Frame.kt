@@ -104,11 +104,10 @@ class Window: App(
 		stage.height = 600.0
 		stage.width = 800.0
 		super.start(stage)
-		removeLoading()
 		log("started Frame", LogType.NORMAL)
+		removeLoading()
+//		TabManager.openTab("reminders", ::createReminderTab)
 		TabManager.openTab("calendar", ::createOverviewTab)
-		TabManager.openTab("reminders", ::createReminderTab)
-		
 	}
 }
 
