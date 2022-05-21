@@ -42,3 +42,4 @@ A desktop calendar written in [Kotlin](https://github.com/edvin/tornadofx) with 
 - Improved Reminder Overview
 - Global notes
 - Notes overview
+- Global TODOs
