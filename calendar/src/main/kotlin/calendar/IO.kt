@@ -1,8 +1,8 @@
 package calendar
 
 import javafx.collections.*
-import javafx.scene.control.*
 import listen
+import logic.Files
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Database
@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 
 
 fun initDb() {
-	Database.connect("jdbc:sqlite:data/data.sqlite")
+	Database.connect("jdbc:sqlite:${Files.DBfile}")
 	// user = "myself", password = "secret")
 	transaction {
 		SchemaUtils.createMissingTablesAndColumns(AppointmentTable, FileTable, NoteTable, ReminderTable, TypeTable)

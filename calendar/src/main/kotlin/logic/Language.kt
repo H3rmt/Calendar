@@ -19,7 +19,7 @@ class Language(private val language: AvailableLanguages) {
 	 * in translations Map
 	 */
 	init {
-		val file = File({}::class.java.classLoader.getResource("${ConfigFiles.languageFiles}/$language.json").toURI())
+		val file = File({}::class.java.classLoader.getResource("lang/$language.json")?.toURI() ?: throw Exit("?????"))
 		if(!file.exists()) {
 			file.createNewFile()
 			file.writeText(EMPTY_LANGUAGE)
@@ -52,11 +52,6 @@ class Language(private val language: AvailableLanguages) {
 			tr // return requested string to translate
 		}
 	}
-	
-	private fun transformClassname(name: String) = name.removeRange(
-		name.indexOf('$').let { return@let if(it == -1) 0 else it },
-		name.length
-	)
 	
 	fun info(): String = "Language: $language loaded ${translations.values.sumOf { it.size }} Translations"
 	

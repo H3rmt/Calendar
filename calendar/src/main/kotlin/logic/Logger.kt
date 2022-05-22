@@ -52,7 +52,7 @@ fun initLogger() {
 		addHandler(consoleHandler)
 		log("added console Handler")
 		
-		fileHandler = FileHandler(ConfigFiles.logfile)
+		fileHandler = FileHandler(Files.logfile)
 		fileHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		fileHandler.level = Level.ALL
 		
