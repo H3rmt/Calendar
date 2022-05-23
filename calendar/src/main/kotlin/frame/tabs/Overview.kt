@@ -8,6 +8,7 @@ import calendar.Appointments
 import calendar.Notes
 import calendar.Reminder
 import calendar.Timing
+import calendar.Type
 import frame.TabManager
 import frame.createFXImage
 import frame.popup.ReminderPopup
@@ -22,7 +23,6 @@ import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.image.*
 import javafx.scene.layout.*
-import javafx.scene.paint.*
 import javafx.scene.shape.*
 import javafx.scene.text.*
 import javafx.util.*
@@ -137,14 +137,14 @@ fun createOverviewTab(pane: TabPane): Tab {
 						addClass(GlobalStyles.background_)
 						
 						val update = { new: LocalDate ->
+							clear()
+							
 							// get date of first visible cell
 							var time: LocalDate = new.withDayOfMonth(1).with(ChronoField.DAY_OF_WEEK, 1)
 							// loop until last week with day in this month is complete
 							do {
 								// week box
 								hbox(spacing = 5.0, alignment = Pos.CENTER) {
-									val appointments: ObservableList<Appointment> =
-										Appointments.getAppointmentsFromTo(time.atStartOfDay(), time.plusWeeks(1).atStartOfDay(), time.dayOfWeek).lgListen("appts f we")
 									// week cell
 									vbox {
 										addClass(GlobalStyles.tableItem_)
@@ -157,18 +157,18 @@ fun createOverviewTab(pane: TabPane): Tab {
 											}
 											anchorpane {
 												gridpaneConstraints {
-													columnRowIndex(0, 0)
+													columnIndex = 0
 												}
 											}
 											label(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR).toString()) {
 												gridpaneConstraints {
-													columnRowIndex(1, 0)
+													columnIndex = 1
 												}
 												addClass(OverviewStyles.cellLabel_)
 											}
 											anchorpane {
 												gridpaneConstraints {
-													columnRowIndex(2, 0)
+													columnIndex = 2
 												}
 												
 												// update images on notes updates
@@ -204,17 +204,67 @@ fun createOverviewTab(pane: TabPane): Tab {
 											}
 										}
 										
-										val pane = pane {
+										vbox(spacing = 1, alignment = Pos.TOP_LEFT) {
 											style(append = true) {
-												backgroundColor += Color.AQUA
-												prefHeight = DETAILSPANMINHEIGHT.px
+//												backgroundColor += Color.AQUA
+//												prefHeight = DETAILSPANMINHEIGHT.px
+											}
+											
+											// just rerender whole day on change (doesn't make a difference here,
+											// to append to pane on add and remove on remove)
+											val update = { appointments: List<Appointment> ->
+												clear()
+												val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
+												
+												val list = mutableMapOf<Type, Int>()
+												for(appointment in appointments) {
+													list[appointment.type.value] = list[appointment.type.value]?.plus(1) ?: 1
+												}
+												
+												for((index, typeCount) in list.entries.withIndex()) {
+													label {
+														val update = { title: String ->
+															text = "$title: ${typeCount.value}"
+														}
+														val title = typeCount.key.name
+														update(title.value)
+														title.listen({
+															update(it)
+														})
+														
+														val update2 = { color: javafx.scene.paint.Color ->
+															textFill = color
+														}
+														val color = typeCount.key.color
+														update2(color.value)
+														color.listen({
+															update2(it)
+														})
+														
+														addClass(OverviewStyles.cellAppointLabel_)
+//															translateX = HORIZONTAL_LEFT_MARGIN + CIRCLE_WIDTH
+//															translateY = SIDE_TOP_MARGIN + index * (SPACING + CIRCLE_WIDTH) - CIRCLE_WIDTH / 1.1
+														
+														maxWidth = width - HORIZONTAL_LEFT_MARGIN - CIRCLE_WIDTH
+														ellipsisString = ".."
+														textOverrun = OverrunStyle.ELLIPSIS
+													}
+												}
+											}
+											
+											val appointments: ObservableList<Appointment> =
+												Appointments.getAppointmentsFromTo(time.atStartOfDay(), time.plusWeeks(1).atStartOfDay(), time.dayOfWeek).lgListen("appts f we")
+											
+											update(appointments)
+											appointments.listen { change ->
+												update(change.list)
 											}
 										}
 									}
 									
 									// day cells
 									do {
-										vbox {
+										vbox(alignment = Pos.TOP_LEFT) {
 											addClass(GlobalStyles.tableItem_)
 											addClass(OverviewStyles.cell_)
 											if(time.month != new.month)
@@ -225,10 +275,9 @@ fun createOverviewTab(pane: TabPane): Tab {
 													padding = box(0.px, 3.px, 2.px, 3.px)
 												}
 												anchorpane {
-													gridpaneConstraints { // TODO check if necessary
-														columnRowIndex(0, 0)
+													gridpaneConstraints {
+														columnIndex = 0
 													}
-													
 													val defaultImg = createFXImage("remind.svg")
 													val hoveredImg = createFXImage("remind hovered.svg")
 													
@@ -242,15 +291,16 @@ fun createOverviewTab(pane: TabPane): Tab {
 												}
 												label(time.dayOfMonth.toString()) {
 													gridpaneConstraints {
-														columnRowIndex(1, 0)
+														columnIndex = 1
 													}
 													addClass(OverviewStyles.cellLabel_)
 												}
 												anchorpane {
 													gridpaneConstraints {
-														columnRowIndex(2, 0)
+														columnIndex = 2
 													}
 													
+													// update images on notes updates
 													lateinit var img: Image
 													lateinit var hoveredImg: Image
 													val update = { empty: Boolean ->
@@ -282,11 +332,60 @@ fun createOverviewTab(pane: TabPane): Tab {
 													onMouseExited = EventHandler { imgView.image = img }
 												}
 											}
+											vbox {
+												style(append = true) {
+//													backgroundColor += Color.AQUA
+//													prefHeight = DETAILSPANMINHEIGHT.px
+												}
+												
+												// just rerender whole day on change (doesn't make a difference here,
+												// to append to pane on add and remove on remove)
+												val update = { appointments: List<Appointment> ->
+													clear()
+													val width = (if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
+													
+													for((index, appointment) in appointments.withIndex()) {
+														label {
+															val update = { title: String ->
+																text = title
+															}
+															val title = appointment.title
+															update(title.value)
+															title.listen({
+																update(it)
+															})
+															
+															val update2 = { color: javafx.scene.paint.Color ->
+																textFill = color
+															}
+															val color = appointment.type.value.color
+															update2(color.value)
+															color.listen({
+																update2(it)
+															})
+															
+															addClass(OverviewStyles.cellAppointLabel_)
+//															translateX = HORIZONTAL_LEFT_MARGIN + CIRCLE_WIDTH
+//															translateY = SIDE_TOP_MARGIN + index * (SPACING + CIRCLE_WIDTH) - CIRCLE_WIDTH / 1.1
+															
+															maxWidth = width - HORIZONTAL_LEFT_MARGIN - CIRCLE_WIDTH
+															ellipsisString = ".."
+															textOverrun = OverrunStyle.ELLIPSIS
+														}
+													}
+												}
+												
+												val appointments = Appointments.getAppointmentsFromTo(time.atStartOfDay(), time.plusDays(1).atStartOfDay(), time.dayOfWeek)
+												update(appointments)
+												appointments.listen { change ->
+													update(change.list)
+												}
+											}
 										}
 										time = time.plusDays(1)
 									} while(time.dayOfWeek != DayOfWeek.MONDAY)
 								}
-							} while(time.month == new.month || time.dayOfWeek != DayOfWeek.MONDAY)
+							} while(time.month == new.month)
 						}
 						update(overviewTime.value)
 						overviewTime.listen(update)
