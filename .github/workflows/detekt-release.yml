@@ -4,8 +4,8 @@ on:
   push:
     branches: [ release ]
    
- jobs:
-   scanRelease:
+jobs:
+  scanRelease:
     name: ScanRelease
     runs-on: ubuntu-latest
   
