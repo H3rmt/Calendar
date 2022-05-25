@@ -391,7 +391,7 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 		}
 		
 	}
-	val color: DBObservableD<Color, String> = object: DBObservableD<Color, String>() {
+	val color: DBObservableBase<Color, String> = object: DBObservableBase<Color, String>() {
 		override fun convertFrom(value: Color): String = value.toString()
 		override fun convertTo(value: String): Color = Color.valueOf(value)
 		override fun abstractGet(): String = dbColor
