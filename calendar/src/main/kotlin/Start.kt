@@ -1,27 +1,24 @@
 import calendar.initDb
 import calendar.loadCalendarData
 import frame.frameInit
-import javafx.beans.value.*
-import javafx.collections.*
-import logic.LogType
-import logic.configs
-import logic.initConfigs
-import logic.initLogger
-import logic.log
-import logic.updateLogger
+import javafx.beans.value.ChangeListener
+import javafx.beans.value.ObservableValue
+import javafx.collections.ListChangeListener
+import javafx.collections.ObservableList
+import logic.*
 import kotlin.system.exitProcess
 
 fun main() {
 	println("\nStarting Calendar... \n")
-	
+
 	initLogger()
 	log("initialised Logger", LogType.IMPORTANT)
-	
+
 	init()
-	
+
 	log("starting Frame", LogType.IMPORTANT)
 	frameInit()
-	
+
 	log("exiting Frame", LogType.IMPORTANT)
 	exitProcess(0)
 }
@@ -29,13 +26,13 @@ fun main() {
 fun init() {
 	initConfigs()
 	log("read Configs:$configs", LogType.IMPORTANT)
-	
+
 	log("Updating Logger with config data", LogType.IMPORTANT)
 	updateLogger()
 	log("Updated Logger", LogType.IMPORTANT)
-	
+
 	initDb()
-	
+
 	log("preparing Data", LogType.IMPORTANT)
 	loadCalendarData()
 }
@@ -53,16 +50,25 @@ fun <T: ObservableValue<*>> T.lgListen(): T {
 	return this
 }
 
+/**
+ * this one is used when listener is passed as a function pointer, other function would require to pass false
+ * as once all the time
+ */
+fun <T> ObservableValue<T>.listen(listener: (new: T) -> Unit, runOnceWith: T? = null, once: Boolean = false) =
+	listen(once, runOnceWith, listener)
+
 // TODO add run instantly
-fun <T> ObservableValue<T>.listen(listener: (new: T) -> Unit, once: Boolean = false) {
+fun <T> ObservableValue<T>.listen(once: Boolean = false, runOnceWith: T? = null, listener: (new: T) -> Unit) {
 	lateinit var lst: ChangeListener<T>
 	lst = ChangeListener<T> { _, _, newValue ->
 		listener(newValue)
 		if(once)
 			this.removeListener(lst)
-		
+
 	}
 	addListener(lst)
+	if(runOnceWith != null)
+		listener(runOnceWith)
 }
 
 fun <F, T: ObservableList<F>> T.listen(listener: (new: ListChangeListener.Change<out F>) -> Unit) {
