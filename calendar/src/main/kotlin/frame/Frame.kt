@@ -39,6 +39,7 @@ import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -49,7 +50,6 @@ import kotlin.random.Random
 import kotlin.reflect.KFunction
 
 
-
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
 
 /**
@@ -58,7 +58,7 @@ import kotlin.reflect.KFunction
 fun frameInit() {
 	createLoading()
 	log("created loading", LogType.NORMAL)
-	
+
 	/**
 	 * this looks pretty weird, but it essentially
 	 * creates a stacktrace with the head of an Exit
@@ -73,24 +73,40 @@ fun frameInit() {
 	 */
 	DefaultErrorHandler.filter = {
 		val writer = StringWriter()
-		
-		//if(it.error::class != Exit::class) {
 		writer.append("Exit <ErrorCode: Frame Exception> -> ")
-		//}
-		
+
 		if(getConfig(Configs.PrintStacktrace))
 			it.error.printStackTrace(PrintWriter(writer))
 		else
 			writer.append(it.error.toString())
 		log(writer, LogType.ERROR)
-		
-		// uncomment if errorPopup should be disabled  enable in Release
-		// it.consume()
+
+		// switch to true to use custom error  (do in Release)
+		if(true) {
+			it.consume()
+			errorMessage(it.error, writer.toString())
+		}
 	}
-	
+
 	log("launching Application", LogType.IMPORTANT)
 	launch<Window>()
 	//LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
+}
+
+fun errorMessage(error: Throwable, writer: String) = Alert(Alert.AlertType.ERROR).apply {
+	headerText = error.message ?: "An error occurred"
+	isResizable = true
+	title = "Error in " + error.stackTrace[0].fileName
+	dialogPane.content = VBox().apply {
+		label(writer.substringBefore('\n').replace("->","\n"))
+
+		if(getConfig(Configs.Debug))
+			textarea {
+				prefRowCount = 10
+				text = writer
+			}
+	}
+	showAndWait()
 }
 
 class Window: App(
