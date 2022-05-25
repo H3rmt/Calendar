@@ -1,10 +1,13 @@
 package picker.dateTimePicker
 
 import frame.createFXImage
-import javafx.beans.property.*
-import javafx.event.*
+import javafx.beans.property.IntegerProperty
+import javafx.beans.property.Property
+import javafx.beans.property.SimpleObjectProperty
+import javafx.event.EventTarget
 import javafx.scene.control.*
-import javafx.scene.paint.*
+import javafx.scene.paint.Color
+import listen
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -54,10 +57,22 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 	
 	override fun createDefaultSkin(): Skin<*> {
 		return object: SkinBase<DateTimePicker>(this) {
-			override fun computeMaxWidth(height: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double): Double =
+			override fun computeMaxWidth(
+				height: Double,
+				topInset: Double,
+				rightInset: Double,
+				bottomInset: Double,
+				leftInset: Double
+			): Double =
 				super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset)
 			
-			override fun computeMaxHeight(width: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double): Double =
+			override fun computeMaxHeight(
+				width: Double,
+				topInset: Double,
+				rightInset: Double,
+				bottomInset: Double,
+				leftInset: Double
+			): Double =
 				super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset)
 		}
 	}
@@ -76,7 +91,7 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 				isEditable = false
 				isFocusTraversable = false
 				text = formatter.format(dateTimeProperty.value)
-				focusedProperty().addListener { _, _, focus ->
+				focusedProperty().listen { focus ->
 					if(focus) button.requestFocus()
 				}
 			}
@@ -101,7 +116,7 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 			}
 		}
 		
-		dateTimeProperty.addListener { _, _, new: LocalDateTime ->
+		dateTimeProperty.listen { new ->
 			textField.text = formatter.format(new)
 		}
 		

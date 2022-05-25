@@ -1,17 +1,19 @@
 package calendar
 
-import javafx.collections.*
+import javafx.collections.ObservableList
 import listen
+import logic.Language
+import logic.translate
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import tornadofx.*
+import tornadofx.observableListOf
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
-
+import kotlin.random.Random
 
 
 fun initDb() {
@@ -57,26 +59,24 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		// either gets called when any relevant value on appointment changes or new appointments get added
 		val check = { appointment: Appointment ->
 			if(condition(appointment)) {
-				if(!list.contains(appointment))
-					list.add(appointment)  // add appointment if not on list
+				if(!list.contains(appointment)) list.add(appointment)  // add appointment if not on list
 			} else {
-				if(list.contains(appointment))
-					list.remove(appointment)  // remove appointment if on list
+				if(list.contains(appointment)) list.remove(appointment)  // remove appointment if on list
 			}
 		}
 		
 		// add listener to every value of appointment that is evaluated in condition
 		// to check again if appointment should be added or removed from returned list
 		val addChangeChecks: (Appointment) -> Unit = { appointment ->
-			appointment.start.listen({
+			appointment.start.listen {
 				check(appointment)
-			})
-			appointment.end.listen({
+			}
+			appointment.end.listen {
 				check(appointment)
-			})
-			appointment.week.listen({
+			}
+			appointment.week.listen {
 				check(appointment)
-			})
+			}
 		}
 		
 		// add checks to all current appointments in list
@@ -96,7 +96,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	}
 	
 	/**
-	 * returns an observable List containing non Week Appointments within timespan and Week Appointments at that day that gets updated every time
+	 * returns an observable List containing non Week Appointments within timespan that gets updated every time
 	 * - the list of Notes change
 	 * - time of any note changes and it (Note) fulfills the timespan condition
 	 *
@@ -115,26 +115,24 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		// either gets called when any relevant value on appointment changes or new appointments get added
 		val check = { appointment: Appointment ->
 			if(condition(appointment)) {
-				if(!list.contains(appointment))
-					list.add(appointment)  // add appointment if not on list
+				if(!list.contains(appointment)) list.add(appointment)  // add appointment if not on list
 			} else {
-				if(list.contains(appointment))
-					list.remove(appointment)  // remove appointment if on list
+				if(list.contains(appointment)) list.remove(appointment)  // remove appointment if on list
 			}
 		}
 		
 		// add listener to every value of appointment that is evaluated in condition
 		// to check again if appointment should be added or removed from returned list
 		val addChangeChecks: (Appointment) -> Unit = { appointment ->
-			appointment.start.listen({
+			appointment.start.listen {
 				check(appointment)
-			})
-			appointment.end.listen({
+			}
+			appointment.end.listen {
 				check(appointment)
-			})
-			appointment.week.listen({
+			}
+			appointment.week.listen {
 				check(appointment)
-			})
+			}
 		}
 		
 		// add checks to all current appointments in list
@@ -164,11 +162,10 @@ object NoteTable: LongIdTable() {
 object Notes: DBObservableList<Note>(Note.Notes) {
 	
 	
-	
 	/**
 	 * returns an observable List containing non Week Notes at this time that gets updated every time
 	 * - the list of Notes change
-	 * - time of any note changes and it (Note) fulfills the time condition
+	 * - time of any note changes and it (Note) fulfills the timespan condition
 	 *
 	 * listeners for any new Notes added after creation of the list get added automatically
 	 */
@@ -185,23 +182,21 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		// either gets called when any relevant value on note changes or new notes get added
 		val check = { note: Note ->
 			if(condition(note)) {
-				if(!list.contains(note))
-					list.add(note)  // add note if not on list
+				if(!list.contains(note)) list.add(note)  // add note if not on list
 			} else {
-				if(list.contains(note))
-					list.remove(note)  // remove note if on list
+				if(list.contains(note)) list.remove(note)  // remove note if on list
 			}
 		}
 		
 		// add listener to every value of note that is evaluated in condition
 		// to check again if note should be added or removed from returned list
 		val addChangeChecks: (Note) -> Unit = { note ->
-			note.time.listen({
+			note.time.listen {
 				check(note)
-			})
-			note.week.listen({
+			}
+			note.week.listen {
 				check(note)
-			})
+			}
 		}
 		
 		// add checks to all current notes in list
@@ -240,23 +235,21 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		// either gets called when any relevant value on note changes or new notes get added
 		val check = { note: Note ->
 			if(condition(note)) {
-				if(!list.contains(note))
-					list.add(note)  // add note if not on list
+				if(!list.contains(note)) list.add(note)  // add note if not on list
 			} else {
-				if(list.contains(note))
-					list.remove(note)  // remove note if on list
+				if(list.contains(note)) list.remove(note)  // remove note if on list
 			}
 		}
 		
 		// add listener to every value of note that is evaluated in condition
 		// to check again if note should be added or removed from returned list
 		val addChangeChecks: (Note) -> Unit = { note ->
-			note.time.listen({
+			note.time.listen {
 				check(note)
-			})
-			note.week.listen({
+			}
+			note.week.listen {
 				check(note)
-			})
+			}
 		}
 		
 		// add checks to all current notes in list
@@ -283,15 +276,18 @@ object FileTable: LongIdTable() {
 	val note = reference("note", NoteTable)
 }
 
+@Suppress("EmptyClassBlock")
 object Files: DBObservableList<File>(File.Files)
 
 object ReminderTable: LongIdTable() {
-	val time = long("time") //.nullable() // not nullable, TODO clone appointment time and always use it (ask when editing appointment if reminder should be moved)
+	val time =
+		long("time") //.nullable() // not nullable, TODO clone appointment time and always use it (ask when editing appointment if reminder should be moved)
 	val appointment = reference("appointment", AppointmentTable).nullable()
 	val title = text("title")
 	val description = text("description")
 }
 
+@Suppress("EmptyClassBlock")
 object Reminders: DBObservableList<Reminder>(Reminder.Reminders)
 
 object TypeTable: IntIdTable() {
@@ -300,5 +296,11 @@ object TypeTable: IntIdTable() {
 }
 
 object Types: DBObservableList<Type>(Type.Types) {
-	fun getRandom(): Type = random()
+	fun getRandom(exceptionName: String): Type {
+		require(isNotEmpty()) { throw NoTypeFound(exceptionName) }
+		return get(Random.nextInt(size))
+	}
 }
+
+class NoTypeFound(name: String):
+	Exception("no types for %s found (add some types in settings)".translate(Language.TranslationTypes.Global, name))

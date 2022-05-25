@@ -5,12 +5,15 @@ import calendar.Appointments
 import calendar.Reminder
 import frame.styles.GlobalStyles
 import frame.toggleSwitch
-import javafx.beans.property.*
-import javafx.geometry.*
-import javafx.scene.layout.*
-import javafx.scene.paint.*
-import javafx.scene.text.*
-import javafx.stage.*
+import javafx.beans.property.Property
+import javafx.beans.property.SimpleObjectProperty
+import javafx.geometry.Pos
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.BorderStrokeStyle
+import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
+import javafx.stage.Modality
+import javafx.stage.Stage
 import listen
 import logic.Language
 import logic.translate
@@ -42,12 +45,10 @@ class ReminderPopup: Fragment() {
 	private var control: BorderPane? = null
 	
 	init {
-		appointment.listen({
-			if(it != null)
-				time.value = it.start.value
-			else
-				time.value = scope.end
-		})
+		appointment.listen {
+			if(it != null) time.value = it.start.value
+			else time.value = scope.end
+		}
 	}
 	
 	private fun updateDisplay(toggle: Boolean) {
@@ -106,8 +107,7 @@ class ReminderPopup: Fragment() {
 								paddingRight = 38
 							}
 						}
-						toggleSwitch(selected = toggle) {
-						}
+						toggleSwitch(selected = toggle) { }
 					}
 				}
 			}
@@ -148,8 +148,7 @@ class ReminderPopup: Fragment() {
 					action {
 						val check = checkReminder()
 						if(check == null) {
-							if(reminder == null)
-								reminder = createReminder()
+							if(reminder == null) reminder = createReminder()
 							updateReminder()
 							onSave.invoke(reminder!!)
 							close()
@@ -164,21 +163,35 @@ class ReminderPopup: Fragment() {
 	
 	
 	init {
-		toggle.listen({
+		toggle.listen(runOnceWithValue = true) {
 			updateDisplay(it)
-		})
-		updateDisplay(toggle.value)
+		}
 	}
 	
 	class ItemsScope(
-		val title: String, val saveTitle: String, val reminder: Reminder?, val end: LocalDateTime, val save: (Reminder) -> Unit, val timeOrAppointment: Boolean
+		val title: String,
+		val saveTitle: String,
+		val reminder: Reminder?,
+		val end: LocalDateTime,
+		val save: (Reminder) -> Unit,
+		val timeOrAppointment: Boolean
 	): Scope()
 	
 	companion object {
 		@Suppress("LongParameterList")
-		fun open(title: String, saveTitle: String, block: Boolean, reminder: Reminder?, end: LocalDateTime, save: (Reminder) -> Unit, timeOrAppointment: Boolean = true): Stage? {
+		fun open(
+			title: String,
+			saveTitle: String,
+			block: Boolean,
+			reminder: Reminder?,
+			end: LocalDateTime,
+			save: (Reminder) -> Unit,
+			timeOrAppointment: Boolean = true
+		): Stage? {
 			val scope = ItemsScope(title, saveTitle, reminder, end, save, timeOrAppointment)
-			return find<ReminderPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+			return find<ReminderPopup>(scope).openModal(
+				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false
+			)
 		}
 	}
 }

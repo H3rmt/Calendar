@@ -1,40 +1,28 @@
 package frame
 
 
-import calendar.Appointment
-import calendar.Reminder
-import calendar.Timing
-import calendar.Type
-import calendar.Types
+import calendar.*
 import frame.TabManager.Secure
 import frame.popup.AppointmentPopup
 import frame.popup.ReminderPopup
-import frame.styles.GlobalStyles
-import frame.styles.MenubarStyles
-import frame.styles.NoteStyles
-import frame.styles.OverviewStyles
-import frame.styles.ReminderStyles
-import frame.styles.TabStyles
-import frame.styles.WeekStyles
+import frame.styles.*
 import frame.tabs.createOverviewTab
 import frame.tabs.createReminderTab
 import init
-import javafx.application.*
-import javafx.beans.property.*
-import javafx.beans.value.*
-import javafx.event.*
+import javafx.application.Platform
+import javafx.beans.property.Property
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.value.ObservableValue
+import javafx.event.EventTarget
 import javafx.scene.control.*
-import javafx.scene.image.*
-import javafx.scene.layout.*
-import javafx.stage.*
-import logic.Configs
-import logic.Exit
-import logic.Language
-import logic.LogType
-import logic.Warning
-import logic.getConfig
-import logic.log
-import logic.translate
+import javafx.scene.image.Image
+import javafx.scene.image.WritableImage
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.GridPane
+import javafx.scene.layout.Priority
+import javafx.stage.Stage
+import listen
+import logic.*
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
 import java.awt.Desktop
@@ -47,7 +35,6 @@ import javax.imageio.IIOException
 import javax.imageio.ImageIO
 import kotlin.random.Random
 import kotlin.reflect.KFunction
-
 
 
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
@@ -78,10 +65,8 @@ fun frameInit() {
 		writer.append("Exit <ErrorCode: Frame Exception> -> ")
 		//}
 		
-		if(getConfig(Configs.PrintStacktrace))
-			it.error.printStackTrace(PrintWriter(writer))
-		else
-			writer.append(it.error.toString())
+		if(getConfig(Configs.PrintStacktrace)) it.error.printStackTrace(PrintWriter(writer))
+		else writer.append(it.error.toString())
 		log(writer, LogType.ERROR)
 		
 		// uncomment if errorPopup should be disabled  enable in Release
@@ -95,8 +80,12 @@ fun frameInit() {
 
 class Window: App(
 	MainView::class,
-	GlobalStyles::class, MenubarStyles::class, TabStyles::class,
-	NoteStyles::class, ReminderStyles::class, OverviewStyles::class,
+	GlobalStyles::class,
+	MenubarStyles::class,
+	TabStyles::class,
+	NoteStyles::class,
+	ReminderStyles::class,
+	OverviewStyles::class,
 	WeekStyles::class
 ) {
 	
@@ -115,7 +104,6 @@ class MainView: View("Calendar") {
 	override val root = borderpane {
 		top = createMenuBar(this)
 		log("created menubar", LogType.IMPORTANT)
-		
 		center = tabpane {
 			tabDragPolicy = TabPane.TabDragPolicy.REORDER
 			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
@@ -128,81 +116,65 @@ class MainView: View("Calendar") {
 fun createMenuBar(pane: BorderPane): MenuBar {
 	return pane.menubar {
 		menu("create".translate(Language.TranslationTypes.Menubar)) {
-			createMenuGroup(
-				createMenuItem(this@menu, "Appointment", "Strg + N") {
-					AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.AppointmentPopup), "create".translate(Language.TranslationTypes.AppointmentPopup),
-						false,
-						null,
-						Timing.getNowLocal(),
-						Timing.getNowLocal().plusHours(1),
-						save = { app: Appointment ->
-							log("Created:$app")
-						}
-					)
-				},
-				createMenuItem(this@menu, "Reminder", "Strg + R") {
-					ReminderPopup.open("new reminder".translate(Language.TranslationTypes.ReminderPopup), "create".translate(Language.TranslationTypes.ReminderPopup),
-						false,
-						null,
-						Timing.getNowLocal(),
-						save = { rem: Reminder ->
-							log("Created:$rem")
-						}
-					)
-				}
-			)
+			createMenuGroup(createMenuItem(this@menu, "Appointment", "Strg + N") {
+				AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.AppointmentPopup),
+					"create".translate(Language.TranslationTypes.AppointmentPopup),
+					false,
+					null,
+					Timing.getNowLocal(),
+					Timing.getNowLocal().plusHours(1),
+					save = { app: Appointment ->
+						log("Created:$app")
+					})
+			}, createMenuItem(this@menu, "Reminder", "Strg + R") {
+				ReminderPopup.open("new reminder".translate(Language.TranslationTypes.ReminderPopup),
+					"create".translate(Language.TranslationTypes.ReminderPopup),
+					false,
+					null,
+					Timing.getNowLocal(),
+					save = { rem: Reminder ->
+						log("Created:$rem")
+					})
+			})
 		}
 		menu("options".translate(Language.TranslationTypes.Menubar)) {
-			createMenuGroup(
-				createMenuItem(this@menu, "Reload", "F5") {
-					init()
-					Secure.overrideTab("calendar", ::createOverviewTab)
-				},
-				createMenuItem(this@menu, "Preferences", "Strg + ,") {
-					log("Preferences")
-				},
-				run { separator(); return@run null },
-				createMenuItem(this@menu, "Quit", "Strg + Q") {
-					log("exiting Program via quit", LogType.IMPORTANT)
-					Platform.exit()
-				}
-			)
+			createMenuGroup(createMenuItem(this@menu, "Reload", "F5") {
+				init()
+				Secure.overrideTab("calendar", ::createOverviewTab)
+			}, createMenuItem(this@menu, "Preferences", "Strg + ,") {
+				log("Preferences")
+			}, run { separator(); return@run null }, createMenuItem(this@menu, "Quit", "Strg + Q") {
+				log("exiting Program via quit", LogType.IMPORTANT)
+				Platform.exit()
+			})
 		}
 		menu("view".translate(Language.TranslationTypes.Menubar)) {
-			createMenuGroup(
-				createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") {
-					log("Show Reminder")
-					Secure.overrideTab("reminders", ::createReminderTab)
-				},
-				createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {
-					log("Show Calendar")
-					Secure.overrideTab("calendar", ::createOverviewTab)
-				}
-			)
+			createMenuGroup(createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") {
+				log("Show Reminder")
+				Secure.overrideTab("reminders", ::createReminderTab)
+			}, createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {
+				log("Show Calendar")
+				Secure.overrideTab("calendar", ::createOverviewTab)
+			})
 		}
 		menu("help".translate(Language.TranslationTypes.Menubar)) {
-			createMenuGroup(
-				createMenuItem(this@menu, "Github", "") {
-					log("Open Github", LogType.IMPORTANT)
-					try {
-						runAsync {
-							Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
-						}
-					} catch(e: IOException) {
-						log("failed to open browser $e", LogType.WARNING)
+			createMenuGroup(createMenuItem(this@menu, "Github", "") {
+				log("Open Github", LogType.IMPORTANT)
+				try {
+					runAsync {
+						Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
 					}
-				},
-				createMenuItem(this@menu, "Memory Usage", "") {
-					//System.gc()
-					val rt = Runtime.getRuntime()
-					val usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024 / 1024
-					log("used memory: $usedMB  | max memory: ${rt.maxMemory() / 1024 / 1024}  | total memory ${rt.totalMemory() / 1024 / 1024}  | free memory ${rt.freeMemory() / 1024 / 1024}")
-				},
-				run { separator(); return@run null },
-				createMenuItem(this@menu, "Help", "") {
-					log("Help")
+				} catch(e: IOException) {
+					log("failed to open browser $e", LogType.WARNING)
 				}
-			)
+			}, createMenuItem(this@menu, "Memory Usage", "") {
+				//System.gc()
+				val rt = Runtime.getRuntime()
+				val usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024 / 1024
+				log("used memory: $usedMB  | max memory: ${rt.maxMemory() / 1024 / 1024}  | total memory ${rt.totalMemory() / 1024 / 1024}  | free memory ${rt.freeMemory() / 1024 / 1024}")
+			}, run { separator(); return@run null }, createMenuItem(this@menu, "Help", "") {
+				log("Help")
+			})
 		}
 	}
 }
@@ -214,16 +186,13 @@ fun createMenuGroup(vararg panes: GridPane?) {
 	val changed = mutableListOf<GridPane>()
 	items.forEach { item ->
 		item.apply {
-			widthProperty().addListener(ChangeListener { _, _, newWidth ->
-				if(!changed.contains(this))
-					changed.add(this)
-				if(newWidth.toDouble() > currentWidth)
-					currentWidth = newWidth.toDouble()
-				if(changed.size == items.size)
-					items.forEach {
-						it.prefWidth = currentWidth
-					}
-			})
+			widthProperty().listen { width ->
+				if(!changed.contains(this)) changed.add(this)
+				if(width.toDouble() > currentWidth) currentWidth = width.toDouble()
+				if(changed.size == items.size) items.forEach {
+					it.prefWidth = currentWidth
+				}
+			}
 		}
 	}
 }
@@ -377,11 +346,10 @@ fun createFXImage(name: String): Image {
 fun getImageMissing(): BufferedImage {
 	val im = BufferedImage(30, 30, BufferedImage.TYPE_3BYTE_BGR)
 	val g2 = im.graphics
-	for(i in 0 until 15)
-		for(j in 0 until 15) {
-			g2.color = java.awt.Color(Random.nextInt(255), Random.nextInt(155), Random.nextInt(155))
-			g2.fillRect(1 + i * 2, 1 + j * 2, 3, 3)
-		}
+	for(i in 0 until 15) for(j in 0 until 15) {
+		g2.color = java.awt.Color(Random.nextInt(255), Random.nextInt(155), Random.nextInt(155))
+		g2.fillRect(1 + i * 2, 1 + j * 2, 3, 3)
+	}
 	for(i in 0 until 30) {
 		g2.color = java.awt.Color(200, 10, 50)
 		g2.fillRect(i, 0, 1, 1)
@@ -406,12 +374,13 @@ fun EventTarget.toggleSwitch(
 	op: ToggleSwitch.() -> Unit = {}
 ) = ToggleSwitch().attachTo(this, op) {
 	it.selectedProperty().bindBidirectional(selected)
-	if(text != null)
-		it.textProperty().bind(text)
+	if(text != null) it.textProperty().bind(text)
 }
 
 
-class TranslatingSimpleStringProperty(initialValue: String = "", private val type: Language.TranslationTypes, private vararg val args: Any): SimpleStringProperty(initialValue) {
+class TranslatingSimpleStringProperty(
+	initialValue: String = "", private val type: Language.TranslationTypes, private vararg val args: Any
+): SimpleStringProperty(initialValue) {
 	override fun set(newValue: String?) {
 		super.set(newValue)
 	}

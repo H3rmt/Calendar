@@ -5,10 +5,15 @@ import calendar.Reminders
 import frame.styles.GlobalStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
-import javafx.beans.property.*
-import javafx.geometry.*
-import javafx.scene.control.*
+import javafx.beans.property.DoubleProperty
+import javafx.geometry.Orientation
+import javafx.geometry.Pos
+import javafx.scene.control.ScrollBar
+import javafx.scene.control.ScrollPane
+import javafx.scene.control.Tab
+import javafx.scene.control.TabPane
 import listen
+import listenAndRunOnce
 import logic.Language
 import logic.LogType
 import logic.log
@@ -65,17 +70,18 @@ fun createReminderTab(pane: TabPane): Tab {
 						isPannable = true
 						
 						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-						widthProperty().listen({
-							lookupAll(".scroll-bar").filterIsInstance<ScrollBar>().filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-								bar.visibleProperty().listen({ visible ->
+						widthProperty().listen(once = true) {
+							lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
+								.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
+								bar.visibleProperty().listen { visible ->
 									if(visible) { // 20 on first visible;  13.33  on second visible  => hardcoded 13.3 width TODO add to calender
 										scrollbarWidth.value = 13.3 + 2.0 // bar.width + 2.0 // 2 padding right of inner vbox
 									} else {
 										scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
 									}
-								})
+								}
 							}
-						}, once = true)
+						}
 						
 						// gets stretched across whole scrollpane
 						vbox(spacing = 2.0, alignment = Pos.TOP_CENTER) {
@@ -101,11 +107,9 @@ fun createReminderTab(pane: TabPane): Tab {
 					}
 				}
 				
-				Reminders.listen {
-					updateTable(it.list)
+				Reminders.listenAndRunOnce {
+					updateTable(it)
 				}
-				
-				updateTable(Reminders)
 			}
 		}
 	}

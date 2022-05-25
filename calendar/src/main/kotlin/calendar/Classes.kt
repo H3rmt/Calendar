@@ -1,6 +1,6 @@
 package calendar
 
-import javafx.scene.paint.*
+import javafx.scene.paint.Color
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.LongEntity
@@ -14,7 +14,15 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 	
 	companion object {
-		fun new(_start: LocalDateTime, _end: LocalDateTime, _title: String, _description: String, _type: Type, _allDay: Boolean = false, _week: Boolean = false): Appointment {
+		fun new(
+			_start: LocalDateTime,
+			_end: LocalDateTime,
+			_title: String,
+			_description: String,
+			_type: Type,
+			_allDay: Boolean = false,
+			_week: Boolean = false
+		): Appointment {
 			return transaction {
 				return@transaction Appointments.new {
 					start.set(_start)
@@ -86,7 +94,8 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 		}.also { calendar.Appointments.remove(this) }
 	}
 	
-	override fun toString(): String = "[{${id.value}} ${start.value} - ${end.value}  ${type.value} ${if(week.value) "Week" else "Day"} | ${title.value}: ${description.value}]"
+	override fun toString(): String =
+		"[{${id.value}} ${start.value} - ${end.value}  ${type.value} ${if(week.value) "Week" else "Day"} | ${title.value}: ${description.value}]"
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Appointment) false
@@ -333,7 +342,7 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 		}
 		
 	}
-	val color: DBObservableD<Color, String> = object: DBObservableD<Color, String>() {
+	val color: DBObservableBase<Color, String> = object: DBObservableBase<Color, String>() {
 		override fun convertFrom(value: Color): String = value.toString()
 		override fun convertTo(value: String): Color = Color.valueOf(value)
 		override fun abstractGet(): String = dbColor

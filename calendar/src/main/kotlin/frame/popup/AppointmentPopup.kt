@@ -6,11 +6,13 @@ import calendar.Type
 import calendar.Types
 import frame.styles.GlobalStyles
 import frame.typeCombobox
-import javafx.beans.property.*
-import javafx.scene.layout.*
-import javafx.scene.paint.*
-import javafx.scene.text.*
-import javafx.stage.*
+import javafx.beans.property.Property
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.BorderStrokeStyle
+import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
+import javafx.stage.Modality
+import javafx.stage.Stage
 import listen
 import logic.Language
 import logic.translate
@@ -18,7 +20,6 @@ import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
-
 
 
 class AppointmentPopup: Fragment() {
@@ -31,7 +32,7 @@ class AppointmentPopup: Fragment() {
 	private var end: Property<LocalDateTime> = appointment?.end?.clone() ?: scope.end.toProperty()
 	private var appointmentTitle: Property<String> = appointment?.title?.clone() ?: "".toProperty()
 	private var description: Property<String> = appointment?.description?.clone() ?: "".toProperty()
-	private var type: Property<Type> = appointment?.type?.clone() ?: Types.random().toProperty()
+	private var type: Property<Type> = appointment?.type?.clone() ?: Types.getRandom("Appointment").toProperty()
 	private var wholeDay: Property<Boolean> = appointment?.allDay?.clone() ?: false.toProperty()
 	
 	private var onSave: (Appointment) -> Unit = scope.save
@@ -160,8 +161,7 @@ class AppointmentPopup: Fragment() {
 					action {
 						val check = checkAppointment()
 						if(check == null) {
-							if(appointment == null)
-								appointment = createAppointment()
+							if(appointment == null) appointment = createAppointment()
 							updateAppointment()
 							onSave.invoke(appointment!!)
 							close()
@@ -175,22 +175,35 @@ class AppointmentPopup: Fragment() {
 	}
 	
 	init {
-		wholeDay.listen({
+		wholeDay.listen(runOnceWithValue = true) {
 			updateDisplay(it)
-		})
-		updateDisplay(wholeDay.value)
+		}
 	}
 	
 	class ItemsScope(
-		val title: String, val saveTitle: String, val appointment: Appointment?,
-		val start: LocalDateTime, val end: LocalDateTime, val save: (Appointment) -> Unit
+		val title: String,
+		val saveTitle: String,
+		val appointment: Appointment?,
+		val start: LocalDateTime,
+		val end: LocalDateTime,
+		val save: (Appointment) -> Unit
 	): Scope()
 	
 	companion object {
 		@Suppress("LongParameterList")
-		fun open(title: String, saveTitle: String, block: Boolean, appointment: Appointment?, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
+		fun open(
+			title: String,
+			saveTitle: String,
+			block: Boolean,
+			appointment: Appointment?,
+			start: LocalDateTime,
+			end: LocalDateTime,
+			save: (Appointment) -> Unit
+		): Stage? {
 			val scope = ItemsScope(title, saveTitle, appointment, start, end, save)
-			return find<AppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+			return find<AppointmentPopup>(scope).openModal(
+				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false
+			)
 		}
 	}
 }

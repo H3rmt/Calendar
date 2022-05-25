@@ -9,19 +9,13 @@ import frame.styles.GlobalStyles
 import frame.styles.NoteStyles
 import frame.styles.TabStyles
 import frame.typeCombobox
-import javafx.geometry.*
+import javafx.geometry.Pos
 import javafx.scene.control.*
-import javafx.scene.layout.*
+import javafx.scene.layout.VBox
 import listen
-import logic.Configs
-import logic.Language
-import logic.LogType
-import logic.getConfig
-import logic.log
-import logic.translate
+import logic.*
 import tornadofx.*
 import java.time.temporal.ChronoField
-
 
 
 fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit): Tab {
@@ -29,7 +23,11 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 	return pane.tab("") {
 		text = when(cell) {
 			is Day -> "Notes for ${cell.time.dayOfMonth}. ${cell.time.month.name.translate(Language.TranslationTypes.Global)}"
-			is Week -> "Notes for ${cell.time.get(ChronoField.ALIGNED_WEEK_OF_MONTH)}. Week in ${cell.time.month.name.translate(Language.TranslationTypes.Global)}"
+			is Week -> "Notes for ${cell.time.get(ChronoField.ALIGNED_WEEK_OF_MONTH)}. Week in ${
+				cell.time.month.name.translate(
+					Language.TranslationTypes.Global
+				)
+			}"
 			else -> ""
 		}
 		isClosable = true
@@ -51,7 +49,8 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					isDisable = true
 					
 					// disables button if no type selected or type already added
-					addType.valueProperty().listen({ new -> isDisable = (new == null) || noteTabs.any { it.text == new.name.value } })
+					addType.valueProperty()
+						.listen { new -> isDisable = (new == null) || noteTabs.any { it.text == new.name.value } }
 					addClass(TabStyles.titleButton_)
 				}
 			}
@@ -135,7 +134,7 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 			}
 		}
 		contentDisplay = ContentDisplay.RIGHT
-		expandedProperty().listen({ new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY })
+		expandedProperty().listen { new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
 		
 		htmleditor(text) {
 			addClass(GlobalStyles.disableFocusDraw_)
