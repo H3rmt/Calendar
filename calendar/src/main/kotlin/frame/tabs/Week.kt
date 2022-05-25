@@ -117,6 +117,7 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 											style {
 												fontSize = 20.px
 											}
+											@Suppress("ImplicitDefaultLocale")
 											text = String.format("%02d", hour)
 										}
 									}
