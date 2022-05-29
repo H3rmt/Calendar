@@ -2,7 +2,6 @@ package frame.tabs
 
 import Day
 import Week
-import calendar.Appointment
 import calendar.Timing
 import frame.popup.AppointmentPopup
 import frame.styles.GlobalStyles
@@ -207,7 +206,8 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 												contextmenu {
 													item("new appointment".translate(Language.TranslationTypes.Week)) {
 														action {
-															AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.AppointmentPopup),
+															AppointmentPopup.open(
+																"new appointment".translate(Language.TranslationTypes.AppointmentPopup),
 																"create".translate(Language.TranslationTypes.AppointmentPopup),
 																false,
 																null,
@@ -222,13 +222,8 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																	week.time.month,
 																	day.time.dayOfMonth,
 																	hour
-																).plusHours(1),
-																save = { app: Appointment ->
-																	log("Created:$app")
-																	week.allDays[app.start.value.dayOfWeek]?.appointments?.add(app) // TODO replace this
-																	updateTable()
-																	updateCallback()
-																})
+																).plusHours(1)
+															)
 														}
 													}
 													menu("remove appointment".translate(Language.TranslationTypes.Week)) {
@@ -259,16 +254,14 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 														cellAppointments.forEach { appointment ->
 															item(appointment.title) {
 																action {
-																	AppointmentPopup.open("edit appointment".translate(Language.TranslationTypes.AppointmentPopup),
+																	AppointmentPopup.open(
+																		"edit appointment".translate(Language.TranslationTypes.AppointmentPopup),
 																		"save".translate(Language.TranslationTypes.AppointmentPopup),
 																		false,
 																		appointment,
 																		Timing.getNowLocal(), // irrelevant, as they get overridden by values in appointment
-																		Timing.getNowLocal(),
-																		save = { app: Appointment ->
-																			log("Updated:$app")
-																			updateTable()
-																		})
+																		Timing.getNowLocal()
+																	)
 																}
 															}
 														}

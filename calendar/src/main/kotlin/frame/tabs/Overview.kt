@@ -546,9 +546,6 @@ fun createCellGraphics(
 							false,
 							null,
 							data.time.atStartOfDay(),
-							save = { rem: Reminder ->
-								log("Created:$rem")
-							},
 							false
 						)
 					}

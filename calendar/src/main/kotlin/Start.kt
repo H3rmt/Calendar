@@ -1,5 +1,4 @@
-import calendar.initDb
-import calendar.loadCalendarData
+import calendar.*
 import frame.frameInit
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
@@ -34,7 +33,12 @@ fun init() {
 	initDb()
 	
 	log("preparing Data", LogType.IMPORTANT)
-	loadCalendarData()
+	Appointments.lgListen("Appointments").reload()
+	Notes.lgListen("Notes").reload()
+	Files.lgListen("Files").reload()
+	Reminders.lgListen("Reminders").reload()
+	Types.lgListen("Types").reload()
+	log("loaded Data", LogType.IMPORTANT)
 }
 
 fun <T> T.lg(): T {
@@ -55,15 +59,11 @@ fun <T: ObservableValue<*>> T.lgListen(): T {
  * as once all the time
  */
 fun <T> ObservableValue<T>.listen(
-	listener: (new: T) -> Unit,
-	runOnceWithValue: Boolean = false,
-	once: Boolean = false
+	listener: (new: T) -> Unit, runOnceWithValue: Boolean = false, once: Boolean = false
 ) = listen(once, runOnceWithValue, listener)
 
 fun <T> ObservableValue<T>.listen(
-	once: Boolean = false,
-	runOnceWithValue: Boolean = false,
-	listener: (new: T) -> Unit
+	once: Boolean = false, runOnceWithValue: Boolean = false, listener: (new: T) -> Unit
 ) {
 	lateinit var lst: ChangeListener<T>
 	lst = ChangeListener<T> { _, _, newValue ->
@@ -94,13 +94,16 @@ fun <T: ObservableList<*>> T.lgListen(name: String = ""): T {
 		while(change.next()) {
 			when(true) {
 				change.wasAdded() -> {
-					println("\tadded ${change.addedSubList} ")
+					println("\tadded:")
+					change.addedSubList.forEach { println("\t\t$it") }
 				}
 				change.wasRemoved() -> {
-					println("\tremoved ${change.removed} ")
+					println("\tremoved:")
+					change.removed.forEach { println("\t\t$it") }
 				}
 				change.wasUpdated() -> {
-					println("\tupdated ${change.list}")
+					println("\tupdated:")
+					change.list.forEach { println("\t\t$it") }
 				}
 				else -> {}
 			}
@@ -121,4 +124,8 @@ fun <T> ObservableValue<T>.listen2(once: Boolean = false, listener: (new: T, old
 fun println(vararg any: Any) {
 	any.forEach { print("$it ") }
 	kotlin.io.println()
+}
+
+fun String.replaceNewline(): String {
+	return this.replace("\n", "\\n")
 }
