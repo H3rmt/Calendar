@@ -85,9 +85,11 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 	}
 	
 	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Appointments.remove(this) }
+		calendar.Appointments.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
 	// [{7} 2022-05-16T00:00 - 2022-05-16T23:59  [{1} test 0x008000ff] Day | test_1_title: test_1_desc]
@@ -116,13 +118,13 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	object Notes: LongEntityClass<Note>(NoteTable)
 	
 	companion object {
-		fun new(_time: LocalDate, _text: String, _type: Type, _week: Boolean): Note {
+		fun new(time: LocalDate, text: String, type: Type, week: Boolean): Note {
 			return transaction {
 				return@transaction Notes.new {
-					time.set(_time)
-					text.set(_text)
-					type.set(_type)
-					week.set(_week)
+					this.time.set(time)
+					this.text.set(text)
+					this.type.set(type)
+					this.week.set(week)
 				}.also { calendar.Notes.add(it) }
 			}
 		}
@@ -168,9 +170,11 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	}
 	
 	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Notes.remove(this) }
+		calendar.Notes.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
 	// [{2} 2022-05-16T00:00 [{1} test 0x008000ff] ||: test_note_text]
@@ -229,9 +233,11 @@ class File(id: EntityID<Long>): LongEntity(id) {
 	}
 	
 	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Files.remove(this) }
+		calendar.Files.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
 	// [{2} testfile C:/Users/fef/Documents/test.txt]
@@ -296,9 +302,11 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 	}
 	
 	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Reminders.remove(this) }
+		calendar.Reminders.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
 	// [{14} 2022-05-16T00:00 | test_title: test_description]
@@ -354,9 +362,11 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 	
 	
 	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Types.remove(this) }
+		calendar.Types.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
 	// [{1} test_1_type 0x008000ff]
