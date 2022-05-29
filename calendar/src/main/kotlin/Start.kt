@@ -33,11 +33,11 @@ fun init() {
 	initDb()
 	
 	log("preparing Data", LogType.IMPORTANT)
+	Types.lgListen("Types").reload()
 	Appointments.lgListen("Appointments").reload()
 	Notes.lgListen("Notes").reload()
 	Files.lgListen("Files").reload()
 	Reminders.lgListen("Reminders").reload()
-	Types.lgListen("Types").reload()
 	log("loaded Data", LogType.IMPORTANT)
 }
 
@@ -92,22 +92,20 @@ fun <T: ObservableList<*>> T.lgListen(name: String = ""): T {
 	addListener(ListChangeListener { change ->
 		println("change ${name.ifEmpty { "ObservableValue" }} [$size] ($this): ")
 		while(change.next()) {
-			when(true) {
-				change.wasAdded() -> {
-					println("\tadded:")
-					change.addedSubList.forEach { println("\t\t$it") }
-				}
-				change.wasRemoved() -> {
-					println("\tremoved:")
-					change.removed.forEach { println("\t\t$it") }
-				}
-				change.wasUpdated() -> {
-					println("\tupdated:")
-					change.list.forEach { println("\t\t$it") }
-				}
-				else -> {}
+			if(change.wasAdded()) {
+				println("\tadded:")
+				change.addedSubList.forEach { println("\t\t$it") }
+			}
+			if(change.wasRemoved()) {
+				println("\tremoved:")
+				change.removed.forEach { println("\t\t$it") }
+			}
+			if(change.wasUpdated()) {
+				println("\tupdated:")
+				change.list.forEach { println("\t\t$it") }
 			}
 		}
+		
 	})
 	return this
 }

@@ -144,6 +144,9 @@ fun createOverviewTab(pane: TabPane): Tab {
 								var time: LocalDate = new.withDayOfMonth(1).with(ChronoField.DAY_OF_WEEK, 1)
 								// loop until last week with day in this month is complete
 								do {
+									// clone time, so that later called callbacks use right time and not time of last day
+									val ctime = time
+									
 									// week box
 									hbox(spacing = 5.0, alignment = Pos.CENTER) {
 										// week cell
@@ -161,7 +164,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 														columnIndex = 0
 													}
 												}
-												label(time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR).toString()) {
+												label(ctime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR).toString()) {
 													gridpaneConstraints {
 														columnIndex = 1
 													}
@@ -170,6 +173,12 @@ fun createOverviewTab(pane: TabPane): Tab {
 												anchorpane {
 													gridpaneConstraints {
 														columnIndex = 2
+													}
+													
+													val imgView = imageview {
+														addClass(OverviewStyles.cellIcon_)
+														fitHeight = 21.5
+														fitWidth = 21.5
 													}
 													
 													// update images on notes updates
@@ -181,19 +190,17 @@ fun createOverviewTab(pane: TabPane): Tab {
 														} else {
 															createFXImage("note active.svg")
 														}
-														hoveredImg = if(empty) createFXImage("note hovered.svg")
-														else createFXImage("note active hovered.svg")
+														hoveredImg= if(empty) {
+															createFXImage("note hovered.svg")
+														} else {
+															createFXImage("note active hovered.svg")
+														}
+														imgView.image = if(imgView.isHover) hoveredImg else img
 													}
 													
-													val notes = Notes.getNotesAt(time)
+													val notes = Notes.getNotesAt(ctime)
 													notes.listenAndRunOnce {
 														update(it.isEmpty())
-													}
-													
-													val imgView = imageview(img) {
-														addClass(OverviewStyles.cellIcon_)
-														fitHeight = 21.5
-														fitWidth = 21.5
 													}
 													
 													onMouseClicked
@@ -250,7 +257,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 												}
 												
 												val appointments: ObservableList<Appointment> = Appointments.getAppointmentsFromTo(
-													time.atStartOfDay(), time.plusWeeks(1).atStartOfDay(), time.dayOfWeek
+													ctime.atStartOfDay(), ctime.plusWeeks(1).atStartOfDay(), ctime.dayOfWeek
 												)
 												
 												appointments.listenAndRunOnce {
@@ -261,10 +268,14 @@ fun createOverviewTab(pane: TabPane): Tab {
 										
 										// day cells
 										do {
+											// clone time, so that later called callbacks use right time and not time of last day
+											val cctime = time
+											
 											vbox(alignment = Pos.TOP_LEFT) {
 												addClass(GlobalStyles.tableItem_)
 												addClass(OverviewStyles.cell_)
-												if(time.month != new.month) addClass(OverviewStyles.disabledCell_)
+												if(cctime.month != new.month)
+													addClass(OverviewStyles.disabledCell_)
 												gridpane {
 													style {
 														prefWidth = Int.MAX_VALUE.px
@@ -282,10 +293,11 @@ fun createOverviewTab(pane: TabPane): Tab {
 															fitHeight = 21.5
 															fitWidth = 21.5
 														}
+														onMouseClicked
 														onMouseEntered = EventHandler { img.image = hoveredImg }
 														onMouseExited = EventHandler { img.image = defaultImg }
 													}
-													label(time.dayOfMonth.toString()) {
+													label(cctime.dayOfMonth.toString()) {
 														gridpaneConstraints {
 															columnIndex = 1
 														}
@@ -294,6 +306,12 @@ fun createOverviewTab(pane: TabPane): Tab {
 													anchorpane {
 														gridpaneConstraints {
 															columnIndex = 2
+														}
+														
+														val imgView = imageview {
+															addClass(OverviewStyles.cellIcon_)
+															fitHeight = 21.5
+															fitWidth = 21.5
 														}
 														
 														// update images on notes updates
@@ -305,22 +323,28 @@ fun createOverviewTab(pane: TabPane): Tab {
 															} else {
 																createFXImage("note active.svg")
 															}
-															hoveredImg = if(empty) createFXImage("note hovered.svg")
-															else createFXImage("note active hovered.svg")
+															hoveredImg = if(empty) {
+																createFXImage("note hovered.svg")
+															} else {
+																createFXImage("note active hovered.svg")
+															}
+															imgView.image = if(imgView.isHover) hoveredImg else img
 														}
 														
-														val notes = Notes.getNotesAt(time)
+														val notes = Notes.getNotesAt(cctime)
 														notes.listenAndRunOnce {
 															update(it.isEmpty())
 														}
 														
-														val imgView = imageview(img) {
-															addClass(OverviewStyles.cellIcon_)
-															fitHeight = 21.5
-															fitWidth = 21.5
+														onMouseClicked = EventHandler {
+															it.consume()
+															TabManager.openTab(
+																"WeekNotes/${cctime.year}/${cctime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}/${cctime.dayOfWeek}",
+																::createNoteTab,
+																cctime,
+																false
+															)
 														}
-														
-														onMouseClicked
 														onMouseEntered = EventHandler { imgView.image = hoveredImg }
 														onMouseExited = EventHandler { imgView.image = img }
 													}
@@ -369,7 +393,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 													}
 													
 													val appointments = Appointments.getAppointmentsFromTo(
-														time.atStartOfDay(), time.plusDays(1).atStartOfDay(), time.dayOfWeek
+														cctime.atStartOfDay(), cctime.plusDays(1).atStartOfDay(), cctime.dayOfWeek
 													)
 													appointments.listenAndRunOnce {
 														update(it)
@@ -629,14 +653,7 @@ fun createCellGraphics(
 					}
 					onMouseClicked = EventHandler {
 						it.consume()
-						TabManager.openTab("WeekNotes${data.WeekOfYear}/${data.time.year}", ::createNoteTab, data, {
-//								if(overviewTime.month == data.time.month || overviewTime.month == data.time.plusMonths(1).month || overviewTime.month == data.time.minusMonths(1).month) {
-//									log("reloading Month ${data.time.month} from updateCallback", LogType.NORMAL)
-//									val weeksData = generateMonth(overviewTime)
-//									overviewWeeks.clear()
-//									overviewWeeks.addAll(weeksData)
-//								}
-						})
+						TabManager.openTab("WeekNotes${data.WeekOfYear}/${data.time.year}", ::createNoteTab, data)
 					}
 					onMouseEntered = EventHandler { img.image = hoveredImg }
 					onMouseExited = EventHandler { img.image = defaultImg }

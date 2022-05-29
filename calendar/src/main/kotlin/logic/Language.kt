@@ -19,12 +19,16 @@ class Language(private val language: AvailableLanguages) {
 	 * in translations Map
 	 */
 	init {
-		val file = File({}::class.java.classLoader.getResource("${ConfigFiles.languageFiles}/$language.json").toURI())
-		if(!file.exists()) {
-			file.createNewFile()
-			file.writeText(EMPTY_LANGUAGE)
+		try {
+			val file =
+				File({}::class.java.classLoader.getResource("${ConfigFiles.languageFiles}/$language.json")!!.toURI())
+			translations = (getJson().fromJson<Map<String, Map<String, String>>>(
+				getJsonReader(FileReader(file)),
+				Map::class.java
+			)).mapKeys { TranslationTypes.valueOf(it.key) }
+		} catch(e: NullPointerException) {
+			throw Exit("??????", e)
 		}
-		translations = (getJson().fromJson<Map<String, Map<String, String>>>(getJsonReader(FileReader(file)), Map::class.java)).mapKeys { TranslationTypes.valueOf(it.key) }
 	}
 	
 	
@@ -42,7 +46,8 @@ class Language(private val language: AvailableLanguages) {
 		return try {
 			translations[type]!![tr]!!
 		} catch(e: NullPointerException) {
-			val caller = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }[2] // go back to getLangString and then calling methods
+			val caller = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
+				.walk { it.toList() }[2] // go back to getLangString and then calling methods
 			log(
 				"translation for |${
 					tr.trim().lowercase()
@@ -80,4 +85,5 @@ class Language(private val language: AvailableLanguages) {
 	}
 }
 
-fun String.translate(type: Language.TranslationTypes, vararg args: Any?) = language.getTranslation(this, type).format(*args)
+fun String.translate(type: Language.TranslationTypes, vararg args: Any?) =
+	language.getTranslation(this, type).format(*args)

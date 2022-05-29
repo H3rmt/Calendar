@@ -134,7 +134,6 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 		menu("options".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(createMenuItem(this@menu, "Reload", "F5") {
 				init()
-				Secure.overrideTab("calendar", ::createOverviewTab)
 			}, createMenuItem(this@menu, "Preferences", "Strg + ,") {
 				log("Preferences")
 			}, run { separator(); return@run null }, createMenuItem(this@menu, "Quit", "Strg + Q") {
