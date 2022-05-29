@@ -34,8 +34,6 @@ class ReminderPopup: Fragment() {
 	private var description: Property<String> = reminder?.description?.clone() ?: "".toProperty()
 	private var appointment: Property<Appointment?> = reminder?.appointment?.clone() ?: SimpleObjectProperty()
 	
-	private var onSave: (Reminder) -> Unit = scope.save
-	
 	private var error: Property<String> = "".toProperty()
 	private var windowTitle: String = scope.title
 	
@@ -150,7 +148,6 @@ class ReminderPopup: Fragment() {
 						if(check == null) {
 							if(reminder == null) reminder = createReminder()
 							updateReminder()
-							onSave.invoke(reminder!!)
 							close()
 						} else {
 							error.value = check
@@ -173,7 +170,6 @@ class ReminderPopup: Fragment() {
 		val saveTitle: String,
 		val reminder: Reminder?,
 		val end: LocalDateTime,
-		val save: (Reminder) -> Unit,
 		val timeOrAppointment: Boolean
 	): Scope()
 	
@@ -185,10 +181,9 @@ class ReminderPopup: Fragment() {
 			block: Boolean,
 			reminder: Reminder?,
 			end: LocalDateTime,
-			save: (Reminder) -> Unit,
 			timeOrAppointment: Boolean = true
 		): Stage? {
-			val scope = ItemsScope(title, saveTitle, reminder, end, save, timeOrAppointment)
+			val scope = ItemsScope(title, saveTitle, reminder, end, timeOrAppointment)
 			return find<ReminderPopup>(scope).openModal(
 				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false
 			)

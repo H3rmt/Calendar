@@ -35,8 +35,6 @@ class AppointmentPopup: Fragment() {
 	private var type: Property<Type> = appointment?.type?.clone() ?: Types.getRandom("Appointment").toProperty()
 	private var wholeDay: Property<Boolean> = appointment?.allDay?.clone() ?: false.toProperty()
 	
-	private var onSave: (Appointment) -> Unit = scope.save
-	
 	private var error: Property<String> = "".toProperty()
 	private var control: BorderPane? = null
 	private var day: Property<LocalDate> = (appointment?.start?.value ?: scope.start).toLocalDate().toProperty()
@@ -81,32 +79,32 @@ class AppointmentPopup: Fragment() {
 	
 	private fun createAppointment(): Appointment = if(wholeDay.value) {
 		Appointment.new(
-			_start = day.value.atStartOfDay(),
-			_end = day.value.plusDays(1).atStartOfDay().minusMinutes(1),
-			_title = appointmentTitle.value,
-			_description = description.value,
-			_type = type.value,
-			_allDay = true
+			start = day.value.atStartOfDay(),
+			end = day.value.plusDays(1).atStartOfDay().minusMinutes(1),
+			title = appointmentTitle.value,
+			description = description.value,
+			type = type.value,
+			allDay = true
 		)
 	} else {
 		Appointment.new(
-			_start = start.value,
-			_end = end.value,
-			_title = appointmentTitle.value,
-			_description = description.value,
-			_type = type.value,
-			_allDay = false
+			start = start.value,
+			end = end.value,
+			title = appointmentTitle.value,
+			description = description.value,
+			type = type.value,
+			allDay = false
 		)
 	}
 	
-	@Suppress("ReturnCount")
 	private fun checkAppointment(): String? {
-		if(appointmentTitle.value.isEmpty()) {
-			return "missing title".translate(Language.TranslationTypes.AppointmentPopup)
+		return if(appointmentTitle.value.isEmpty()) {
+			"missing title".translate(Language.TranslationTypes.AppointmentPopup)
 		} else if(end.value.toUTCEpochMinute() < start.value.toUTCEpochMinute()) {
-			return "start must be before end".translate(Language.TranslationTypes.AppointmentPopup)
+			"start must be before end".translate(Language.TranslationTypes.AppointmentPopup)
+		} else {
+			null
 		}
-		return null
 	}
 	
 	override fun onBeforeShow() {
@@ -163,7 +161,6 @@ class AppointmentPopup: Fragment() {
 						if(check == null) {
 							if(appointment == null) appointment = createAppointment()
 							updateAppointment()
-							onSave.invoke(appointment!!)
 							close()
 						} else {
 							error.value = check
@@ -185,8 +182,7 @@ class AppointmentPopup: Fragment() {
 		val saveTitle: String,
 		val appointment: Appointment?,
 		val start: LocalDateTime,
-		val end: LocalDateTime,
-		val save: (Appointment) -> Unit
+		val end: LocalDateTime
 	): Scope()
 	
 	companion object {
@@ -197,10 +193,9 @@ class AppointmentPopup: Fragment() {
 			block: Boolean,
 			appointment: Appointment?,
 			start: LocalDateTime,
-			end: LocalDateTime,
-			save: (Appointment) -> Unit
+			end: LocalDateTime
 		): Stage? {
-			val scope = ItemsScope(title, saveTitle, appointment, start, end, save)
+			val scope = ItemsScope(title, saveTitle, appointment, start, end)
 			return find<AppointmentPopup>(scope).openModal(
 				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false
 			)
