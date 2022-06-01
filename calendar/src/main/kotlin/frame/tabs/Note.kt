@@ -107,6 +107,7 @@ fun noteTab(tabs: VBox, note: Note): TitledPane {
 		isExpanded = getConfig(Configs.ExpandNotesOnOpen)
 		addClass(NoteStyles.notesPane_)
 		
+		@Suppress("JoinDeclarationAndAssignment")
 		lateinit var editor: HTMLEditor
 		
 		graphic = toolbar {

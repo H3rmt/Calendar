@@ -121,14 +121,14 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 					"create".translate(Language.TranslationTypes.AppointmentPopup),
 					false,
 					null,
-					Timing.getNowLocal(),
-					Timing.getNowLocal().plusHours(1))
+					Timing.getNow(),
+					Timing.getNow().plusHours(1))
 			}, createMenuItem(this@menu, "Reminder", "Strg + R") {
 				ReminderPopup.open("new reminder".translate(Language.TranslationTypes.ReminderPopup),
 					"create".translate(Language.TranslationTypes.ReminderPopup),
 					false,
 					null,
-					Timing.getNowLocal())
+					Timing.getNow())
 			})
 		}
 		menu("options".translate(Language.TranslationTypes.Menubar)) {

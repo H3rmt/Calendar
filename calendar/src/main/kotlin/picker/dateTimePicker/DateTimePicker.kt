@@ -31,24 +31,13 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 	// this property only gets updated if the OK button is pressed
 	val dateTimeProperty: Property<LocalDateTime> = SimpleObjectProperty(dateTime)
 	
-	// fake Property that generate its values from other props when it gets accessed, and updates the other props if it gets changed
-	private val timeProperty: Property<LocalTime> = object: SimpleObjectProperty<LocalTime>() {
-		override fun getValue(): LocalTime = LocalTime.of(hourProperty.value, minuteProperty.value)
-		
-		override fun setValue(v: LocalTime?) {
-			minuteProperty.value = v?.minute
-			hourProperty.value = v?.hour
-		}
-	}
-	
-	
 	private val dateProperty: Property<LocalDate> = dateTime.toLocalDate().toProperty()
-	val minuteProperty: IntegerProperty = dateTime.minute.toProperty()
-	val hourProperty: IntegerProperty = dateTime.hour.toProperty()
+	private val minuteProperty: IntegerProperty = dateTime.minute.toProperty()
+	private val hourProperty: IntegerProperty = dateTime.hour.toProperty()
 	
 	
 	private val popup: DateTimePickerPopup = DateTimePickerPopup(dateProperty, hourProperty, minuteProperty) {
-		dateTimeProperty.value = LocalDateTime.of(dateProperty.value, timeProperty.value)
+		dateTimeProperty.value = LocalDateTime.of(dateProperty.value, LocalTime.of(hourProperty.value, minuteProperty.value))
 		button.fire()
 	}
 	

@@ -1,7 +1,5 @@
 package frame.tabs
 
-import Day
-import Week
 import calendar.Timing
 import frame.popup.AppointmentPopup
 import frame.styles.GlobalStyles
@@ -23,16 +21,20 @@ import java.time.LocalDateTime
 import java.time.temporal.IsoFields
 
 
-fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> Unit): Tab {
+fun createWeekTab(pane: TabPane, time: LocalDateTime): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab("") {
-		text =
-			"${week.time.dayOfMonth} - ${week.time.plusDays(6).dayOfMonth} / ${week.time.month.name.translate(Language.TranslationTypes.Global)}"
+		text = "Week %s - %s".translate(
+			Language.TranslationTypes.Week,
+			"${time.dayOfMonth}.${time.month}.",
+			"${time.plusDays(6).dayOfMonth}.${time.plusDays(6).month}."
+		)
 		isClosable = true
 		addClass(TabStyles.tab_)
 		
 		// mainTab
 		vbox {
+			addClass(TabStyles.content_)
 			hbox(spacing = 40.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar_)
 				label("Week".translate(Language.TranslationTypes.Week)) {
@@ -58,20 +60,21 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 						addClass(GlobalStyles.tableItem_)
 					}
 					for(header in arrayListOf(
-						"Monday",
-						"Tuesday",
-						"Wednesday",
-						"Thursday",
-						"Friday",
-						"Saturday",
-						"Sunday"
+						"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
 					)) {
-						label(header.translate(Language.TranslationTypes.Week)) {
+						label(header.translate(Language.TranslationTypes.Note)) {
 							addClass(GlobalStyles.tableItem_)
 							addClass(GlobalStyles.tableHeaderItem_)
 							addClass(WeekStyles.tableTimeHeader_)
 						}
 					}
+				}
+				
+				scrollpane(fitToWidth = true, fitToHeight = true) {
+					addClass(GlobalStyles.disableFocusDraw_)
+					addClass(GlobalStyles.maxHeight_)
+					addClass(GlobalStyles.background_)
+					isPannable = true
 				}
 				
 				var table: ScrollPane? = null
@@ -94,20 +97,22 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 								.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 								bar.visibleProperty().listen { visible ->
 									if(visible) {
-										scrollbarWidth.value =
-											13.3 + 2 // 13.3 = scrollpane  scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+										scrollbarWidth.value = 13.3 + 2 // 13.3 scrollbar  2 padding right of inner vbox
 									} else {
-										scrollbarWidth.value =
-											2.0 //scrollbarWidthInitial.toDouble() + 2 // 2 padding right of inner vbox
+										scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
 									}
 								}
 							}
 						}
 						
+						
+						// gets stretched across whole scrollpane
 						hbox {
 							addClass(GlobalStyles.background_)
+							
 							vbox(alignment = Pos.TOP_CENTER) {
 								addClass(WeekStyles.tableDay_)
+								
 								for(hour in 0..23) {
 									vbox(alignment = Pos.CENTER) {
 										addClass(WeekStyles.TimeCell_)
@@ -119,9 +124,9 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 											}
 										}
 										
-										if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(
+										if(Timing.getNow().hour == hour && time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == Timing.getNow().get(
 												IsoFields.WEEK_OF_WEEK_BASED_YEAR
-											) && week.time.year == now.year
+											) && time.year == Timing.getNow().year
 										) addClass(
 											WeekStyles.ActiveTimeCell_
 										)
@@ -259,8 +264,8 @@ fun createWeekTab(pane: TabPane, week: Week, _day: Day?, updateCallback: () -> U
 																		"save".translate(Language.TranslationTypes.AppointmentPopup),
 																		false,
 																		appointment,
-																		Timing.getNowLocal(), // irrelevant, as they get overridden by values in appointment
-																		Timing.getNowLocal()
+																		Timing.getNow(), // irrelevant, as they get overridden by values in appointment
+																		Timing.getNow()
 																	)
 																}
 															}
