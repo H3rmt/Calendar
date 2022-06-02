@@ -1,7 +1,8 @@
 package frame.tabs
 
+import calendar.Appointment
+import calendar.Appointments
 import calendar.Timing
-import frame.popup.AppointmentPopup
 import frame.styles.GlobalStyles
 import frame.styles.TabStyles
 import frame.styles.WeekStyles
@@ -9,25 +10,32 @@ import javafx.beans.property.DoubleProperty
 import javafx.event.EventHandler
 import javafx.geometry.Orientation
 import javafx.geometry.Pos
-import javafx.scene.control.*
+import javafx.scene.control.ScrollBar
+import javafx.scene.control.ScrollPane
+import javafx.scene.control.Tab
+import javafx.scene.control.TabPane
 import javafx.scene.layout.BorderStrokeStyle
+import javafx.scene.paint.Color
 import listen
+import listenAndRunOnce
 import logic.Language
 import logic.LogType
 import logic.log
 import logic.translate
 import tornadofx.*
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.temporal.IsoFields
 
 
-fun createWeekTab(pane: TabPane, time: LocalDateTime): Tab {
+fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 	log("creating week tab", LogType.IMPORTANT)
 	return pane.tab("") {
 		text = "Week %s - %s".translate(
 			Language.TranslationTypes.Week,
-			"${time.dayOfMonth}.${time.month}.",
-			"${time.plusDays(6).dayOfMonth}.${time.plusDays(6).month}."
+			"${time.dayOfMonth}.${time.month.value}.",
+			"${time.plusDays(6).dayOfMonth}.${time.plusDays(6).month.value}."
 		)
 		isClosable = true
 		addClass(TabStyles.tab_)
@@ -75,107 +83,79 @@ fun createWeekTab(pane: TabPane, time: LocalDateTime): Tab {
 					addClass(GlobalStyles.maxHeight_)
 					addClass(GlobalStyles.background_)
 					isPannable = true
-				}
-				
-				var table: ScrollPane? = null
-				
-				// table_
-				fun updateTable() {
-					children.remove(table)
-					log("updated table_ view", LogType.LOW)
-					var scrollToHour = 0
 					
-					table = scrollpane(fitToWidth = true, fitToHeight = true) {
-						addClass(GlobalStyles.disableFocusDraw_)
-						addClass(GlobalStyles.maxHeight_)
+					// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
+					widthProperty().listen(once = true) {
+						lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
+							.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
+							bar.visibleProperty().listen { visible ->
+								if(visible) {
+									scrollbarWidth.value = 13.3 + 2 // 13.3 scrollbar  2 padding right of inner vbox
+								} else {
+									scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
+								}
+							}
+						}
+					}
+					
+					// gets stretched across whole scrollpane
+					hbox {
 						addClass(GlobalStyles.background_)
-						isPannable = true
-						
-						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-						widthProperty().listen(once = true) {
-							lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
-								.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-								bar.visibleProperty().listen { visible ->
-									if(visible) {
-										scrollbarWidth.value = 13.3 + 2 // 13.3 scrollbar  2 padding right of inner vbox
-									} else {
-										scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
+						// week number columns
+						vbox {
+							addClass(WeekStyles.tableDay_)
+							
+							for(hour in 0..23) {
+								vbox(alignment = Pos.CENTER) {
+									addClass(WeekStyles.TimeCell_)
+									if(hour != 23) { // remove border on last element
+										style(append = true) {
+											borderColor += box(c(0.75, 0.75, 0.75))
+											borderStyle += BorderStrokeStyle.DOTTED
+											borderWidth += box(0.px, 0.px, 2.px, 0.px)
+										}
+									}
+									
+									if(Timing.getNow().hour == hour && time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == Timing.getNow()
+											.get(
+												IsoFields.WEEK_OF_WEEK_BASED_YEAR
+											) && time.year == Timing.getNow().year
+									) addClass(
+										WeekStyles.ActiveTimeCell_
+									)
+									
+									label {
+										style {
+											fontSize = 20.px
+										}
+										text = String.format("%02d", hour)
 									}
 								}
 							}
 						}
 						
-						
-						// gets stretched across whole scrollpane
-						hbox {
-							addClass(GlobalStyles.background_)
-							
-							vbox(alignment = Pos.TOP_CENTER) {
+						for(day in 0..6) {
+							val ctime = time.plusDays(day.toLong())
+							vbox {
 								addClass(WeekStyles.tableDay_)
 								
 								for(hour in 0..23) {
+									val cctime = LocalDateTime.of(ctime, LocalTime.of(hour, 0))
 									vbox(alignment = Pos.CENTER) {
 										addClass(WeekStyles.TimeCell_)
-										if(hour != 23) { // remove border on last element
-											style(append = true) {
-												borderColor += box(c(0.75, 0.75, 0.75))
-												borderStyle += BorderStrokeStyle.DOTTED
-												borderWidth += box(0.px, 0.px, 2.px, 0.px)
-											}
-										}
 										
-										if(Timing.getNow().hour == hour && time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == Timing.getNow().get(
-												IsoFields.WEEK_OF_WEEK_BASED_YEAR
-											) && time.year == Timing.getNow().year
-										) addClass(
-											WeekStyles.ActiveTimeCell_
-										)
-										
-										label {
-											style {
-												fontSize = 20.px
+										hbox(alignment = Pos.CENTER) {
+											addClass(WeekStyles.UnHoveredInnerTimeCell_)
+											onMouseEntered = EventHandler {
+												addClass(WeekStyles.HoveredInnerTimeCell_)
 											}
-											text = String.format("%02d", hour)
-										}
-									}
-								}
-							}
-							for((dayOfWeek, day) in week.allDays) {
-								val appointments = week.allDays[dayOfWeek]?.appointments ?: listOf()
-								log("Day: $dayOfWeek: $appointments", LogType.LOW)
-								
-								vbox(alignment = Pos.TOP_CENTER) {
-									addClass(WeekStyles.tableDay_)
-									
-									for(hour in 0..23) {
-										// outer tableCell with border
-										hbox {
-											addClass(WeekStyles.TimeCell_)
-											if(hour != 23)  // remove border on last element
-												addClass(WeekStyles.TimeCellBorder_)
-											
-											if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(
-													IsoFields.WEEK_OF_WEEK_BASED_YEAR
-												) && week.time.year == now.year
-											) {
-												addClass(WeekStyles.ActiveTimeCell_)
-												scrollToHour = hour
+											onMouseExited = EventHandler {
+												removeClass(WeekStyles.HoveredInnerTimeCell_)
 											}
-											
-											// inner tableCell
-											hbox(spacing = 2.0, alignment = Pos.CENTER) {
-												
-												// appointments
-												val cellAppointments = appointments.filter {
-													val cellTimeStart =
-														LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0)
-													val cellTimeEnd =
-														LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0)
-															.plusHours(1)
-													cellTimeEnd > it.start.value && cellTimeStart < it.end.value
-												}
-												
-												for((ind, app) in cellAppointments.withIndex()) {
+											val update = { list: List<Appointment> ->
+												children.clear()
+												for((ind, app) in list.withIndex()) {
+													
 													// colored box(es)
 													hbox {
 														gridpaneConstraints {
@@ -195,11 +175,110 @@ fun createWeekTab(pane: TabPane, time: LocalDateTime): Tab {
 															// translateY = -10.px
 															
 															padding = box(2.px)
+															backgroundColor += app.type.value.color.value // TODO bind
+														}
+													}
+												}
+											}
+											val appointments =
+												Appointments.getAppointmentsFromTo(cctime, cctime.plusHours(1), cctime.dayOfWeek)
+											appointments.listenAndRunOnce(update)
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				
+				var table: ScrollPane? = null
+				
+				// table_
+				fun updateTable() {
+					children.remove(table)
+					log("updated table_ view", LogType.LOW)
+					var scrollToHour = 0
+					
+					table = scrollpane(fitToWidth = true, fitToHeight = true) {
+						addClass(GlobalStyles.disableFocusDraw_)
+						addClass(GlobalStyles.maxHeight_)
+						addClass(GlobalStyles.background_)
+						isPannable = true
+						
+						
+						// gets stretched across whole scrollpane
+						hbox {
+							addClass(GlobalStyles.background_)
+							
+							vbox(alignment = Pos.TOP_CENTER) {
+								style {
+									backgroundColor += Color.BLUE
+								}
+							}
+
+
+/*
+							for((dayOfWeek, day) in week.allDays) {
+								val appointments = week.allDays[dayOfWeek]?.appointments ?: listOf()
+								log("Day: $dayOfWeek: $appointments", LogType.LOW)
+
+								vbox(alignment = Pos.TOP_CENTER) {
+									addClass(WeekStyles.tableDay_)
+
+									for(hour in 0..23) {
+										// outer tableCell with border
+										hbox {
+											addClass(WeekStyles.TimeCell_)
+											if(hour != 23)  // remove border on last element
+												addClass(WeekStyles.TimeCellBorder_)
+
+											if(now.hour == hour && week.time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == now.get(
+													IsoFields.WEEK_OF_WEEK_BASED_YEAR
+												) && week.time.year == now.year
+											) {
+												addClass(WeekStyles.ActiveTimeCell_)
+												scrollToHour = hour
+											}
+
+											// inner tableCell
+											hbox(spacing = 2.0, alignment = Pos.CENTER) {
+
+												// appointments
+												val cellAppointments = appointments.filter {
+													val cellTimeStart =
+														LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0)
+													val cellTimeEnd =
+														LocalDateTime.of(day.time.year, day.time.month, day.time.dayOfMonth, hour, 0)
+															.plusHours(1)
+													cellTimeEnd > it.start.value && cellTimeStart < it.end.value
+												}
+
+												for((ind, app) in cellAppointments.withIndex()) {
+													// colored box(es)
+													hbox {
+														gridpaneConstraints {
+															columnRowIndex(ind, 0)
+														}
+
+														label(app.title)
+														style {
+															prefWidth = Int.MAX_VALUE.px
+
+															// val height = ((app.start + app.duration) - hour * 60).coerceAtMost(60).toInt()
+
+															// prefHeight = 20.px//height * (this@gridpane.height / 60).px
+															// maxHeight_ = prefHeight
+															// minHeight = prefHeight
+
+															// translateY = -10.px
+
+															padding = box(2.px)
 															backgroundColor += app.type.value.color.value // TODO repaint
 														}
 													}
 												}
-												
+
 												addClass(WeekStyles.UnHoveredInnerTimeCell_)
 												onMouseEntered = EventHandler {
 													addClass(WeekStyles.HoveredInnerTimeCell_)
@@ -207,7 +286,7 @@ fun createWeekTab(pane: TabPane, time: LocalDateTime): Tab {
 												onMouseExited = EventHandler {
 													removeClass(WeekStyles.HoveredInnerTimeCell_)
 												}
-												
+
 												contextmenu {
 													item("new appointment".translate(Language.TranslationTypes.Week)) {
 														action {
@@ -277,13 +356,14 @@ fun createWeekTab(pane: TabPane, time: LocalDateTime): Tab {
 									}
 								}
 							}
+*/
 						}
 						// scroll to current time a place ~in middle
 						vvalue = (scrollToHour.toDouble() / 23) * vmax
 					}
 				}
-				
-				updateTable()
+
+//				updateTable()
 			}
 		}
 	}
