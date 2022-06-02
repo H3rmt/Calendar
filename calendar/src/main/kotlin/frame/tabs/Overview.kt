@@ -14,7 +14,6 @@ import javafx.animation.*
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleIntegerProperty
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Orientation
@@ -35,14 +34,10 @@ import logic.*
 import tornadofx.*
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.temporal.ChronoField
 import java.time.temporal.IsoFields
 
-val overviewTime: Property<LocalDate> = Timing.getNowLocal().toLocalDate().toProperty()
-
-val now: LocalDateTime = Timing.getNowLocal()
-
+val overviewTime: Property<LocalDate> = Timing.getNow().toLocalDate().toProperty()
 
 fun createOverviewTab(pane: TabPane): Tab {
 	log("creating overview tab", LogType.IMPORTANT)
@@ -80,9 +75,8 @@ fun createOverviewTab(pane: TabPane): Tab {
 				}
 			}
 			
-			log("creating table_ view", LogType.LOW)
-			
-			
+			log("creating table view", LogType.LOW)
+			// Table view
 			vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 				addClass(GlobalStyles.disableFocusDraw_)
 				addClass(GlobalStyles.table_)
@@ -111,8 +105,6 @@ fun createOverviewTab(pane: TabPane): Tab {
 					}
 				}
 				
-				val selectedIndex = SimpleIntegerProperty(-1)
-				
 				scrollpane(fitToWidth = true, fitToHeight = true) {
 					addClass(GlobalStyles.disableFocusDraw_)
 					addClass(GlobalStyles.maxHeight_)
@@ -131,29 +123,152 @@ fun createOverviewTab(pane: TabPane): Tab {
 								}
 							}
 						}
+					}
+					
+					
+					// gets stretched across whole scrollpane
+					vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
+						addClass(GlobalStyles.background_)
 						
-						
-						// gets stretched across whole scrollpane
-						vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
-							addClass(GlobalStyles.background_)
+						val update = { new: LocalDate ->
+							clear()
 							
-							val update = { new: LocalDate ->
-								clear()
+							// get date of first visible cell
+							var time: LocalDate = new.withDayOfMonth(1).with(ChronoField.DAY_OF_WEEK, 1)
+							// loop until last week with day in this month is complete
+							do {
+								// clone time, so that later called callbacks use right time and not time of last day
+								val ctime = time
 								
-								// get date of first visible cell
-								var time: LocalDate = new.withDayOfMonth(1).with(ChronoField.DAY_OF_WEEK, 1)
-								// loop until last week with day in this month is complete
-								do {
-									// clone time, so that later called callbacks use right time and not time of last day
-									val ctime = time
+								// week box
+								hbox(spacing = 5.0, alignment = Pos.CENTER) {
+									// week cell
+									vbox {
+										addClass(GlobalStyles.tableItem_)
+										addClass(OverviewStyles.cell_)
+										addClass(OverviewStyles.disabledCell_)
+										gridpane {
+											style {
+												prefWidth = Int.MAX_VALUE.px
+												padding = box(0.px, 3.px, 2.px, 3.px)
+											}
+											anchorpane {
+												gridpaneConstraints {
+													columnIndex = 0
+												}
+											}
+											label(ctime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR).toString()) {
+												gridpaneConstraints {
+													columnIndex = 1
+												}
+												addClass(OverviewStyles.cellLabel_)
+											}
+											anchorpane {
+												gridpaneConstraints {
+													columnIndex = 2
+												}
+												
+												val imgView = imageview {
+													addClass(OverviewStyles.cellIcon_)
+													fitHeight = 21.5
+													fitWidth = 21.5
+												}
+												
+												// update images on notes updates
+												lateinit var img: Image
+												lateinit var hoveredImg: Image
+												val update = { empty: Boolean ->
+													img = if(empty) {
+														createFXImage("note.svg")
+													} else {
+														createFXImage("note active.svg")
+													}
+													hoveredImg = if(empty) {
+														createFXImage("note hovered.svg")
+													} else {
+														createFXImage("note active hovered.svg")
+													}
+													imgView.image = if(imgView.isHover) hoveredImg else img
+												}
+												
+												val notes = Notes.getNotesAt(ctime)
+												notes.listenAndRunOnce {
+													update(it.isEmpty())
+												}
+												
+												onMouseClicked
+												onMouseEntered = EventHandler { imgView.image = hoveredImg }
+												onMouseExited = EventHandler { imgView.image = img }
+											}
+										}
+										
+										vbox(spacing = 1, alignment = Pos.TOP_LEFT) {
+											style(append = true) {
+//												backgroundColor += Color.AQUA
+//												prefHeight = DETAILSPANMINHEIGHT.px
+											}
+											
+											// just rerender whole day on change (doesn't make a difference here,
+											// to append to pane on add and remove on remove)
+											val update = { appointments: List<Appointment> ->
+												clear()
+												val width =
+													(if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
+												
+												val list = mutableMapOf<Type, Int>()
+												for(appointment in appointments) {
+													list[appointment.type.value] = list[appointment.type.value]?.plus(1) ?: 1
+												}
+												
+												for((index, typeCount) in list.entries.withIndex()) {
+													label {
+														val update = { title: String ->
+															text = "$title: ${typeCount.value}"
+														}
+														val title = typeCount.key.name
+														title.listen(runOnceWithValue = true) {
+															update(it)
+														}
+														
+														val update2 = { color: javafx.scene.paint.Color ->
+															textFill = color
+														}
+														val color = typeCount.key.color
+														color.listen(runOnceWithValue = true) {
+															update2(it)
+														}
+														
+														addClass(OverviewStyles.cellAppointLabel_)
+//															translateX = HORIZONTAL_LEFT_MARGIN + CIRCLE_WIDTH
+//															translateY = SIDE_TOP_MARGIN + index * (SPACING + CIRCLE_WIDTH) - CIRCLE_WIDTH / 1.1
+														
+														maxWidth = width - HORIZONTAL_LEFT_MARGIN - CIRCLE_WIDTH
+														ellipsisString = ".."
+														textOverrun = OverrunStyle.ELLIPSIS
+													}
+												}
+											}
+											
+											val appointments: ObservableList<Appointment> = Appointments.getAppointmentsFromTo(
+												ctime.atStartOfDay(), ctime.plusWeeks(1).atStartOfDay(), ctime.dayOfWeek
+											)
+											
+											appointments.listenAndRunOnce {
+												update(it)
+											}
+										}
+									}
 									
-									// week box
-									hbox(spacing = 5.0, alignment = Pos.CENTER) {
-										// week cell
-										vbox {
+									// day cells
+									do {
+										// clone time, so that later called callbacks use right time and not time of last day
+										val cctime = time
+										
+										vbox(alignment = Pos.TOP_LEFT) {
 											addClass(GlobalStyles.tableItem_)
 											addClass(OverviewStyles.cell_)
-											addClass(OverviewStyles.disabledCell_)
+											if(cctime.month != new.month)
+												addClass(OverviewStyles.disabledCell_)
 											gridpane {
 												style {
 													prefWidth = Int.MAX_VALUE.px
@@ -163,8 +278,19 @@ fun createOverviewTab(pane: TabPane): Tab {
 													gridpaneConstraints {
 														columnIndex = 0
 													}
+													val defaultImg = createFXImage("remind.svg")
+													val hoveredImg = createFXImage("remind hovered.svg")
+													
+													val img = imageview(defaultImg) {
+														addClass(OverviewStyles.cellIcon_)
+														fitHeight = 21.5
+														fitWidth = 21.5
+													}
+													onMouseClicked
+													onMouseEntered = EventHandler { img.image = hoveredImg }
+													onMouseExited = EventHandler { img.image = defaultImg }
 												}
-												label(ctime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR).toString()) {
+												label(cctime.dayOfMonth.toString()) {
 													gridpaneConstraints {
 														columnIndex = 1
 													}
@@ -190,7 +316,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 														} else {
 															createFXImage("note active.svg")
 														}
-														hoveredImg= if(empty) {
+														hoveredImg = if(empty) {
 															createFXImage("note hovered.svg")
 														} else {
 															createFXImage("note active hovered.svg")
@@ -198,21 +324,28 @@ fun createOverviewTab(pane: TabPane): Tab {
 														imgView.image = if(imgView.isHover) hoveredImg else img
 													}
 													
-													val notes = Notes.getNotesAt(ctime)
+													val notes = Notes.getNotesAt(cctime)
 													notes.listenAndRunOnce {
 														update(it.isEmpty())
 													}
 													
-													onMouseClicked
+													onMouseClicked = EventHandler {
+														it.consume()
+														TabManager.openTab(
+															"WeekNotes/${cctime.year}/${cctime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}/${cctime.dayOfWeek}",
+															::createNoteTab,
+															cctime,
+															false
+														)
+													}
 													onMouseEntered = EventHandler { imgView.image = hoveredImg }
 													onMouseExited = EventHandler { imgView.image = img }
 												}
 											}
-											
-											vbox(spacing = 1, alignment = Pos.TOP_LEFT) {
+											vbox {
 												style(append = true) {
-//												backgroundColor += Color.AQUA
-//												prefHeight = DETAILSPANMINHEIGHT.px
+//													backgroundColor += Color.AQUA
+//													prefHeight = DETAILSPANMINHEIGHT.px
 												}
 												
 												// just rerender whole day on change (doesn't make a difference here,
@@ -222,17 +355,12 @@ fun createOverviewTab(pane: TabPane): Tab {
 													val width =
 														(if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
 													
-													val list = mutableMapOf<Type, Int>()
-													for(appointment in appointments) {
-														list[appointment.type.value] = list[appointment.type.value]?.plus(1) ?: 1
-													}
-													
-													for((index, typeCount) in list.entries.withIndex()) {
+													for((index, appointment) in appointments.withIndex()) {
 														label {
 															val update = { title: String ->
-																text = "$title: ${typeCount.value}"
+																text = title
 															}
-															val title = typeCount.key.name
+															val title = appointment.title
 															title.listen(runOnceWithValue = true) {
 																update(it)
 															}
@@ -240,7 +368,8 @@ fun createOverviewTab(pane: TabPane): Tab {
 															val update2 = { color: javafx.scene.paint.Color ->
 																textFill = color
 															}
-															val color = typeCount.key.color
+															val color = appointment.type.value.color
+															update2(color.value)
 															color.listen(runOnceWithValue = true) {
 																update2(it)
 															}
@@ -256,278 +385,151 @@ fun createOverviewTab(pane: TabPane): Tab {
 													}
 												}
 												
-												val appointments: ObservableList<Appointment> = Appointments.getAppointmentsFromTo(
-													ctime.atStartOfDay(), ctime.plusWeeks(1).atStartOfDay(), ctime.dayOfWeek
+												val appointments = Appointments.getAppointmentsFromTo(
+													cctime.atStartOfDay(), cctime.plusDays(1).atStartOfDay(), cctime.dayOfWeek
 												)
-												
 												appointments.listenAndRunOnce {
 													update(it)
 												}
 											}
 										}
-										
-										// day cells
-										do {
-											// clone time, so that later called callbacks use right time and not time of last day
-											val cctime = time
-											
-											vbox(alignment = Pos.TOP_LEFT) {
-												addClass(GlobalStyles.tableItem_)
-												addClass(OverviewStyles.cell_)
-												if(cctime.month != new.month)
-													addClass(OverviewStyles.disabledCell_)
-												gridpane {
-													style {
-														prefWidth = Int.MAX_VALUE.px
-														padding = box(0.px, 3.px, 2.px, 3.px)
-													}
-													anchorpane {
-														gridpaneConstraints {
-															columnIndex = 0
-														}
-														val defaultImg = createFXImage("remind.svg")
-														val hoveredImg = createFXImage("remind hovered.svg")
-														
-														val img = imageview(defaultImg) {
-															addClass(OverviewStyles.cellIcon_)
-															fitHeight = 21.5
-															fitWidth = 21.5
-														}
-														onMouseClicked
-														onMouseEntered = EventHandler { img.image = hoveredImg }
-														onMouseExited = EventHandler { img.image = defaultImg }
-													}
-													label(cctime.dayOfMonth.toString()) {
-														gridpaneConstraints {
-															columnIndex = 1
-														}
-														addClass(OverviewStyles.cellLabel_)
-													}
-													anchorpane {
-														gridpaneConstraints {
-															columnIndex = 2
-														}
-														
-														val imgView = imageview {
-															addClass(OverviewStyles.cellIcon_)
-															fitHeight = 21.5
-															fitWidth = 21.5
-														}
-														
-														// update images on notes updates
-														lateinit var img: Image
-														lateinit var hoveredImg: Image
-														val update = { empty: Boolean ->
-															img = if(empty) {
-																createFXImage("note.svg")
-															} else {
-																createFXImage("note active.svg")
-															}
-															hoveredImg = if(empty) {
-																createFXImage("note hovered.svg")
-															} else {
-																createFXImage("note active hovered.svg")
-															}
-															imgView.image = if(imgView.isHover) hoveredImg else img
-														}
-														
-														val notes = Notes.getNotesAt(cctime)
-														notes.listenAndRunOnce {
-															update(it.isEmpty())
-														}
-														
-														onMouseClicked = EventHandler {
-															it.consume()
-															TabManager.openTab(
-																"WeekNotes/${cctime.year}/${cctime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}/${cctime.dayOfWeek}",
-																::createNoteTab,
-																cctime,
-																false
-															)
-														}
-														onMouseEntered = EventHandler { imgView.image = hoveredImg }
-														onMouseExited = EventHandler { imgView.image = img }
-													}
-												}
-												vbox {
-													style(append = true) {
-//													backgroundColor += Color.AQUA
-//													prefHeight = DETAILSPANMINHEIGHT.px
-													}
-													
-													// just rerender whole day on change (doesn't make a difference here,
-													// to append to pane on add and remove on remove)
-													val update = { appointments: List<Appointment> ->
-														clear()
-														val width =
-															(if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
-														
-														for((index, appointment) in appointments.withIndex()) {
-															label {
-																val update = { title: String ->
-																	text = title
-																}
-																val title = appointment.title
-																title.listen(runOnceWithValue = true) {
-																	update(it)
-																}
-																
-																val update2 = { color: javafx.scene.paint.Color ->
-																	textFill = color
-																}
-																val color = appointment.type.value.color
-																update2(color.value)
-																color.listen(runOnceWithValue = true) {
-																	update2(it)
-																}
-																
-																addClass(OverviewStyles.cellAppointLabel_)
-//															translateX = HORIZONTAL_LEFT_MARGIN + CIRCLE_WIDTH
-//															translateY = SIDE_TOP_MARGIN + index * (SPACING + CIRCLE_WIDTH) - CIRCLE_WIDTH / 1.1
-																
-																maxWidth = width - HORIZONTAL_LEFT_MARGIN - CIRCLE_WIDTH
-																ellipsisString = ".."
-																textOverrun = OverrunStyle.ELLIPSIS
-															}
-														}
-													}
-													
-													val appointments = Appointments.getAppointmentsFromTo(
-														cctime.atStartOfDay(), cctime.plusDays(1).atStartOfDay(), cctime.dayOfWeek
-													)
-													appointments.listenAndRunOnce {
-														update(it)
-													}
-												}
-											}
-											time = time.plusDays(1)
-										} while(time.dayOfWeek != DayOfWeek.MONDAY)
-									}
-								} while(time.month == new.month)
-							}
-							overviewTime.listen(update, runOnceWithValue = true)
-							/*
-							for((index, week) in list.withIndex()) {
-								hbox(spacing = 5.0, alignment = Pos.CENTER) {
-									val openTimeline = Timeline()
-									val closeTimeline = Timeline()
-
-									val cells = mutableListOf<VBox>()
-
-									val expand = SimpleDoubleProperty(DETAILSPANMINHEIGHT.toDouble())
-
-									val openAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
-									val closeAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
-
-									val temp = createCellGraphics(week, this@hbox, openTimeline, closeTimeline, expand)
-									cells.add(temp[0] as VBox)
-									@Suppress("UNCHECKED_CAST")
-									openAppointmentOpenAnimations.add(temp[1] as MutableList<Animation>)
-									@Suppress("UNCHECKED_CAST")
-									closeAppointmentOpenAnimations.add(temp[2] as MutableList<Animation>)
-
-									week.allDays.values.forEach {
-										val graphic = createCellGraphics(it, this@hbox, openTimeline, closeTimeline, expand)
-										cells.add(graphic[0] as VBox)
-
-										if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
-											(graphic[0] as VBox).addClass(OverviewStyles.markedCell_)
-
-										@Suppress("UNCHECKED_CAST")
-										openAppointmentOpenAnimations.add(graphic[1] as MutableList<Animation>)
-										@Suppress("UNCHECKED_CAST")
-										closeAppointmentOpenAnimations.add(graphic[2] as MutableList<Animation>)
-									}
-
-
-									val hoveredCell = SimpleIntegerProperty(-1)
-
-									for((cellIndex, cell) in cells.withIndex()) {
-										cell.onMouseEntered = EventHandler {
-											cell.addClass(OverviewStyles.hoveredCell_)
-											hoveredCell.value = cellIndex
-										}
-										cell.onMouseExited = EventHandler {
-											cell.removeClass(OverviewStyles.hoveredCell_)
-											hoveredCell.value = -1
-										}
-										cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
-									}
-
-									var openPreparation: Boolean
-
-									onMouseEntered = EventHandler {
-										if(selectedIndex.value != index) {
-											openPreparation = true
-											runAsync {
-												Thread.sleep(getConfig<Double>(Configs.AnimationDelay).toLong())
-												if(openPreparation) {
-													openPreparation = false
-													val skip = closeTimeline.totalDuration - closeTimeline.currentTime
-
-													closeAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
-													closeTimeline.stop()
-													openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
-													openTimeline.playFrom(skip)
-												}
-											}
-										}
-									}
-
-									onMouseExited = EventHandler {
-										if(selectedIndex.value != index) {
-											openPreparation = false
-											val skip = openTimeline.totalDuration - openTimeline.currentTime
-
-											openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
-											openTimeline.stop()
-											closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
-											closeTimeline.playFrom(skip)
-										}
-									}
-
-									// jumpTo end of close, so first open animation starts at beginning as closeTimeline.currentTime is at end
-									closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.jumpTo(it.totalDuration) } }
-									closeTimeline.jumpTo(closeTimeline.totalDuration)
-
+										time = time.plusDays(1)
+									} while(time.dayOfWeek != DayOfWeek.MONDAY)
 									onMouseClicked = EventHandler {
-										if(selectedIndex.value != index) {
-											selectedIndex.value = index
-											addClass(OverviewStyles.toggledRow_)
-										} else {
-											selectedIndex.value = -1
-											removeClass(OverviewStyles.toggledRow_)
-										}
-										if(it.clickCount > 1) {
-											log(
-												"click week: $week   day:${
-													week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
-												}", LogType.LOW
-											)
-											TabManager.openTab( // "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
-												"Week${week.time.dayOfMonth}/${week.time.year}",
+										if(it.clickCount == 2) {
+											it.consume()
+											TabManager.openTab(
+												"Week/${ctime.year}/${ctime.month}/${ctime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)}",
 												::createWeekTab,
-												week,
-												week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
-													log("update from Week triggered")
-													updateTable(overviewWeeks)
-												}
+												ctime
 											)
 										}
 									}
+								}
+							} while(time.month == new.month)
+						}
+						overviewTime.listen(update, runOnceWithValue = true)
+						/*
+						for((index, week) in list.withIndex()) {
+							hbox(spacing = 5.0, alignment = Pos.CENTER) {
+								val openTimeline = Timeline()
+								val closeTimeline = Timeline()
 
-									selectedIndex.addListener(ChangeListener { _, old, new ->
-										if(new != index) {
-											removeClass(OverviewStyles.toggledRow_)
-											if(old == index && (new != -1)) {
-												onMouseExited.handle(null)
+								val cells = mutableListOf<VBox>()
+
+								val expand = SimpleDoubleProperty(DETAILSPANMINHEIGHT.toDouble())
+
+								val openAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
+								val closeAppointmentOpenAnimations: MutableList<MutableList<Animation>> = mutableListOf()
+
+								val temp = createCellGraphics(week, this@hbox, openTimeline, closeTimeline, expand)
+								cells.add(temp[0] as VBox)
+								@Suppress("UNCHECKED_CAST")
+								openAppointmentOpenAnimations.add(temp[1] as MutableList<Animation>)
+								@Suppress("UNCHECKED_CAST")
+								closeAppointmentOpenAnimations.add(temp[2] as MutableList<Animation>)
+
+								week.allDays.values.forEach {
+									val graphic = createCellGraphics(it, this@hbox, openTimeline, closeTimeline, expand)
+									cells.add(graphic[0] as VBox)
+
+									if(it.time.dayOfYear == now.dayOfYear && it.time.year == now.year)
+										(graphic[0] as VBox).addClass(OverviewStyles.markedCell_)
+
+									@Suppress("UNCHECKED_CAST")
+									openAppointmentOpenAnimations.add(graphic[1] as MutableList<Animation>)
+									@Suppress("UNCHECKED_CAST")
+									closeAppointmentOpenAnimations.add(graphic[2] as MutableList<Animation>)
+								}
+
+
+								val hoveredCell = SimpleIntegerProperty(-1)
+
+								for((cellIndex, cell) in cells.withIndex()) {
+									cell.onMouseEntered = EventHandler {
+										cell.addClass(OverviewStyles.hoveredCell_)
+										hoveredCell.value = cellIndex
+									}
+									cell.onMouseExited = EventHandler {
+										cell.removeClass(OverviewStyles.hoveredCell_)
+										hoveredCell.value = -1
+									}
+									cell.widthProperty().listen { selectedIndex.value = -2 /*-1 doesn't close -2 forces close of row*/ }
+								}
+
+								var openPreparation: Boolean
+
+								onMouseEntered = EventHandler {
+									if(selectedIndex.value != index) {
+										openPreparation = true
+										runAsync {
+											Thread.sleep(getConfig<Double>(Configs.AnimationDelay).toLong())
+											if(openPreparation) {
+												openPreparation = false
+												val skip = closeTimeline.totalDuration - closeTimeline.currentTime
+
+												closeAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
+												closeTimeline.stop()
+												openAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
+												openTimeline.playFrom(skip)
 											}
 										}
-									})
+									}
 								}
+
+								onMouseExited = EventHandler {
+									if(selectedIndex.value != index) {
+										openPreparation = false
+										val skip = openTimeline.totalDuration - openTimeline.currentTime
+
+										openAppointmentOpenAnimations.forEach { ain -> ain.forEach { it.stop() } }
+										openTimeline.stop()
+										closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.playFrom(skip) } }
+										closeTimeline.playFrom(skip)
+									}
+								}
+
+								// jumpTo end of close, so first open animation starts at beginning as closeTimeline.currentTime is at end
+								closeAppointmentOpenAnimations.forEach { ani -> ani.forEach { it.jumpTo(it.totalDuration) } }
+								closeTimeline.jumpTo(closeTimeline.totalDuration)
+
+								onMouseClicked = EventHandler {
+									if(selectedIndex.value != index) {
+										selectedIndex.value = index
+										addClass(OverviewStyles.toggledRow_)
+									} else {
+										selectedIndex.value = -1
+										removeClass(OverviewStyles.toggledRow_)
+									}
+									if(it.clickCount > 1) {
+										log(
+											"click week: $week   day:${
+												week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1)
+											}", LogType.LOW
+										)
+										TabManager.openTab( // "${time.dayOfMonth} - ${time.plusDays(6).dayOfMonth} / ${getLangString(time.month.name)}"
+											"Week${week.time.dayOfMonth}/${week.time.year}",
+											::createWeekTab,
+											week,
+											week.allDays.values.toTypedArray().getOrNull(hoveredCell.value - 1), {
+												log("update from Week triggered")
+												updateTable(overviewWeeks)
+											}
+										)
+									}
+								}
+
+								selectedIndex.addListener(ChangeListener { _, old, new ->
+									if(new != index) {
+										removeClass(OverviewStyles.toggledRow_)
+										if(old == index && (new != -1)) {
+											onMouseExited.handle(null)
+										}
+									}
+								})
 							}
-							*/
 						}
+						*/
 					}
 				}
 			}
