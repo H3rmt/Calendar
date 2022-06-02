@@ -24,11 +24,11 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 		text = if(isWeek) {
 			"Week Notes for %s to %s".translate(
 				Language.TranslationTypes.Note,
-				"${time.dayOfMonth}.${time.month}.",
-				"${time.plusDays(6).dayOfMonth}.${time.plusDays(6).month}."
+				"${time.dayOfMonth}.${time.month.value}.",
+				"${time.plusDays(6).dayOfMonth}.${time.plusDays(6).month.value}."
 			)
 		} else {
-			"Notes on %s".translate(Language.TranslationTypes.Note, "${time.dayOfMonth}.${time.month}.")
+			"Notes on %s".translate(Language.TranslationTypes.Note, "${time.dayOfMonth}.${time.month.value}.")
 		}
 		isClosable = true
 		addClass(TabStyles.tab_)
