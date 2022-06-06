@@ -12,12 +12,7 @@ import javafx.scene.control.ScrollBar
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
-import listen
-import listenAndRunOnce
-import logic.Language
-import logic.LogType
-import logic.log
-import logic.translate
+import logic.*
 import tornadofx.*
 
 
@@ -70,7 +65,7 @@ fun createReminderTab(pane: TabPane): Tab {
 						isPannable = true
 						
 						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-						widthProperty().listen(once = true) {
+						widthProperty().listen(removeAfterRun = true) {
 							lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
 								.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 								bar.visibleProperty().listen { visible ->
@@ -107,7 +102,7 @@ fun createReminderTab(pane: TabPane): Tab {
 					}
 				}
 				
-				Reminders.listenAndRunOnce {
+				Reminders.listen {
 					updateTable(it)
 				}
 			}

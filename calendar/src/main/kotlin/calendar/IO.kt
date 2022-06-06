@@ -1,8 +1,9 @@
 package calendar
 
 import javafx.collections.ObservableList
-import listen
 import logic.Language
+import logic.listen
+import logic.listenUpdates
 import logic.translate
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
@@ -83,7 +84,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		forEach(addChangeChecks)
 		
 		// runs if new appointments were created or removed
-		listen { event ->
+		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed appointments
 				list.addAll(event.addedSubList.filter(condition)) // add new appointments if they fulfill condition
@@ -105,7 +106,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	fun getAppointmentsFromTo(from: LocalDateTime, to: LocalDateTime, day: DayOfWeek): ObservableList<Appointment> {
 		// condition to check if appointment fulfills condition to be in returned list
 		val condition: (Appointment) -> Boolean = {
-			(!it.week.value && it.start.value >= from && it.end.value <= to) || (it.week.value && day in it.start.value.dayOfWeek..it.end.value.dayOfWeek)
+			(!it.week.value && (it.start.value <= to && it.end.value >= from)) || false//(it.week.value && day in it.start.value.dayOfWeek..it.end.value.dayOfWeek) // TODO this doesn't seem right (week appointments)
 		}
 		
 		// populate list
@@ -115,9 +116,11 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		// either gets called when any relevant value on appointment changes or new appointments get added
 		val check = { appointment: Appointment ->
 			if(condition(appointment)) {
-				if(!list.contains(appointment)) list.add(appointment)  // add appointment if not on list
+				if(!list.contains(appointment))
+					list.add(appointment)  // add appointment if not on list
 			} else {
-				if(list.contains(appointment)) list.remove(appointment)  // remove appointment if on list
+				if(list.contains(appointment))
+					list.remove(appointment)  // remove appointment if on list
 			}
 		}
 		
@@ -139,7 +142,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		forEach(addChangeChecks)
 		
 		// runs if new appointments were created or removed
-		listen { event ->
+		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed appointments
 				list.addAll(event.addedSubList.filter(condition)) // add new appointments if they fulfill condition
@@ -203,7 +206,7 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		forEach(addChangeChecks)
 		
 		// runs if new notes were created or removed
-		listen { event ->
+		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed notes
 				list.addAll(event.addedSubList.filter(condition)) // add new notes if they fulfill condition
@@ -256,7 +259,7 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		forEach(addChangeChecks)
 		
 		// runs if new notes were created or removed
-		listen { event ->
+		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed notes
 				list.addAll(event.addedSubList.filter(condition)) // add new notes if they fulfill condition

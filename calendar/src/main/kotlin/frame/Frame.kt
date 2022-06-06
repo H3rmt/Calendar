@@ -21,7 +21,6 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.Priority
 import javafx.stage.Stage
-import listen
 import logic.*
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
@@ -117,18 +116,22 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 	return pane.menubar {
 		menu("create".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(createMenuItem(this@menu, "Appointment", "Strg + N") {
-				AppointmentPopup.open("new appointment".translate(Language.TranslationTypes.AppointmentPopup),
+				AppointmentPopup.open(
+					"new appointment".translate(Language.TranslationTypes.AppointmentPopup),
 					"create".translate(Language.TranslationTypes.AppointmentPopup),
 					false,
 					null,
 					Timing.getNow(),
-					Timing.getNow().plusHours(1))
+					Timing.getNow().plusHours(1)
+				)
 			}, createMenuItem(this@menu, "Reminder", "Strg + R") {
-				ReminderPopup.open("new reminder".translate(Language.TranslationTypes.ReminderPopup),
+				ReminderPopup.open(
+					"new reminder".translate(Language.TranslationTypes.ReminderPopup),
 					"create".translate(Language.TranslationTypes.ReminderPopup),
 					false,
 					null,
-					Timing.getNow())
+					Timing.getNow()
+				)
 			})
 		}
 		menu("options".translate(Language.TranslationTypes.Menubar)) {
@@ -172,6 +175,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 	}
 }
 
+// TODO rework
 fun createMenuGroup(vararg panes: GridPane?) {
 	log("creating MenuGroup with ${panes.size} elements", LogType.LOW)
 	var currentWidth = 10.0
@@ -180,8 +184,10 @@ fun createMenuGroup(vararg panes: GridPane?) {
 	items.forEach { item ->
 		item.apply {
 			widthProperty().listen { width ->
-				if(!changed.contains(this)) changed.add(this)
-				if(width.toDouble() > currentWidth) currentWidth = width.toDouble()
+				if(!changed.contains(this))
+					changed.add(this)
+				if(width.toDouble() > currentWidth)
+					currentWidth = width.toDouble()
 				if(changed.size == items.size) items.forEach {
 					it.prefWidth = currentWidth
 				}

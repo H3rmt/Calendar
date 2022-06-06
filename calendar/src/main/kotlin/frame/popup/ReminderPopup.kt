@@ -14,8 +14,8 @@ import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.Modality
 import javafx.stage.Stage
-import listen
 import logic.Language
+import logic.listen
 import logic.translate
 import picker.appointmentPicker.appointmentPicker
 import picker.dateTimePicker.dateTimePicker
@@ -29,10 +29,11 @@ class ReminderPopup: Fragment() {
 	private var reminder: Reminder? = scope.reminder
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
-	private var time: Property<LocalDateTime> = reminder?.time?.clone() ?: scope.end.toProperty()
-	private var reminderTitle: Property<String> = reminder?.title?.clone() ?: "".toProperty()
-	private var description: Property<String> = reminder?.description?.clone() ?: "".toProperty()
-	private var appointment: Property<Appointment?> = reminder?.appointment?.clone() ?: SimpleObjectProperty()
+	private var appointment: Property<Appointment?> = reminder?.appointment?.cloneProp() ?: SimpleObjectProperty()
+	private var time: Property<LocalDateTime> =
+		reminder?.time?.cloneProp() ?: appointment.value?.start?.cloneProp() ?: scope.time.toProperty()
+	private var reminderTitle: Property<String> = reminder?.title?.cloneProp() ?: "".toProperty()
+	private var description: Property<String> = reminder?.description?.cloneProp() ?: "".toProperty()
 	
 	private var error: Property<String> = "".toProperty()
 	private var windowTitle: String = scope.title
@@ -44,8 +45,10 @@ class ReminderPopup: Fragment() {
 	
 	init {
 		appointment.listen {
-			if(it != null) time.value = it.start.value
-			else time.value = scope.end
+			if(it != null)
+				time.value = it.start.value
+			else
+				time.value = scope.time
 		}
 	}
 	
@@ -160,16 +163,14 @@ class ReminderPopup: Fragment() {
 	
 	
 	init {
-		toggle.listen(runOnceWithValue = true) {
-			updateDisplay(it)
-		}
+		toggle.listen(::updateDisplay, runOnce = true)
 	}
 	
 	class ItemsScope(
 		val title: String,
 		val saveTitle: String,
 		val reminder: Reminder?,
-		val end: LocalDateTime,
+		val time: LocalDateTime,
 		val timeOrAppointment: Boolean
 	): Scope()
 	

@@ -13,8 +13,8 @@ import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.Modality
 import javafx.stage.Stage
-import listen
 import logic.Language
+import logic.listen
 import logic.translate
 import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
@@ -28,12 +28,12 @@ class AppointmentPopup: Fragment() {
 	private var appointment: Appointment? = scope.appointment
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
-	private var start: Property<LocalDateTime> = appointment?.start?.clone() ?: scope.start.toProperty()
-	private var end: Property<LocalDateTime> = appointment?.end?.clone() ?: scope.end.toProperty()
-	private var appointmentTitle: Property<String> = appointment?.title?.clone() ?: "".toProperty()
-	private var description: Property<String> = appointment?.description?.clone() ?: "".toProperty()
-	private var type: Property<Type> = appointment?.type?.clone() ?: Types.getRandom("Appointment").toProperty()
-	private var wholeDay: Property<Boolean> = appointment?.allDay?.clone() ?: false.toProperty()
+	private var start: Property<LocalDateTime> = appointment?.start?.cloneProp() ?: scope.start.toProperty()
+	private var end: Property<LocalDateTime> = appointment?.end?.cloneProp() ?: scope.end.toProperty()
+	private var appointmentTitle: Property<String> = appointment?.title?.cloneProp() ?: "".toProperty()
+	private var description: Property<String> = appointment?.description?.cloneProp() ?: "".toProperty()
+	private var type: Property<Type> = appointment?.type?.cloneProp() ?: Types.getRandom("Appointment").toProperty()
+	private var wholeDay: Property<Boolean> = appointment?.allDay?.cloneProp() ?: false.toProperty()
 	
 	private var error: Property<String> = "".toProperty()
 	private var control: BorderPane? = null
@@ -172,9 +172,7 @@ class AppointmentPopup: Fragment() {
 	}
 	
 	init {
-		wholeDay.listen(runOnceWithValue = true) {
-			updateDisplay(it)
-		}
+		wholeDay.listen(::updateDisplay, runOnce = true)
 	}
 	
 	class ItemsScope(

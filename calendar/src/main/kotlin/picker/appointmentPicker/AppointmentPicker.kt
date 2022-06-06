@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventTarget
 import javafx.scene.control.*
 import javafx.scene.paint.Color
-import listen
+import logic.listen
 import tornadofx.*
 
 
@@ -59,7 +59,8 @@ class AppointmentPicker(appointment: Appointment?, appointments: List<Appointmen
 				isEditable = false
 				isFocusTraversable = false
 				focusedProperty().listen { focus ->
-					if(focus) button.requestFocus()
+					if(focus)
+						button.requestFocus()
 				}
 			}
 			

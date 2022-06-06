@@ -59,7 +59,7 @@ abstract class DBObservableBase<T, DB>: ObjectPropertyBase<T>(), IDBObservableD<
 		return true
 	}
 	
-	fun clone(): Property<T> = SimpleObjectProperty(value)
+	fun cloneProp(): Property<T> = SimpleObjectProperty(value)
 	
 	override fun toString(): String = "[DBO(${get()})]"
 }

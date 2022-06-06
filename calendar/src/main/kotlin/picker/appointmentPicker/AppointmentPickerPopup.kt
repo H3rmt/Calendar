@@ -11,9 +11,9 @@ import javafx.scene.layout.BorderStrokeStyle
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.Popup
-import listenAndRunOnce
 import logic.Configs
 import logic.getConfig
+import logic.listen
 import picker.dropdownTogglePicker.DropdownToggle
 import picker.dropdownTogglePicker.dropdownTogglePicker
 import tornadofx.*
@@ -106,9 +106,10 @@ class AppointmentPickerPopup(
 					maxHeight = 100.px
 					minHeight = 10.px
 				}
-				fun update() {
+				val update: (List<Appointment>) -> Unit = { list: List<Appointment> ->
+					clear()
 					vbox {
-						for(app in appointmentsList) {
+						for(app in list) {
 							hbox(spacing = 5.0, alignment = Pos.CENTER) {
 								style(append = true) {
 									borderColor += box(c(0.75, 0.75, 0.75))
@@ -183,9 +184,7 @@ class AppointmentPickerPopup(
 					}
 				}
 				
-				appointmentsList.listenAndRunOnce {
-					update()
-				}
+				appointmentsList.listen(update, runOnce = true)
 			}
 		})
 	}

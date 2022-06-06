@@ -16,12 +16,7 @@ import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.layout.BorderStrokeStyle
 import javafx.scene.paint.Color
-import listen
-import listenAndRunOnce
-import logic.Language
-import logic.LogType
-import logic.log
-import logic.translate
+import logic.*
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -85,7 +80,7 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 					isPannable = true
 					
 					// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-					widthProperty().listen(once = true) {
+					widthProperty().listen(removeAfterRun = true) {
 						lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
 							.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 							bar.visibleProperty().listen { visible ->
@@ -180,9 +175,9 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 													}
 												}
 											}
-											val appointments =
-												Appointments.getAppointmentsFromTo(cctime, cctime.plusHours(1), cctime.dayOfWeek)
-											appointments.listenAndRunOnce(update)
+											Appointments.getAppointmentsFromTo(
+												cctime, cctime.plusHours(1), cctime.dayOfWeek
+											).listen(update, runOnce = true)
 										}
 									}
 								}

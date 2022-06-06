@@ -28,8 +28,6 @@ import javafx.scene.shape.MoveTo
 import javafx.scene.shape.Path
 import javafx.scene.text.FontWeight
 import javafx.util.Duration
-import listen
-import listenAndRunOnce
 import logic.*
 import tornadofx.*
 import java.time.DayOfWeek
@@ -61,11 +59,9 @@ fun createOverviewTab(pane: TabPane): Tab {
 					addClass(TabStyles.title_)
 					minWidth = 200.0
 					alignment = Pos.CENTER
-					val update = { date: LocalDate ->
-						this.text = date.month.name
+					overviewTime.listen(runOnce = true) {
+						this.text = it.month.name
 					}
-					update(overviewTime.value)
-					overviewTime.listen(update, runOnceWithValue = true)
 				}
 				button(">") {
 					addClass(TabStyles.titleButton_)
@@ -112,7 +108,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 					isPannable = true
 					
 					// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-					widthProperty().listen(once = true) {
+					widthProperty().listen(removeAfterRun = true) {
 						lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
 							.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 							bar.visibleProperty().listen { visible ->
@@ -192,7 +188,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 												}
 												
 												val notes = Notes.getNotesAt(ctime)
-												notes.listenAndRunOnce {
+												notes.listen {
 													update(it.isEmpty())
 												}
 												
@@ -222,20 +218,11 @@ fun createOverviewTab(pane: TabPane): Tab {
 												
 												for((index, typeCount) in list.entries.withIndex()) {
 													label {
-														val update = { title: String ->
-															text = "$title: ${typeCount.value}"
+														typeCount.key.name.listen(runOnce = true) {
+															text = "$it: ${typeCount.value}"
 														}
-														val title = typeCount.key.name
-														title.listen(runOnceWithValue = true) {
-															update(it)
-														}
-														
-														val update2 = { color: javafx.scene.paint.Color ->
-															textFill = color
-														}
-														val color = typeCount.key.color
-														color.listen(runOnceWithValue = true) {
-															update2(it)
+														typeCount.key.color.listen(runOnce = true) {
+															textFill = it
 														}
 														
 														addClass(OverviewStyles.cellAppointLabel_)
@@ -249,13 +236,9 @@ fun createOverviewTab(pane: TabPane): Tab {
 												}
 											}
 											
-											val appointments: ObservableList<Appointment> = Appointments.getAppointmentsFromTo(
+											Appointments.getAppointmentsFromTo(
 												ctime.atStartOfDay(), ctime.plusWeeks(1).atStartOfDay(), ctime.dayOfWeek
-											)
-											
-											appointments.listenAndRunOnce {
-												update(it)
-											}
+											).listen(update, runOnce = true)
 										}
 									}
 									
@@ -325,7 +308,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 													}
 													
 													val notes = Notes.getNotesAt(cctime)
-													notes.listenAndRunOnce {
+													notes.listen {
 														update(it.isEmpty())
 													}
 													
@@ -357,21 +340,11 @@ fun createOverviewTab(pane: TabPane): Tab {
 													
 													for((index, appointment) in appointments.withIndex()) {
 														label {
-															val update = { title: String ->
-																text = title
+															appointment.title.listen(runOnce = true) {
+																text = it
 															}
-															val title = appointment.title
-															title.listen(runOnceWithValue = true) {
-																update(it)
-															}
-															
-															val update2 = { color: javafx.scene.paint.Color ->
-																textFill = color
-															}
-															val color = appointment.type.value.color
-															update2(color.value)
-															color.listen(runOnceWithValue = true) {
-																update2(it)
+															appointment.type.value.color.listen(runOnce = true) {
+																textFill = it
 															}
 															
 															addClass(OverviewStyles.cellAppointLabel_)
@@ -388,7 +361,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 												val appointments = Appointments.getAppointmentsFromTo(
 													cctime.atStartOfDay(), cctime.plusDays(1).atStartOfDay(), cctime.dayOfWeek
 												)
-												appointments.listenAndRunOnce {
+												appointments.listen {
 													update(it)
 												}
 											}
@@ -408,7 +381,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 								}
 							} while(time.month == new.month)
 						}
-						overviewTime.listen(update, runOnceWithValue = true)
+						overviewTime.listen(update, runOnce = true)
 						/*
 						for((index, week) in list.withIndex()) {
 							hbox(spacing = 5.0, alignment = Pos.CENTER) {

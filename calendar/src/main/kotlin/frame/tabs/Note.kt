@@ -12,7 +12,6 @@ import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.VBox
 import javafx.scene.web.HTMLEditor
-import listen
 import logic.*
 import tornadofx.*
 import java.time.LocalDate
@@ -70,7 +69,7 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 					}
 					
 					val notes = Notes.getNotesAt(time)
-					notes.listen { change ->
+					notes.listenUpdates { change ->
 						while(change.next()) {
 							if(change.wasAdded()) {
 								for(note in change.addedSubList) {
