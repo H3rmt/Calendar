@@ -82,7 +82,7 @@ class AppointmentPicker(appointment: Appointment?, appointments: List<Appointmen
 			}
 		}
 		
-		appointmentProperty.listen {
+		appointmentProperty.listen(runOnce = true) {
 			textField.text = "${it?.title ?: ""} ${it?.description ?: ""}"
 		}
 		

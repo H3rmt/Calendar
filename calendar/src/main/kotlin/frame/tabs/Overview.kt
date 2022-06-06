@@ -5,6 +5,7 @@ import Day
 import Week
 import calendar.*
 import frame.TabManager
+import frame.adjustWidth
 import frame.createFXImage
 import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
@@ -108,19 +109,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 					isPannable = true
 					
 					// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-					widthProperty().listen(removeAfterRun = true) {
-						lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
-							.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-							bar.visibleProperty().listen { visible ->
-								if(visible) {
-									scrollbarWidth.value = 13.3 + 2 // 13.3 scrollbar  2 padding right of inner vbox
-								} else {
-									scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
-								}
-							}
-						}
-					}
-					
+					adjustWidth(scrollbarWidth)
 					
 					// gets stretched across whole scrollpane
 					vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
@@ -173,24 +162,21 @@ fun createOverviewTab(pane: TabPane): Tab {
 												// update images on notes updates
 												lateinit var img: Image
 												lateinit var hoveredImg: Image
-												val update = { empty: Boolean ->
-													img = if(empty) {
+												val update = { list: List<Note> ->
+													img = if(list.isEmpty()) {
 														createFXImage("note.svg")
 													} else {
 														createFXImage("note active.svg")
 													}
-													hoveredImg = if(empty) {
+													hoveredImg = if(list.isEmpty()) {
 														createFXImage("note hovered.svg")
 													} else {
 														createFXImage("note active hovered.svg")
 													}
-													imgView.image = if(imgView.isHover) hoveredImg else img
+													imgView.image = if(imgView.isHover)
+														hoveredImg else img
 												}
-												
-												val notes = Notes.getNotesAt(ctime)
-												notes.listen {
-													update(it.isEmpty())
-												}
+												Notes.getNotesAt(ctime).listen(update, runOnce = true)
 												
 												onMouseClicked
 												onMouseEntered = EventHandler { imgView.image = hoveredImg }
@@ -293,24 +279,22 @@ fun createOverviewTab(pane: TabPane): Tab {
 													// update images on notes updates
 													lateinit var img: Image
 													lateinit var hoveredImg: Image
-													val update = { empty: Boolean ->
-														img = if(empty) {
+													val update = { list: List<Note> ->
+														img = if(list.isEmpty()) {
 															createFXImage("note.svg")
 														} else {
 															createFXImage("note active.svg")
 														}
-														hoveredImg = if(empty) {
+														hoveredImg = if(list.isEmpty()) {
 															createFXImage("note hovered.svg")
 														} else {
 															createFXImage("note active hovered.svg")
 														}
-														imgView.image = if(imgView.isHover) hoveredImg else img
+														imgView.image = if(imgView.isHover)
+															hoveredImg else img
 													}
 													
-													val notes = Notes.getNotesAt(cctime)
-													notes.listen {
-														update(it.isEmpty())
-													}
+													Notes.getNotesAt(cctime).listen(update, runOnce = true)
 													
 													onMouseClicked = EventHandler {
 														it.consume()
@@ -358,12 +342,9 @@ fun createOverviewTab(pane: TabPane): Tab {
 													}
 												}
 												
-												val appointments = Appointments.getAppointmentsFromTo(
+												Appointments.getAppointmentsFromTo(
 													cctime.atStartOfDay(), cctime.plusDays(1).atStartOfDay(), cctime.dayOfWeek
-												)
-												appointments.listen {
-													update(it)
-												}
+												).listen(update, runOnce = true)
 											}
 										}
 										time = time.plusDays(1)

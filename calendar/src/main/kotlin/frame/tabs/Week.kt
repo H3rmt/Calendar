@@ -3,6 +3,7 @@ package frame.tabs
 import calendar.Appointment
 import calendar.Appointments
 import calendar.Timing
+import frame.adjustWidth
 import frame.styles.GlobalStyles
 import frame.styles.TabStyles
 import frame.styles.WeekStyles
@@ -80,18 +81,7 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 					isPannable = true
 					
 					// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-					widthProperty().listen(removeAfterRun = true) {
-						lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
-							.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-							bar.visibleProperty().listen { visible ->
-								if(visible) {
-									scrollbarWidth.value = 13.3 + 2 // 13.3 scrollbar  2 padding right of inner vbox
-								} else {
-									scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
-								}
-							}
-						}
-					}
+					adjustWidth(scrollbarWidth)
 					
 					// gets stretched across whole scrollpane
 					hbox {

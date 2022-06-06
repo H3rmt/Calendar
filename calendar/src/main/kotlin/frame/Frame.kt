@@ -10,10 +10,12 @@ import frame.tabs.createOverviewTab
 import frame.tabs.createReminderTab
 import init
 import javafx.application.Platform
+import javafx.beans.property.DoubleProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.event.EventTarget
+import javafx.geometry.Orientation
 import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.image.WritableImage
@@ -411,6 +413,21 @@ fun EventTarget.typeCombobox(type: Property<Type>? = null): ComboBox<Type> {
 					} else {
 						text = item.name.value
 					}
+				}
+			}
+		}
+	}
+}
+
+fun ScrollPane.adjustWidth(scrollbarWidth: DoubleProperty) {
+	widthProperty().listen(removeAfterRun = true) {
+		lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
+			.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
+			bar.visibleProperty().listen(runOnce = true) { visible ->
+				if(visible) {
+					scrollbarWidth.value = 13.3 + 2 // 13.3 scrollbar  2 padding right of inner vbox
+				} else {
+					scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
 				}
 			}
 		}

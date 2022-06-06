@@ -14,7 +14,7 @@ import javafx.collections.ObservableList
  */
 fun <T> ObservableValue<T>.listen(
 	listener: (value: T) -> Unit, runOnce: Boolean = false, removeAfterRun: Boolean = false
-) = listen(removeAfterRun, runOnce, listener)
+) = listen(runOnce = runOnce, removeAfterRun = removeAfterRun, listener)
 
 
 /**

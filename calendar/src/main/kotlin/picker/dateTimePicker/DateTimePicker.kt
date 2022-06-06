@@ -37,7 +37,8 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 	
 	
 	private val popup: DateTimePickerPopup = DateTimePickerPopup(dateProperty, hourProperty, minuteProperty) {
-		dateTimeProperty.value = LocalDateTime.of(dateProperty.value, LocalTime.of(hourProperty.value, minuteProperty.value))
+		dateTimeProperty.value =
+			LocalDateTime.of(dateProperty.value, LocalTime.of(hourProperty.value, minuteProperty.value))
 		button.fire()
 	}
 	
@@ -81,7 +82,8 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 				isFocusTraversable = false
 				text = formatter.format(dateTimeProperty.value)
 				focusedProperty().listen { focus ->
-					if(focus) button.requestFocus()
+					if(focus)
+						button.requestFocus()
 				}
 			}
 			
@@ -105,7 +107,7 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 			}
 		}
 		
-		dateTimeProperty.listen { new ->
+		dateTimeProperty.listen(runOnce = true) { new ->
 			textField.text = formatter.format(new)
 		}
 		

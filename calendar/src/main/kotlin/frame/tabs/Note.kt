@@ -8,6 +8,7 @@ import frame.styles.GlobalStyles
 import frame.styles.NoteStyles
 import frame.styles.TabStyles
 import frame.typeCombobox
+import javafx.beans.property.Property
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.layout.VBox
@@ -36,19 +37,21 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 			addClass(TabStyles.content_)
 			lateinit var add: Button
 			lateinit var addType: ComboBox<Type>
+			val type: Property<Type> = Types.getRandom("Note").toProperty()
 			
 			var noteTabs = mutableMapOf<Note, TitledPane>()
 			
 			hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
 				addClass(TabStyles.topbar_)
 				
-				addType = typeCombobox()
+				addType = typeCombobox(type)
 				add = button {
 					text = "Add"
-					isDisable = true
 					
 					// disables button if no type selected or type already added
-					addType.valueProperty().listen { new -> isDisable = noteTabs.any { it.key.type.value == new } }
+					addType.valueProperty().listen(runOnce = true) { new ->
+						isDisable = noteTabs.any { it.key.type.value == new }
+					}
 					addClass(TabStyles.titleButton_)
 				}
 			}
@@ -64,7 +67,7 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 					addClass(GlobalStyles.background_)
 					
 					add.action {
-						Note.new(time, "", Types.getRandom("Note"), isWeek)
+						Note.new(time, "", type.value, isWeek)
 						add.isDisable = true
 					}
 					
@@ -128,8 +131,12 @@ fun noteTab(tabs: VBox, note: Note): TitledPane {
 				}
 			}
 		}
-		contentDisplay = ContentDisplay.RIGHT
-		expandedProperty().listen { new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
+		expandedProperty().listen(runOnce = true) { new ->
+			contentDisplay = if(new)
+				ContentDisplay.RIGHT
+			else
+				ContentDisplay.TEXT_ONLY
+		}
 		
 		editor = htmleditor(note.text.value) {
 			addClass(GlobalStyles.disableFocusDraw_)

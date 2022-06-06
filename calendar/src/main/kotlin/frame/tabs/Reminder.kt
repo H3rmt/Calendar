@@ -2,6 +2,7 @@ package frame.tabs
 
 import calendar.Reminder
 import calendar.Reminders
+import frame.adjustWidth
 import frame.styles.GlobalStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
@@ -54,7 +55,7 @@ fun createReminderTab(pane: TabPane): Tab {
 				
 				var table: ScrollPane? = null
 				
-				fun updateTable(list: List<Reminder>) {
+				val update = { list: List<Reminder> ->
 					children.remove(table)
 					log("updated table_ view", LogType.LOW)
 					
@@ -65,18 +66,7 @@ fun createReminderTab(pane: TabPane): Tab {
 						isPannable = true
 						
 						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-						widthProperty().listen(removeAfterRun = true) {
-							lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
-								.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
-								bar.visibleProperty().listen { visible ->
-									if(visible) { // 20 on first visible;  13.33  on second visible  => hardcoded 13.3 width TODO add to calender
-										scrollbarWidth.value = 13.3 + 2.0 // bar.width + 2.0 // 2 padding right of inner vbox
-									} else {
-										scrollbarWidth.value = 2.0 // 2 padding right of inner vbox
-									}
-								}
-							}
-						}
+						adjustWidth(scrollbarWidth)
 						
 						// gets stretched across whole scrollpane
 						vbox(spacing = 2.0, alignment = Pos.TOP_CENTER) {
@@ -101,10 +91,7 @@ fun createReminderTab(pane: TabPane): Tab {
 						}
 					}
 				}
-				
-				Reminders.listen {
-					updateTable(it)
-				}
+				Reminders.listen(update, runOnce = true)
 			}
 		}
 	}

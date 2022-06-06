@@ -43,15 +43,6 @@ class ReminderPopup: Fragment() {
 	private var toggleName: Property<String> = "".toProperty()
 	private var control: BorderPane? = null
 	
-	init {
-		appointment.listen {
-			if(it != null)
-				time.value = it.start.value
-			else
-				time.value = scope.time
-		}
-	}
-	
 	private fun updateDisplay(toggle: Boolean) {
 		if(toggle) {
 			toggleName.value = "Appointment"
