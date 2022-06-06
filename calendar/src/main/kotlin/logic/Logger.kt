@@ -47,8 +47,8 @@ fun initLogger() {
 		consoleHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		addHandler(consoleHandler)
 		log("added console Handler")
-
-		fileHandler = FileHandler(ConfigFiles.logfile)
+		
+		fileHandler = FileHandler(Files.logfile)
 		fileHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		fileHandler.level = Level.ALL
 
@@ -69,11 +69,7 @@ fun log(message: Any?, type: LogType = LogType.NORMAL) {
 		val callerList = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }
 		val caller = callerList.filter { it.declaringClass.simpleName != "LoggerKt" }[0]
 		var callerStr = "(" + caller.fileName + ":" + caller.lineNumber + ")"
-		/*callerStr += caller.declaringClass.simpleName.ifBlank { // strange formatting because nested $1$3$2 classes because tornadoFX
-			println(caller.declaringClass.name); caller.declaringClass.name.run { substring(0, indexOf('$')) }.replaceBefore('.', "").substring(1)
-		}*/
 		callerStr += " " + caller.methodName
-
 
 		val mess = message.toString()
 		val messstrip = message.toString().replace("\n", "\\n")

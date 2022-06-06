@@ -4,6 +4,12 @@ import com.google.gson.*
 import com.google.gson.stream.JsonReader
 import logic.ConfigFiles.dataDirectory
 import java.io.*
+import java.io.File
+import java.io.FileReader
+import java.io.PrintWriter
+import java.io.Reader
+import java.io.StringReader
+import java.io.StringWriter
 import kotlin.collections.set
 import kotlin.reflect.typeOf
 
@@ -36,24 +42,22 @@ var configs: MutableMap<Configs, Any> = mutableMapOf()
  * must be the first method called to read from data files
  * like fonts or language
  *
- * @see ConfigFiles.configFile
- * @see ConfigFiles.dataDirectory
+ * @see Files.configFile
  */
 fun initConfigs() {
-	val file = File(ConfigFiles.configFile)
+	val file = File(Files.configFile)
 	if(!file.exists()) {
-		if(dataDirectory.isNotEmpty()) {
-			val dir = File(dataDirectory)
+		if(!File(OSFolders.getConfigFolder()).exists()) {
+			val dir = File(OSFolders.getConfigFolder())
 			dir.mkdirs()
 		}
 		file.createNewFile()
 		file.writeText(CONFIG_DEFAULT)
-		log("created default config:${ConfigFiles.configFile}", LogType.WARNING)
+		log("created default config:${Files.configFile} in ${File(OSFolders.getConfigFolder())}", LogType.WARNING)
 	}
 
 	try {
-		val load: Map<String, Any> =
-			getJson().fromJson(getJsonReader(FileReader(ConfigFiles.configFile)), Map::class.java)
+		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(Files.configFile)), Map::class.java)
 		load.forEach {
 			try {
 				configs[getJson().fromJson(
@@ -210,31 +214,27 @@ enum class Configs {
 	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen, IgnoreCaseForSearch
 }
 
-object ConfigFiles {
-	const val logfile = "Calendar.log"
+object Files {
+	val logfile = OSFolders.getDataFolder() + "calendar.log"
+	val DBfile = OSFolders.getDataFolder() + "data.sqlite"
 
-	const val dataDirectory = "data"
-
-	const val languageFiles = "lang"
-
-	const val configFile = "$dataDirectory/config.json"
+	val configFile = OSFolders.getConfigFolder() + "config.json"
 }
 
 lateinit var language: Language
 
 // TODO update this before release
 const val CONFIG_DEFAULT = "{\n" +
-		  "\t\"Language\": \"EN\",\n" +
-		  "\t\"Debug\": false,\n" +
-		  "\t\"PrintStacktrace\": true,\n" +
-		  "\t\"PrintLogs\": true,\n" +
-		  "\t\"StoreLogs\": true,\n" +
-		  "\t\"LogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
-		  "\t\"DebugLogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
-		  "\t// \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
-		  "\t\"AnimationSpeed\": 200,\n" +
-		  "\t\"AnimationDelay\": 80,\n" +
-		  "\t\"MaxDayAppointments\": 8,\n" +
-		  "\t\"ExpandNotesOnOpen\": true,\n" +
-		  "\t\"IgnoreCaseForSearch\": true\n" +
-		  "}"
+		"\t\"Language\": \"EN\",\n" +
+		"\t\"Debug\": false,\n" +
+		"\t\"PrintStacktrace\": true,\n" +
+		"\t\"PrintLogs\": true,\n" +
+		"\t\"StoreLogs\": true,\n" +
+		"\t\"LogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
+		"\t\"DebugLogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
+		"\t\"AnimationSpeed\": 200,\n" +
+		"\t\"AnimationDelay\": 80,\n" +
+		"\t\"MaxDayAppointments\": 8,\n" +
+		"\t\"ExpandNotesOnOpen\": true,\n" +
+		"\t\"IgnoreCaseForSearch\": true\n" +
+		"}"

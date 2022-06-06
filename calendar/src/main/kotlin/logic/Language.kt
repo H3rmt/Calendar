@@ -21,7 +21,7 @@ class Language(private val language: AvailableLanguages) {
 	init {
 		try {
 			val file =
-				File({}::class.java.classLoader.getResource("${ConfigFiles.languageFiles}/$language.json")!!.toURI())
+				File({}::class.java.classLoader.getResource("lang/$language.json")!!.toURI())
 			translations = (getJson().fromJson<Map<String, Map<String, String>>>(
 				getJsonReader(FileReader(file)),
 				Map::class.java

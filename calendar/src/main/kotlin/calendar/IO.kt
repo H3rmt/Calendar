@@ -1,5 +1,8 @@
 package calendar
 
+import javafx.collections.*
+import listen
+import logic.Files
 import javafx.collections.ObservableList
 import logic.Language
 import logic.listen
@@ -18,7 +21,7 @@ import kotlin.random.Random
 
 
 fun initDb() {
-	Database.connect("jdbc:sqlite:data/data.sqlite")
+	Database.connect("jdbc:sqlite:${Files.DBfile}")
 	// user = "myself", password = "secret")
 	transaction {
 		SchemaUtils.createMissingTablesAndColumns(AppointmentTable, FileTable, NoteTable, ReminderTable, TypeTable)
