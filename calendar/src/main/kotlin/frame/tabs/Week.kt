@@ -9,9 +9,7 @@ import frame.styles.TabStyles
 import frame.styles.WeekStyles
 import javafx.beans.property.DoubleProperty
 import javafx.event.EventHandler
-import javafx.geometry.Orientation
 import javafx.geometry.Pos
-import javafx.scene.control.ScrollBar
 import javafx.scene.control.ScrollPane
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
@@ -124,23 +122,29 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 							vbox {
 								addClass(WeekStyles.tableDay_)
 								
-								for(hour in 0..23) {
-									val cctime = LocalDateTime.of(ctime, LocalTime.of(hour, 0))
-									vbox(alignment = Pos.CENTER) {
-										addClass(WeekStyles.TimeCell_)
-										
-										hbox(alignment = Pos.CENTER) {
-											addClass(WeekStyles.UnHoveredInnerTimeCell_)
-											onMouseEntered = EventHandler {
-												addClass(WeekStyles.HoveredInnerTimeCell_)
-											}
-											onMouseExited = EventHandler {
-												removeClass(WeekStyles.HoveredInnerTimeCell_)
-											}
-											val update = { list: List<Appointment> ->
-												children.clear()
-												for((ind, app) in list.withIndex()) {
-													
+								val update = { list: List<Appointment> ->
+									clear()
+									for(hour in 0..23) {
+										val cctime = LocalDateTime.of(ctime, LocalTime.of(hour, 0))
+										vbox(alignment = Pos.CENTER) {
+											addClass(WeekStyles.TimeCell_)
+											
+											hbox(alignment = Pos.CENTER) {
+												addClass(WeekStyles.UnHoveredInnerTimeCell_)
+												onMouseEntered = EventHandler {
+													addClass(WeekStyles.HoveredInnerTimeCell_)
+												}
+												onMouseExited = EventHandler {
+													removeClass(WeekStyles.HoveredInnerTimeCell_)
+												}
+												
+												// TODO Week appointments
+												// do some filtering if appointment is at this day
+												val f = list.filter {
+													(!it.week.value && (it.start.value <= cctime.plusHours(1) && it.end.value >= cctime))
+												}
+												
+												for((ind, app) in f.withIndex()) {
 													// colored box(es)
 													hbox {
 														gridpaneConstraints {
@@ -165,12 +169,14 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 													}
 												}
 											}
-											Appointments.getAppointmentsFromTo(
-												cctime, cctime.plusHours(1), cctime.dayOfWeek
-											).listen(update, runOnce = true)
 										}
 									}
 								}
+								
+								// reduces active listeners from 1 per hour of each day to one per day
+								Appointments.getAppointmentsFromTo(
+									ctime.atStartOfDay(), ctime.plusDays(1).atStartOfDay(), ctime.dayOfWeek
+								).listen(update, runOnce = true)
 							}
 						}
 					}

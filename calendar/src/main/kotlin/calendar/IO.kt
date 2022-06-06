@@ -105,7 +105,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	 */
 	fun getAppointmentsFromTo(from: LocalDateTime, to: LocalDateTime, day: DayOfWeek): ObservableList<Appointment> {
 		// condition to check if appointment fulfills condition to be in returned list
-		val condition: (Appointment) -> Boolean = {
+		val condition: (Appointment) -> Boolean = { // TODO Week appointments
 			(!it.week.value && (it.start.value <= to && it.end.value >= from)) || false//(it.week.value && day in it.start.value.dayOfWeek..it.end.value.dayOfWeek) // TODO this doesn't seem right (week appointments)
 		}
 		
