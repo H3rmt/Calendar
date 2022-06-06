@@ -159,7 +159,8 @@ class AppointmentPopup: Fragment() {
 					action {
 						val check = checkAppointment()
 						if(check == null) {
-							if(appointment == null) appointment = createAppointment()
+							if(appointment == null)
+								appointment = createAppointment()
 							updateAppointment()
 							close()
 						} else {

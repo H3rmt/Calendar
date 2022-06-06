@@ -99,7 +99,7 @@ class ReminderPopup: Fragment() {
 								paddingRight = 38
 							}
 						}
-						toggleSwitch(selected = toggle) { }
+						toggleSwitch(selected = toggle)
 					}
 				}
 			}

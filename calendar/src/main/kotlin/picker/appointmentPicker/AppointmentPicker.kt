@@ -13,7 +13,7 @@ import tornadofx.*
 
 
 fun EventTarget.appointmentPicker(
-	appointments: ObservableList<Appointment>, // TODO make this observable
+	appointments: ObservableList<Appointment>,
 	appointment: Property<Appointment?> = SimpleObjectProperty<Appointment?>(null), op: AppointmentPicker.() -> Unit = {}
 ): AppointmentPicker {
 	val picker = AppointmentPicker(appointment, appointments)
@@ -79,8 +79,12 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 			}
 		}
 		
-		appointmentProperty.listen(runOnce = true) { //  TODO bind here (or listen)
-			textField.text = "${it?.title?.value ?: ""} ${it?.description?.value ?: ""}"
+		appointmentProperty.listen(runOnce = true) { app: Appointment? ->
+			val update = { appointment: Appointment ->
+				textField.text = "${appointment.title.value} ${appointment.description.value}"
+			}
+			app?.title?.listen { update(app) }
+			app?.description?.listen { update(app) }
 		}
 		
 		popup.autoHideProperty().set(true)

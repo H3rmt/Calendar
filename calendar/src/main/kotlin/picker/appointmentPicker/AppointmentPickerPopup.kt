@@ -24,26 +24,31 @@ class AppointmentPickerPopup(
 	private val appointments: ObservableList<Appointment>, save: () -> Unit
 ): Popup() {
 	private var replace: String? = null
-	private val appointmentsList = observableArrayList(appointments) // TODO add new appointments to this list
-	private val searchColumns = observableArrayList(
-		DropdownToggle(true, "title"), DropdownToggle(true, "description"), DropdownToggle(true, "type")
-	)
+	private val titleSearchSelect = DropdownToggle(true, "title")
+	private val descriptionSearchSelect = DropdownToggle(true, "description")
+	private val typeSearchSelect = DropdownToggle(true, "type")
 	
-	private fun String.conditionalLowercase(bool: Boolean): String = if(bool) this.lowercase() else this
+	private val appointmentsList = observableArrayList(appointments)
+	
+	init {
+		appointments.listen {
+			appointmentsList.setAll(it)
+		}
+		filter()
+	}
+	
+	private fun String.lowerConfigIgnore(): String =
+		if(getConfig(Configs.IgnoreCaseForSearch)) this.lowercase() else this
 	
 	private fun filter() {
 		if(replace != null) {
-			val text = replace!!.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
+			val text = replace!!.lowerConfigIgnore()
 			appointmentsList.clear()
 			for(app: Appointment in appointments)
 				@Suppress("ComplexCondition")
-				if((searchColumns.find { it.name == "title" }!!.selected.value &&
-							  app.title.value.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
-								  .contains(text)) || (searchColumns.find { it.name == "description" }!!.selected.value &&
-							  app.description.value.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
-								  .contains(text)) || (searchColumns.find { it.name == "type" }!!.selected.value &&
-							  app.type.value.name.value.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
-								  .contains(text))
+				if((titleSearchSelect.selected.value && app.title.value.lowerConfigIgnore().contains(text)) ||
+					(descriptionSearchSelect.selected.value && app.description.value.lowerConfigIgnore().contains(text)) ||
+					(typeSearchSelect.selected.value && app.type.value.name.value.lowerConfigIgnore().contains(text))
 				) appointmentsList.add(app)
 		} else {
 			appointmentsList.clear()
@@ -74,9 +79,11 @@ class AppointmentPickerPopup(
 					style {
 						padding = box(2.px)
 					}
-					dropdownTogglePicker("filter", searchColumns, {
-						filter()
-					})
+					dropdownTogglePicker("filter",
+						observableArrayList(titleSearchSelect, descriptionSearchSelect, typeSearchSelect), {
+							filter()
+						}
+					)
 				}
 				
 				hbox(spacing = 3, alignment = Pos.CENTER_RIGHT) {
@@ -93,7 +100,8 @@ class AppointmentPickerPopup(
 							maxWidth = 50.px
 						}
 						onKeyTyped = EventHandler {
-							replace = if((it.target as TextField).text != "") (it.target as TextField).text else null
+							replace = if((it.target as TextField).text != "")
+								(it.target as TextField).text else null
 							filter()
 						}
 					}
@@ -117,15 +125,16 @@ class AppointmentPickerPopup(
 									padding = box(2.px, 0.px)
 								}
 								textflow {
-									if(replace != null && searchColumns.find { it.name == "title" }!!.selected.value) {
+									if(replace != null && titleSearchSelect.selected.value) {
 										val strings = app.title.value.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
 										for((index, text) in strings.withIndex()) {
 											text(text)
-											if(index != strings.size - 1) text(replace) {
-												style(append = true) {
-													fontWeight = FontWeight.BOLD
+											if(index != strings.size - 1)
+												text(replace) {
+													style(append = true) {
+														fontWeight = FontWeight.BOLD
+													}
 												}
-											}
 										}
 									} else text(app.title)
 									style {
@@ -136,15 +145,16 @@ class AppointmentPickerPopup(
 									}
 								}
 								textflow {
-									if(replace != null && searchColumns.find { it.name == "description" }!!.selected.value) {
+									if(replace != null && descriptionSearchSelect.selected.value) {
 										val strings = app.description.value.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
 										for((index, text) in strings.withIndex()) { // TODO bind here same as when no filter (no .value)
 											text(text)
-											if(index != strings.size - 1) text(replace) {
-												style(append = true) {
-													fontWeight = FontWeight.BOLD
+											if(index != strings.size - 1)
+												text(replace) {
+													style(append = true) {
+														fontWeight = FontWeight.BOLD
+													}
 												}
-											}
 										}
 									} else text(app.description)
 									style {
@@ -155,15 +165,16 @@ class AppointmentPickerPopup(
 									}
 								}
 								textflow {
-									if(replace != null && searchColumns.find { it.name == "type" }!!.selected.value) {
+									if(replace != null && typeSearchSelect.selected.value) {
 										val strings = app.type.value.name.value.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
 										for((index, text) in strings.withIndex()) {
 											text(text)
-											if(index != strings.size - 1) text(replace) {
-												style(append = true) {
-													fontWeight = FontWeight.BOLD
+											if(index != strings.size - 1)
+												text(replace) {
+													style(append = true) {
+														fontWeight = FontWeight.BOLD
+													}
 												}
-											}
 										}
 									} else text(app.type.value.name)
 									style {
