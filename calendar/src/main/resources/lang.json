@@ -1,0 +1,68 @@
+{
+  "EN": {
+    // General
+    "cancel": "Cancel",
+    "title": "Title",
+    "help": "Help",
+    "missing %s": "Missing %s",
+    "day": "Day",
+    // Menu bar
+    "options": "Options",
+    "reload": "Reload",
+    "preferences": "Preferences",
+    "quit": "Quit",
+    "view": "View",
+    "show reminder": "Show Reminder",
+    "show calendar": "Show Calendar",
+    "github": "Github",
+    "memory usage": "Memory usage",
+    "appointment": "Appointment",
+    "reminder": "Reminder",
+    // Tabs (tabpane name)
+    "calender": "Calendar",
+    "reminders": "Reminder",
+    // days
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    // months (Week.date, calendartab title)
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December",
+    // Note Tab
+    "save": "Save",
+    "create": "Create",
+    "delete": "Delete",
+    // Week Tab
+    "new appointment": "New Appointment",
+    "description": "Description",
+    "start to end": "Start - End",
+    "remove appointment": "Remove Appointment",
+    "edit appointment": "Edit Appointment",
+    // Appointment Popup
+    "missing type": "Missing type",
+    "missing title": "Missing title",
+    "start must be before end": "Start time must be before end time",
+    "do you want to remove %s appointment": "do you want to remove %s appointment",
+    "remove?": "Remove?",
+    "notify": "Notify",
+    // Reminder Tab
+    "new reminder": "New Reminder",
+    "deadline": "Deadline",
+    // Reminder Popup
+    "finish": "Finish"
+  }
+}
