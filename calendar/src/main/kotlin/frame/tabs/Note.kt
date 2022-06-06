@@ -1,36 +1,34 @@
 package frame.tabs
 
-import calendar.CellDisplay
-import calendar.Day
 import calendar.Note
+import calendar.Notes
 import calendar.Type
-import calendar.Week
+import calendar.Types
 import frame.styles.GlobalStyles
 import frame.styles.NoteStyles
 import frame.styles.TabStyles
 import frame.typeCombobox
-import javafx.geometry.*
+import javafx.beans.property.Property
+import javafx.geometry.Pos
 import javafx.scene.control.*
-import javafx.scene.layout.*
-import listen
-import logic.Configs
-import logic.Language
-import logic.LogType
-import logic.getConfig
-import logic.log
-import logic.translate
+import javafx.scene.layout.VBox
+import javafx.scene.web.HTMLEditor
+import logic.*
 import tornadofx.*
-import java.time.temporal.ChronoField
+import java.time.LocalDate
 
 
-
-fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit): Tab {
+fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 	log("creating note tab", LogType.IMPORTANT)
 	return pane.tab("") {
-		text = when(cell) {
-			is Day -> "Notes for ${cell.time.dayOfMonth}. ${cell.time.month.name.translate(Language.TranslationTypes.Global)}"
-			is Week -> "Notes for ${cell.time.get(ChronoField.ALIGNED_WEEK_OF_MONTH)}. Week in ${cell.time.month.name.translate(Language.TranslationTypes.Global)}"
-			else -> ""
+		text = if(isWeek) {
+			"Week Notes for %s to %s".translate(
+				Language.TranslationTypes.Note,
+				"${time.dayOfMonth}.${time.month.value}.",
+				"${time.plusDays(6).dayOfMonth}.${time.plusDays(6).month.value}."
+			)
+		} else {
+			"Notes on %s".translate(Language.TranslationTypes.Note, "${time.dayOfMonth}.${time.month.value}.")
 		}
 		isClosable = true
 		addClass(TabStyles.tab_)
@@ -39,19 +37,21 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 			addClass(TabStyles.content_)
 			lateinit var add: Button
 			lateinit var addType: ComboBox<Type>
+			val type: Property<Type> = Types.getRandom("Note").toProperty()
 			
-			val noteTabs = mutableListOf<TitledPane>()
+			var noteTabs = mutableMapOf<Note, TitledPane>()
 			
 			hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
 				addClass(TabStyles.topbar_)
 				
-				addType = typeCombobox()
+				addType = typeCombobox(type)
 				add = button {
 					text = "Add"
-					isDisable = true
 					
 					// disables button if no type selected or type already added
-					addType.valueProperty().listen { new -> isDisable = (new == null) || noteTabs.any { it.text == new.name.value } }
+					addType.valueProperty().listen(runOnce = true) { new ->
+						isDisable = noteTabs.any { it.key.type.value == new }
+					}
 					addClass(TabStyles.titleButton_)
 				}
 			}
@@ -67,42 +67,32 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 					addClass(GlobalStyles.background_)
 					
 					add.action {
-						var note: Note? = null
-						lateinit var tb: TitledPane
-						tb = noteTab(this, addType.value.name.value, "", { text ->
-							if(note == null) {
-								note = Note.new(cell.time, "", addType.value, cell is Week)
-							}
-							note?.text?.set(text)
-							updateCallback()
-						}, {
-							this.children.remove(noteTabs.first { it == tb })
-							noteTabs.remove(tb)
-							note?.remove()
-							
-							// triggers reload of add button to check if new note can be created
-							add.isDisable = noteTabs.any { it.text == addType.value.name.value }
-							updateCallback()
-						})
-						noteTabs.add(0, tb)
+						Note.new(time, "", type.value, isWeek)
 						add.isDisable = true
 					}
 					
-					for(note in cell.notes) {
-						lateinit var tb: TitledPane
-						tb = noteTab(this, note.type.name, note.text.value, { text ->
-							note.text.set(text)
-							updateCallback()
-						}, {
-							this.children.remove(noteTabs.first { it == tb })
-							noteTabs.remove(tb)
-							note.remove()
-							
-							// triggers reload of add button to check if new note can be created
-							add.isDisable = noteTabs.any { it.text == addType.value.name.value }
-							updateCallback()
-						})
-						noteTabs.add(tb)
+					val notes = Notes.getNotesAt(time)
+					notes.listenUpdates { change ->
+						while(change.next()) {
+							if(change.wasAdded()) {
+								for(note in change.addedSubList) {
+									noteTabs[note] = noteTab(this, note)
+								}
+							}
+							if(change.wasRemoved()) {
+								for(note in change.removed) {
+									// custom filtering, as notes are not the exact same (this will always return only one element)
+									this.children.removeAll(noteTabs.filter { it.key == note }.values)
+									noteTabs = noteTabs.filter { it.key != note }.toMutableMap()
+									
+									// check addType selector again
+									add.isDisable = noteTabs.any { it.key.type.value == addType.value }
+								}
+							}
+						}
+					}
+					for(note in notes) {
+						noteTabs[note] = noteTab(this, note)
 					}
 				}
 			}
@@ -110,16 +100,17 @@ fun createNoteTab(pane: TabPane, cell: CellDisplay, updateCallback: () -> Unit):
 	}
 }
 
-fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, deleteFun: () -> Unit): TitledPane {
+fun noteTab(tabs: VBox, note: Note): TitledPane {
 	// cannot use the EventTarget Functions because they automatically add the
 	// pane to the end of the vbox
 	val pane = TitledPane()
 	pane.apply {
-		setText(title)
+		textProperty().bind(note.type.value.name)
 		isExpanded = getConfig(Configs.ExpandNotesOnOpen)
 		addClass(NoteStyles.notesPane_)
 		
-		lateinit var save: Button
+		@Suppress("JoinDeclarationAndAssignment")
+		lateinit var editor: HTMLEditor
 		
 		graphic = toolbar {
 			addClass(NoteStyles.paneToolbar_)
@@ -127,24 +118,29 @@ fun noteTab(tabs: VBox, title: String, text: String, saveFun: (String) -> Unit, 
 				style {
 					fontSize = 15.px
 				}
-				save = button("create".translate(Language.TranslationTypes.Note))
+				button("save".translate(Language.TranslationTypes.Note)) {
+					action {
+						note.text.set(editor.htmlText)
+					}
+				}
 				
 				button("delete".translate(Language.TranslationTypes.Note)) {
-					action { deleteFun() }
+					action {
+						note.remove()
+					}
 				}
 			}
 		}
-		contentDisplay = ContentDisplay.RIGHT
-		expandedProperty().listen { new -> contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY }
+		expandedProperty().listen(runOnce = true) { new ->
+			contentDisplay = if(new)
+				ContentDisplay.RIGHT
+			else
+				ContentDisplay.TEXT_ONLY
+		}
 		
-		htmleditor(text) {
+		editor = htmleditor(note.text.value) {
 			addClass(GlobalStyles.disableFocusDraw_)
 			addClass(NoteStyles.editor_)
-			this.getChildList()
-			save.action {
-				saveFun(this@htmleditor.htmlText)
-				save.text = "save".translate(Language.TranslationTypes.Note)
-			}
 		}
 	}
 	

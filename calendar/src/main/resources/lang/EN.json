@@ -1,5 +1,6 @@
 {
 	"Global": {
+		"no types for %s found (add some types in settings)": "No Types for %s found (add some types in settings)",
 		"fef": "e"
 	},
 	"Menubar": {
@@ -15,7 +16,9 @@
 	
 	},
 	"Week": {
-	
+		"edit appointment": "edit appointment",
+		"remove appointment": "remove appointment",
+		"new appointment": "new appointment"
 	},
 	"AppointmentPopup": {
 	

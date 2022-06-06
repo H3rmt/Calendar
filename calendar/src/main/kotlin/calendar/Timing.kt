@@ -10,7 +10,7 @@ import java.time.ZoneOffset
 
 
 object Timing {
-	fun getNowLocal(): LocalDateTime = LocalDateTime.now(ZoneId.systemDefault())
+	fun getNow(): LocalDateTime = LocalDateTime.now(ZoneId.systemDefault())
 	
 	fun LocalDate.toUTCEpochMinute(): Long = toEpochSecond(LocalTime.MIDNIGHT, ZoneOffset.UTC) / 60
 	

@@ -2,7 +2,7 @@ IDEOLOG Config for logs
 
 Log format in config.json: "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n"
 
-Name: Custom 2
+Name: Calendar Log
 Message pattern:  ^\[[^\]]*\] \|[A-Z]+ *.*
 Message start pattern:  ^\[
 Time format:  yyyy-MM-dd HH:mm:ss

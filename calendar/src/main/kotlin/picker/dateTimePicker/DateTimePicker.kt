@@ -1,10 +1,13 @@
 package picker.dateTimePicker
 
 import frame.createFXImage
-import javafx.beans.property.*
-import javafx.event.*
+import javafx.beans.property.IntegerProperty
+import javafx.beans.property.Property
+import javafx.beans.property.SimpleObjectProperty
+import javafx.event.EventTarget
 import javafx.scene.control.*
-import javafx.scene.paint.*
+import javafx.scene.paint.Color
+import logic.listen
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -28,24 +31,14 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 	// this property only gets updated if the OK button is pressed
 	val dateTimeProperty: Property<LocalDateTime> = SimpleObjectProperty(dateTime)
 	
-	// fake Property that generate its values from other props when it gets accessed, and updates the other props if it gets changed
-	private val timeProperty: Property<LocalTime> = object: SimpleObjectProperty<LocalTime>() {
-		override fun getValue(): LocalTime = LocalTime.of(hourProperty.value, minuteProperty.value)
-		
-		override fun setValue(v: LocalTime?) {
-			minuteProperty.value = v?.minute
-			hourProperty.value = v?.hour
-		}
-	}
-	
-	
 	private val dateProperty: Property<LocalDate> = dateTime.toLocalDate().toProperty()
-	val minuteProperty: IntegerProperty = dateTime.minute.toProperty()
-	val hourProperty: IntegerProperty = dateTime.hour.toProperty()
+	private val minuteProperty: IntegerProperty = dateTime.minute.toProperty()
+	private val hourProperty: IntegerProperty = dateTime.hour.toProperty()
 	
 	
 	private val popup: DateTimePickerPopup = DateTimePickerPopup(dateProperty, hourProperty, minuteProperty) {
-		dateTimeProperty.value = LocalDateTime.of(dateProperty.value, timeProperty.value)
+		dateTimeProperty.value =
+			LocalDateTime.of(dateProperty.value, LocalTime.of(hourProperty.value, minuteProperty.value))
 		button.fire()
 	}
 	
@@ -54,10 +47,22 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 	
 	override fun createDefaultSkin(): Skin<*> {
 		return object: SkinBase<DateTimePicker>(this) {
-			override fun computeMaxWidth(height: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double): Double =
+			override fun computeMaxWidth(
+				height: Double,
+				topInset: Double,
+				rightInset: Double,
+				bottomInset: Double,
+				leftInset: Double
+			): Double =
 				super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset)
 			
-			override fun computeMaxHeight(width: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double): Double =
+			override fun computeMaxHeight(
+				width: Double,
+				topInset: Double,
+				rightInset: Double,
+				bottomInset: Double,
+				leftInset: Double
+			): Double =
 				super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset)
 		}
 	}
@@ -76,8 +81,9 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 				isEditable = false
 				isFocusTraversable = false
 				text = formatter.format(dateTimeProperty.value)
-				focusedProperty().addListener { _, _, focus ->
-					if(focus) button.requestFocus()
+				focusedProperty().listen { focus ->
+					if(focus)
+						button.requestFocus()
 				}
 			}
 			
@@ -101,7 +107,7 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 			}
 		}
 		
-		dateTimeProperty.addListener { _, _, new: LocalDateTime ->
+		dateTimeProperty.listen(runOnce = true) { new ->
 			textField.text = formatter.format(new)
 		}
 		

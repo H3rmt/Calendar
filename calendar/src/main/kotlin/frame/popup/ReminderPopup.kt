@@ -5,14 +5,17 @@ import calendar.Appointments
 import calendar.Reminder
 import frame.styles.GlobalStyles
 import frame.toggleSwitch
-import javafx.beans.property.*
-import javafx.geometry.*
-import javafx.scene.layout.*
-import javafx.scene.paint.*
-import javafx.scene.text.*
-import javafx.stage.*
-import listen
+import javafx.beans.property.Property
+import javafx.beans.property.SimpleObjectProperty
+import javafx.geometry.Pos
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.BorderStrokeStyle
+import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
+import javafx.stage.Modality
+import javafx.stage.Stage
 import logic.Language
+import logic.listen
 import logic.translate
 import picker.appointmentPicker.appointmentPicker
 import picker.dateTimePicker.dateTimePicker
@@ -26,12 +29,11 @@ class ReminderPopup: Fragment() {
 	private var reminder: Reminder? = scope.reminder
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
-	private var time: Property<LocalDateTime> = reminder?.time?.clone() ?: scope.end.toProperty()
-	private var reminderTitle: Property<String> = reminder?.title?.clone() ?: "".toProperty()
-	private var description: Property<String> = reminder?.description?.clone() ?: "".toProperty()
-	private var appointment: Property<Appointment?> = reminder?.appointment?.clone() ?: SimpleObjectProperty()
-	
-	private var onSave: (Reminder) -> Unit = scope.save
+	private var appointment: Property<Appointment?> = reminder?.appointment?.cloneProp() ?: SimpleObjectProperty()
+	private var time: Property<LocalDateTime> =
+		reminder?.time?.cloneProp() ?: appointment.value?.start?.cloneProp() ?: scope.time.toProperty()
+	private var reminderTitle: Property<String> = reminder?.title?.cloneProp() ?: "".toProperty()
+	private var description: Property<String> = reminder?.description?.cloneProp() ?: "".toProperty()
 	
 	private var error: Property<String> = "".toProperty()
 	private var windowTitle: String = scope.title
@@ -40,15 +42,6 @@ class ReminderPopup: Fragment() {
 	private var toggle: Property<Boolean> = scope.timeOrAppointment.toProperty()
 	private var toggleName: Property<String> = "".toProperty()
 	private var control: BorderPane? = null
-	
-	init {
-		appointment.listen {
-			if(it != null)
-				time.value = it.start.value
-			else
-				time.value = scope.end
-		}
-	}
 	
 	private fun updateDisplay(toggle: Boolean) {
 		if(toggle) {
@@ -106,8 +99,7 @@ class ReminderPopup: Fragment() {
 								paddingRight = 38
 							}
 						}
-						toggleSwitch(selected = toggle) {
-						}
+						toggleSwitch(selected = toggle)
 					}
 				}
 			}
@@ -148,10 +140,8 @@ class ReminderPopup: Fragment() {
 					action {
 						val check = checkReminder()
 						if(check == null) {
-							if(reminder == null)
-								reminder = createReminder()
+							if(reminder == null) reminder = createReminder()
 							updateReminder()
-							onSave.invoke(reminder!!)
 							close()
 						} else {
 							error.value = check
@@ -164,21 +154,31 @@ class ReminderPopup: Fragment() {
 	
 	
 	init {
-		toggle.listen {
-			updateDisplay(it)
-		}
-		updateDisplay(toggle.value)
+		toggle.listen(::updateDisplay, runOnce = true)
 	}
 	
 	class ItemsScope(
-		val title: String, val saveTitle: String, val reminder: Reminder?, val end: LocalDateTime, val save: (Reminder) -> Unit, val timeOrAppointment: Boolean
+		val title: String,
+		val saveTitle: String,
+		val reminder: Reminder?,
+		val time: LocalDateTime,
+		val timeOrAppointment: Boolean
 	): Scope()
 	
 	companion object {
 		@Suppress("LongParameterList")
-		fun open(title: String, saveTitle: String, block: Boolean, reminder: Reminder?, end: LocalDateTime, save: (Reminder) -> Unit, timeOrAppointment: Boolean = true): Stage? {
-			val scope = ItemsScope(title, saveTitle, reminder, end, save, timeOrAppointment)
-			return find<ReminderPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+		fun open(
+			title: String,
+			saveTitle: String,
+			block: Boolean,
+			reminder: Reminder?,
+			end: LocalDateTime,
+			timeOrAppointment: Boolean = true
+		): Stage? {
+			val scope = ItemsScope(title, saveTitle, reminder, end, timeOrAppointment)
+			return find<ReminderPopup>(scope).openModal(
+				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false
+			)
 		}
 	}
 }

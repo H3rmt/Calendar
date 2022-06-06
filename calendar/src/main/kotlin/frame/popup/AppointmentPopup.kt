@@ -6,19 +6,20 @@ import calendar.Type
 import calendar.Types
 import frame.styles.GlobalStyles
 import frame.typeCombobox
-import javafx.beans.property.*
-import javafx.scene.layout.*
-import javafx.scene.paint.*
-import javafx.scene.text.*
-import javafx.stage.*
-import listen
+import javafx.beans.property.Property
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.BorderStrokeStyle
+import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
+import javafx.stage.Modality
+import javafx.stage.Stage
 import logic.Language
+import logic.listen
 import logic.translate
 import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
-
 
 
 class AppointmentPopup: Fragment() {
@@ -27,14 +28,12 @@ class AppointmentPopup: Fragment() {
 	private var appointment: Appointment? = scope.appointment
 	
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
-	private var start: Property<LocalDateTime> = appointment?.start?.clone() ?: scope.start.toProperty()
-	private var end: Property<LocalDateTime> = appointment?.end?.clone() ?: scope.end.toProperty()
-	private var appointmentTitle: Property<String> = appointment?.title?.clone() ?: "".toProperty()
-	private var description: Property<String> = appointment?.description?.clone() ?: "".toProperty()
-	private var type: Property<Type> = appointment?.type?.clone() ?: Types.random().toProperty()
-	private var wholeDay: Property<Boolean> = appointment?.allDay?.clone() ?: false.toProperty()
-	
-	private var onSave: (Appointment) -> Unit = scope.save
+	private var start: Property<LocalDateTime> = appointment?.start?.cloneProp() ?: scope.start.toProperty()
+	private var end: Property<LocalDateTime> = appointment?.end?.cloneProp() ?: scope.end.toProperty()
+	private var appointmentTitle: Property<String> = appointment?.title?.cloneProp() ?: "".toProperty()
+	private var description: Property<String> = appointment?.description?.cloneProp() ?: "".toProperty()
+	private var type: Property<Type> = appointment?.type?.cloneProp() ?: Types.getRandom("Appointment").toProperty()
+	private var wholeDay: Property<Boolean> = appointment?.allDay?.cloneProp() ?: false.toProperty()
 	
 	private var error: Property<String> = "".toProperty()
 	private var control: BorderPane? = null
@@ -80,32 +79,32 @@ class AppointmentPopup: Fragment() {
 	
 	private fun createAppointment(): Appointment = if(wholeDay.value) {
 		Appointment.new(
-			_start = day.value.atStartOfDay(),
-			_end = day.value.plusDays(1).atStartOfDay().minusMinutes(1),
-			_title = appointmentTitle.value,
-			_description = description.value,
-			_type = type.value,
-			_allDay = true
+			start = day.value.atStartOfDay(),
+			end = day.value.plusDays(1).atStartOfDay().minusMinutes(1),
+			title = appointmentTitle.value,
+			description = description.value,
+			type = type.value,
+			allDay = true
 		)
 	} else {
 		Appointment.new(
-			_start = start.value,
-			_end = end.value,
-			_title = appointmentTitle.value,
-			_description = description.value,
-			_type = type.value,
-			_allDay = false
+			start = start.value,
+			end = end.value,
+			title = appointmentTitle.value,
+			description = description.value,
+			type = type.value,
+			allDay = false
 		)
 	}
 	
-	@Suppress("ReturnCount")
 	private fun checkAppointment(): String? {
-		if(appointmentTitle.value.isEmpty()) {
-			return "missing title".translate(Language.TranslationTypes.AppointmentPopup)
+		return if(appointmentTitle.value.isEmpty()) {
+			"missing title".translate(Language.TranslationTypes.AppointmentPopup)
 		} else if(end.value.toUTCEpochMinute() < start.value.toUTCEpochMinute()) {
-			return "start must be before end".translate(Language.TranslationTypes.AppointmentPopup)
+			"start must be before end".translate(Language.TranslationTypes.AppointmentPopup)
+		} else {
+			null
 		}
-		return null
 	}
 	
 	override fun onBeforeShow() {
@@ -163,7 +162,6 @@ class AppointmentPopup: Fragment() {
 							if(appointment == null)
 								appointment = createAppointment()
 							updateAppointment()
-							onSave.invoke(appointment!!)
 							close()
 						} else {
 							error.value = check
@@ -175,22 +173,31 @@ class AppointmentPopup: Fragment() {
 	}
 	
 	init {
-		wholeDay.listen {
-			updateDisplay(it)
-		}
-		updateDisplay(wholeDay.value)
+		wholeDay.listen(::updateDisplay, runOnce = true)
 	}
 	
 	class ItemsScope(
-		val title: String, val saveTitle: String, val appointment: Appointment?,
-		val start: LocalDateTime, val end: LocalDateTime, val save: (Appointment) -> Unit
+		val title: String,
+		val saveTitle: String,
+		val appointment: Appointment?,
+		val start: LocalDateTime,
+		val end: LocalDateTime
 	): Scope()
 	
 	companion object {
 		@Suppress("LongParameterList")
-		fun open(title: String, saveTitle: String, block: Boolean, appointment: Appointment?, start: LocalDateTime, end: LocalDateTime, save: (Appointment) -> Unit): Stage? {
-			val scope = ItemsScope(title, saveTitle, appointment, start, end, save)
-			return find<AppointmentPopup>(scope).openModal(modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false)
+		fun open(
+			title: String,
+			saveTitle: String,
+			block: Boolean,
+			appointment: Appointment?,
+			start: LocalDateTime,
+			end: LocalDateTime
+		): Stage? {
+			val scope = ItemsScope(title, saveTitle, appointment, start, end)
+			return find<AppointmentPopup>(scope).openModal(
+				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false
+			)
 		}
 	}
 }

@@ -1,24 +1,17 @@
 package logic
 
-import com.google.gson.FieldNamingPolicy
-import com.google.gson.FieldNamingStrategy
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonSyntaxException
+import com.google.gson.*
 import com.google.gson.stream.JsonReader
 import logic.ConfigFiles.dataDirectory
-import java.io.File
-import java.io.FileReader
-import java.io.PrintWriter
-import java.io.Reader
-import java.io.StringReader
-import java.io.StringWriter
+import java.io.*
 import kotlin.collections.set
 import kotlin.reflect.typeOf
 
 
-private val gson: Gson = GsonBuilder().setPrettyPrinting().setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-	.excludeFieldsWithoutExposeAnnotation().setFieldNamingStrategy(FieldNamingStrategy { return@FieldNamingStrategy it.name }).create()
+private val gson: Gson =
+	GsonBuilder().setPrettyPrinting().setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+		.excludeFieldsWithoutExposeAnnotation()
+		.setFieldNamingStrategy(FieldNamingStrategy { return@FieldNamingStrategy it.name }).create()
 
 /**
  * general JSON reader and writer
@@ -59,7 +52,8 @@ fun initConfigs() {
 	}
 	
 	try {
-		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(ConfigFiles.configFile)), Map::class.java)
+		val load: Map<String, Any> =
+			getJson().fromJson(getJsonReader(FileReader(ConfigFiles.configFile)), Map::class.java)
 		load.forEach {
 			try {
 				configs[getJson().fromJson(
@@ -118,7 +112,11 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 					it as T
 				}
 			} catch(e: ClassCastException) {
-				Warning("ik49dk", e, "Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}")
+				Warning(
+					"ik49dk",
+					e,
+					"Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}"
+				)
 				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
 					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.LOW)
 					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
@@ -126,7 +124,10 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 					throw Exit("k23d1f", e)
 				}
 			} catch(e: ClassCastException) {
-				log("Gson could not cast value: ${it::class.simpleName} to requested: ${T::class.simpleName}", LogType.WARNING)
+				log(
+					"Gson could not cast value: ${it::class.simpleName} to requested: ${T::class.simpleName}",
+					LogType.WARNING
+				)
 				throw Exit("k23d1f", e)
 			}
 		}

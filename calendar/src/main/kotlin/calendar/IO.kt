@@ -1,18 +1,20 @@
 package calendar
 
-import javafx.collections.*
-import javafx.scene.control.*
-import listen
+import javafx.collections.ObservableList
+import logic.Language
+import logic.listen
+import logic.listenUpdates
+import logic.translate
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import tornadofx.*
+import tornadofx.observableListOf
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
-
+import kotlin.random.Random
 
 
 fun initDb() {
@@ -58,11 +60,9 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		// either gets called when any relevant value on appointment changes or new appointments get added
 		val check = { appointment: Appointment ->
 			if(condition(appointment)) {
-				if(!list.contains(appointment))
-					list.add(appointment)  // add appointment if not on list
+				if(!list.contains(appointment)) list.add(appointment)  // add appointment if not on list
 			} else {
-				if(list.contains(appointment))
-					list.remove(appointment)  // remove appointment if on list
+				if(list.contains(appointment)) list.remove(appointment)  // remove appointment if on list
 			}
 		}
 		
@@ -84,7 +84,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		forEach(addChangeChecks)
 		
 		// runs if new appointments were created or removed
-		listen { event ->
+		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed appointments
 				list.addAll(event.addedSubList.filter(condition)) // add new appointments if they fulfill condition
@@ -105,8 +105,8 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	 */
 	fun getAppointmentsFromTo(from: LocalDateTime, to: LocalDateTime, day: DayOfWeek): ObservableList<Appointment> {
 		// condition to check if appointment fulfills condition to be in returned list
-		val condition: (Appointment) -> Boolean = {
-			(!it.week.value && it.start.value >= from && it.end.value <= to) || (it.week.value && day in it.start.value.dayOfWeek..it.end.value.dayOfWeek)
+		val condition: (Appointment) -> Boolean = { // TODO Week appointments
+			(!it.week.value && (it.start.value <= to && it.end.value >= from)) || false//(it.week.value && day in it.start.value.dayOfWeek..it.end.value.dayOfWeek) // TODO this doesn't seem right (week appointments)
 		}
 		
 		// populate list
@@ -142,7 +142,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		forEach(addChangeChecks)
 		
 		// runs if new appointments were created or removed
-		listen { event ->
+		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed appointments
 				list.addAll(event.addedSubList.filter(condition)) // add new appointments if they fulfill condition
@@ -165,7 +165,6 @@ object NoteTable: LongIdTable() {
 object Notes: DBObservableList<Note>(Note.Notes) {
 	
 	
-	
 	/**
 	 * returns an observable List containing non Week Notes at this time that gets updated every time
 	 * - the list of Notes change
@@ -186,11 +185,9 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		// either gets called when any relevant value on note changes or new notes get added
 		val check = { note: Note ->
 			if(condition(note)) {
-				if(!list.contains(note))
-					list.add(note)  // add note if not on list
+				if(!list.contains(note)) list.add(note)  // add note if not on list
 			} else {
-				if(list.contains(note))
-					list.remove(note)  // remove note if on list
+				if(list.contains(note)) list.remove(note)  // remove note if on list
 			}
 		}
 		
@@ -209,7 +206,7 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		forEach(addChangeChecks)
 		
 		// runs if new notes were created or removed
-		listen { event ->
+		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed notes
 				list.addAll(event.addedSubList.filter(condition)) // add new notes if they fulfill condition
@@ -241,11 +238,9 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		// either gets called when any relevant value on note changes or new notes get added
 		val check = { note: Note ->
 			if(condition(note)) {
-				if(!list.contains(note))
-					list.add(note)  // add note if not on list
+				if(!list.contains(note)) list.add(note)  // add note if not on list
 			} else {
-				if(list.contains(note))
-					list.remove(note)  // remove note if on list
+				if(list.contains(note)) list.remove(note)  // remove note if on list
 			}
 		}
 		
@@ -264,7 +259,7 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		forEach(addChangeChecks)
 		
 		// runs if new notes were created or removed
-		listen { event ->
+		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed notes
 				list.addAll(event.addedSubList.filter(condition)) // add new notes if they fulfill condition
@@ -284,20 +279,19 @@ object FileTable: LongIdTable() {
 	val note = reference("note", NoteTable)
 }
 
-object Files: DBObservableList<File>(File.Files) {
-
-}
+@Suppress("EmptyClassBlock")
+object Files: DBObservableList<File>(File.Files)
 
 object ReminderTable: LongIdTable() {
-	val time = long("time") //.nullable() // not nullable, TODO clone appointment time and always use it (ask when editing appointment if reminder should be moved)
+	val time =
+		long("time") //.nullable() // not nullable, TODO clone appointment time and always use it (ask when editing appointment if reminder should be moved)
 	val appointment = reference("appointment", AppointmentTable).nullable()
 	val title = text("title")
 	val description = text("description")
 }
 
-object Reminders: DBObservableList<Reminder>(Reminder.Reminders) {
-
-}
+@Suppress("EmptyClassBlock")
+object Reminders: DBObservableList<Reminder>(Reminder.Reminders)
 
 object TypeTable: IntIdTable() {
 	val name = text("name")
@@ -305,5 +299,11 @@ object TypeTable: IntIdTable() {
 }
 
 object Types: DBObservableList<Type>(Type.Types) {
-	fun getRandom(): Type = random()
+	fun getRandom(exceptionName: String): Type {
+		require(isNotEmpty()) { throw NoTypeFound(exceptionName) }
+		return get(Random.nextInt(size))
+	}
 }
+
+class NoTypeFound(name: String):
+	Exception("no types for %s found (add some types in settings)".translate(Language.TranslationTypes.Global, name))

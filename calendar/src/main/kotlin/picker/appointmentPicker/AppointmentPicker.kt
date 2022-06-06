@@ -2,29 +2,26 @@ package picker.appointmentPicker
 
 import calendar.Appointment
 import frame.createFXImage
-import javafx.beans.property.*
-import javafx.event.*
+import javafx.beans.property.Property
+import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.ObservableList
+import javafx.event.EventTarget
 import javafx.scene.control.*
-import javafx.scene.paint.*
-import listen
+import javafx.scene.paint.Color
+import logic.listen
 import tornadofx.*
 
 
 fun EventTarget.appointmentPicker(
-	appointments: List<Appointment>, // TODO make this observable
-	appointment: Property<Appointment?> = SimpleObjectProperty<Appointment?>(null),
-	op: AppointmentPicker.() -> Unit = {}
+	appointments: ObservableList<Appointment>,
+	appointment: Property<Appointment?> = SimpleObjectProperty<Appointment?>(null), op: AppointmentPicker.() -> Unit = {}
 ): AppointmentPicker {
-	val picker = AppointmentPicker(appointment.value, appointments)
-	picker.appointmentProperty.bindBidirectional(appointment)
+	val picker = AppointmentPicker(appointment, appointments)
 	return opcr(this, picker, op)
 }
 
-class AppointmentPicker(appointment: Appointment?, appointments: List<Appointment>): Control() {
-	
-	// this property only gets updated if the OK button is pressed
-	val appointmentProperty: Property<Appointment?> = SimpleObjectProperty(appointment)
-	
+class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointments: ObservableList<Appointment>):
+	Control() {
 	
 	private val popup: AppointmentPickerPopup = AppointmentPickerPopup(appointmentProperty, appointments) {
 		button.fire()
@@ -35,11 +32,13 @@ class AppointmentPicker(appointment: Appointment?, appointments: List<Appointmen
 	
 	override fun createDefaultSkin(): Skin<*> {
 		return object: SkinBase<AppointmentPicker>(this) {
-			override fun computeMaxWidth(height: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double): Double =
-				super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset)
+			override fun computeMaxWidth(
+				height: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double
+			): Double = super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset)
 			
-			override fun computeMaxHeight(width: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double): Double =
-				super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset)
+			override fun computeMaxHeight(
+				width: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double
+			): Double = super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset)
 		}
 	}
 	
@@ -56,8 +55,9 @@ class AppointmentPicker(appointment: Appointment?, appointments: List<Appointmen
 				prefHeight = 25.0
 				isEditable = false
 				isFocusTraversable = false
-				focusedProperty().addListener { _, _, focus ->
-					if(focus) button.requestFocus()
+				focusedProperty().listen { focus ->
+					if(focus)
+						button.requestFocus()
 				}
 			}
 			
@@ -79,8 +79,14 @@ class AppointmentPicker(appointment: Appointment?, appointments: List<Appointmen
 			}
 		}
 		
-		appointmentProperty.listen {
-			textField.text = "${it?.title ?: ""} ${it?.description ?: ""}"
+		appointmentProperty.listen(runOnce = true) { app: Appointment? ->
+			val update = { appointment: Appointment ->
+				textField.text = "${appointment.title.value} ${appointment.description.value}"
+			}
+			app?.title?.listen { update(app) }
+			app?.description?.listen { update(app) }
+			if(app != null)
+				update(app)
 		}
 		
 		popup.autoHideProperty().set(true)

@@ -1,10 +1,10 @@
 package picker.dropdownTogglePicker
 
-import javafx.collections.*
-import javafx.geometry.*
-import javafx.scene.paint.*
-import javafx.stage.*
-import listen
+import javafx.collections.ObservableList
+import javafx.geometry.Pos
+import javafx.scene.paint.Color
+import javafx.stage.Popup
+import logic.listen
 import tornadofx.*
 
 class DropdownTogglePickerPopup(toggles: ObservableList<DropdownToggle>, change: (DropdownToggle) -> Unit): Popup() {
@@ -23,7 +23,7 @@ class DropdownTogglePickerPopup(toggles: ObservableList<DropdownToggle>, change:
 					backgroundColor += Color.valueOf("#E9E9E9")
 				}
 				scrollpane(fitToWidth = true, fitToHeight = true) {
-					fun update() {
+					val update: (List<DropdownToggle>) -> Unit = { _: List<DropdownToggle> ->
 						vbox(spacing = 4) {
 							style(append = true) {
 								padding = box(2.px)
@@ -36,10 +36,7 @@ class DropdownTogglePickerPopup(toggles: ObservableList<DropdownToggle>, change:
 							}
 						}
 					}
-					update()
-					toggles.addListener(ListChangeListener {
-						update()
-					})
+					toggles.listen(update, runOnce = true)
 				}
 			}
 		)

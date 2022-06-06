@@ -1,87 +1,33 @@
 package calendar
 
-import javafx.collections.*
-import javafx.scene.paint.*
-import logic.Configs
-import logic.getConfig
+import javafx.scene.paint.Color
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.DayOfWeek
-import java.time.DayOfWeek.FRIDAY
-import java.time.DayOfWeek.MONDAY
-import java.time.DayOfWeek.SATURDAY
-import java.time.DayOfWeek.SUNDAY
-import java.time.DayOfWeek.THURSDAY
-import java.time.DayOfWeek.TUESDAY
-import java.time.DayOfWeek.WEDNESDAY
+import replaceNewline
 import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlin.collections.set
 
-interface CellDisplay {
-	val notes: MutableList<Note>
-	
-	val time: LocalDate
-}
-
-class Week(override val time: LocalDate, days: List<Day>, val WeekOfYear: Int, override val notes: ObservableList<Note>): CellDisplay {
-	
-	val appointments: List<Appointment>
-		get() {
-			val list = mutableListOf<Appointment>()
-			for(day in allDays.values) {
-				list.addAll(day.appointments)
-			}
-			return list
-		}
-	
-	val allDays: Map<DayOfWeek, Day> = mapOf(
-		MONDAY to days[0], TUESDAY to days[1], WEDNESDAY to days[2], THURSDAY to days[3], FRIDAY to days[4], SATURDAY to days[5], SUNDAY to days[6]
-	)
-	
-	fun getAllAppointmentsSorted(): Map<Type, Int> {
-		val list = mutableMapOf<Type, Int>()
-		for(appointment in appointments) {
-			list[appointment.type.value] = list[appointment.type.value]?.plus(1) ?: 1
-		}
-		return list
-	}
-	
-	override fun toString(): String = "$time $notes $allDays"
-}
-
-
-data class Day(override val time: LocalDate, val partOfMonth: Boolean): CellDisplay {
-	
-	var appointments: MutableList<Appointment> = mutableListOf()
-	
-	override var notes: MutableList<Note> = mutableListOf()
-	
-	fun getAppointmentsLimited(): List<Appointment> = appointments.subList(0, minOf(appointments.size, getConfig<Double>(Configs.MaxDayAppointments).toInt()))
-	
-	override fun toString(): String = "$time $notes $appointments"
-}
-
-
-
-class Appointment(id: EntityID<Long>): LongEntity(id) {
+class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 	
 	companion object {
-		fun new(_start: LocalDateTime, _end: LocalDateTime, _title: String, _description: String, _type: Type, _allDay: Boolean = false, _week: Boolean = false): Appointment {
+		fun new(
+			start: LocalDateTime, end: LocalDateTime, title: String, description: String, type: Type,
+			allDay: Boolean = false, week: Boolean = false
+		): Appointment {
 			return transaction {
 				return@transaction Appointments.new {
-					start.set(_start)
-					end.set(_end)
-					title.set(_title)
-					description.set(_description)
-					type.set(_type)
-					allDay.set(_allDay)
-					week.set(_week)
+					this.start.set(start)
+					this.end.set(end)
+					this.title.set(title)
+					this.description.set(description)
+					this.type.set(type)
+					this.allDay.set(allDay)
+					this.week.set(week)
 				}.also { calendar.Appointments.add(it) }
 			}
 		}
@@ -138,17 +84,22 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Appointments.remove(this) }
+	override fun remove() {
+		calendar.Appointments.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
-	override fun toString(): String = "[{${id.value}} ${start.value} - ${end.value}  ${type.value} ${if(week.value) "Week" else "Day"} | ${title.value}: ${description.value}]"
+	// [{7} 2022-05-16T00:00 - 2022-05-16T23:59  [{1} test 0x008000ff] Day | test_1_title: test_1_desc]
+	override fun toString(): String = ("[{${id.value}} ${start.value} - ${end.value}  ${type.value} " +
+			  "${if(week.value) "Week" else "Day"} | " +
+			  "${title.value}: ${description.value}]").replaceNewline()
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Appointment) false
-		else start == other.start && end == other.end && title == other.title && description == other.description && type == other.type && week == other.week
+		else other.id == id
 	}
 	
 	override fun hashCode(): Int {
@@ -163,17 +114,17 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 }
 
 
-class Note(id: EntityID<Long>): LongEntity(id) {
+class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Notes: LongEntityClass<Note>(NoteTable)
 	
 	companion object {
-		fun new(_time: LocalDate, _text: String, _type: Type, _week: Boolean): Note {
+		fun new(time: LocalDate, text: String, type: Type, week: Boolean): Note {
 			return transaction {
 				return@transaction Notes.new {
-					time.set(_time)
-					text.set(_text)
-					type.set(_type)
-					week.set(_week)
+					this.time.set(time)
+					this.text.set(text)
+					this.type.set(type)
+					this.week.set(week)
 				}.also { calendar.Notes.add(it) }
 			}
 		}
@@ -218,17 +169,21 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Notes.remove(this) }
+	override fun remove() {
+		calendar.Notes.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
-	override fun toString(): String = "[{${id.value}} ${time.value} ${type.value} |$files| ]"
+	// [{2} 2022-05-16T00:00 [{1} test 0x008000ff] ||: test_note_text]
+	override fun toString(): String =
+		"[{${id.value}} ${time.value} ${type.value} |$files|: ${text.value}]".replaceNewline()
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Note) false
-		else other.time == time && text == other.text && type == other.type && week == other.week && files == other.files
+		else other.id == id
 	}
 	
 	override fun hashCode(): Int {
@@ -241,7 +196,7 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	}
 }
 
-class File(id: EntityID<Long>): LongEntity(id) {
+class File(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Files: LongEntityClass<File>(FileTable)
 	
 	companion object {
@@ -277,17 +232,20 @@ class File(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Files.remove(this) }
+	override fun remove() {
+		calendar.Files.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
-	override fun toString(): String = "[{${id.value}} ${name.value} ${origin.value}]"
+	// [{2} testfile C:/Users/fef/Documents/test.txt]
+	override fun toString(): String = "[{${id.value}} ${name.value} ${origin.value}]".replaceNewline()
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is File) false
-		else other.name == name && origin == other.origin
+		else other.id == id
 	}
 	
 	override fun hashCode(): Int {
@@ -297,7 +255,7 @@ class File(id: EntityID<Long>): LongEntity(id) {
 	}
 }
 
-class Reminder(id: EntityID<Long>): LongEntity(id) {
+class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Reminders: LongEntityClass<Reminder>(ReminderTable)
 	
 	companion object {
@@ -343,17 +301,21 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Reminders.remove(this) }
+	override fun remove() {
+		calendar.Reminders.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
-	override fun toString(): String = "[{${id.value}} ${time.value} | ${title.value}: ${description.value}]"
+	// [{14} 2022-05-16T00:00 | test_title: test_description]
+	override fun toString(): String =
+		"[{${id.value}} ${time.value} | ${title.value}: ${description.value} (${appointment.value})]".replaceNewline()
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Reminder) false
-		else time == other.time && title == other.title && description == other.description
+		else other.id == id
 	}
 	
 	override fun hashCode(): Int {
@@ -365,7 +327,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 }
 
 
-class Type(id: EntityID<Int>): IntEntity(id) {
+class Type(id: EntityID<Int>): IntEntity(id), DBClass {
 	
 	object Types: IntEntityClass<Type>(TypeTable)
 	
@@ -385,11 +347,9 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 	
 	val name: DBObservable<String> = object: DBObservable<String>() {
 		override fun abstractGet(): String = dbName
-		
 		override fun abstractSet(dat: String) {
 			dbName = dat
 		}
-		
 	}
 	val color: DBObservableBase<Color, String> = object: DBObservableBase<Color, String>() {
 		override fun convertFrom(value: Color): String = value.toString()
@@ -401,17 +361,20 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 	}
 	
 	
-	fun remove() {
-		transaction {
-			delete()
-		}.also { calendar.Types.remove(this) }
+	override fun remove() {
+		calendar.Types.remove(this).also {
+			transaction {
+				delete()
+			}
+		}
 	}
 	
-	override fun toString(): String = "[{${id.value}} ${name.value} ${color.value}]"
+	// [{1} test_1_type 0x008000ff]
+	override fun toString(): String = "[{${id.value}} ${name.value} ${color.value}]".replaceNewline()
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Type) false
-		else other.name == name && other.color == color
+		else other.id == id
 	}
 	
 	override fun hashCode(): Int {
@@ -421,4 +384,10 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 	}
 }
 
+interface DBClass {
+	override fun hashCode(): Int
+	override fun equals(other: Any?): Boolean
+	override fun toString(): String
+	fun remove()
+}
 

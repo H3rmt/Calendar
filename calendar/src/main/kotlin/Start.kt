@@ -1,14 +1,6 @@
-import calendar.initDb
-import calendar.loadCalendarData
+import calendar.*
 import frame.frameInit
-import javafx.beans.value.*
-import javafx.collections.*
-import logic.LogType
-import logic.configs
-import logic.initConfigs
-import logic.initLogger
-import logic.log
-import logic.updateLogger
+import logic.*
 import kotlin.system.exitProcess
 
 fun main() {
@@ -37,71 +29,14 @@ fun init() {
 	initDb()
 	
 	log("preparing Data", LogType.IMPORTANT)
-	loadCalendarData()
+	Types.log("Types").reload()
+	Appointments.log("Appointments").reload()
+	Notes.log("Notes").reload()
+	Files.log("Files").reload()
+	Reminders.log("Reminders").reload()
+	log("loaded Data", LogType.IMPORTANT)
 }
 
-fun <T> T.lg(): T {
-	println(this)
-	return this
-}
-
-fun <T: ObservableValue<*>> T.lgListen(): T {
-	println("lgListen on: $this ")
-	listen2 { old, new ->
-		println("lgListen ($this): $old -> $new")
-	}
-	return this
-}
-
-fun <T> ObservableValue<T>.listen(once: Boolean = false, listener: (new: T) -> Unit) {
-	lateinit var lst: ChangeListener<T>
-	lst = ChangeListener<T> { _, _, newValue ->
-		listener(newValue)
-		if(once)
-			this.removeListener(lst)
-		
-	}
-	addListener(lst)
-}
-
-fun <F, T: ObservableList<F>> T.listen(listener: (new: ListChangeListener.Change<out F>) -> Unit) {
-	addListener(ListChangeListener { change ->
-		listener(change)
-	})
-}
-
-fun <T: ObservableList<*>> T.lgListen(name: String = ""): T {
-	addListener(ListChangeListener { change ->
-		println("change ${name.ifEmpty { "ObservableValue" }} ($this): ")
-		while(change.next()) {
-			when(true) {
-				change.wasAdded() -> {
-					println("\tadded ${change.addedSubList} ")
-				}
-				change.wasRemoved() -> {
-					println("\tremoved ${change.removed} ")
-				}
-				change.wasUpdated() -> {
-					println("\tupdated ${change.list}")
-				}
-				else -> {}
-			}
-		}
-	})
-	return this
-}
-
-fun <T> ObservableValue<T>.listen2(once: Boolean = false, listener: (new: T, old: T) -> Unit) {
-	lateinit var lst: ChangeListener<T>
-	lst = ChangeListener<T> { _, oldValue, newValue ->
-		listener(newValue, oldValue)
-		if(once)
-			this.removeListener(lst)
-	}
-	this.addListener(lst)
-}
-
-fun println(vararg any: Any) {
-	any.forEach { print("$it ") }
-	kotlin.io.println()
+fun String.replaceNewline(): String {
+	return this.replace("\n", "\\n")
 }

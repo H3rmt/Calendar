@@ -21,15 +21,19 @@ interface IDBObservableD<T, DB> {
 abstract class DBObservableBase<T, DB>: ObjectPropertyBase<T>(), IDBObservableD<T, DB> {
 	private var loaded = false
 	override fun getBean(): Any = "--Bean--"//TODO("Not yet implemented")
-
-	override fun getName(): String = "DBObservableD"//TODO("Not yet implemented")
-
-	private fun reload() {
-		transaction {
+	
+	override fun getName(): String = "DBObservableBase"//TODO("Not yet implemented")
+	
+	private fun reload(hasTransaction: Boolean = false) {
+		if(!hasTransaction)
+			transaction {
+				set(convertTo(abstractGet()))
+			}
+		else
 			set(convertTo(abstractGet()))
-		}
+		loaded = true
 	}
-
+	
 	override fun get(): T {
 		if(!loaded)
 			reload()
@@ -71,9 +75,7 @@ abstract class DBObservableBase<T, DB>: ObjectPropertyBase<T>(), IDBObservableD<
 
 abstract class DBObservable<T>: DBObservableBase<T, T>() {
 	override fun convertFrom(value: T): T = value
-
 	override fun convertTo(value: T): T = value
-
 }
 
 abstract class DBDateObservable: DBObservableBase<LocalDate, Long>() {
@@ -95,7 +97,7 @@ open class DBObservableList<T: Entity<*>>(private val table: EntityClass<*, T>):
 	private var loaded = false
 
 	fun reload() {
-		return transaction {
+		transaction {
 			super.setAll(table.all().toList())
 		}
 	}
