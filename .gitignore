@@ -2,11 +2,9 @@
 
 # Build stuff
 /.gradle
+/calendar/build
 /build
-/out
 
 # Log files
 *.log
 *.lck
-
-/data/data.sqlite
