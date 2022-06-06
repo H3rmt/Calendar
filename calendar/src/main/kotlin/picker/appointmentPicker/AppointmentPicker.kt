@@ -85,6 +85,8 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 			}
 			app?.title?.listen { update(app) }
 			app?.description?.listen { update(app) }
+			if(app != null)
+				update(app)
 		}
 		
 		popup.autoHideProperty().set(true)
