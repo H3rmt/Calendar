@@ -30,7 +30,7 @@
 ## New feature (Merge into main branch)
 
 - check build status on `next` branch (no broken allowed in `main`)
-- edit top comment containing summary of most relevant added features
+- edit top comment containing summary of most relevant added features (list with -#?? -#??)
 - Merge into `main` [IDE]
 - close fished Projects
 - add new `Next` Pull request with empty top comment
