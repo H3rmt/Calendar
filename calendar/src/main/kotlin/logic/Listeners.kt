@@ -28,7 +28,7 @@ fun <T> ObservableValue<T>.listen(
 		listener(newValue)
 		if(removeAfterRun)
 			this.removeListener(lst)
-		
+
 	}
 	addListener(lst)
 	if(runOnce)
@@ -110,7 +110,7 @@ fun <F, T: ObservableList<F>> T.log(name: String = ""): T {
 				change.list.forEach { println("\t\t$it") }
 			}
 		}
-		
+
 	}
 	return this
 }

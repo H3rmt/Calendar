@@ -2,12 +2,7 @@ package logic
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.logging.ConsoleHandler
-import java.util.logging.FileHandler
-import java.util.logging.Formatter
-import java.util.logging.Level
-import java.util.logging.LogRecord
-import java.util.logging.Logger
+import java.util.logging.*
 
 
 /** this is necessary to turn of printing
@@ -28,14 +23,15 @@ lateinit var fileHandler: FileHandler
 
 fun updateLogger() {
 	logger.level = if(getConfig(Configs.Debug)) Level.ALL else Level.CONFIG
-	
-	consoleHandler.formatter = SimpleFormatter(if(getConfig(Configs.Debug)) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
+
+	consoleHandler.formatter =
+		SimpleFormatter(if(getConfig(Configs.Debug)) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
 	fileHandler.formatter = consoleHandler.formatter
-	
+
 	if(!getConfig<Boolean>(Configs.PrintLogs)) {
 		logger.removeHandler(consoleHandler)
 	}
-	
+
 	if(getConfig(Configs.StoreLogs)) {
 		logger.addHandler(fileHandler)
 	}
@@ -44,18 +40,18 @@ fun updateLogger() {
 fun initLogger() {
 	logger.apply {
 		handlers.forEach { removeHandler(it) }
-		
+
 		level = Level.ALL
-		
+
 		consoleHandler = ConsoleHandler()
 		consoleHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		addHandler(consoleHandler)
 		log("added console Handler")
-		
+
 		fileHandler = FileHandler(ConfigFiles.logfile)
 		fileHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		fileHandler.level = Level.ALL
-		
+
 		log("added file Handler")
 	}
 }
@@ -77,11 +73,11 @@ fun log(message: Any?, type: LogType = LogType.NORMAL) {
 			println(caller.declaringClass.name); caller.declaringClass.name.run { substring(0, indexOf('$')) }.replaceBefore('.', "").substring(1)
 		}*/
 		callerStr += " " + caller.methodName
-		
-		
+
+
 		val mess = message.toString()
 		val messstrip = message.toString().replace("\n", "\\n")
-		
+
 		when(type) {
 			LogType.LOW -> log(Log(Level.CONFIG, messstrip, callerStr))
 			LogType.NORMAL -> log(Log(Level.INFO, messstrip, callerStr))

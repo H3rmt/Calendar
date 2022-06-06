@@ -5,15 +5,15 @@ import kotlin.system.exitProcess
 
 fun main() {
 	println("\nStarting Calendar... \n")
-	
+
 	initLogger()
 	log("initialised Logger", LogType.IMPORTANT)
-	
+
 	init()
-	
+
 	log("starting Frame", LogType.IMPORTANT)
 	frameInit()
-	
+
 	log("exiting Frame", LogType.IMPORTANT)
 	exitProcess(0)
 }
@@ -21,13 +21,13 @@ fun main() {
 fun init() {
 	initConfigs()
 	log("read Configs:$configs", LogType.IMPORTANT)
-	
+
 	log("Updating Logger with config data", LogType.IMPORTANT)
 	updateLogger()
 	log("Updated Logger", LogType.IMPORTANT)
-	
+
 	initDb()
-	
+
 	log("preparing Data", LogType.IMPORTANT)
 	Types.log("Types").reload()
 	Appointments.log("Appointments").reload()

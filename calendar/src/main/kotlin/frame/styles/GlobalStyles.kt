@@ -2,25 +2,25 @@ package frame.styles
 
 import frame.styles.GlobalStyles.Mixins.BGColor
 import frame.styles.GlobalStyles.Mixins.SecColor
-import javafx.geometry.*
-import javafx.scene.paint.*
-import javafx.scene.text.*
+import javafx.geometry.Pos
+import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
 import tornadofx.*
 
 class GlobalStyles: Stylesheet() {
 	companion object {
 		val background_ by cssclass()
 		val secBackground_ by cssclass()
-		
+
 		val disableFocusDraw_ by cssclass()
 		val maxHeight_ by cssclass()
-		
+
 		val table_ by cssclass()
 		val tableHeader_ by cssclass()
 		val tableItem_ by cssclass()
 		val tableHeaderItem_ by cssclass()
 	}
-	
+
 	object Mixins {
 		val BGColor = mixin {
 			backgroundColor += Color.LIGHTGREY
@@ -29,7 +29,7 @@ class GlobalStyles: Stylesheet() {
 			backgroundColor += Color.DARKGRAY
 		}
 	}
-	
+
 	init {
 		background_ {
 			+BGColor
@@ -43,7 +43,7 @@ class GlobalStyles: Stylesheet() {
 		maxHeight_ {
 			prefHeight = Int.MAX_VALUE.px
 		}
-		
+
 		table_ {
 			+BGColor
 			prefHeight = Int.MAX_VALUE.px
@@ -56,13 +56,13 @@ class GlobalStyles: Stylesheet() {
 		tableItem_ {
 			alignment = Pos.CENTER
 			prefWidth = Int.MAX_VALUE.px
-			
+
 			padding = box(2.px)
 		}
 		tableHeaderItem_ {
 			prefHeight = 30.px
 			minHeight = prefHeight
-			
+
 			fontSize = 13.px
 			fontWeight = FontWeight.BOLD
 		}

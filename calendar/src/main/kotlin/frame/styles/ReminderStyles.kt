@@ -1,8 +1,8 @@
 package frame.styles
 
 import frame.styles.GlobalStyles.Mixins.BGColor
-import javafx.scene.layout.*
-import javafx.scene.paint.*
+import javafx.scene.layout.BorderStrokeStyle
+import javafx.scene.paint.Color
 import tornadofx.*
 
 class ReminderStyles: Stylesheet() {
@@ -13,7 +13,7 @@ class ReminderStyles: Stylesheet() {
 		val reminderRow_ by cssclass()
 		val tableHeaderItem_ by cssclass()
 	}
-	
+
 	init {
 		tableItemLeft_ {
 			borderColor += box(Color.SILVER)
@@ -32,11 +32,11 @@ class ReminderStyles: Stylesheet() {
 		}
 		reminderRow_ {
 			prefHeight = 40.px
-			
+
 			+BGColor
 			backgroundRadius += box(6.px)
 			borderWidth += box(2.px)
-			
+
 			borderColor += box(c(0.75, 0.75, 0.75))
 			borderRadius += box(6.px)
 			borderWidth += box(2.px)

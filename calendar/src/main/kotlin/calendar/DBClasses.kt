@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 
 class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
-	
+
 	companion object {
 		fun new(
 			start: LocalDateTime, end: LocalDateTime, title: String, description: String, type: Type,
@@ -32,7 +32,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 			}
 		}
 	}
-	
+
 	private var dbStart by AppointmentTable.start
 	private var dbEnd by AppointmentTable.end
 	private var dbTitle by AppointmentTable.title
@@ -40,7 +40,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 	private var dbAllDay by AppointmentTable.allDay
 	private var dbType by Type.Types referencedOn AppointmentTable.type
 	private var dbWeek by AppointmentTable.week
-	
+
 	val start: DBDateTimeObservable = object: DBDateTimeObservable() {
 		override fun abstractGet(): Long = dbStart
 		override fun abstractSet(dat: Long) {
@@ -83,7 +83,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 			dbWeek = dat
 		}
 	}
-	
+
 	override fun remove() {
 		calendar.Appointments.remove(this).also {
 			transaction {
@@ -91,17 +91,17 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 			}
 		}
 	}
-	
-	// [{7} 2022-05-16T00:00 - 2022-05-16T23:59  [{1} test 0x008000ff] Day | test_1_title: test_1_desc]
+
+	// [{7} 2022-05-16T00:00 - 2022-05-16T23:59  [{1} test 0x008000ff] frame.Day | test_1_title: test_1_desc]
 	override fun toString(): String = ("[{${id.value}} ${start.value} - ${end.value}  ${type.value} " +
-			  "${if(week.value) "Week" else "Day"} | " +
+			  "${if(week.value) "Week" else "frame.Day"} | " +
 			  "${title.value}: ${description.value}]").replaceNewline()
-	
+
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Appointment) false
 		else other.id == id
 	}
-	
+
 	override fun hashCode(): Int {
 		var result = start.hashCode()
 		result = 31 * result + end.hashCode()
@@ -116,7 +116,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 
 class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Notes: LongEntityClass<Note>(NoteTable)
-	
+
 	companion object {
 		fun new(time: LocalDate, text: String, type: Type, week: Boolean): Note {
 			return transaction {
@@ -129,13 +129,13 @@ class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 			}
 		}
 	}
-	
+
 	private var dbTime by NoteTable.time
 	private var dbText by NoteTable.text
 	private var dbType by Type.Types referencedOn NoteTable.type
 	private var dbWeek by NoteTable.week
 //	private val dbFiles by File.Files referrersOn FileTable.note
-	
+
 	val time: DBDateObservable = object: DBDateObservable() {
 		override fun abstractGet(): Long = dbTime
 		override fun abstractSet(dat: Long) {
@@ -154,8 +154,8 @@ class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 			dbType = dat
 		}
 	}
-	val files = arrayListOf<File>() // TODO not implemented
-	
+	private val files = arrayListOf<File>() // TODO not implemented
+
 	//	val files: DBObservable<SizedIterable<File>> = object: DBObservable<SizedIterable<File>>() {
 //		override fun abstractGet(): SizedIterable<File> = dbFiles
 //		override fun abstractSet(dat: SizedIterable<File>) {
@@ -168,7 +168,7 @@ class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 			dbWeek = dat
 		}
 	}
-	
+
 	override fun remove() {
 		calendar.Notes.remove(this).also {
 			transaction {
@@ -176,16 +176,16 @@ class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 			}
 		}
 	}
-	
+
 	// [{2} 2022-05-16T00:00 [{1} test 0x008000ff] ||: test_note_text]
 	override fun toString(): String =
 		"[{${id.value}} ${time.value} ${type.value} |$files|: ${text.value}]".replaceNewline()
-	
+
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Note) false
 		else other.id == id
 	}
-	
+
 	override fun hashCode(): Int {
 		var result = time.hashCode()
 		result = 31 * result + text.hashCode()
@@ -198,7 +198,7 @@ class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 
 class File(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Files: LongEntityClass<File>(FileTable)
-	
+
 	companion object {
 		fun new(_data: ByteArray, _name: String, _origin: String): File {
 			return transaction {
@@ -210,11 +210,11 @@ class File(id: EntityID<Long>): LongEntity(id), DBClass {
 			}
 		}
 	}
-	
+
 	//	private var dbData by FileTable.data
 	private var dbName by FileTable.name
 	private var dbOrigin by FileTable.origin
-	
+
 	//	var data: DBObservableD<ByteArray, String> = object: DBObservableD<ByteArray, String>(dbData) {
 //		override fun convertFrom(value: ByteArray?): String? = value?.decodeToString()
 //		override fun convertTo(value: String?): ByteArray? = value?.encodeToByteArray()
@@ -231,7 +231,7 @@ class File(id: EntityID<Long>): LongEntity(id), DBClass {
 			dbOrigin = dat
 		}
 	}
-	
+
 	override fun remove() {
 		calendar.Files.remove(this).also {
 			transaction {
@@ -239,15 +239,15 @@ class File(id: EntityID<Long>): LongEntity(id), DBClass {
 			}
 		}
 	}
-	
+
 	// [{2} testfile C:/Users/fef/Documents/test.txt]
 	override fun toString(): String = "[{${id.value}} ${name.value} ${origin.value}]".replaceNewline()
-	
+
 	override fun equals(other: Any?): Boolean {
 		return if(other !is File) false
 		else other.id == id
 	}
-	
+
 	override fun hashCode(): Int {
 		var result = name.hashCode()
 		result = 31 * result + origin.hashCode()
@@ -257,7 +257,7 @@ class File(id: EntityID<Long>): LongEntity(id), DBClass {
 
 class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Reminders: LongEntityClass<Reminder>(ReminderTable)
-	
+
 	companion object {
 		fun new(_time: LocalDateTime, _appointment: Appointment?, _title: String, _description: String): Reminder {
 			return transaction {
@@ -270,12 +270,12 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 			}
 		}
 	}
-	
+
 	private var dbTime by ReminderTable.time
 	private var dbAppointment by Appointment.Appointments optionalReferencedOn ReminderTable.appointment
 	private var dbTitle by ReminderTable.title
 	private var dbDescription by ReminderTable.description
-	
+
 	val time: DBDateTimeObservable = object: DBDateTimeObservable() {
 		override fun abstractGet(): Long = dbTime
 		override fun abstractSet(dat: Long) {
@@ -300,7 +300,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 			dbDescription = dat
 		}
 	}
-	
+
 	override fun remove() {
 		calendar.Reminders.remove(this).also {
 			transaction {
@@ -308,16 +308,16 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 			}
 		}
 	}
-	
+
 	// [{14} 2022-05-16T00:00 | test_title: test_description]
 	override fun toString(): String =
 		"[{${id.value}} ${time.value} | ${title.value}: ${description.value} (${appointment.value})]".replaceNewline()
-	
+
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Reminder) false
 		else other.id == id
 	}
-	
+
 	override fun hashCode(): Int {
 		var result = time.hashCode()
 		result = 31 * result + title.hashCode()
@@ -328,9 +328,9 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 
 
 class Type(id: EntityID<Int>): IntEntity(id), DBClass {
-	
+
 	object Types: IntEntityClass<Type>(TypeTable)
-	
+
 	companion object {
 		fun new(_name: String, _color: Color): Type {
 			return transaction {
@@ -341,10 +341,10 @@ class Type(id: EntityID<Int>): IntEntity(id), DBClass {
 			}
 		}
 	}
-	
+
 	private var dbName by TypeTable.name
 	private var dbColor by TypeTable.color
-	
+
 	val name: DBObservable<String> = object: DBObservable<String>() {
 		override fun abstractGet(): String = dbName
 		override fun abstractSet(dat: String) {
@@ -359,8 +359,8 @@ class Type(id: EntityID<Int>): IntEntity(id), DBClass {
 			dbColor = dat
 		}
 	}
-	
-	
+
+
 	override fun remove() {
 		calendar.Types.remove(this).also {
 			transaction {
@@ -368,15 +368,15 @@ class Type(id: EntityID<Int>): IntEntity(id), DBClass {
 			}
 		}
 	}
-	
+
 	// [{1} test_1_type 0x008000ff]
 	override fun toString(): String = "[{${id.value}} ${name.value} ${color.value}]".replaceNewline()
-	
+
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Type) false
 		else other.id == id
 	}
-	
+
 	override fun hashCode(): Int {
 		var result = name.hashCode()
 		result = 31 * result + color.hashCode()

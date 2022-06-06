@@ -21,9 +21,9 @@ interface IDBObservableD<T, DB> {
 abstract class DBObservableBase<T, DB>: ObjectPropertyBase<T>(), IDBObservableD<T, DB> {
 	private var loaded = false
 	override fun getBean(): Any = "--Bean--"//TODO("Not yet implemented")
-	
+
 	override fun getName(): String = "DBObservableBase"//TODO("Not yet implemented")
-	
+
 	private fun reload(hasTransaction: Boolean = false) {
 		if(!hasTransaction)
 			transaction {
@@ -33,7 +33,7 @@ abstract class DBObservableBase<T, DB>: ObjectPropertyBase<T>(), IDBObservableD<
 			set(convertTo(abstractGet()))
 		loaded = true
 	}
-	
+
 	override fun get(): T {
 		if(!loaded)
 			reload()
@@ -67,7 +67,7 @@ abstract class DBObservableBase<T, DB>: ObjectPropertyBase<T>(), IDBObservableD<
 		return true
 	}
 
-	fun clone(): Property<T> = SimpleObjectProperty(value)
+	fun cloneProp(): Property<T> = SimpleObjectProperty(value)
 
 	override fun toString(): String = "[DBO(${get()})]"
 }
@@ -93,7 +93,8 @@ abstract class DBDateTimeObservable: DBObservableBase<LocalDateTime, Long>() {
  *
  * set and setValue are also blocked, only remove and add
  */
-open class DBObservableList<T: Entity<*>>(private val table: EntityClass<*, T>): ObservableListWrapper<T>(mutableListOf()) {
+open class DBObservableList<T: Entity<*>>(private val table: EntityClass<*, T>):
+	ObservableListWrapper<T>(mutableListOf()) {
 	private var loaded = false
 
 	fun reload() {

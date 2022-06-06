@@ -1,7 +1,9 @@
 package frame
 
 
-import calendar.*
+import calendar.Timing
+import calendar.Type
+import calendar.Types
 import frame.TabManager.Secure
 import frame.popup.AppointmentPopup
 import frame.popup.ReminderPopup
@@ -22,13 +24,13 @@ import javafx.scene.image.WritableImage
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.Priority
+import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import logic.*
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
 import java.awt.Desktop
 import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -40,14 +42,10 @@ import kotlin.reflect.KFunction
 
 
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
-
-/**
- * BLOCKING
- */
 fun frameInit() {
 	createLoading()
 	log("created loading", LogType.NORMAL)
-	
+
 	/**
 	 * this looks pretty weird, but it essentially
 	 * creates a stacktrace with the head of an Exit
@@ -64,10 +62,8 @@ fun frameInit() {
 		val writer = StringWriter()
 		writer.append("Exit <ErrorCode: Frame Exception> -> ")
 
-		if(getConfig(Configs.PrintStacktrace))
-			it.error.printStackTrace(PrintWriter(writer))
-		else
-			writer.append(it.error.toString())
+		if(getConfig(Configs.PrintStacktrace)) it.error.printStackTrace(PrintWriter(writer))
+		else writer.append(it.error.toString())
 		log(writer, LogType.ERROR)
 
 		// switch to true to use custom error  (do in Release)
@@ -76,24 +72,24 @@ fun frameInit() {
 			errorMessage(it.error, writer.toString())
 		}
 	}
-	
+
 	log("launching Application", LogType.IMPORTANT)
 	launch<Window>()
 	//LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
 
 fun errorMessage(error: Throwable, writer: String) = Alert(Alert.AlertType.ERROR).apply {
-	headerText = error.message ?: "An error occurred"
+	val err: Throwable = error.cause ?: error
+	headerText = err.message ?: "An error occurred"
 	isResizable = true
-	title = "Error in " + error.stackTrace[0].fileName
+	title = "Error in " + err.stackTrace[0].fileName
 	dialogPane.content = VBox().apply {
-		label(writer.substringBefore('\n').replace("->","\n"))
+		label(writer.substringBefore('\n').replace("->", "\n"))
 
-		if(getConfig(Configs.Debug))
-			textarea {
-				prefRowCount = 10
-				text = writer
-			}
+		if(getConfig(Configs.Debug)) textarea {
+			prefRowCount = 10
+			text = writer
+		}
 	}
 	showAndWait()
 }
@@ -108,7 +104,7 @@ class Window: App(
 	OverviewStyles::class,
 	WeekStyles::class
 ) {
-	
+
 	override fun start(stage: Stage) {
 		stage.height = 600.0
 		stage.width = 800.0
@@ -205,10 +201,8 @@ fun createMenuGroup(vararg panes: GridPane?) {
 	items.forEach { item ->
 		item.apply {
 			widthProperty().listen { width ->
-				if(!changed.contains(this))
-					changed.add(this)
-				if(width.toDouble() > currentWidth)
-					currentWidth = width.toDouble()
+				if(!changed.contains(this)) changed.add(this)
+				if(width.toDouble() > currentWidth) currentWidth = width.toDouble()
 				if(changed.size == items.size) items.forEach {
 					it.prefWidth = currentWidth
 				}
@@ -223,7 +217,7 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 	menu.customitem {
 		grid = gridpane {
 			addClass(MenubarStyles.gridPane_)
-			
+
 			label(name.translate(Language.TranslationTypes.Menubar)) {
 				addClass(MenubarStyles.itemName_)
 				gridpaneConstraints {
@@ -259,14 +253,14 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
  * @see Secure
  */
 object TabManager {
-	
+
 	lateinit var pane: TabPane
-	
+
 	/**
 	 * <identifier, Tab>
 	 */
 	private val tabs: MutableMap<String, Tab> = mutableMapOf()
-	
+
 	/**
 	 * creates a new tab, or focuses the tab if it already exists
 	 *
@@ -291,7 +285,7 @@ object TabManager {
 	 *                       and return ab Tab
 	 *
 	 *                       Examples:
-	 *                       > ::createWeekTab(fun createWeekTab(pane: TabPane, week: Week, day: Day?): Tab)
+	 *                       > ::createWeekTab(fun createWeekTab(pane: TabPane, week: Week, day: frame.Day?): Tab)
 	 *                       > ::createNoteTab(fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab)
 	 *
 	 * @param methodArgs add all extra parameters apart from the pane here
@@ -303,10 +297,10 @@ object TabManager {
 	fun openTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
 		val newTab = tabs.getOrElse(identifier) { createFunction.call(pane, *methodArgs).also { tabs[identifier] = it } }
 		newTab.setOnClosed { tabs.remove(identifier) }
-		
+
 		pane.selectionModel.select(newTab)
 	}
-	
+
 	/**
 	 * this part contains methods
 	 * for the Tabmanager that should
@@ -318,19 +312,19 @@ object TabManager {
 			tabs[identifier]?.close()
 			tabs.remove(identifier)
 		}
-		
+
 		fun overrideTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
 			tabs[identifier]?.close()
-			
+
 			val tab = createFunction.call(pane, *methodArgs).also { tabs[identifier] = it }
 			tab.setOnClosed { tabs.remove(identifier) }
-			
+
 			pane.selectionModel.select(tab)
 		}
 	}
-	
+
 	override fun toString(): String = tabs.keys.toString()
-	
+
 }
 
 
@@ -342,7 +336,7 @@ val cache = mutableMapOf<String, Image>()
 fun createFXImage(name: String): Image {
 	val path = "img/$name"
 	cache[path]?.let { return it }
-	
+
 	val image = try {
 		ImageIO.read({}::class.java.classLoader.getResource(path))
 	} catch(e: IllegalArgumentException) {
@@ -382,7 +376,7 @@ fun getImageMissing(): BufferedImage {
 		g2.fillRect(28, i, 1, 1)
 		g2.fillRect(i, 28, 1, 1)
 	}
-	
+
 	g2.dispose()
 	return im
 }
@@ -404,9 +398,9 @@ class TranslatingSimpleStringProperty(
 	override fun set(newValue: String?) {
 		super.set(newValue)
 	}
-	
+
 	override fun get(): String = super.get().translate(type, args)
-	
+
 }
 
 fun EventTarget.typeCombobox(type: Property<Type>? = null): ComboBox<Type> {

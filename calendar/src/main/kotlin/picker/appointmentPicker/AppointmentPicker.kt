@@ -22,33 +22,33 @@ fun EventTarget.appointmentPicker(
 
 class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointments: ObservableList<Appointment>):
 	Control() {
-	
+
 	private val popup: AppointmentPickerPopup = AppointmentPickerPopup(appointmentProperty, appointments) {
 		button.fire()
 	}
-	
+
 	private lateinit var textField: TextField
 	private lateinit var button: Button
-	
+
 	override fun createDefaultSkin(): Skin<*> {
 		return object: SkinBase<AppointmentPicker>(this) {
 			override fun computeMaxWidth(
 				height: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double
 			): Double = super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset)
-			
+
 			override fun computeMaxHeight(
 				width: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double
 			): Double = super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset)
 		}
 	}
-	
+
 	init {
 		hbox {
 			style {
 				borderColor += box(Color.DIMGREY)
 				borderRadius += box(3.px)
 				borderWidth += box(1.px)
-				
+
 				backgroundColor += Color.LIGHTGRAY
 			}
 			textField = textfield {
@@ -60,7 +60,7 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 						button.requestFocus()
 				}
 			}
-			
+
 			button = button {
 				imageview(createFXImage("appointmentchooser.svg")) {
 					fitHeight = 18.0
@@ -78,7 +78,7 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 				}
 			}
 		}
-		
+
 		appointmentProperty.listen(runOnce = true) { app: Appointment? ->
 			val update = { appointment: Appointment ->
 				textField.text = "${appointment.title.value} ${appointment.description.value}"
@@ -88,8 +88,8 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 			if(app != null)
 				update(app)
 		}
-		
+
 		popup.autoHideProperty().set(true)
 	}
-	
+
 }

@@ -27,19 +27,19 @@ class AppointmentPickerPopup(
 	private val titleSearchSelect = DropdownToggle(true, "title")
 	private val descriptionSearchSelect = DropdownToggle(true, "description")
 	private val typeSearchSelect = DropdownToggle(true, "type")
-	
+
 	private val appointmentsList = observableArrayList(appointments)
-	
+
 	init {
 		appointments.listen {
 			appointmentsList.setAll(it)
 		}
 		filter()
 	}
-	
+
 	private fun String.lowerConfigIgnore(): String =
 		if(getConfig(Configs.IgnoreCaseForSearch)) this.lowercase() else this
-	
+
 	private fun filter() {
 		if(replace != null) {
 			val text = replace!!.lowerConfigIgnore()
@@ -55,17 +55,17 @@ class AppointmentPickerPopup(
 			appointmentsList.addAll(appointments)
 		}
 	}
-	
+
 	init {
 		content.add(vbox(spacing = 0.0, alignment = Pos.CENTER) {
 			style(append = true) {
 				maxWidth = 250.px
 				minWidth = 140.px
 				maxHeight = 200.px
-				
+
 				borderColor += box(Color.DIMGREY)
 				borderWidth += box(1.px)
-				
+
 				backgroundColor += Color.valueOf("#E9E9E9")
 			}
 			hbox(spacing = 10.0, alignment = Pos.CENTER_RIGHT) {
@@ -74,7 +74,7 @@ class AppointmentPickerPopup(
 					borderStyle += BorderStrokeStyle.SOLID
 					borderWidth += box(0.px, 0.px, 2.px, 0.px)
 				}
-				
+
 				hbox(spacing = 3, alignment = Pos.CENTER_LEFT) {
 					style {
 						padding = box(2.px)
@@ -85,7 +85,7 @@ class AppointmentPickerPopup(
 						}
 					)
 				}
-				
+
 				hbox(spacing = 3, alignment = Pos.CENTER_RIGHT) {
 					style {
 						padding = box(2.px)
@@ -121,7 +121,7 @@ class AppointmentPickerPopup(
 									borderColor += box(c(0.75, 0.75, 0.75))
 									borderStyle += BorderStrokeStyle.DOTTED
 									borderWidth += box(0.px, 0.px, 2.px, 0.px)
-									
+
 									padding = box(2.px, 0.px)
 								}
 								textflow {
@@ -140,7 +140,7 @@ class AppointmentPickerPopup(
 									style {
 										alignment = Pos.CENTER
 										prefWidth = Int.MAX_VALUE.px
-										
+
 										padding = box(2.px)
 									}
 								}
@@ -160,7 +160,7 @@ class AppointmentPickerPopup(
 									style {
 										alignment = Pos.CENTER
 										prefWidth = Int.MAX_VALUE.px
-										
+
 										padding = box(2.px)
 									}
 								}
@@ -180,7 +180,7 @@ class AppointmentPickerPopup(
 									style {
 										alignment = Pos.CENTER
 										prefWidth = Int.MAX_VALUE.px
-										
+
 										padding = box(2.px)
 									}
 								}

@@ -25,24 +25,24 @@ import java.time.LocalDateTime
 
 class ReminderPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
-	
+
 	private var reminder: Reminder? = scope.reminder
-	
+
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
 	private var appointment: Property<Appointment?> = reminder?.appointment?.cloneProp() ?: SimpleObjectProperty()
 	private var time: Property<LocalDateTime> =
 		reminder?.time?.cloneProp() ?: appointment.value?.start?.cloneProp() ?: scope.time.toProperty()
 	private var reminderTitle: Property<String> = reminder?.title?.cloneProp() ?: "".toProperty()
 	private var description: Property<String> = reminder?.description?.cloneProp() ?: "".toProperty()
-	
+
 	private var error: Property<String> = "".toProperty()
 	private var windowTitle: String = scope.title
-	
+
 	private var saveTitle: String = scope.saveTitle
 	private var toggle: Property<Boolean> = scope.timeOrAppointment.toProperty()
 	private var toggleName: Property<String> = "".toProperty()
 	private var control: BorderPane? = null
-	
+
 	private fun updateDisplay(toggle: Boolean) {
 		if(toggle) {
 			toggleName.value = "Appointment"
@@ -52,7 +52,7 @@ class ReminderPopup: Fragment() {
 			control?.left = dateTimePicker(dateTime = time)
 		}
 	}
-	
+
 	private fun updateReminder() {
 		reminder?.let { rem ->
 			rem.time.set(time)
@@ -61,28 +61,28 @@ class ReminderPopup: Fragment() {
 			rem.appointment.set(appointment)
 		}
 	}
-	
+
 	private fun createReminder(): Reminder = Reminder.new(
 		_time = time.value,
 		_appointment = appointment.value,
 		_title = reminderTitle.value,
 		_description = description.value,
 	)
-	
+
 	private fun checkReminder(): String? {
 		if(reminderTitle.value.isEmpty()) {
 			return "missing title".translate(Language.TranslationTypes.ReminderPopup)
 		}
 		return null
 	}
-	
+
 	override fun onBeforeShow() {
 		modalStage?.height = 320.0
 		modalStage?.width = 440.0
 		modalStage?.minWidth = 430.0
 		modalStage?.minHeight = 280.0
 	}
-	
+
 	override val root = form {
 		addClass(GlobalStyles.background_)
 		fieldset(windowTitle) {
@@ -151,12 +151,12 @@ class ReminderPopup: Fragment() {
 			}
 		}
 	}
-	
-	
+
+
 	init {
 		toggle.listen(::updateDisplay, runOnce = true)
 	}
-	
+
 	class ItemsScope(
 		val title: String,
 		val saveTitle: String,
@@ -164,7 +164,7 @@ class ReminderPopup: Fragment() {
 		val time: LocalDateTime,
 		val timeOrAppointment: Boolean
 	): Scope()
-	
+
 	companion object {
 		@Suppress("LongParameterList")
 		fun open(

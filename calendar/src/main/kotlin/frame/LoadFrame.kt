@@ -1,10 +1,6 @@
 package frame
 
-import java.awt.BasicStroke
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Graphics
-import java.awt.Graphics2D
+import java.awt.*
 import java.awt.event.WindowEvent
 import java.awt.geom.Arc2D
 import java.awt.geom.Ellipse2D
@@ -41,7 +37,7 @@ fun removeLoading() {
 }
 
 class LoadingScreen: JFrame() {
-	
+
 	init {
 		isVisible = false
 		title = "Loading"
@@ -51,26 +47,38 @@ class LoadingScreen: JFrame() {
 		size = Dimension(100, 100)
 		setLocationRelativeTo(null)
 	}
-	
+
 	override fun paint(g: Graphics) {
 		val g2 = g as Graphics2D
 		g2.color = Color(0, 0, 0, 15)
 		g2.fillRect(0, 0, width, height)
-		
+
 		g2.color = Color(60, 210, 0, 100)
 		g2.stroke = BasicStroke(15F)
-		
+
 		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[0], 40.0, Arc2D.OPEN))
 		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[1], 40.0, Arc2D.OPEN))
 		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[2], 40.0, Arc2D.OPEN))
 		g2.draw(Arc2D.Double(0.0, 0.0, width.toDouble(), height.toDouble(), loadingsCircles[3], 40.0, Arc2D.OPEN))
-		
-		
+
+
 		g2.color = Color(60, 210, 0, 160)
 		g2.stroke = BasicStroke(5F)
-		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[0], 50.0, Arc2D.PIE))
-		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[1], 50.0, Arc2D.PIE))
-		g2.draw(Arc2D.Double(20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[2], 50.0, Arc2D.PIE))
-		
+		g2.draw(
+			Arc2D.Double(
+				20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[0], 50.0, Arc2D.PIE
+			)
+		)
+		g2.draw(
+			Arc2D.Double(
+				20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[1], 50.0, Arc2D.PIE
+			)
+		)
+		g2.draw(
+			Arc2D.Double(
+				20.0, 20.0, width.toDouble() - 40, height.toDouble() - 40, innerLoadingsCircles[2], 50.0, Arc2D.PIE
+			)
+		)
+
 	}
 }

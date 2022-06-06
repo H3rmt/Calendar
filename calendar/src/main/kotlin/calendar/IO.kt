@@ -32,14 +32,14 @@ object AppointmentTable: LongIdTable() {
 	val title = text("title").default("")
 	val description = text("description").default("")
 	val week = bool("week").default(false)
-	
+
 	// week appointment start with 0 as Monday (so start 0-10.080, end between 1-20.160, if longer it reaches from end of week back to beginning )
 	val allDay = bool("allDay").default(false)
 	val type = reference("type", TypeTable)
 }
 
 object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
-	
+
 	/**
 	 * returns an observable List containing Week Appointments that gets updated every time
 	 * - the list of Notes change
@@ -52,10 +52,10 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 		val condition: (Appointment) -> Boolean = {
 			it.week.value
 		}
-		
+
 		// populate list
 		val list = observableListOf<Appointment>(this.filter(condition))
-		
+
 		// adds or removes appointment from/to returned list based on condition
 		// either gets called when any relevant value on appointment changes or new appointments get added
 		val check = { appointment: Appointment ->
@@ -65,7 +65,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 				if(list.contains(appointment)) list.remove(appointment)  // remove appointment if on list
 			}
 		}
-		
+
 		// add listener to every value of appointment that is evaluated in condition
 		// to check again if appointment should be added or removed from returned list
 		val addChangeChecks: (Appointment) -> Unit = { appointment ->
@@ -79,23 +79,23 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 				check(appointment)
 			}
 		}
-		
+
 		// add checks to all current appointments in list
 		forEach(addChangeChecks)
-		
+
 		// runs if new appointments were created or removed
 		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed appointments
 				list.addAll(event.addedSubList.filter(condition)) // add new appointments if they fulfill condition
-				
+
 				// add checks to all new appointments in list
 				event.addedSubList.forEach(addChangeChecks)
 			}
 		}
 		return list
 	}
-	
+
 	/**
 	 * returns an observable List containing non Week Appointments within timespan that gets updated every time
 	 * - the list of Notes change
@@ -106,12 +106,12 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	fun getAppointmentsFromTo(from: LocalDateTime, to: LocalDateTime, day: DayOfWeek): ObservableList<Appointment> {
 		// condition to check if appointment fulfills condition to be in returned list
 		val condition: (Appointment) -> Boolean = { // TODO Week appointments
-			(!it.week.value && (it.start.value <= to && it.end.value >= from)) || false//(it.week.value && day in it.start.value.dayOfWeek..it.end.value.dayOfWeek) // TODO this doesn't seem right (week appointments)
+			!it.week.value && (it.start.value <= to && it.end.value >= from)//(it.week.value && day in it.start.value.dayOfWeek..it.end.value.dayOfWeek) // TODO this doesn't seem right (week appointments)
 		}
-		
+
 		// populate list
 		val list = observableListOf<Appointment>(this.filter(condition))
-		
+
 		// adds or removes appointment from/to returned list based on condition
 		// either gets called when any relevant value on appointment changes or new appointments get added
 		val check = { appointment: Appointment ->
@@ -123,7 +123,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 					list.remove(appointment)  // remove appointment if on list
 			}
 		}
-		
+
 		// add listener to every value of appointment that is evaluated in condition
 		// to check again if appointment should be added or removed from returned list
 		val addChangeChecks: (Appointment) -> Unit = { appointment ->
@@ -137,16 +137,16 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 				check(appointment)
 			}
 		}
-		
+
 		// add checks to all current appointments in list
 		forEach(addChangeChecks)
-		
+
 		// runs if new appointments were created or removed
 		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed appointments
 				list.addAll(event.addedSubList.filter(condition)) // add new appointments if they fulfill condition
-				
+
 				// add checks to all new appointments in list
 				event.addedSubList.forEach(addChangeChecks)
 			}
@@ -163,8 +163,8 @@ object NoteTable: LongIdTable() {
 }
 
 object Notes: DBObservableList<Note>(Note.Notes) {
-	
-	
+
+
 	/**
 	 * returns an observable List containing non Week Notes at this time that gets updated every time
 	 * - the list of Notes change
@@ -177,10 +177,10 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		val condition: (Note) -> Boolean = {
 			!it.week.value && at == it.time.value
 		}
-		
+
 		// populate list
 		val list = observableListOf<Note>(this.filter(condition))
-		
+
 		// adds or removes notes from/to returned list based on condition
 		// either gets called when any relevant value on note changes or new notes get added
 		val check = { note: Note ->
@@ -190,7 +190,7 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 				if(list.contains(note)) list.remove(note)  // remove note if on list
 			}
 		}
-		
+
 		// add listener to every value of note that is evaluated in condition
 		// to check again if note should be added or removed from returned list
 		val addChangeChecks: (Note) -> Unit = { note ->
@@ -201,23 +201,23 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 				check(note)
 			}
 		}
-		
+
 		// add checks to all current notes in list
 		forEach(addChangeChecks)
-		
+
 		// runs if new notes were created or removed
 		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed notes
 				list.addAll(event.addedSubList.filter(condition)) // add new notes if they fulfill condition
-				
+
 				// add checks to all new notes in list
 				event.addedSubList.forEach(addChangeChecks)
 			}
 		}
 		return list
 	}
-	
+
 	/**
 	 * returns an observable List containing Week Notes within timespan that gets updated every time
 	 * - the list of Notes change
@@ -230,10 +230,10 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 		val condition: (Note) -> Boolean = {
 			it.week.value && from < it.time.value && it.time.value < to
 		}
-		
+
 		// populate list
 		val list = observableListOf<Note>(this.filter(condition))
-		
+
 		// adds or removes notes from/to returned list based on condition
 		// either gets called when any relevant value on note changes or new notes get added
 		val check = { note: Note ->
@@ -243,7 +243,7 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 				if(list.contains(note)) list.remove(note)  // remove note if on list
 			}
 		}
-		
+
 		// add listener to every value of note that is evaluated in condition
 		// to check again if note should be added or removed from returned list
 		val addChangeChecks: (Note) -> Unit = { note ->
@@ -254,16 +254,16 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 				check(note)
 			}
 		}
-		
+
 		// add checks to all current notes in list
 		forEach(addChangeChecks)
-		
+
 		// runs if new notes were created or removed
 		listenUpdates { event ->
 			while(event.next()) {
 				list.removeAll(event.removed) // remove all removed notes
 				list.addAll(event.addedSubList.filter(condition)) // add new notes if they fulfill condition
-				
+
 				// add checks to all new notes in list
 				event.addedSubList.forEach(addChangeChecks)
 			}

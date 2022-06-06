@@ -1,15 +1,15 @@
 {
-	"Language": "EN",
-	"Debug": false,
-	"PrintStacktrace": true,
-	"PrintLogs": true,
-	"StoreLogs": true,
-	"LogFormat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
-	"DebugLogFormat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
-	// "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
-	"AnimationSpeed": 200,
-	"AnimationDelay": 80,
-	"MaxDayAppointments": 8,
-	"ExpandNotesOnOpen": true,
-	"IgnoreCaseForSearch": true
+  "Language": "EN",
+  "Debug": false,
+  "PrintStacktrace": true,
+  "PrintLogs": true,
+  "StoreLogs": true,
+  "LogFormat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
+  "DebugLogFormat": "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
+  // "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n",
+  "AnimationSpeed": 200,
+  "AnimationDelay": 80,
+  "MaxDayAppointments": 8,
+  "ExpandNotesOnOpen": true,
+  "IgnoreCaseForSearch": true
 }

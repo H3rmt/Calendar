@@ -50,7 +50,7 @@ fun initConfigs() {
 		file.writeText(CONFIG_DEFAULT)
 		log("created default config:${ConfigFiles.configFile}", LogType.WARNING)
 	}
-	
+
 	try {
 		val load: Map<String, Any> =
 			getJson().fromJson(getJsonReader(FileReader(ConfigFiles.configFile)), Map::class.java)
@@ -69,13 +69,13 @@ fun initConfigs() {
 		log("Config File missing", LogType.ERROR)
 		throw Exit("5e928h", e)
 	} catch(e: JsonSyntaxException) {
-		log("JSON invalid in Configfile", LogType.ERROR)
+		log("JSON invalid in ConfigFile", LogType.ERROR)
 		throw Exit("iu2sj2", e)
 	}
-	
+
 	language = Language(getConfig(Configs.Language))
 	log("loaded language ${language.info()}", LogType.LOW)
-	
+
 	stacktrace = getConfig(Configs.PrintStacktrace)
 	log("set stacktrace $stacktrace", LogType.LOW)
 }
@@ -162,14 +162,14 @@ var stacktrace = true
  * @throws Exception
  */
 class Exit(private val code: String, private val exception: Exception? = null): Exception(code) {
-	
+
 	override fun fillInStackTrace(): Throwable {
 		return if(stacktrace)
 			super.fillInStackTrace()
 		else
 			this
 	}
-	
+
 	override fun toString(): String = "Exit <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
 }
 
@@ -193,12 +193,12 @@ class Exit(private val code: String, private val exception: Exception? = null): 
 fun Warning(code: String, exception: Exception, log: Any) {
 	log(log, LogType.WARNING)
 	val writer = StringWriter()
-	
+
 	if(stacktrace)
 		exception.printStackTrace(PrintWriter(writer))
 	else
 		writer.append(exception.toString())
-	
+
 	log(writer, LogType.ERROR)
 }
 
@@ -212,17 +212,15 @@ enum class Configs {
 
 object ConfigFiles {
 	const val logfile = "Calendar.log"
-	
+
 	const val dataDirectory = "data"
-	
+
 	const val languageFiles = "lang"
-	
+
 	const val configFile = "$dataDirectory/config.json"
 }
 
 lateinit var language: Language
-
-const val EMPTY_LANGUAGE = "{\n\n}"
 
 // TODO update this before release
 const val CONFIG_DEFAULT = "{\n" +

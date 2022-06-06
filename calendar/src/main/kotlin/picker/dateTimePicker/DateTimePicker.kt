@@ -27,24 +27,24 @@ fun EventTarget.dateTimePicker(
 }
 
 class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFormatter): Control() {
-	
+
 	// this property only gets updated if the OK button is pressed
 	val dateTimeProperty: Property<LocalDateTime> = SimpleObjectProperty(dateTime)
-	
+
 	private val dateProperty: Property<LocalDate> = dateTime.toLocalDate().toProperty()
 	private val minuteProperty: IntegerProperty = dateTime.minute.toProperty()
 	private val hourProperty: IntegerProperty = dateTime.hour.toProperty()
-	
-	
+
+
 	private val popup: DateTimePickerPopup = DateTimePickerPopup(dateProperty, hourProperty, minuteProperty) {
 		dateTimeProperty.value =
 			LocalDateTime.of(dateProperty.value, LocalTime.of(hourProperty.value, minuteProperty.value))
 		button.fire()
 	}
-	
+
 	private lateinit var textField: TextField
 	private lateinit var button: Button
-	
+
 	override fun createDefaultSkin(): Skin<*> {
 		return object: SkinBase<DateTimePicker>(this) {
 			override fun computeMaxWidth(
@@ -55,7 +55,7 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 				leftInset: Double
 			): Double =
 				super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset)
-			
+
 			override fun computeMaxHeight(
 				width: Double,
 				topInset: Double,
@@ -66,14 +66,14 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 				super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset)
 		}
 	}
-	
+
 	init {
 		hbox {
 			style {
 				borderColor += box(Color.DIMGREY)
 				borderRadius += box(3.px)
 				borderWidth += box(1.px)
-				
+
 				backgroundColor += Color.LIGHTGRAY
 			}
 			textField = textfield {
@@ -86,7 +86,7 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 						button.requestFocus()
 				}
 			}
-			
+
 			button = button {
 				imageview(createFXImage("datetimechooser.svg")) {
 					fitHeight = 18.0
@@ -106,12 +106,12 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 				}
 			}
 		}
-		
+
 		dateTimeProperty.listen(runOnce = true) { new ->
 			textField.text = formatter.format(new)
 		}
-		
+
 		popup.autoHideProperty().set(true)
 	}
-	
+
 }

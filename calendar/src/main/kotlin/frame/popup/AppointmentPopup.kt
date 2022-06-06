@@ -24,9 +24,9 @@ import java.time.LocalDateTime
 
 class AppointmentPopup: Fragment() {
 	override val scope = super.scope as ItemsScope
-	
+
 	private var appointment: Appointment? = scope.appointment
-	
+
 	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
 	private var start: Property<LocalDateTime> = appointment?.start?.cloneProp() ?: scope.start.toProperty()
 	private var end: Property<LocalDateTime> = appointment?.end?.cloneProp() ?: scope.end.toProperty()
@@ -34,14 +34,14 @@ class AppointmentPopup: Fragment() {
 	private var description: Property<String> = appointment?.description?.cloneProp() ?: "".toProperty()
 	private var type: Property<Type> = appointment?.type?.cloneProp() ?: Types.getRandom("Appointment").toProperty()
 	private var wholeDay: Property<Boolean> = appointment?.allDay?.cloneProp() ?: false.toProperty()
-	
+
 	private var error: Property<String> = "".toProperty()
 	private var control: BorderPane? = null
 	private var day: Property<LocalDate> = (appointment?.start?.value ?: scope.start).toLocalDate().toProperty()
-	
+
 	private var windowTitle: String = scope.title
 	private var saveTitle: String = scope.saveTitle
-	
+
 	private fun updateDisplay(toggle: Boolean) {
 		control?.left = if(toggle) {
 			field("day".translate(Language.TranslationTypes.AppointmentPopup)) {
@@ -54,7 +54,7 @@ class AppointmentPopup: Fragment() {
 			}
 		}
 	}
-	
+
 	private fun updateAppointment() {
 		if(wholeDay.value) {
 			appointment?.let { app ->
@@ -76,7 +76,7 @@ class AppointmentPopup: Fragment() {
 			}
 		}
 	}
-	
+
 	private fun createAppointment(): Appointment = if(wholeDay.value) {
 		Appointment.new(
 			start = day.value.atStartOfDay(),
@@ -96,7 +96,7 @@ class AppointmentPopup: Fragment() {
 			allDay = false
 		)
 	}
-	
+
 	private fun checkAppointment(): String? {
 		return if(appointmentTitle.value.isEmpty()) {
 			"missing title".translate(Language.TranslationTypes.AppointmentPopup)
@@ -106,12 +106,12 @@ class AppointmentPopup: Fragment() {
 			null
 		}
 	}
-	
+
 	override fun onBeforeShow() {
 		modalStage?.height = 320.0
 		modalStage?.width = 500.0
 	}
-	
+
 	override val root = form {
 		addClass(GlobalStyles.background_)
 		fieldset(windowTitle) {
@@ -137,7 +137,7 @@ class AppointmentPopup: Fragment() {
 					addClass(GlobalStyles.maxHeight_)
 				}
 			}
-			
+
 			buttonbar {
 				textfield(error) {
 					style(append = true) {
@@ -171,11 +171,11 @@ class AppointmentPopup: Fragment() {
 			}
 		}
 	}
-	
+
 	init {
 		wholeDay.listen(::updateDisplay, runOnce = true)
 	}
-	
+
 	class ItemsScope(
 		val title: String,
 		val saveTitle: String,
@@ -183,7 +183,7 @@ class AppointmentPopup: Fragment() {
 		val start: LocalDateTime,
 		val end: LocalDateTime
 	): Scope()
-	
+
 	companion object {
 		@Suppress("LongParameterList")
 		fun open(

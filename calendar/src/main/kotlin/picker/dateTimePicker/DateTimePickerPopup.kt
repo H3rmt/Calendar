@@ -1,20 +1,27 @@
 package picker.dateTimePicker
 
-import javafx.beans.property.*
-import javafx.geometry.*
-import javafx.scene.paint.*
-import javafx.stage.*
+import javafx.beans.property.IntegerProperty
+import javafx.beans.property.Property
+import javafx.geometry.Orientation
+import javafx.geometry.Pos
+import javafx.scene.paint.Color
+import javafx.stage.Popup
 import tornadofx.*
 import java.time.LocalDate
 
-class DateTimePickerPopup(dateProperty: Property<LocalDate>, hourProperty: IntegerProperty, minuteProperty: IntegerProperty, save: () -> Unit): Popup() {
+class DateTimePickerPopup(
+	dateProperty: Property<LocalDate>,
+	hourProperty: IntegerProperty,
+	minuteProperty: IntegerProperty,
+	save: () -> Unit
+): Popup() {
 	init {
 		content.add(vbox(spacing = 5.0) {
 			style {
 				borderColor += box(Color.DIMGREY)
 				//borderRadius += box(3.px)
 				borderWidth += box(1.px)
-				
+
 				backgroundColor += Color.valueOf("#E9E9E9")
 			}
 			datepicker(dateProperty) { }
@@ -23,7 +30,7 @@ class DateTimePickerPopup(dateProperty: Property<LocalDate>, hourProperty: Integ
 				style(append = true) {
 					padding = box(0.px, 3.px, 3.px, 3.px)
 				}
-				
+
 				hbox(spacing = 3.0, alignment = Pos.CENTER) {
 					spinner(min = 0, max = 23, amountToStepBy = 1, enableScroll = true, property = hourProperty) {
 						prefWidth = 65.0

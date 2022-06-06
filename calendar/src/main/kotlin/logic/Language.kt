@@ -4,14 +4,14 @@ import java.io.File
 import java.io.FileReader
 
 class Language(private val language: AvailableLanguages) {
-	
+
 	/**
 	 * Map<Category, Map<string, translation>>
 	 *
 	 * linking a String to a translated String, split by Category
 	 */
 	private var translations: Map<TranslationTypes, Map<String, String>>
-	
+
 	/**
 	 * creates json file if it didn't exist
 	 *
@@ -30,8 +30,8 @@ class Language(private val language: AvailableLanguages) {
 			throw Exit("??????", e)
 		}
 	}
-	
-	
+
+
 	/**
 	 * finds the corresponding translated String to a
 	 * String
@@ -57,9 +57,9 @@ class Language(private val language: AvailableLanguages) {
 			tr // return requested string to translate
 		}
 	}
-	
+
 	fun info(): String = "Language: $language loaded ${translations.values.sumOf { it.size }} Translations"
-	
+
 	/**
 	 * all different types of available Languages
 	 *
@@ -72,7 +72,7 @@ class Language(private val language: AvailableLanguages) {
 		DE,
 		FR,
 	}
-	
+
 	enum class TranslationTypes {
 		Global,
 		Menubar,

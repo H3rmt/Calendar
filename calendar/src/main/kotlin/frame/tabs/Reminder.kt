@@ -21,7 +21,7 @@ fun createReminderTab(pane: TabPane): Tab {
 	return pane.tab("reminders".translate(Language.TranslationTypes.Reminder)) {
 		isClosable = false
 		addClass(TabStyles.tab_)
-		
+
 		vbox {
 			hbox(spacing = 20.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar_)
@@ -31,17 +31,17 @@ fun createReminderTab(pane: TabPane): Tab {
 					alignment = Pos.CENTER
 				}
 			}
-			
+
 			vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 				addClass(GlobalStyles.disableFocusDraw_)
 				addClass(GlobalStyles.table_)
-				
+
 				lateinit var scrollbarWidth: DoubleProperty
-				
+
 				// Top bar
 				hbox(spacing = 5.0, alignment = Pos.CENTER) {
 					addClass(GlobalStyles.tableHeader_)
-					
+
 					scrollbarWidth = paddingRightProperty
 					for(header in arrayListOf("Title", "Deadline", "Description")) {
 						label(header.translate(Language.TranslationTypes.Reminder)) {
@@ -51,40 +51,40 @@ fun createReminderTab(pane: TabPane): Tab {
 						}
 					}
 				}
-				
+
 				scrollpane(fitToWidth = true, fitToHeight = true) {
 					addClass(GlobalStyles.disableFocusDraw_)
 					addClass(GlobalStyles.maxHeight_)
 					addClass(GlobalStyles.background_)
 					isPannable = true
-					
+
 					// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
 					adjustWidth(scrollbarWidth)
-					
+
 					// gets stretched across whole scrollpane
 					vbox(spacing = 2.0, alignment = Pos.TOP_CENTER) {
 						addClass(GlobalStyles.background_)
-						
-						var reminderTabs = mutableMapOf<Reminder, HBox>()
-						
+
+						var reminderRows = mutableMapOf<Reminder, HBox>()
+
 						Reminders.listenUpdates { change ->
 							while(change.next()) {
 								if(change.wasAdded()) {
 									for(reminder in change.addedSubList) {
-										reminderTabs[reminder] = reminderTab(this, reminder)
+										reminderRows[reminder] = reminderRow(this, reminder)
 									}
 								}
 								if(change.wasRemoved()) {
 									for(reminder in change.removed) {
 										// custom filtering, as notes are not the exact same (this will always return only one element)
-										this.children.removeAll(reminderTabs.filter { it.key == reminder }.values)
-										reminderTabs = reminderTabs.filter { it.key != reminder }.toMutableMap()
+										this.children.removeAll(reminderRows.filter { it.key == reminder }.values)
+										reminderRows = reminderRows.filter { it.key != reminder }.toMutableMap()
 									}
 								}
 							}
 						}
 						for(reminder in Reminders) {
-							reminderTabs[reminder] = reminderTab(this, reminder)
+							reminderRows[reminder] = reminderRow(this, reminder)
 						}
 					}
 				}
@@ -93,7 +93,7 @@ fun createReminderTab(pane: TabPane): Tab {
 	}
 }
 
-fun reminderTab(tabs: VBox, reminder: Reminder): HBox {
+fun reminderRow(tabs: VBox, reminder: Reminder): HBox {
 	return tabs.hbox(spacing = 5.0, alignment = Pos.CENTER) {
 		addClass(ReminderStyles.reminderRow_)
 		label(reminder.title) {

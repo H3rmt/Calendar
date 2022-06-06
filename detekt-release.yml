@@ -9,7 +9,7 @@ complexity:
   ComplexCondition:
     active: true
     threshold: 4
-    
+
 style:
   MaxLineLength:
     active: false
