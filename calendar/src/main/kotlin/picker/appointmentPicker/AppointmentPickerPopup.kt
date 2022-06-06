@@ -3,7 +3,8 @@ package picker.appointmentPicker
 import calendar.Appointment
 import frame.createFXImage
 import javafx.beans.property.Property
-import javafx.collections.FXCollections
+import javafx.collections.FXCollections.observableArrayList
+import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.control.TextField
@@ -19,17 +20,14 @@ import picker.dropdownTogglePicker.dropdownTogglePicker
 import tornadofx.*
 
 class AppointmentPickerPopup(
-	appointment: Property<Appointment?>, private val appointments: List<Appointment>, save: () -> Unit
+	appointment: Property<Appointment?>,
+	private val appointments: ObservableList<Appointment>, save: () -> Unit
 ): Popup() {
 	private var replace: String? = null
-	private val appointmentsList = FXCollections.observableArrayList(appointments)
-	private val searchColumns = FXCollections.observableArrayList<DropdownToggle>()
-	
-	init {
-		searchColumns.addAll(
-			DropdownToggle(true, "title"), DropdownToggle(true, "description"), DropdownToggle(true, "type")
-		)
-	}
+	private val appointmentsList = observableArrayList(appointments) // TODO add new appointments to this list
+	private val searchColumns = observableArrayList(
+		DropdownToggle(true, "title"), DropdownToggle(true, "description"), DropdownToggle(true, "type")
+	)
 	
 	private fun String.conditionalLowercase(bool: Boolean): String = if(bool) this.lowercase() else this
 	
@@ -37,16 +35,16 @@ class AppointmentPickerPopup(
 		if(replace != null) {
 			val text = replace!!.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
 			appointmentsList.clear()
-			for(app: Appointment in appointments) @Suppress("ComplexCondition") if((searchColumns.find { it.name == "title" }!!.selected.value && app.title.value.conditionalLowercase(
-					getConfig(Configs.IgnoreCaseForSearch)
-				)
-					.contains(text)) || (searchColumns.find { it.name == "description" }!!.selected.value && app.description.value.conditionalLowercase(
-					getConfig(Configs.IgnoreCaseForSearch)
-				)
-					.contains(text)) || (searchColumns.find { it.name == "type" }!!.selected.value && app.type.value.name.value.conditionalLowercase(
-					getConfig(Configs.IgnoreCaseForSearch)
-				).contains(text))
-			) appointmentsList.add(app)
+			for(app: Appointment in appointments)
+				@Suppress("ComplexCondition")
+				if((searchColumns.find { it.name == "title" }!!.selected.value &&
+							  app.title.value.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
+								  .contains(text)) || (searchColumns.find { it.name == "description" }!!.selected.value &&
+							  app.description.value.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
+								  .contains(text)) || (searchColumns.find { it.name == "type" }!!.selected.value &&
+							  app.type.value.name.value.conditionalLowercase(getConfig(Configs.IgnoreCaseForSearch))
+								  .contains(text))
+				) appointmentsList.add(app)
 		} else {
 			appointmentsList.clear()
 			appointmentsList.addAll(appointments)
@@ -78,7 +76,7 @@ class AppointmentPickerPopup(
 					}
 					dropdownTogglePicker("filter", searchColumns, {
 						filter()
-					}) { }
+					})
 				}
 				
 				hbox(spacing = 3, alignment = Pos.CENTER_RIGHT) {
@@ -106,9 +104,9 @@ class AppointmentPickerPopup(
 					maxHeight = 100.px
 					minHeight = 10.px
 				}
-				val update: (List<Appointment>) -> Unit = { list: List<Appointment> ->
-					clear()
-					vbox {
+				vbox {
+					val update: (List<Appointment>) -> Unit = { list: List<Appointment> ->
+						clear()
 						for(app in list) {
 							hbox(spacing = 5.0, alignment = Pos.CENTER) {
 								style(append = true) {
@@ -140,7 +138,7 @@ class AppointmentPickerPopup(
 								textflow {
 									if(replace != null && searchColumns.find { it.name == "description" }!!.selected.value) {
 										val strings = app.description.value.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
-										for((index, text) in strings.withIndex()) {
+										for((index, text) in strings.withIndex()) { // TODO bind here same as when no filter (no .value)
 											text(text)
 											if(index != strings.size - 1) text(replace) {
 												style(append = true) {
@@ -167,7 +165,7 @@ class AppointmentPickerPopup(
 												}
 											}
 										}
-									} else text(app.type.name)
+									} else text(app.type.value.name)
 									style {
 										alignment = Pos.CENTER
 										prefWidth = Int.MAX_VALUE.px
@@ -182,9 +180,8 @@ class AppointmentPickerPopup(
 							}
 						}
 					}
+					appointmentsList.listen(update, runOnce = true)
 				}
-				
-				appointmentsList.listen(update, runOnce = true)
 			}
 		})
 	}

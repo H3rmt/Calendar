@@ -4,6 +4,7 @@ import calendar.Appointment
 import frame.createFXImage
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.ObservableList
 import javafx.event.EventTarget
 import javafx.scene.control.*
 import javafx.scene.paint.Color
@@ -12,19 +13,15 @@ import tornadofx.*
 
 
 fun EventTarget.appointmentPicker(
-	appointments: List<Appointment>, // TODO make this observable
+	appointments: ObservableList<Appointment>, // TODO make this observable
 	appointment: Property<Appointment?> = SimpleObjectProperty<Appointment?>(null), op: AppointmentPicker.() -> Unit = {}
 ): AppointmentPicker {
-	val picker = AppointmentPicker(appointment.value, appointments)
-	picker.appointmentProperty.bindBidirectional(appointment)
+	val picker = AppointmentPicker(appointment, appointments)
 	return opcr(this, picker, op)
 }
 
-class AppointmentPicker(appointment: Appointment?, appointments: List<Appointment>): Control() {
-	
-	// this property only gets updated if the OK button is pressed
-	val appointmentProperty: Property<Appointment?> = SimpleObjectProperty(appointment)
-	
+class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointments: ObservableList<Appointment>):
+	Control() {
 	
 	private val popup: AppointmentPickerPopup = AppointmentPickerPopup(appointmentProperty, appointments) {
 		button.fire()
@@ -82,8 +79,8 @@ class AppointmentPicker(appointment: Appointment?, appointments: List<Appointmen
 			}
 		}
 		
-		appointmentProperty.listen(runOnce = true) {
-			textField.text = "${it?.title ?: ""} ${it?.description ?: ""}"
+		appointmentProperty.listen(runOnce = true) { //  TODO bind here (or listen)
+			textField.text = "${it?.title?.value ?: ""} ${it?.description?.value ?: ""}"
 		}
 		
 		popup.autoHideProperty().set(true)
