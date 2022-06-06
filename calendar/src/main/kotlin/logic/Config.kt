@@ -2,14 +2,7 @@ package logic
 
 import com.google.gson.*
 import com.google.gson.stream.JsonReader
-import logic.ConfigFiles.dataDirectory
 import java.io.*
-import java.io.File
-import java.io.FileReader
-import java.io.PrintWriter
-import java.io.Reader
-import java.io.StringReader
-import java.io.StringWriter
 import kotlin.collections.set
 import kotlin.reflect.typeOf
 
@@ -225,16 +218,16 @@ lateinit var language: Language
 
 // TODO update this before release
 const val CONFIG_DEFAULT = "{\n" +
-		"\t\"Language\": \"EN\",\n" +
-		"\t\"Debug\": false,\n" +
-		"\t\"PrintStacktrace\": true,\n" +
-		"\t\"PrintLogs\": true,\n" +
-		"\t\"StoreLogs\": true,\n" +
-		"\t\"LogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
-		"\t\"DebugLogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
-		"\t\"AnimationSpeed\": 200,\n" +
-		"\t\"AnimationDelay\": 80,\n" +
-		"\t\"MaxDayAppointments\": 8,\n" +
-		"\t\"ExpandNotesOnOpen\": true,\n" +
-		"\t\"IgnoreCaseForSearch\": true\n" +
-		"}"
+		  "\t\"Language\": \"EN\",\n" +
+		  "\t\"Debug\": false,\n" +
+		  "\t\"PrintStacktrace\": true,\n" +
+		  "\t\"PrintLogs\": true,\n" +
+		  "\t\"StoreLogs\": true,\n" +
+		  "\t\"LogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
+		  "\t\"DebugLogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
+		  "\t\"AnimationSpeed\": 200,\n" +
+		  "\t\"AnimationDelay\": 80,\n" +
+		  "\t\"MaxDayAppointments\": 8,\n" +
+		  "\t\"ExpandNotesOnOpen\": true,\n" +
+		  "\t\"IgnoreCaseForSearch\": true\n" +
+		  "}"
