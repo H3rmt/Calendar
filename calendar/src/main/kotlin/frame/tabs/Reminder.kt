@@ -7,12 +7,11 @@ import frame.styles.GlobalStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
 import javafx.beans.property.DoubleProperty
-import javafx.geometry.Orientation
 import javafx.geometry.Pos
-import javafx.scene.control.ScrollBar
-import javafx.scene.control.ScrollPane
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
 import logic.*
 import tornadofx.*
 
@@ -53,46 +52,61 @@ fun createReminderTab(pane: TabPane): Tab {
 					}
 				}
 				
-				var table: ScrollPane? = null
-				
-				val update = { list: List<Reminder> ->
-					children.remove(table)
-					log("updated table_ view", LogType.LOW)
+				scrollpane(fitToWidth = true, fitToHeight = true) {
+					addClass(GlobalStyles.disableFocusDraw_)
+					addClass(GlobalStyles.maxHeight_)
+					addClass(GlobalStyles.background_)
+					isPannable = true
 					
-					table = scrollpane(fitToWidth = true, fitToHeight = true) {
-						addClass(GlobalStyles.disableFocusDraw_)
-						addClass(GlobalStyles.maxHeight_)
+					// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
+					adjustWidth(scrollbarWidth)
+					
+					// gets stretched across whole scrollpane
+					vbox(spacing = 2.0, alignment = Pos.TOP_CENTER) {
 						addClass(GlobalStyles.background_)
-						isPannable = true
 						
-						// update top bar fake scrollbar padding  (wait for width update,so that scrollbars were created already; and then update if scrollbar width changes[appears/disappears])
-						adjustWidth(scrollbarWidth)
+						var reminderTabs = mutableMapOf<Reminder, HBox>()
 						
-						// gets stretched across whole scrollpane
-						vbox(spacing = 2.0, alignment = Pos.TOP_CENTER) {
-							addClass(GlobalStyles.background_)
-							for(reminder in list) {
-								hbox(spacing = 5.0, alignment = Pos.CENTER) {
-									addClass(ReminderStyles.reminderRow_)
-									label(reminder.title) {
-										addClass(GlobalStyles.tableItem_)
-										addClass(ReminderStyles.tableItemLeft_)
+						Reminders.listenUpdates { change ->
+							while(change.next()) {
+								if(change.wasAdded()) {
+									for(reminder in change.addedSubList) {
+										reminderTabs[reminder] = reminderTab(this, reminder)
 									}
-									label(reminder.time) {
-										addClass(GlobalStyles.tableItem_)
-										addClass(ReminderStyles.tableItemMiddle_)
-									}
-									label(reminder.description) {
-										addClass(GlobalStyles.tableItem_)
-										addClass(ReminderStyles.tableItemRight_)
+								}
+								if(change.wasRemoved()) {
+									for(reminder in change.removed) {
+										// custom filtering, as notes are not the exact same (this will always return only one element)
+										this.children.removeAll(reminderTabs.filter { it.key == reminder }.values)
+										reminderTabs = reminderTabs.filter { it.key != reminder }.toMutableMap()
 									}
 								}
 							}
 						}
+						for(reminder in Reminders) {
+							reminderTabs[reminder] = reminderTab(this, reminder)
+						}
 					}
 				}
-				Reminders.listen(update, runOnce = true)
 			}
+		}
+	}
+}
+
+fun reminderTab(tabs: VBox, reminder: Reminder): HBox {
+	return tabs.hbox(spacing = 5.0, alignment = Pos.CENTER) {
+		addClass(ReminderStyles.reminderRow_)
+		label(reminder.title) {
+			addClass(GlobalStyles.tableItem_)
+			addClass(ReminderStyles.tableItemLeft_)
+		}
+		label(reminder.time) {
+			addClass(GlobalStyles.tableItem_)
+			addClass(ReminderStyles.tableItemMiddle_)
+		}
+		label(reminder.description) {
+			addClass(GlobalStyles.tableItem_)
+			addClass(ReminderStyles.tableItemRight_)
 		}
 	}
 }
