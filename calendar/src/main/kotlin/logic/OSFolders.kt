@@ -12,7 +12,7 @@ object OSFolders {
 		} else if(os.startsWith("windows")) {
 			System.getenv("APPDATA") + "\\calendar\\"
 		} else {
-			System.getenv("HOME") + "/.config" + "/calendar/"
+			System.getProperty("user.home") + "/.config" + "/calendar/"
 		}.also { // create Folder if it doesn't exist
 			if(!File(it).exists()) {
 				val dir = File(it)
