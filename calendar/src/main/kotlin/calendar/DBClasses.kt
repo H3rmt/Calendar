@@ -11,7 +11,7 @@ import replaceNewline
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class Appointment(id: EntityID<Long>): LongEntity(id) {
+class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 	
 	companion object {
@@ -84,7 +84,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	fun remove() {
+	override fun remove() {
 		calendar.Appointments.remove(this).also {
 			transaction {
 				delete()
@@ -114,7 +114,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id) {
 }
 
 
-class Note(id: EntityID<Long>): LongEntity(id) {
+class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Notes: LongEntityClass<Note>(NoteTable)
 	
 	companion object {
@@ -169,7 +169,7 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	fun remove() {
+	override fun remove() {
 		calendar.Notes.remove(this).also {
 			transaction {
 				delete()
@@ -196,7 +196,7 @@ class Note(id: EntityID<Long>): LongEntity(id) {
 	}
 }
 
-class File(id: EntityID<Long>): LongEntity(id) {
+class File(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Files: LongEntityClass<File>(FileTable)
 	
 	companion object {
@@ -232,7 +232,7 @@ class File(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	fun remove() {
+	override fun remove() {
 		calendar.Files.remove(this).also {
 			transaction {
 				delete()
@@ -255,7 +255,7 @@ class File(id: EntityID<Long>): LongEntity(id) {
 	}
 }
 
-class Reminder(id: EntityID<Long>): LongEntity(id) {
+class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Reminders: LongEntityClass<Reminder>(ReminderTable)
 	
 	companion object {
@@ -301,7 +301,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 		}
 	}
 	
-	fun remove() {
+	override fun remove() {
 		calendar.Reminders.remove(this).also {
 			transaction {
 				delete()
@@ -311,7 +311,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 	
 	// [{14} 2022-05-16T00:00 | test_title: test_description]
 	override fun toString(): String =
-		"[{${id.value}} ${time.value} | ${title.value}: ${description.value}]".replaceNewline()
+		"[{${id.value}} ${time.value} | ${title.value}: ${description.value} (${appointment.value})]".replaceNewline()
 	
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Reminder) false
@@ -327,7 +327,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id) {
 }
 
 
-class Type(id: EntityID<Int>): IntEntity(id) {
+class Type(id: EntityID<Int>): IntEntity(id), DBClass {
 	
 	object Types: IntEntityClass<Type>(TypeTable)
 	
@@ -361,7 +361,7 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 	}
 	
 	
-	fun remove() {
+	override fun remove() {
 		calendar.Types.remove(this).also {
 			transaction {
 				delete()
@@ -384,4 +384,10 @@ class Type(id: EntityID<Int>): IntEntity(id) {
 	}
 }
 
+interface DBClass {
+	override fun hashCode(): Int
+	override fun equals(other: Any?): Boolean
+	override fun toString(): String
+	fun remove()
+}
 

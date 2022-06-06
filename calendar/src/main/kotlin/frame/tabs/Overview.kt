@@ -15,11 +15,12 @@ import javafx.animation.*
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleDoubleProperty
-import javafx.collections.ObservableList
 import javafx.event.EventHandler
-import javafx.geometry.Orientation
 import javafx.geometry.Pos
-import javafx.scene.control.*
+import javafx.scene.control.Label
+import javafx.scene.control.OverrunStyle
+import javafx.scene.control.Tab
+import javafx.scene.control.TabPane
 import javafx.scene.image.Image
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Pane
@@ -115,9 +116,8 @@ fun createOverviewTab(pane: TabPane): Tab {
 					vbox(spacing = 5.0, alignment = Pos.TOP_CENTER) {
 						addClass(GlobalStyles.background_)
 						
-						val update = { new: LocalDate ->
+						val update: (LocalDate) -> Unit = { new: LocalDate ->
 							clear()
-							
 							// get date of first visible cell
 							var time: LocalDate = new.withDayOfMonth(1).with(ChronoField.DAY_OF_WEEK, 1)
 							// loop until last week with day in this month is complete
@@ -192,7 +192,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 											
 											// just rerender whole day on change (doesn't make a difference here,
 											// to append to pane on add and remove on remove)
-											val update = { appointments: List<Appointment> ->
+											val update: (List<Appointment>) -> Unit = { appointments: List<Appointment> ->
 												clear()
 												val width =
 													(if(pane.width.toInt() % 2 == 0) pane.width.toInt() else pane.width.toInt() + 1).toDouble()
@@ -232,7 +232,6 @@ fun createOverviewTab(pane: TabPane): Tab {
 									do {
 										// clone time, so that later called callbacks use right time and not time of last day
 										val cctime = time
-										
 										vbox(alignment = Pos.TOP_LEFT) {
 											addClass(GlobalStyles.tableItem_)
 											addClass(OverviewStyles.cell_)

@@ -24,14 +24,19 @@ abstract class DBObservableBase<T, DB>: ObjectPropertyBase<T>(), IDBObservableD<
 	
 	override fun getName(): String = "DBObservableBase"//TODO("Not yet implemented")
 	
-	private fun reload() {
-		transaction {
+	private fun reload(hasTransaction: Boolean = false) {
+		if(!hasTransaction)
+			transaction {
+				set(convertTo(abstractGet()))
+			}
+		else
 			set(convertTo(abstractGet()))
-		}
+		loaded = true
 	}
 	
 	override fun get(): T {
-		if(!loaded) reload()
+		if(!loaded)
+			reload()
 		return super.get()
 	}
 	
@@ -92,7 +97,7 @@ open class DBObservableList<T: Entity<*>>(private val table: EntityClass<*, T>):
 	private var loaded = false
 	
 	fun reload() {
-		return transaction {
+		transaction {
 			super.setAll(table.all().toList())
 		}
 	}
