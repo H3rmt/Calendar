@@ -3,6 +3,7 @@
     <option name="ALTERNATIVE_JRE_PATH" value="16" />
     <option name="MAIN_CLASS_NAME" value="StartKt" />
     <module name="Calendar.calendar.main" />
+    <option name="PROGRAM_PARAMETERS" value="dev" />
     <shortenClasspath name="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />

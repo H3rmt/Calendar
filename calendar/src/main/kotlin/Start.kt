@@ -1,11 +1,24 @@
-import calendar.*
+import calendar.Appointments
 import calendar.Files
+import calendar.Notes
+import calendar.Reminders
+import calendar.Types
+import calendar.initDb
 import frame.frameInit
-import logic.*
+import logic.LogType
+import logic.configs
+import logic.initConfigs
+import logic.initLogger
+import logic.log
+import logic.updateLogger
 import kotlin.system.exitProcess
 
-fun main() {
-	println("\nStarting Calendar... \n")
+var DEV = false
+
+fun main(args: Array<String>) {
+	println("\nStarting Calendar... $args \n")
+	if(args.contains("dev"))
+		DEV = true
 
 	initLogger()
 	log("initialised Logger", LogType.IMPORTANT)
@@ -38,6 +51,4 @@ fun init() {
 	log("loaded Data", LogType.IMPORTANT)
 }
 
-fun String.replaceNewline(): String {
-	return this.replace("\n", "\\n")
-}
+fun String.replaceNewline(): String = this.replace("\n", "\\n")
