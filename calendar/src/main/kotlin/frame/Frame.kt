@@ -44,7 +44,7 @@ import kotlin.reflect.KFunction
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
 fun frameInit() {
 	createLoading()
-	log("created loading", LogType.NORMAL)
+	log("created loading")
 
 	/**
 	 * this looks pretty weird, but it essentially
@@ -109,8 +109,9 @@ class Window: App(
 		stage.height = 600.0
 		stage.width = 800.0
 		super.start(stage)
-		log("started Frame", LogType.NORMAL)
+		log("started Frame", LogType.IMPORTANT)
 		removeLoading()
+		// TODO open last tabs
 //		TabManager.openTab("reminders", ::createReminderTab)
 		TabManager.openTab("calendar", ::createOverviewTab)
 	}
@@ -123,7 +124,7 @@ class MainView: View("Calendar") {
 		center = tabpane {
 			tabDragPolicy = TabPane.TabDragPolicy.REORDER
 			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
-			TabManager.pane = this@tabpane
+			TabManager.pane = this
 		}
 		log("created pane", LogType.IMPORTANT)
 	}
@@ -153,11 +154,12 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 		}
 		menu("options".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(createMenuItem(this@menu, "Reload", "F5") {
+				log("reload triggered")
 				init()
 			}, createMenuItem(this@menu, "Preferences", "Strg + ,") {
 				log("Preferences")
 			}, run { separator(); return@run null }, createMenuItem(this@menu, "Quit", "Strg + Q") {
-				log("exiting Program via quit", LogType.IMPORTANT)
+				log("exiting Program via quit")
 				Platform.exit()
 			})
 		}
@@ -172,7 +174,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 		}
 		menu("help".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(createMenuItem(this@menu, "Github", "") {
-				log("Open Github", LogType.IMPORTANT)
+				log("Open Github")
 				try {
 					runAsync {
 						Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
@@ -212,7 +214,6 @@ fun createMenuGroup(vararg panes: GridPane?) {
 }
 
 fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Unit): GridPane? {
-	log("creating menuItem: $name $shortcut", LogType.LOW)
 	var grid: GridPane? = null
 	menu.customitem {
 		grid = gridpane {
@@ -340,10 +341,10 @@ fun createFXImage(name: String): Image {
 	val image = try {
 		ImageIO.read({}::class.java.classLoader.getResource(path))
 	} catch(e: IllegalArgumentException) {
-		Warning("imageError", e, "file not found:$path")
+		log("file not found:$path", LogType.WARNING)
 		getImageMissing()
 	} catch(e: IIOException) {
-		Warning("imageError", e, "can't read file:$path")
+		log("can't read file:$path", LogType.WARNING)
 		getImageMissing()
 	}
 	val wr = WritableImage(image.width, image.height)

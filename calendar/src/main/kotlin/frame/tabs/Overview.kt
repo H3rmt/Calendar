@@ -32,7 +32,6 @@ fun createOverviewTab(pane: TabPane): Tab {
 
 		vbox {
 			addClass(TabStyles.content_)
-			log("creating top bar", LogType.LOW)
 			// Top bar
 			hbox(spacing = 20.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar_)
@@ -58,7 +57,6 @@ fun createOverviewTab(pane: TabPane): Tab {
 				}
 			}
 
-			log("creating table view", LogType.LOW)
 			// Table view
 			vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 				addClass(GlobalStyles.disableFocusDraw_)

@@ -51,7 +51,6 @@ fun initLogger() {
 		fileHandler = FileHandler(Files.logfile)
 		fileHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		fileHandler.level = Level.ALL
-
 		log("added file Handler")
 	}
 }

@@ -2,7 +2,10 @@ package logic
 
 import com.google.gson.*
 import com.google.gson.stream.JsonReader
-import java.io.*
+import java.io.File
+import java.io.FileReader
+import java.io.Reader
+import java.io.StringReader
 import kotlin.collections.set
 import kotlin.reflect.typeOf
 
@@ -58,23 +61,20 @@ fun initConfigs() {
 					Configs::class.java
 				)] = it.value
 			} catch(e: NullPointerException) {
-				Warning("g294n3", e, "Unknown config key: ${it.key}")
+				log("Unknown config key: ${it.key}", LogType.WARNING)
 			}
 			log("loaded Config ${it.key}: ${it.value}", LogType.LOW)
 		}
-	} catch(e: NullPointerException) {
-		log("Config File missing", LogType.ERROR)
-		throw Exit("5e928h", e)
 	} catch(e: JsonSyntaxException) {
 		log("JSON invalid in ConfigFile", LogType.ERROR)
 		throw Exit("iu2sj2", e)
 	}
 
 	language = Language(getConfig(Configs.Language))
-	log("loaded language ${language.info()}", LogType.LOW)
+	log("loaded language ${language.info()}")
 
 	stacktrace = getConfig(Configs.PrintStacktrace)
-	log("set stacktrace $stacktrace", LogType.LOW)
+	log("set stacktrace $stacktrace")
 }
 
 /**
@@ -109,13 +109,11 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 					it as T
 				}
 			} catch(e: ClassCastException) {
-				Warning(
-					"ik49dk",
-					e,
-					"Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}"
+				log(
+					"Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}",
+					LogType.WARNING
 				)
 				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
-					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.LOW)
 					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
 				} else {
 					throw Exit("k23d1f", e)
@@ -128,10 +126,10 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 				throw Exit("k23d1f", e)
 			}
 		}
-		log("Missing Config option: $conf", LogType.WARNING)
+		log("Missing Config option: $conf", LogType.ERROR)
 		throw Exit("j21ka1")
 	} catch(e: Exception) {
-		log("Error reading Config option: $conf as ${T::class}", LogType.WARNING)
+		log("Error reading Config option: $conf as ${T::class}", LogType.ERROR)
 		throw Exit("??????", e)
 	}
 }
@@ -170,34 +168,6 @@ class Exit(private val code: String, private val exception: Exception? = null): 
 	override fun toString(): String = "Exit <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
 }
 
-
-/**
- * Custom Warning with Custom error code
- * (doesn't stop the code)
- *
- * all codes listed in doc/error
- *
- * StackTrace can be disabled in config
- *
- * create:
- * Warning("k23d1f");
- * Warning("k23d1f", e)
- *
- * @see Exception
- *
- */
-@Suppress("FunctionNaming", "UnusedPrivateMember")
-fun Warning(code: String, exception: Exception, log: Any) {
-	log(log, LogType.WARNING)
-	val writer = StringWriter()
-
-	if(stacktrace)
-		exception.printStackTrace(PrintWriter(writer))
-	else
-		writer.append(exception.toString())
-
-	log(writer, LogType.ERROR)
-}
 
 /**
  * only Configs in this Config enum are loaded from config.json

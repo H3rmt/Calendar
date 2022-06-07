@@ -1,6 +1,7 @@
 package calendar
 
 import javafx.scene.paint.Color
+import logic.log
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.LongEntity
@@ -28,7 +29,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 					this.type.set(type)
 					this.allDay.set(allDay)
 					this.week.set(week)
-				}.also { calendar.Appointments.add(it) }
+				}.also { calendar.Appointments.add(it); log("Appointment $this created") }
 			}
 		}
 	}
@@ -85,10 +86,10 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 	}
 
 	override fun remove() {
-		calendar.Appointments.remove(this).also {
-			transaction {
-				delete()
-			}
+		calendar.Appointments.remove(this)
+		log("Appointment $this removed")
+		transaction {
+			delete()
 		}
 	}
 
@@ -125,7 +126,7 @@ class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 					this.text.set(text)
 					this.type.set(type)
 					this.week.set(week)
-				}.also { calendar.Notes.add(it) }
+				}.also { calendar.Notes.add(it); log("Note $this created") }
 			}
 		}
 	}
@@ -170,10 +171,10 @@ class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 	}
 
 	override fun remove() {
-		calendar.Notes.remove(this).also {
-			transaction {
-				delete()
-			}
+		calendar.Notes.remove(this)
+		log("Note $this removed")
+		transaction {
+			delete()
 		}
 	}
 
@@ -206,7 +207,7 @@ class File(id: EntityID<Long>): LongEntity(id), DBClass {
 //					data.set(_data)
 					name.set(_name)
 					origin.set(_origin)
-				}.also { calendar.Files.add(it) }
+				}.also { calendar.Files.add(it); log("File $this created") }
 			}
 		}
 	}
@@ -233,10 +234,10 @@ class File(id: EntityID<Long>): LongEntity(id), DBClass {
 	}
 
 	override fun remove() {
-		calendar.Files.remove(this).also {
-			transaction {
-				delete()
-			}
+		calendar.Files.remove(this)
+		log("File $this removed")
+		transaction {
+			delete()
 		}
 	}
 
@@ -266,7 +267,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 					appointment.set(_appointment)
 					title.set(_title)
 					description.set(_description)
-				}.also { calendar.Reminders.add(it) }
+				}.also { calendar.Reminders.add(it); log("Reminder $this created") }
 			}
 		}
 	}
@@ -302,10 +303,10 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 	}
 
 	override fun remove() {
-		calendar.Reminders.remove(this).also {
-			transaction {
-				delete()
-			}
+		calendar.Reminders.remove(this)
+		log("Reminder $this removed")
+		transaction {
+			delete()
 		}
 	}
 
@@ -337,7 +338,7 @@ class Type(id: EntityID<Int>): IntEntity(id), DBClass {
 				return@transaction Types.new {
 					name.set(_name)
 					color.set(_color)
-				}.also { calendar.Types.add(it) }
+				}.also { calendar.Types.add(it); log("Type $this created") }
 			}
 		}
 	}
@@ -362,10 +363,10 @@ class Type(id: EntityID<Int>): IntEntity(id), DBClass {
 
 
 	override fun remove() {
-		calendar.Types.remove(this).also {
-			transaction {
-				delete()
-			}
+		calendar.Types.remove(this)
+		log("Type $this removed")
+		transaction {
+			delete()
 		}
 	}
 

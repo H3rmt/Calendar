@@ -14,9 +14,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.Modality
 import javafx.stage.Stage
-import logic.Language
-import logic.listen
-import logic.translate
+import logic.*
 import picker.appointmentPicker.appointmentPicker
 import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
@@ -84,6 +82,7 @@ class ReminderPopup: Fragment() {
 	}
 
 	override val root = form {
+		log("creating reminder popup", LogType.IMPORTANT)
 		addClass(GlobalStyles.background_)
 		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)

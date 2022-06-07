@@ -13,9 +13,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.Modality
 import javafx.stage.Stage
-import logic.Language
-import logic.listen
-import logic.translate
+import logic.*
 import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
 import java.time.LocalDate
@@ -113,6 +111,7 @@ class AppointmentPopup: Fragment() {
 	}
 
 	override val root = form {
+		log("creating appointment popup", LogType.IMPORTANT)
 		addClass(GlobalStyles.background_)
 		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
