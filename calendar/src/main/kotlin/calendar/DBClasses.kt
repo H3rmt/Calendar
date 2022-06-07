@@ -29,7 +29,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 					this.type.set(type)
 					this.allDay.set(allDay)
 					this.week.set(week)
-				}.also { calendar.Appointments.add(it); log("Appointment $this created") }
+				}.also { calendar.Appointments.add(it); log("Appointment $it created") }
 			}
 		}
 	}
@@ -126,7 +126,7 @@ class Note(id: EntityID<Long>): LongEntity(id), DBClass {
 					this.text.set(text)
 					this.type.set(type)
 					this.week.set(week)
-				}.also { calendar.Notes.add(it); log("Note $this created") }
+				}.also { calendar.Notes.add(it); log("Note $it created") }
 			}
 		}
 	}
@@ -207,7 +207,7 @@ class File(id: EntityID<Long>): LongEntity(id), DBClass {
 //					data.set(_data)
 					name.set(_name)
 					origin.set(_origin)
-				}.also { calendar.Files.add(it); log("File $this created") }
+				}.also { calendar.Files.add(it); log("File $it created") }
 			}
 		}
 	}
@@ -267,7 +267,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 					appointment.set(_appointment)
 					title.set(_title)
 					description.set(_description)
-				}.also { calendar.Reminders.add(it); log("Reminder $this created") }
+				}.also { calendar.Reminders.add(it); log("Reminder $it created") }
 			}
 		}
 	}
@@ -338,7 +338,7 @@ class Type(id: EntityID<Int>): IntEntity(id), DBClass {
 				return@transaction Types.new {
 					name.set(_name)
 					color.set(_color)
-				}.also { calendar.Types.add(it); log("Type $this created") }
+				}.also { calendar.Types.add(it); log("Type $it created") }
 			}
 		}
 	}
