@@ -1,6 +1,7 @@
 package calendar
 
-import javafx.scene.paint.Color
+import calendar.Timing.toUTCEpochMinute
+import javafx.scene.paint.*
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.LongEntity
@@ -94,8 +95,8 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 
 	// [{7} 2022-05-16T00:00 - 2022-05-16T23:59  [{1} test 0x008000ff] frame.Day | test_1_title: test_1_desc]
 	override fun toString(): String = ("[{${id.value}} ${start.value} - ${end.value}  ${type.value} " +
-			  "${if(week.value) "Week" else "frame.Day"} | " +
-			  "${title.value}: ${description.value}]").replaceNewline()
+			"${if(week.value) "Week" else "frame.Day"} | " +
+			"${title.value}: ${description.value}]").replaceNewline()
 
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Appointment) false
@@ -259,10 +260,10 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Reminders: LongEntityClass<Reminder>(ReminderTable)
 
 	companion object {
-		fun new(_time: LocalDateTime, _appointment: Appointment?, _title: String, _description: String): Reminder {
+		fun new(_deadline: LocalDateTime?, _appointment: Appointment?, _title: String, _description: String): Reminder {
 			return transaction {
 				return@transaction Reminders.new {
-					time.set(_time)
+					deadline.set(_deadline)
 					appointment.set(_appointment)
 					title.set(_title)
 					description.set(_description)
@@ -271,16 +272,19 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 		}
 	}
 
-	private var dbTime by ReminderTable.time
+	private var dbDeadline by ReminderTable.deadline
 	private var dbAppointment by Appointment.Appointments optionalReferencedOn ReminderTable.appointment
 	private var dbTitle by ReminderTable.title
 	private var dbDescription by ReminderTable.description
 
-	val time: DBDateTimeObservable = object: DBDateTimeObservable() {
-		override fun abstractGet(): Long = dbTime
-		override fun abstractSet(dat: Long) {
-			dbTime = dat
+	val deadline: DBObservableBase<LocalDateTime?, Long?> = object: DBObservableBase<LocalDateTime?, Long?>() {
+		override fun abstractGet(): Long? = dbDeadline
+		override fun abstractSet(dat: Long?) {
+			dbDeadline = dat
 		}
+
+		override fun convertFrom(value: LocalDateTime?): Long? = value?.toUTCEpochMinute()
+		override fun convertTo(value: Long?): LocalDateTime? = if(value != null) Timing.fromUTCEpochMinuteToLocalDateTime(value) else null
 	}
 	val appointment: DBObservable<Appointment?> = object: DBObservable<Appointment?>() {
 		override fun abstractGet(): Appointment? = dbAppointment
@@ -311,7 +315,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 
 	// [{14} 2022-05-16T00:00 | test_title: test_description]
 	override fun toString(): String =
-		"[{${id.value}} ${time.value} | ${title.value}: ${description.value} (${appointment.value})]".replaceNewline()
+		"[{${id.value}} ${deadline.value} | ${title.value}: ${description.value} (${appointment.value})]".replaceNewline()
 
 	override fun equals(other: Any?): Boolean {
 		return if(other !is Reminder) false
@@ -319,7 +323,7 @@ class Reminder(id: EntityID<Long>): LongEntity(id), DBClass {
 	}
 
 	override fun hashCode(): Int {
-		var result = time.hashCode()
+		var result = deadline.hashCode()
 		result = 31 * result + title.hashCode()
 		result = 31 * result + description.hashCode()
 		return result

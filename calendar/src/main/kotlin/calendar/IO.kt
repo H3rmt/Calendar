@@ -1,14 +1,17 @@
 package calendar
 
-import javafx.collections.ObservableList
-import logic.*
+import javafx.collections.*
 import logic.Files
+import logic.Language
+import logic.listen
+import logic.listenUpdates
+import logic.translate
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import tornadofx.observableListOf
+import tornadofx.*
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -281,8 +284,7 @@ object FileTable: LongIdTable() {
 object Files: DBObservableList<File>(File.Files)
 
 object ReminderTable: LongIdTable() {
-	val time =
-		long("time") //.nullable() // not nullable, TODO clone appointment time and always use it (ask when editing appointment if reminder should be moved)
+	val deadline = long("deadline").nullable()
 	val appointment = reference("appointment", AppointmentTable).nullable()
 	val title = text("title")
 	val description = text("description")
