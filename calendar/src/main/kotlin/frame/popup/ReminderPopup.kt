@@ -82,7 +82,7 @@ class ReminderPopup: Fragment() {
 	}
 
 	override val root = form {
-		log("creating reminder popup", LogType.IMPORTANT)
+		log("creating reminder popup")
 		addClass(GlobalStyles.background_)
 		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
@@ -149,6 +149,8 @@ class ReminderPopup: Fragment() {
 				}
 			}
 		}
+
+		log("created reminder popup")
 	}
 
 

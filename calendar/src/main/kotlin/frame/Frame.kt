@@ -11,21 +11,15 @@ import frame.styles.*
 import frame.tabs.createOverviewTab
 import frame.tabs.createReminderTab
 import init
-import javafx.application.Platform
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.Property
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.value.ObservableValue
-import javafx.event.EventTarget
-import javafx.geometry.Orientation
+import javafx.application.*
+import javafx.beans.property.*
+import javafx.beans.value.*
+import javafx.event.*
+import javafx.geometry.*
 import javafx.scene.control.*
-import javafx.scene.image.Image
-import javafx.scene.image.WritableImage
-import javafx.scene.layout.BorderPane
-import javafx.scene.layout.GridPane
-import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
-import javafx.stage.Stage
+import javafx.scene.image.*
+import javafx.scene.layout.*
+import javafx.stage.*
 import logic.*
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
@@ -296,8 +290,15 @@ object TabManager {
 	 *                       > data
 	 */
 	fun openTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
-		val newTab = tabs.getOrElse(identifier) { createFunction.call(pane, *methodArgs).also { tabs[identifier] = it } }
-		newTab.setOnClosed { tabs.remove(identifier) }
+		log("tab $identifier opened")
+		val newTab = tabs.getOrElse(identifier) {
+			createFunction.call(pane, *methodArgs)
+		}
+		tabs[identifier] = newTab
+		newTab.setOnClosed {
+			log("tab $identifier closed")
+			tabs.remove(identifier)
+		}
 
 		pane.selectionModel.select(newTab)
 	}
@@ -310,22 +311,19 @@ object TabManager {
 	object Secure {
 		@Suppress("unused")
 		fun closeTab(identifier: String) {
+			log("tab $identifier closed")
 			tabs[identifier]?.close()
 			tabs.remove(identifier)
 		}
 
 		fun overrideTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
-			tabs[identifier]?.close()
-
-			val tab = createFunction.call(pane, *methodArgs).also { tabs[identifier] = it }
-			tab.setOnClosed { tabs.remove(identifier) }
-
-			pane.selectionModel.select(tab)
+			log("tab $identifier overridden")
+			closeTab(identifier)
+			openTab(identifier, createFunction, methodArgs)
 		}
 	}
 
 	override fun toString(): String = tabs.keys.toString()
-
 }
 
 

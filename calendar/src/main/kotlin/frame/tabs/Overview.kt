@@ -25,7 +25,7 @@ import java.time.temporal.IsoFields
 val overviewTime: Property<LocalDate> = Timing.getNow().toLocalDate().toProperty()
 
 fun createOverviewTab(pane: TabPane): Tab {
-	log("creating overview tab", LogType.IMPORTANT)
+	log("creating overview tab")
 	return pane.tab("calender".translate(Language.TranslationTypes.Overview)) {
 		isClosable = false
 		addClass(TabStyles.tab_)
@@ -333,6 +333,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 				}
 			}
 		}
+		log("created overview tab")
 	}
 }
 

@@ -17,7 +17,7 @@ import tornadofx.*
 
 
 fun createReminderTab(pane: TabPane): Tab {
-	log("creating reminder tab", LogType.IMPORTANT)
+	log("creating reminder tab")
 	return pane.tab("reminders".translate(Language.TranslationTypes.Reminder)) {
 		isClosable = false
 		addClass(TabStyles.tab_)
@@ -90,6 +90,7 @@ fun createReminderTab(pane: TabPane): Tab {
 				}
 			}
 		}
+		log("created reminder tab")
 	}
 }
 

@@ -1,7 +1,6 @@
 package frame.popup
 
 import calendar.Appointment
-import calendar.Timing.toUTCEpochMinute
 import calendar.Type
 import calendar.Types
 import frame.styles.GlobalStyles
@@ -98,8 +97,8 @@ class AppointmentPopup: Fragment() {
 	private fun checkAppointment(): String? {
 		return if(appointmentTitle.value.isEmpty()) {
 			"missing title".translate(Language.TranslationTypes.AppointmentPopup)
-		} else if(end.value.toUTCEpochMinute() < start.value.toUTCEpochMinute()) {
-			"start must be before end".translate(Language.TranslationTypes.AppointmentPopup)
+		} else if(end.value.isAfter(start.value)) {
+			"end is after start".translate(Language.TranslationTypes.AppointmentPopup)
 		} else {
 			null
 		}
@@ -111,7 +110,7 @@ class AppointmentPopup: Fragment() {
 	}
 
 	override val root = form {
-		log("creating appointment popup", LogType.IMPORTANT)
+		log("creating appointment popup")
 		addClass(GlobalStyles.background_)
 		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
@@ -169,6 +168,7 @@ class AppointmentPopup: Fragment() {
 				}
 			}
 		}
+		log("created appointment popup")
 	}
 
 	init {
