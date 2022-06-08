@@ -3,16 +3,20 @@ package frame.tabs
 import calendar.Reminder
 import calendar.Reminders
 import frame.adjustWidth
+import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
 import frame.styles.ReminderStyles
 import frame.styles.TabStyles
-import javafx.beans.property.DoubleProperty
-import javafx.geometry.Pos
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.VBox
-import logic.*
+import javafx.beans.property.*
+import javafx.event.*
+import javafx.geometry.*
+import javafx.scene.control.*
+import javafx.scene.layout.*
+import logic.Language
+import logic.LogType
+import logic.listenUpdates
+import logic.log
+import logic.translate
 import tornadofx.*
 
 
@@ -107,6 +111,9 @@ fun reminderRow(tabs: VBox, reminder: Reminder): HBox {
 		label(reminder.description) {
 			addClass(GlobalStyles.tableItem_)
 			addClass(ReminderStyles.tableItemRight_)
+		}
+		onMouseClicked = EventHandler {
+			ReminderPopup.openEdit(reminder)
 		}
 	}
 }
