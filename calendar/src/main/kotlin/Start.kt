@@ -1,7 +1,17 @@
-import calendar.*
+import calendar.Appointments
 import calendar.Files
+import calendar.Notes
+import calendar.Reminders
+import calendar.Types
+import calendar.initDb
 import frame.frameInit
-import logic.*
+import javafx.beans.property.*
+import logic.LogType
+import logic.configs
+import logic.initConfigs
+import logic.initLogger
+import logic.log
+import logic.updateLogger
 import kotlin.system.exitProcess
 
 fun main() {
@@ -38,6 +48,7 @@ fun init() {
 	log("loaded Data", LogType.IMPORTANT)
 }
 
-fun String.replaceNewline(): String {
-	return this.replace("\n", "\\n")
-}
+fun String.replaceNewline(): String = this.replace("\n", "\\n")
+
+@Suppress("UNCHECKED_CAST")
+fun <T, TNotNull> Property<T>.nullIfValueNull(): Property<TNotNull>? = if(this.value == null) null else this as Property<TNotNull>
