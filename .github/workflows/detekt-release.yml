@@ -1,7 +1,7 @@
 name: Release Scan with Detekt
 
 on:
-  pull_request:
+  push:
     branches: [ release ]
 
 jobs:
