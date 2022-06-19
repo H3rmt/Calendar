@@ -27,7 +27,7 @@ class Language(private val language: AvailableLanguages) {
 				Map::class.java
 			)).mapKeys { TranslationTypes.valueOf(it.key) }
 		} catch(e: NullPointerException) {
-			throw Exit("??????", e)
+			throw e
 		}
 	}
 

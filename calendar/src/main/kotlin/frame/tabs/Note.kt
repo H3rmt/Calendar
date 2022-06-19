@@ -8,18 +8,24 @@ import frame.styles.GlobalStyles
 import frame.styles.NoteStyles
 import frame.styles.TabStyles
 import frame.typeCombobox
-import javafx.beans.property.Property
-import javafx.geometry.Pos
+import javafx.beans.property.*
+import javafx.geometry.*
 import javafx.scene.control.*
-import javafx.scene.layout.VBox
-import javafx.scene.web.HTMLEditor
-import logic.*
+import javafx.scene.layout.*
+import javafx.scene.web.*
+import logic.Configs
+import logic.Language
+import logic.getConfig
+import logic.listen
+import logic.listenUpdates
+import logic.log
+import logic.translate
 import tornadofx.*
 import java.time.LocalDate
 
 
 fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
-	log("creating note tab", LogType.IMPORTANT)
+	log("creating note tab")
 	return pane.tab("") {
 		text = if(isWeek) {
 			"Week Notes for %s to %s".translate(
@@ -96,6 +102,7 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 				}
 			}
 		}
+		log("created note tab")
 	}
 }
 

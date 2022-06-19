@@ -24,7 +24,7 @@ import java.time.temporal.IsoFields
 
 
 fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
-	log("creating week tab", LogType.IMPORTANT)
+	log("creating week tab")
 	return pane.tab("") {
 		text = "Week %s - %s".translate(
 			Language.TranslationTypes.Week,
@@ -175,5 +175,6 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 				}
 			}
 		}
+		log("created week tab")
 	}
 }

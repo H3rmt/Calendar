@@ -25,14 +25,13 @@ import java.time.temporal.IsoFields
 val overviewTime: Property<LocalDate> = Timing.getNow().toLocalDate().toProperty()
 
 fun createOverviewTab(pane: TabPane): Tab {
-	log("creating overview tab", LogType.IMPORTANT)
+	log("creating overview tab")
 	return pane.tab("calender".translate(Language.TranslationTypes.Overview)) {
 		isClosable = false
 		addClass(TabStyles.tab_)
 
 		vbox {
 			addClass(TabStyles.content_)
-			log("creating top bar", LogType.LOW)
 			// Top bar
 			hbox(spacing = 20.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar_)
@@ -58,7 +57,6 @@ fun createOverviewTab(pane: TabPane): Tab {
 				}
 			}
 
-			log("creating table view", LogType.LOW)
 			// Table view
 			vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 				addClass(GlobalStyles.disableFocusDraw_)
@@ -335,6 +333,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 				}
 			}
 		}
+		log("created overview tab")
 	}
 }
 

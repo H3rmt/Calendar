@@ -1,16 +1,20 @@
 package logic
 
-import com.google.gson.*
+import DEV
+import com.google.gson.FieldNamingStrategy
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonSyntaxException
 import com.google.gson.stream.JsonReader
-import java.io.*
+import java.io.File
+import java.io.FileReader
+import java.io.Reader
+import java.io.StringReader
 import kotlin.collections.set
 import kotlin.reflect.typeOf
 
 
-private val gson: Gson =
-	GsonBuilder().setPrettyPrinting().setLenient().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-		.excludeFieldsWithoutExposeAnnotation()
-		.setFieldNamingStrategy(FieldNamingStrategy { return@FieldNamingStrategy it.name }).create()
+private val gson: Gson = GsonBuilder().setLenient().setFieldNamingStrategy(FieldNamingStrategy { return@FieldNamingStrategy it.name }).create()
 
 /**
  * general JSON reader and writer
@@ -58,23 +62,20 @@ fun initConfigs() {
 					Configs::class.java
 				)] = it.value
 			} catch(e: NullPointerException) {
-				Warning("g294n3", e, "Unknown config key: ${it.key}")
+				log("Unknown config key: ${it.key}", LogType.WARNING)
 			}
 			log("loaded Config ${it.key}: ${it.value}", LogType.LOW)
 		}
-	} catch(e: NullPointerException) {
-		log("Config File missing", LogType.ERROR)
-		throw Exit("5e928h", e)
 	} catch(e: JsonSyntaxException) {
 		log("JSON invalid in ConfigFile", LogType.ERROR)
-		throw Exit("iu2sj2", e)
+		throw e
 	}
 
 	language = Language(getConfig(Configs.Language))
-	log("loaded language ${language.info()}", LogType.LOW)
+	log("loaded language ${language.info()}")
 
 	stacktrace = getConfig(Configs.PrintStacktrace)
-	log("set stacktrace $stacktrace", LogType.LOW)
+	log("set stacktrace $stacktrace")
 }
 
 /**
@@ -103,36 +104,34 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 						getJson().fromJson<T>(getJsonReader(StringReader(it as String)), T::class.java)
 					} catch(e: NullPointerException) {
 						log("Unable to cast $it into element of ${T::class}", LogType.WARNING)
-						throw Exit("??????", e)
+						throw e
 					}
 				} else {
 					it as T
 				}
 			} catch(e: ClassCastException) {
-				Warning(
-					"ik49dk",
-					e,
-					"Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}"
+				log(
+					"Invalid Config value: $conf requested: ${T::class.simpleName}  value: ${it::class.simpleName}",
+					LogType.WARNING
 				)
 				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
-					log("Trying to use Gson to cast to Type: ${T::class.simpleName}", LogType.LOW)
 					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
 				} else {
-					throw Exit("k23d1f", e)
+					throw ClassCastException()
 				}
 			} catch(e: ClassCastException) {
 				log(
 					"Gson could not cast value: ${it::class.simpleName} to requested: ${T::class.simpleName}",
 					LogType.WARNING
 				)
-				throw Exit("k23d1f", e)
+				throw e
 			}
 		}
-		log("Missing Config option: $conf", LogType.WARNING)
-		throw Exit("j21ka1")
+		log("Missing Config option: $conf", LogType.ERROR)
+		throw IllegalArgumentException()
 	} catch(e: Exception) {
-		log("Error reading Config option: $conf as ${T::class}", LogType.WARNING)
-		throw Exit("??????", e)
+		log("Error reading Config option: $conf as ${T::class}", LogType.ERROR)
+		throw e
 	}
 }
 
@@ -144,62 +143,6 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 var stacktrace = true
 
 /**
- * Custom Exception with Custom error code
- *
- * all codes listed in doc/error
- *
- * StackTrace can be disabled in config
- *
- * create:
- * Exit("g21k3m");
- * Exit("g21k3m", e)
- *
- * @see Exception
- *
- * @throws Exception
- */
-class Exit(private val code: String, private val exception: Exception? = null): Exception(code) {
-
-	override fun fillInStackTrace(): Throwable {
-		return if(stacktrace)
-			super.fillInStackTrace()
-		else
-			this
-	}
-
-	override fun toString(): String = "Exit <ErrorCode: $code> ${exception?.let { return@let "-> $it" } ?: ""}"
-}
-
-
-/**
- * Custom Warning with Custom error code
- * (doesn't stop the code)
- *
- * all codes listed in doc/error
- *
- * StackTrace can be disabled in config
- *
- * create:
- * Warning("k23d1f");
- * Warning("k23d1f", e)
- *
- * @see Exception
- *
- */
-@Suppress("FunctionNaming", "UnusedPrivateMember")
-fun Warning(code: String, exception: Exception, log: Any) {
-	log(log, LogType.WARNING)
-	val writer = StringWriter()
-
-	if(stacktrace)
-		exception.printStackTrace(PrintWriter(writer))
-	else
-		writer.append(exception.toString())
-
-	log(writer, LogType.ERROR)
-}
-
-/**
  * only Configs in this Config enum are loaded from config.json
  */
 enum class Configs {
@@ -208,26 +151,25 @@ enum class Configs {
 }
 
 object Files {
-	val logfile = OSFolders.getDataFolder() + "calendar.log"
-	val DBfile = OSFolders.getDataFolder() + "data.sqlite"
-
-	val configFile = OSFolders.getConfigFolder() + "config.json"
+	val logfile = if(DEV) "./calendar.log" else OSFolders.getDataFolder() + "calendar.log"
+	val DBfile = if(DEV) "./data.sqlite" else OSFolders.getDataFolder() + "data.sqlite"
+	val configFile = if(DEV) "./config.json" else OSFolders.getConfigFolder() + "config.json"
 }
 
 lateinit var language: Language
 
 // TODO update this before release
 const val CONFIG_DEFAULT = "{\n" +
-		  "\t\"Language\": \"EN\",\n" +
-		  "\t\"Debug\": false,\n" +
-		  "\t\"PrintStacktrace\": true,\n" +
-		  "\t\"PrintLogs\": true,\n" +
-		  "\t\"StoreLogs\": true,\n" +
-		  "\t\"LogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
-		  "\t\"DebugLogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
-		  "\t\"AnimationSpeed\": 200,\n" +
-		  "\t\"AnimationDelay\": 80,\n" +
-		  "\t\"MaxDayAppointments\": 8,\n" +
-		  "\t\"ExpandNotesOnOpen\": true,\n" +
-		  "\t\"IgnoreCaseForSearch\": true\n" +
-		  "}"
+		"\t\"Language\": \"EN\",\n" +
+		"\t\"Debug\": false,\n" +
+		"\t\"PrintStacktrace\": true,\n" +
+		"\t\"PrintLogs\": true,\n" +
+		"\t\"StoreLogs\": true,\n" +
+		"\t\"LogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
+		"\t\"DebugLogFormat\": \"[%1\$tF %1\$tT] |%3\$-10s %2\$-40s > %4\$s %n\",\n" +
+		"\t\"AnimationSpeed\": 200,\n" +
+		"\t\"AnimationDelay\": 80,\n" +
+		"\t\"MaxDayAppointments\": 8,\n" +
+		"\t\"ExpandNotesOnOpen\": true,\n" +
+		"\t\"IgnoreCaseForSearch\": true\n" +
+		"}"
