@@ -7,7 +7,13 @@ import calendar.Types
 import frame.TabManager.Secure
 import frame.popup.AppointmentPopup
 import frame.popup.ReminderPopup
-import frame.styles.*
+import frame.styles.GlobalStyles
+import frame.styles.MenubarStyles
+import frame.styles.NoteStyles
+import frame.styles.OverviewStyles
+import frame.styles.ReminderStyles
+import frame.styles.TabStyles
+import frame.styles.WeekStyles
 import frame.tabs.createOverviewTab
 import frame.tabs.createReminderTab
 import init
@@ -17,6 +23,18 @@ import javafx.beans.value.*
 import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
+import javafx.scene.image.*
+import javafx.scene.layout.*
+import javafx.stage.*
+import logic.Configs
+import logic.Exit
+import logic.Language
+import logic.LogType
+import logic.Warning
+import logic.getConfig
+import logic.listen
+import logic.log
+import logic.translate
 import javafx.scene.image.*
 import javafx.scene.layout.*
 import javafx.stage.*
@@ -137,13 +155,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 					Timing.getNow().plusHours(1)
 				)
 			}, createMenuItem(this@menu, "Reminder", "Strg + R") {
-				ReminderPopup.open(
-					"new reminder".translate(Language.TranslationTypes.ReminderPopup),
-					"create".translate(Language.TranslationTypes.ReminderPopup),
-					false,
-					null,
-					Timing.getNow()
-				)
+				ReminderPopup.openNew(Timing.getNow(), null)
 			})
 		}
 		menu("options".translate(Language.TranslationTypes.Menubar)) {

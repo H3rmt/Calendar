@@ -101,7 +101,7 @@ fun reminderRow(tabs: VBox, reminder: Reminder): HBox {
 			addClass(GlobalStyles.tableItem_)
 			addClass(ReminderStyles.tableItemLeft_)
 		}
-		label(reminder.time) {
+		label(reminder.deadline) {
 			addClass(GlobalStyles.tableItem_)
 			addClass(ReminderStyles.tableItemMiddle_)
 		}

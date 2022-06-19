@@ -24,7 +24,7 @@ class DateTimePickerPopup(
 
 				backgroundColor += Color.valueOf("#E9E9E9")
 			}
-			datepicker(dateProperty) { }
+			datepicker(dateProperty)
 			vbox(spacing = 5.0) {
 				//prefWidth = 40.0
 				style(append = true) {

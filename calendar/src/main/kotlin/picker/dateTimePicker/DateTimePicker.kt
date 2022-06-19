@@ -1,12 +1,10 @@
 package picker.dateTimePicker
 
 import frame.createFXImage
-import javafx.beans.property.IntegerProperty
-import javafx.beans.property.Property
-import javafx.beans.property.SimpleObjectProperty
-import javafx.event.EventTarget
+import javafx.beans.property.*
+import javafx.event.*
 import javafx.scene.control.*
-import javafx.scene.paint.Color
+import javafx.scene.paint.*
 import logic.listen
 import tornadofx.*
 import java.time.LocalDate
@@ -21,24 +19,18 @@ fun EventTarget.dateTimePicker(
 	formatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT),
 	op: DateTimePicker.() -> Unit = {}
 ): DateTimePicker {
-	val picker = DateTimePicker(dateTime.value, formatter)
-	picker.dateTimeProperty.bindBidirectional(dateTime)
+	val picker = DateTimePicker(dateTime, formatter)
 	return opcr(this, picker, op)
 }
 
-class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFormatter): Control() {
-
-	// this property only gets updated if the OK button is pressed
-	val dateTimeProperty: Property<LocalDateTime> = SimpleObjectProperty(dateTime)
-
-	private val dateProperty: Property<LocalDate> = dateTime.toLocalDate().toProperty()
-	private val minuteProperty: IntegerProperty = dateTime.minute.toProperty()
-	private val hourProperty: IntegerProperty = dateTime.hour.toProperty()
+class DateTimePicker(private val dateTime: Property<LocalDateTime>, private val formatter: DateTimeFormatter): Control() {
+	private val dateProperty: Property<LocalDate> = dateTime.value.toLocalDate().toProperty()
+	private val minuteProperty: IntegerProperty = dateTime.value.minute.toProperty()
+	private val hourProperty: IntegerProperty = dateTime.value.hour.toProperty()
 
 
 	private val popup: DateTimePickerPopup = DateTimePickerPopup(dateProperty, hourProperty, minuteProperty) {
-		dateTimeProperty.value =
-			LocalDateTime.of(dateProperty.value, LocalTime.of(hourProperty.value, minuteProperty.value))
+		dateTime.value = LocalDateTime.of(dateProperty.value, LocalTime.of(hourProperty.value, minuteProperty.value))
 		button.fire()
 	}
 
@@ -80,7 +72,7 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 				prefHeight = 25.0
 				isEditable = false
 				isFocusTraversable = false
-				text = formatter.format(dateTimeProperty.value)
+				text = formatter.format(dateTime.value)
 				focusedProperty().listen { focus ->
 					if(focus)
 						button.requestFocus()
@@ -107,7 +99,7 @@ class DateTimePicker(dateTime: LocalDateTime, private val formatter: DateTimeFor
 			}
 		}
 
-		dateTimeProperty.listen(runOnce = true) { new ->
+		dateTime.listen(runOnce = true) { new ->
 			textField.text = formatter.format(new)
 		}
 
