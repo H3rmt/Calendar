@@ -58,7 +58,7 @@ class ReminderPopup: Fragment() {
 	private val saveTitle: String = edit?.run { "Save".translate(Language.TranslationTypes.ReminderPopup) }
 		?: "Create".translate(Language.TranslationTypes.ReminderPopup)
 
-	private val deadlineOrAppointment: Property<Boolean> = (deadline.value != null).toProperty()
+	private val deadlineOrAppointment: Property<Boolean> = (appointment.value == null).toProperty()
 	private val finishName: Property<String> = "".toProperty()
 
 	private lateinit var control: BorderPane
@@ -180,11 +180,11 @@ class ReminderPopup: Fragment() {
 		// switch between control for AppointmentPicker and DatePicker
 		deadlineOrAppointment.listen(runOnce = true) {
 			if(it) {
-				finishName.value = "Appointment"
-				control.left = AppointmentPicker(appointments = Appointments, appointmentProperty = appointment)
-			} else {
 				finishName.value = "Date"
 				control.left = DateTimePicker(dateTime = deadline, formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
+			} else {
+				finishName.value = "Appointment"
+				control.left = AppointmentPicker(appointments = Appointments, appointmentProperty = appointment)
 			}
 		}
 		// disable deadline pickers of no Deadline selected

@@ -1,21 +1,28 @@
 package frame.tabs
 
-import calendar.*
+import calendar.Appointment
+import calendar.Appointments
+import calendar.Note
+import calendar.Notes
+import calendar.Timing
+import calendar.Type
 import frame.TabManager
 import frame.adjustWidth
 import frame.createFXImage
+import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
 import frame.styles.OverviewStyles
 import frame.styles.TabStyles
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.Property
-import javafx.event.EventHandler
-import javafx.geometry.Pos
-import javafx.scene.control.OverrunStyle
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
-import javafx.scene.image.Image
-import logic.*
+import javafx.beans.property.*
+import javafx.event.*
+import javafx.geometry.*
+import javafx.scene.control.*
+import javafx.scene.image.*
+import logic.Language
+import logic.LogType
+import logic.listen
+import logic.log
+import logic.translate
 import tornadofx.*
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -229,7 +236,10 @@ fun createOverviewTab(pane: TabPane): Tab {
 														fitHeight = 21.5
 														fitWidth = 21.5
 													}
-													onMouseClicked
+													onMouseClicked = EventHandler {
+														it.consume()
+														ReminderPopup.openNew(cctime.atStartOfDay(), null)
+													}
 													onMouseEntered = EventHandler { img.image = hoveredImg }
 													onMouseExited = EventHandler { img.image = defaultImg }
 												}
