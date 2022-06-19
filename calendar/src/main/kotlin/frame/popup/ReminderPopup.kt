@@ -13,6 +13,7 @@ import javafx.scene.text.*
 import javafx.stage.*
 import logic.Language
 import logic.listen
+import logic.log
 import logic.translate
 import nullIfValueNull
 import picker.appointmentPicker.AppointmentPicker

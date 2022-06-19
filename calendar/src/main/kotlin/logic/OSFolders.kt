@@ -5,7 +5,7 @@ import java.util.*
 
 object OSFolders {
 	private val os = System.getProperty("os.name").lowercase(Locale.getDefault())
-	
+
 	fun getConfigFolder(): String {
 		return if(os.startsWith("mac os x")) {
 			System.getProperty("user.home") + "/Library/Preferences" + "/calendar/"
@@ -20,7 +20,7 @@ object OSFolders {
 			}
 		}
 	}
-	
+
 	fun getDataFolder(): String {
 		return if(os.startsWith("mac os x")) {
 			System.getProperty("user.home") + "/Library/Application Support" + "/calendar/"

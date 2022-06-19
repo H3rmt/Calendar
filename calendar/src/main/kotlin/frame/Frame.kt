@@ -26,18 +26,6 @@ import javafx.scene.control.*
 import javafx.scene.image.*
 import javafx.scene.layout.*
 import javafx.stage.*
-import logic.Configs
-import logic.Exit
-import logic.Language
-import logic.LogType
-import logic.Warning
-import logic.getConfig
-import logic.listen
-import logic.log
-import logic.translate
-import javafx.scene.image.*
-import javafx.scene.layout.*
-import javafx.stage.*
 import logic.*
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
@@ -67,8 +55,6 @@ fun frameInit() {
 	 * if it is not an Exit(custom Exception) then
 	 * Exit<errorCode> -> Exception is added at the beginning
 	 * */
-	 *
-	 * @see Exit
 	 */
 	DefaultErrorHandler.filter = {
 		val writer = StringWriter()
@@ -348,6 +334,7 @@ fun createFXImage(name: String): Image {
 	val path = "img/$name"
 	cache[path]?.let { return it }
 
+	@Suppress("SwallowedException")
 	val image = try {
 		ImageIO.read({}::class.java.classLoader.getResource(path))
 	} catch(e: IllegalArgumentException) {

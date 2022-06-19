@@ -56,6 +56,7 @@ fun initConfigs() {
 	try {
 		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(Files.configFile)), Map::class.java)
 		load.forEach {
+			@Suppress("SwallowedException")
 			try {
 				configs[getJson().fromJson(
 					getJsonReader(StringReader(it.key.trim().replaceFirstChar { c -> c.titlecaseChar() })),
@@ -98,6 +99,7 @@ fun initConfigs() {
 inline fun <reified T: Any> getConfig(conf: Configs): T {
 	try {
 		configs[conf]?.let {
+			@Suppress("SwallowedException")
 			try {
 				return if(T::class.java.isEnum) {
 					try {
@@ -128,7 +130,7 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 			}
 		}
 		log("Missing Config option: $conf", LogType.ERROR)
-		throw IllegalArgumentException()
+		throw IllegalArgumentException("Missing Config option")
 	} catch(e: Exception) {
 		log("Error reading Config option: $conf as ${T::class}", LogType.ERROR)
 		throw e

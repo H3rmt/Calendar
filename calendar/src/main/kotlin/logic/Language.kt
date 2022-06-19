@@ -19,16 +19,12 @@ class Language(private val language: AvailableLanguages) {
 	 * in translations Map
 	 */
 	init {
-		try {
-			val file =
-				File({}::class.java.classLoader.getResource("lang/$language.json")!!.toURI())
-			translations = (getJson().fromJson<Map<String, Map<String, String>>>(
-				getJsonReader(FileReader(file)),
-				Map::class.java
-			)).mapKeys { TranslationTypes.valueOf(it.key) }
-		} catch(e: NullPointerException) {
-			throw e
-		}
+		val file =
+			File({}::class.java.classLoader.getResource("lang/$language.json")!!.toURI())
+		translations = (getJson().fromJson<Map<String, Map<String, String>>>(
+			getJsonReader(FileReader(file)),
+			Map::class.java
+		)).mapKeys { TranslationTypes.valueOf(it.key) }
 	}
 
 
@@ -43,6 +39,7 @@ class Language(private val language: AvailableLanguages) {
 	 * @see translations
 	 */
 	fun getTranslation(tr: String, type: TranslationTypes): String {
+		@Suppress("SwallowedException")
 		return try {
 			translations[type]!![tr]!!
 		} catch(e: NullPointerException) {

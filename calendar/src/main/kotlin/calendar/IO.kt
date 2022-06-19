@@ -3,8 +3,10 @@ package calendar
 import javafx.collections.*
 import logic.Files
 import logic.Language
+import logic.LogType
 import logic.listen
 import logic.listenUpdates
+import logic.log
 import logic.translate
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable

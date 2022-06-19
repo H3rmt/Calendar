@@ -18,6 +18,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 	object Appointments: LongEntityClass<Appointment>(AppointmentTable)
 
 	companion object {
+		@Suppress("LongParameterList")
 		fun new(
 			start: LocalDateTime, end: LocalDateTime, title: String, description: String, type: Type,
 			allDay: Boolean = false, week: Boolean = false

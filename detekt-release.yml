@@ -13,5 +13,7 @@ complexity:
 style:
   MaxLineLength:
     active: false
+  MagicNumber:
+    active: false
   WildcardImport:
     active: false
