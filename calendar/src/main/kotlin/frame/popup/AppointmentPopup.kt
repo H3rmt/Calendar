@@ -97,8 +97,8 @@ class AppointmentPopup: Fragment() {
 	private fun checkAppointment(): String? {
 		return if(appointmentTitle.value.isEmpty()) {
 			"missing title".translate(Language.TranslationTypes.AppointmentPopup)
-		} else if(end.value.isAfter(start.value)) {
-			"end is after start".translate(Language.TranslationTypes.AppointmentPopup)
+		} else if(start.value.isAfter(end.value)) {
+			"start is after end".translate(Language.TranslationTypes.AppointmentPopup)
 		} else {
 			null
 		}

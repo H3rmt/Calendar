@@ -12,7 +12,7 @@ import kotlin.system.exitProcess
 var DEV = false
 
 fun main(args: Array<String>) {
-	println("\nStarting Calendar... $args \n")
+	println("\nStarting Calendar... ${args.contentToString()} \n")
 	if(args.contains("dev"))
 		DEV = true
 
