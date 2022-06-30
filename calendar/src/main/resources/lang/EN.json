@@ -1,15 +1,31 @@
 {
   "Global": {
     "no types for %s found (add some types in settings)": "No Types for %s found (add some types in settings)",
-    "fef": "e"
+
   },
   "Menubar": {
+    "create": "Create",
+    "appointment": "Appointment",
+    "reminder": "Reminder",
+    "options": "Options",
+    "reload": "Reload",
+    "preferences": "Preferences",
+    "quit": "Quit",
+    "view": "View",
+    "show reminder": "show reminder",
+    "show calendar": "show calendar",
+    "help": "Help",
+    "github": "Github",
+    "memory usage": "memory usage"
   },
   "Note": {
+
   },
   "Overview": {
+
   },
   "Reminder": {
+
   },
   "Week": {
     "edit appointment": "edit appointment",
@@ -17,7 +33,9 @@
     "new appointment": "new appointment"
   },
   "AppointmentPopup": {
+
   },
   "ReminderPopup": {
+
   }
 }

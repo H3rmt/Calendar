@@ -48,7 +48,7 @@ class Language(private val language: AvailableLanguages) {
 			log(
 				"translation for |${
 					tr.trim().lowercase()
-				}| was not found (lang=$language) in (${caller.fileName}:${caller.lineNumber})",
+				}| with type $type was not found (lang=$language) in (${caller.fileName}:${caller.lineNumber})",
 				LogType.WARNING
 			)
 			tr // return requested string to translate
