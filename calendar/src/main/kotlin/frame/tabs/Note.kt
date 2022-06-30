@@ -28,7 +28,7 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 	log("creating note tab")
 	return pane.tab("") {
 		text = if(isWeek) {
-			"Week Notes for %s to %s".translate(
+			"week notes for %s to %s".translate(
 				Language.TranslationTypes.Note,
 				"${time.dayOfMonth}.${time.month.value}.",
 				"${time.plusDays(6).dayOfMonth}.${time.plusDays(6).month.value}."

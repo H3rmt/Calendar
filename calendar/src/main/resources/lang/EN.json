@@ -8,18 +8,18 @@
 		"saturday": "Saturday",
 		"sunday": "Sunday",
 
-    "january": "January",
-    "february": "February",
-    "march": "March",
-    "april": "April",
-    "may": "May",
-    "june": "June",
-    "july": "July",
-    "august": "August",
-    "september": "September",
-    "october": "October",
-    "november": "November",
-    "december": "December",
+		"january": "January",
+		"february": "February",
+		"march": "March",
+		"april": "April",
+		"may": "May",
+		"june": "June",
+		"july": "July",
+		"august": "August",
+		"september": "September",
+		"october": "October",
+		"november": "November",
+		"december": "December",
 
 		"no types for %s found (add some types in settings)": "No Types for %s found (add some types in settings)"
 	},
@@ -39,7 +39,10 @@
 		"memory usage": "memory usage"
 	},
 	"Note": {
-
+		"notes on %s": "Notes on %s",
+		"week notes for %s to %s": "Week Notes for %s to %s",
+		"save": "save Note",
+		"delete": "delete Note"
 	},
 	"Overview": {
 
