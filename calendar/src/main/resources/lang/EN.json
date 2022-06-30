@@ -1,41 +1,61 @@
 {
-  "Global": {
-    "no types for %s found (add some types in settings)": "No Types for %s found (add some types in settings)",
+	"Global": {
+		"monday": "Monday",
+		"tuesday": "Tuesday",
+		"wednesday": "Wednesday",
+		"thursday": "Thursday",
+		"friday": "Friday",
+		"saturday": "Saturday",
+		"sunday": "Sunday",
 
-  },
-  "Menubar": {
-    "create": "Create",
-    "appointment": "Appointment",
-    "reminder": "Reminder",
-    "options": "Options",
-    "reload": "Reload",
-    "preferences": "Preferences",
-    "quit": "Quit",
-    "view": "View",
-    "show reminder": "show reminder",
-    "show calendar": "show calendar",
-    "help": "Help",
-    "github": "Github",
-    "memory usage": "memory usage"
-  },
-  "Note": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December",
 
-  },
-  "Overview": {
+		"no types for %s found (add some types in settings)": "No Types for %s found (add some types in settings)"
+	},
+	"Menubar": {
+		"create": "Create",
+		"appointment": "Appointment",
+		"reminder": "Reminder",
+		"options": "Options",
+		"reload": "Reload",
+		"preferences": "Preferences",
+		"quit": "Quit",
+		"view": "View",
+		"show reminder": "show reminder",
+		"show calendar": "show calendar",
+		"help": "Help",
+		"github": "Github",
+		"memory usage": "memory usage"
+	},
+	"Note": {
 
-  },
-  "Reminder": {
+	},
+	"Overview": {
 
-  },
-  "Week": {
-    "edit appointment": "edit appointment",
-    "remove appointment": "remove appointment",
-    "new appointment": "new appointment"
-  },
-  "AppointmentPopup": {
+	},
+	"Reminder": {
 
-  },
-  "ReminderPopup": {
+	},
+	"Week": {
+		"edit appointment": "edit appointment",
+		"remove appointment": "remove appointment",
+		"new appointment": "new appointment"
+	},
+	"AppointmentPopup": {
 
-  }
+	},
+	"ReminderPopup": {
+
+	}
 }
