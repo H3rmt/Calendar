@@ -83,7 +83,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 						}
 					}
 					for(header in arrayListOf(
-						"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+						"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
 					)) {
 						label(header.translate(Language.TranslationTypes.Global)) {
 							addClass(GlobalStyles.tableItem_)

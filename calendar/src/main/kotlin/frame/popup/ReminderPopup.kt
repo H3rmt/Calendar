@@ -54,10 +54,10 @@ class ReminderPopup: Fragment() {
 		?: SimpleObjectProperty("")
 	private var noDeadline: Property<Boolean> = (edit?.reminder != null && edit.reminder.deadline.value == null && edit.reminder.appointment.value == null).toProperty()
 
-	private val windowTitle: String = edit?.run { "Edit Reminder".translate(Language.TranslationTypes.ReminderPopup) }
-		?: "New Reminder".translate(Language.TranslationTypes.ReminderPopup)
-	private val saveTitle: String = edit?.run { "Save".translate(Language.TranslationTypes.ReminderPopup) }
-		?: "Create".translate(Language.TranslationTypes.ReminderPopup)
+	private val windowTitle: String = edit?.run { "edit Reminder".translate(Language.TranslationTypes.ReminderPopup) }
+		?: "new Reminder".translate(Language.TranslationTypes.ReminderPopup)
+	private val saveTitle: String = edit?.run { "save".translate(Language.TranslationTypes.ReminderPopup) }
+		?: "create".translate(Language.TranslationTypes.ReminderPopup)
 
 	private val deadlineOrAppointment: Property<Boolean> = (appointment.value == null).toProperty()
 	private val finishName: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty("", Language.TranslationTypes.ReminderPopup)
