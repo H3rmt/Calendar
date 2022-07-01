@@ -19,8 +19,7 @@ class Language(private val language: AvailableLanguages) {
 	 * in translations Map
 	 */
 	init {
-		val file =
-			File({}::class.java.classLoader.getResource("lang/$language.json")!!.toURI())
+		val file = File({}::class.java.classLoader.getResource("lang/$language.json")!!.toURI())
 		translations = (getJson().fromJson<Map<String, Map<String, String>>>(
 			getJsonReader(FileReader(file)),
 			Map::class.java
@@ -41,14 +40,14 @@ class Language(private val language: AvailableLanguages) {
 	fun getTranslation(tr: String, type: TranslationTypes): String {
 		@Suppress("SwallowedException")
 		return try {
-			translations[type]!![tr]!!
+			translations[type]!![tr.lowercase()]!!
 		} catch(e: NullPointerException) {
 			val caller = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
 				.walk { it.toList() }[2] // go back to getLangString and then calling methods
 			log(
 				"translation for |${
 					tr.trim().lowercase()
-				}| was not found (lang=$language) in (${caller.fileName}:${caller.lineNumber})",
+				}| with type $type was not found (lang=$language) in (${caller.fileName}:${caller.lineNumber})",
 				LogType.WARNING
 			)
 			tr // return requested string to translate

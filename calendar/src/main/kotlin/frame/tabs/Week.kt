@@ -26,7 +26,7 @@ import java.time.temporal.IsoFields
 fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 	log("creating week tab")
 	return pane.tab("") {
-		text = "Week %s - %s".translate(
+		text = "week %s - %s".translate(
 			Language.TranslationTypes.Week,
 			"${time.dayOfMonth}.${time.month.value}.",
 			"${time.plusDays(6).dayOfMonth}.${time.plusDays(6).month.value}."
@@ -39,7 +39,7 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 			addClass(TabStyles.content_)
 			hbox(spacing = 40.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar_)
-				label("Week".translate(Language.TranslationTypes.Week)) {
+				label("week".translate(Language.TranslationTypes.Week)) {
 					addClass(TabStyles.title_)
 					alignment = Pos.CENTER
 				}
@@ -62,9 +62,9 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 						addClass(GlobalStyles.tableItem_)
 					}
 					for(header in arrayListOf(
-						"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+						"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
 					)) {
-						label(header.translate(Language.TranslationTypes.Note)) {
+						label(header.translate(Language.TranslationTypes.Global)) {
 							addClass(GlobalStyles.tableItem_)
 							addClass(GlobalStyles.tableHeaderItem_)
 							addClass(WeekStyles.tableTimeHeader_)

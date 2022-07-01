@@ -53,7 +53,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 					minWidth = 200.0
 					alignment = Pos.CENTER
 					overviewTime.listen(runOnce = true) {
-						this.text = it.month.name
+						this.text = it.month.name.translate(Language.TranslationTypes.Global)
 					}
 				}
 				button(">") {
@@ -83,9 +83,9 @@ fun createOverviewTab(pane: TabPane): Tab {
 						}
 					}
 					for(header in arrayListOf(
-						"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+						"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
 					)) {
-						label(header.translate(Language.TranslationTypes.Note)) {
+						label(header.translate(Language.TranslationTypes.Global)) {
 							addClass(GlobalStyles.tableItem_)
 							addClass(GlobalStyles.tableHeaderItem_)
 							addClass(OverviewStyles.headerItem_)
