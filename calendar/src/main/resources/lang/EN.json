@@ -49,7 +49,11 @@
 
 	},
 	"Reminder": {
-
+		"reminders": "reminders",
+		"reminder": "reminder",
+		"title": "title",
+		"deadline": "deadline",
+		"description": "description"
 	},
 	"Week": {
 		"edit appointment": "edit appointment",
