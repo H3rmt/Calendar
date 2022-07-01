@@ -4,6 +4,7 @@ import calendar.Appointment
 import calendar.Appointments
 import calendar.Reminder
 import calendar.Timing
+import frame.TranslatingSimpleStringProperty
 import frame.styles.GlobalStyles
 import frame.toggleSwitch
 import javafx.beans.property.*
@@ -59,7 +60,7 @@ class ReminderPopup: Fragment() {
 		?: "Create".translate(Language.TranslationTypes.ReminderPopup)
 
 	private val deadlineOrAppointment: Property<Boolean> = (appointment.value == null).toProperty()
-	private val finishName: Property<String> = "".toProperty()
+	private val finishName: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty("", Language.TranslationTypes.ReminderPopup)
 
 	private lateinit var control: BorderPane
 	private lateinit var deadlineFiled: Field
@@ -115,7 +116,7 @@ class ReminderPopup: Fragment() {
 		addClass(GlobalStyles.background_)
 		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
-			field("no Deadline".translate(Language.TranslationTypes.ReminderPopup)) {
+			field("no deadline".translate(Language.TranslationTypes.ReminderPopup)) {
 				toggleSwitch(selected = noDeadline)
 			}
 			field("finish".translate(Language.TranslationTypes.ReminderPopup)) {
@@ -138,7 +139,7 @@ class ReminderPopup: Fragment() {
 				}
 			}
 			field("notify".translate(Language.TranslationTypes.ReminderPopup)) {
-				text("missing %s".translate(Language.TranslationTypes.ReminderPopup, "Notifications"))
+				text("missing %s".translate(Language.TranslationTypes.Global, "Notifications"))
 			}
 			buttonbar {
 				textfield(error) {

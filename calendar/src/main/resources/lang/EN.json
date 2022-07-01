@@ -21,7 +21,8 @@
 		"november": "November",
 		"december": "December",
 
-		"no types for %s found (add some types in settings)": "No Types for %s found (add some types in settings)"
+		"no types for %s found (add some types in settings)": "No Types for %s found (add some types in settings)",
+		"missing %s": "missing %s"
 	},
 	"Menubar": {
 		"create": "Create",
@@ -59,6 +60,13 @@
 
 	},
 	"ReminderPopup": {
-
+		"no deadline": "no deadline",
+		"finish": "finish",
+		"title": "title",
+		"description": "description",
+		"notify": "notify",
+		"cancel": "cancel",
+		"Date": "Date",
+		"Appointment": "Appointment"
 	}
 }
