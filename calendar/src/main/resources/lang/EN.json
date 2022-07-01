@@ -46,7 +46,7 @@
 		"delete": "delete Note"
 	},
 	"Overview": {
-
+		"calender": "calender"
 	},
 	"Reminder": {
 		"reminders": "reminders",
@@ -56,11 +56,12 @@
 		"description": "description"
 	},
 	"Week": {
-		"edit appointment": "edit appointment",
-		"remove appointment": "remove appointment",
-		"new appointment": "new appointment"
+		"week %s - %s": "week %s - %s",
+		"week": "week"
 	},
 	"AppointmentPopup": {
+		"new appointment": "new appointment",
+		"create": "create",
 		"type": "type",
 		"whole day": "whole day",
 		"title": "title",
@@ -72,12 +73,19 @@
 		"start to end": "start to end"
 	},
 	"ReminderPopup": {
+		"edit reminder":  "Edit Reminder",
+		"new reminder": "New Reminder",
+		"save": "Save",
+		"create": "Create",
+
+		"missing title": "missing title",
 		"no deadline": "no deadline",
 		"finish": "finish",
 		"title": "title",
 		"description": "description",
 		"notify": "notify",
 		"cancel": "cancel",
+
 		"Date": "Date",
 		"Appointment": "Appointment"
 	}

@@ -26,7 +26,13 @@ import javafx.scene.control.*
 import javafx.scene.image.*
 import javafx.scene.layout.*
 import javafx.stage.*
-import logic.*
+import logic.Configs
+import logic.Language
+import logic.LogType
+import logic.getConfig
+import logic.listen
+import logic.log
+import logic.translate
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
 import java.awt.Desktop
@@ -397,7 +403,7 @@ class TranslatingSimpleStringProperty(
 		super.set(newValue)
 	}
 
-	override fun get(): String = super.get().translate(type, args)
+	override fun get(): String = super.get().takeIf { it == "" }?.translate(type, args) ?: "" // dont try to translate if empty
 
 }
 

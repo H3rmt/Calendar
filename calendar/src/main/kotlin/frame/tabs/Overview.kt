@@ -53,7 +53,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 					minWidth = 200.0
 					alignment = Pos.CENTER
 					overviewTime.listen(runOnce = true) {
-						this.text = it.month.name
+						this.text = it.month.name.translate(Language.TranslationTypes.Global)
 					}
 				}
 				button(">") {
