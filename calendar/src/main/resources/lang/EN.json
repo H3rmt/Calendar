@@ -57,7 +57,15 @@
 		"new appointment": "new appointment"
 	},
 	"AppointmentPopup": {
-
+		"type": "type",
+		"whole day": "whole day",
+		"title": "title",
+		"description": "description",
+		"cancel": "cancel",
+		"end is after start": "end is after start",
+		"missing title": "missing title",
+		"day": "day",
+		"start to end": "start to end"
 	},
 	"ReminderPopup": {
 		"no deadline": "no deadline",
