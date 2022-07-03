@@ -36,7 +36,7 @@ A desktop calendar written in [Kotlin](https://github.com/edvin/tornadofx) with 
 ## TODO
 - Reminder without deadline
 - Settingstab
-  - Settings for different typs
+  - Settings for different types
   - Settings for Weekly Appointments
 - Notifications
 - Improved Reminder Overview
