@@ -336,8 +336,8 @@ object TabManager {
  */
 val cache = mutableMapOf<String, Image>()
 
-fun createFXImage(name: String): Image {
-	val path = "img/$name"
+fun createFXImage(name: String, path: String = ""): Image {
+	val path = "img/$path/$name"
 	cache[path]?.let { return it }
 
 	@Suppress("SwallowedException")
