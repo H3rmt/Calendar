@@ -1,11 +1,20 @@
-import calendar.*
+import calendar.Appointments
 import calendar.Files
+import calendar.Notes
+import calendar.Reminders
+import calendar.Types
+import calendar.initDb
 import frame.frameInit
+import javafx.beans.property.*
 import logic.*
 import kotlin.system.exitProcess
 
-fun main() {
-	println("\nStarting Calendar... \n")
+var DEV = false
+
+fun main(args: Array<String>) {
+	println("\nStarting Calendar... ${args.contentToString()} \n")
+	if(args.contains("dev"))
+		DEV = true
 
 	initLogger()
 	log("initialised Logger", LogType.IMPORTANT)
@@ -38,6 +47,7 @@ fun init() {
 	log("loaded Data", LogType.IMPORTANT)
 }
 
-fun String.replaceNewline(): String {
-	return this.replace("\n", "\\n")
-}
+fun String.replaceNewline(): String = this.replace("\n", "\\n")
+
+@Suppress("UNCHECKED_CAST")
+fun <T, TNotNull> Property<T>.nullIfValueNull(): Property<TNotNull>? = if(this.value == null) null else this as Property<TNotNull>

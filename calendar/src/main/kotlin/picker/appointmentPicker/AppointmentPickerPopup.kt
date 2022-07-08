@@ -2,16 +2,16 @@ package picker.appointmentPicker
 
 import calendar.Appointment
 import frame.createFXImage
-import javafx.beans.property.Property
-import javafx.collections.FXCollections.observableArrayList
-import javafx.collections.ObservableList
-import javafx.event.EventHandler
-import javafx.geometry.Pos
-import javafx.scene.control.TextField
-import javafx.scene.layout.BorderStrokeStyle
-import javafx.scene.paint.Color
-import javafx.scene.text.FontWeight
-import javafx.stage.Popup
+import javafx.beans.property.*
+import javafx.collections.*
+import javafx.collections.FXCollections.*
+import javafx.event.*
+import javafx.geometry.*
+import javafx.scene.control.*
+import javafx.scene.layout.*
+import javafx.scene.paint.*
+import javafx.scene.text.*
+import javafx.stage.*
 import logic.Configs
 import logic.getConfig
 import logic.listen
@@ -90,7 +90,7 @@ class AppointmentPickerPopup(
 					style {
 						padding = box(2.px)
 					}
-					imageview(createFXImage("search.svg")) {
+					imageview(createFXImage("search.svg", "picker/appointmentPicker")) {
 						fitHeight = 14.0
 						fitWidth = 14.0
 					}

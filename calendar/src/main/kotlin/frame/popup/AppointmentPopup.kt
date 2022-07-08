@@ -1,7 +1,6 @@
 package frame.popup
 
 import calendar.Appointment
-import calendar.Timing.toUTCEpochMinute
 import calendar.Type
 import calendar.Types
 import frame.styles.GlobalStyles
@@ -13,9 +12,7 @@ import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.Modality
 import javafx.stage.Stage
-import logic.Language
-import logic.listen
-import logic.translate
+import logic.*
 import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
 import java.time.LocalDate
@@ -100,8 +97,8 @@ class AppointmentPopup: Fragment() {
 	private fun checkAppointment(): String? {
 		return if(appointmentTitle.value.isEmpty()) {
 			"missing title".translate(Language.TranslationTypes.AppointmentPopup)
-		} else if(end.value.toUTCEpochMinute() < start.value.toUTCEpochMinute()) {
-			"start must be before end".translate(Language.TranslationTypes.AppointmentPopup)
+		} else if(start.value.isAfter(end.value)) {
+			"start is after end".translate(Language.TranslationTypes.AppointmentPopup)
 		} else {
 			null
 		}
@@ -113,10 +110,11 @@ class AppointmentPopup: Fragment() {
 	}
 
 	override val root = form {
+		log("creating appointment popup")
 		addClass(GlobalStyles.background_)
 		fieldset(windowTitle) {
 			addClass(GlobalStyles.maxHeight_)
-			field("Type") {
+			field("type".translate(Language.TranslationTypes.AppointmentPopup)) {
 				typeCombobox(type)
 				checkbox("whole day".translate(Language.TranslationTypes.AppointmentPopup), property = wholeDay) {
 					style {
@@ -170,6 +168,7 @@ class AppointmentPopup: Fragment() {
 				}
 			}
 		}
+		log("created appointment popup")
 	}
 
 	init {

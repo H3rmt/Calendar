@@ -1,14 +1,19 @@
 package calendar
 
-import javafx.collections.ObservableList
-import logic.*
+import javafx.collections.*
 import logic.Files
+import logic.Language
+import logic.LogType
+import logic.listen
+import logic.listenUpdates
+import logic.log
+import logic.translate
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import tornadofx.observableListOf
+import tornadofx.*
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -46,6 +51,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	 * listeners for any new Appointments added after creation of the list get added automatically
 	 */
 	fun getWeekAppointments(): ObservableList<Appointment> { // probably needed for configuration of week appointments
+		log("(Appointments) getting getWeekAppointments", LogType.LOW)
 		// condition to check if appointment fulfills condition to be in returned list
 		val condition: (Appointment) -> Boolean = {
 			it.week.value
@@ -102,6 +108,7 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	 * listeners for any new Appointments added after creation of the list get added automatically
 	 */
 	fun getAppointmentsFromTo(from: LocalDateTime, to: LocalDateTime, day: DayOfWeek): ObservableList<Appointment> {
+		log("(Appointments) getting AppointmentsFromTo $from - $to", LogType.LOW)
 		// condition to check if appointment fulfills condition to be in returned list
 		val condition: (Appointment) -> Boolean = { // TODO Week appointments
 			!it.week.value && (it.start.value <= to && it.end.value >= from)//(it.week.value && day in it.start.value.dayOfWeek..it.end.value.dayOfWeek) // TODO this doesn't seem right (week appointments)
@@ -171,6 +178,7 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 	 * listeners for any new Notes added after creation of the list get added automatically
 	 */
 	fun getNotesAt(at: LocalDate): ObservableList<Note> {
+		log("(Notes) getting NotesAt at $at", LogType.LOW)
 		// condition to check if note fulfills condition to be in returned list
 		val condition: (Note) -> Boolean = {
 			!it.week.value && at == it.time.value
@@ -224,6 +232,7 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 	 * listeners for any new Notes added after creation of the list get added automatically
 	 */
 	fun getWeekNotesFromTo(from: LocalDate, to: LocalDate): ObservableList<Note> {
+		log("(Notes) getting WeekNotesFromTo $from - $to", LogType.LOW)
 		// condition to check if note fulfills condition to be in returned list
 		val condition: (Note) -> Boolean = {
 			it.week.value && from < it.time.value && it.time.value < to
@@ -281,8 +290,7 @@ object FileTable: LongIdTable() {
 object Files: DBObservableList<File>(File.Files)
 
 object ReminderTable: LongIdTable() {
-	val time =
-		long("time") //.nullable() // not nullable, TODO clone appointment time and always use it (ask when editing appointment if reminder should be moved)
+	val deadline = long("deadline").nullable()
 	val appointment = reference("appointment", AppointmentTable).nullable()
 	val title = text("title")
 	val description = text("description")
@@ -298,6 +306,7 @@ object TypeTable: IntIdTable() {
 
 object Types: DBObservableList<Type>(Type.Types) {
 	fun getRandom(exceptionName: String): Type {
+		log("(Types) getting Random", LogType.LOW)
 		require(isNotEmpty()) { throw NoTypeFound(exceptionName) }
 		return get(Random.nextInt(size))
 	}

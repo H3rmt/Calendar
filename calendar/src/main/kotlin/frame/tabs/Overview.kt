@@ -1,21 +1,28 @@
 package frame.tabs
 
-import calendar.*
+import calendar.Appointment
+import calendar.Appointments
+import calendar.Note
+import calendar.Notes
+import calendar.Timing
+import calendar.Type
 import frame.TabManager
 import frame.adjustWidth
 import frame.createFXImage
+import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
 import frame.styles.OverviewStyles
 import frame.styles.TabStyles
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.Property
-import javafx.event.EventHandler
-import javafx.geometry.Pos
-import javafx.scene.control.OverrunStyle
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
-import javafx.scene.image.Image
-import logic.*
+import javafx.beans.property.*
+import javafx.event.*
+import javafx.geometry.*
+import javafx.scene.control.*
+import javafx.scene.image.*
+import logic.Language
+import logic.LogType
+import logic.listen
+import logic.log
+import logic.translate
 import tornadofx.*
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -25,14 +32,13 @@ import java.time.temporal.IsoFields
 val overviewTime: Property<LocalDate> = Timing.getNow().toLocalDate().toProperty()
 
 fun createOverviewTab(pane: TabPane): Tab {
-	log("creating overview tab", LogType.IMPORTANT)
+	log("creating overview tab")
 	return pane.tab("calender".translate(Language.TranslationTypes.Overview)) {
 		isClosable = false
 		addClass(TabStyles.tab_)
 
 		vbox {
 			addClass(TabStyles.content_)
-			log("creating top bar", LogType.LOW)
 			// Top bar
 			hbox(spacing = 20.0, alignment = Pos.CENTER) {
 				addClass(TabStyles.topbar_)
@@ -47,7 +53,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 					minWidth = 200.0
 					alignment = Pos.CENTER
 					overviewTime.listen(runOnce = true) {
-						this.text = it.month.name
+						this.text = it.month.name.translate(Language.TranslationTypes.Global)
 					}
 				}
 				button(">") {
@@ -58,7 +64,6 @@ fun createOverviewTab(pane: TabPane): Tab {
 				}
 			}
 
-			log("creating table view", LogType.LOW)
 			// Table view
 			vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 				addClass(GlobalStyles.disableFocusDraw_)
@@ -78,9 +83,9 @@ fun createOverviewTab(pane: TabPane): Tab {
 						}
 					}
 					for(header in arrayListOf(
-						"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+						"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
 					)) {
-						label(header.translate(Language.TranslationTypes.Note)) {
+						label(header.translate(Language.TranslationTypes.Global)) {
 							addClass(GlobalStyles.tableItem_)
 							addClass(GlobalStyles.tableHeaderItem_)
 							addClass(OverviewStyles.headerItem_)
@@ -231,7 +236,10 @@ fun createOverviewTab(pane: TabPane): Tab {
 														fitHeight = 21.5
 														fitWidth = 21.5
 													}
-													onMouseClicked
+													onMouseClicked = EventHandler {
+														it.consume()
+														ReminderPopup.openNew(cctime.atStartOfDay(), null)
+													}
 													onMouseEntered = EventHandler { img.image = hoveredImg }
 													onMouseExited = EventHandler { img.image = defaultImg }
 												}
@@ -335,6 +343,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 				}
 			}
 		}
+		log("created overview tab")
 	}
 }
 

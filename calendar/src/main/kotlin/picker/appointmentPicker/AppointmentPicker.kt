@@ -62,7 +62,7 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 			}
 
 			button = button {
-				imageview(createFXImage("appointmentchooser.svg")) {
+				imageview(createFXImage("openPicker.svg", "picker/appointmentPicker")) {
 					fitHeight = 18.0
 					fitWidth = 17.0
 				}

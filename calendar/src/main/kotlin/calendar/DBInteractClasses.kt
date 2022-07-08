@@ -2,9 +2,7 @@ package calendar
 
 import calendar.Timing.toUTCEpochMinute
 import com.sun.javafx.collections.ObservableListWrapper
-import javafx.beans.property.ObjectPropertyBase
-import javafx.beans.property.Property
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.*
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -88,11 +86,6 @@ abstract class DBDateTimeObservable: DBObservableBase<LocalDateTime, Long>() {
 	override fun convertTo(value: Long): LocalDateTime = Timing.fromUTCEpochMinuteToLocalDateTime(value)
 }
 
-/**
- * only get() is allowed to get its value, this list must always be bound to
- *
- * set and setValue are also blocked, only remove and add
- */
 open class DBObservableList<T: Entity<*>>(private val table: EntityClass<*, T>):
 	ObservableListWrapper<T>(mutableListOf()) {
 	private var loaded = false

@@ -18,7 +18,7 @@ A desktop calendar written in [Kotlin](https://github.com/edvin/tornadofx) with 
 - Each appointment has a specific type like school, work, sports, etc. 
 - appointments can cover multiple days or weeks
 - Appointment consists of a title a description
-![Appointments](img/appointments.png)
+![Appointments](img/Appointments.png)
 
 
 ### Notes
@@ -36,7 +36,7 @@ A desktop calendar written in [Kotlin](https://github.com/edvin/tornadofx) with 
 ## TODO
 - Reminder without deadline
 - Settingstab
-  - Settings for different typs
+  - Settings for different types
   - Settings for Weekly Appointments
 - Notifications
 - Improved Reminder Overview

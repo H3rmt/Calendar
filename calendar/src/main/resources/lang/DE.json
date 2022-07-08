@@ -1,5 +1,92 @@
 {
-  "": {
-    "": ""
+  "Global": {
+    "monday": "Montag",
+    "tuesday": "Dienstag",
+    "wednesday": "Mittwoch",
+    "thursday": "Donnerstag",
+    "friday": "Freitag",
+    "saturday": "Samstag",
+    "sunday": "Sonntag",
+
+    "january": "Januar",
+    "february": "Februar",
+    "march": "März",
+    "april": "April",
+    "may": "Mai",
+    "june": "Juni",
+    "july": "Juli",
+    "august": "August",
+    "september": "September",
+    "october": "Oktober",
+    "november": "November",
+    "december": "Dezember",
+
+    "no types for %s found (add some types in settings)": "Keine Typen für %s gefunden (fügen sie typen in den Einstellungen hinzu)",
+    "missing %s": "%s fehlt"
+  },
+  "Menubar": {
+    "create": "Erstellen",
+    "appointment": "Termin",
+    "reminder": "Erinnerung",
+    "options": "Optionen",
+    "reload": "Neu laden",
+    "preferences": "Einstellungen",
+    "quit": "Schließen",
+    "view": "Ansicht",
+    "show reminder": "Erinnerungen anzeigen",
+    "show calendar": "Kalender anzeigen",
+    "help": "Hilfe",
+    "github": "Github",
+    "memory usage": "Speicherverbrauch"
+  },
+  "Note": {
+    "notes on %s": "Notizen am %s",
+    "week notes for %s to %s": "Wochen-Notizen vom %s bis %s",
+    "save": "Speichern",
+    "delete": "Löschen"
+  },
+  "Overview": {
+    "calender": "Kalender"
+  },
+  "Reminder": {
+    "reminders": "Erinnerungen",
+    "reminder": "Erinnerung",
+    "title": "Titel",
+    "deadline": "Deadline",
+    "description": "Beschreibung"
+  },
+  "Week": {
+    "week %s - %s": "Woche vom %s bis %s",
+    "week": "Woche"
+  },
+  "AppointmentPopup": {
+    "new appointment": "Neuer Termin",
+    "create": "Erstellen",
+    "type": "Typ",
+    "whole day": "gesamter Tag",
+    "title": "Titel",
+    "description": "Beschreibung",
+    "cancel": "Abbrechen",
+    "end is after start": "Ende ist nach dem Anfang",
+    "missing title": "Titel fehlt",
+    "day": "Tag",
+    "start to end": "Anfang bis Ende"
+  },
+  "ReminderPopup": {
+    "edit reminder": "Erinnerung bearbeiten",
+    "new reminder": "Neue Erinnerung",
+    "save": "Speichern",
+    "create": "Erstellen",
+
+    "missing title": "titel fehlt",
+    "no deadline": "keine Deadline",
+    "finish": "Ende",
+    "title": "Titel",
+    "description": "Beschreibung",
+    "notify": "Benachrichtigung",
+    "cancel": "Abbrechen",
+
+    "Date": "Datum",
+    "Appointment": "Termin"
   }
 }

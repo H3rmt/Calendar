@@ -1,8 +1,14 @@
 package logic
 
+import DEV
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.logging.*
+import java.util.logging.ConsoleHandler
+import java.util.logging.FileHandler
+import java.util.logging.Formatter
+import java.util.logging.Level
+import java.util.logging.LogRecord
+import java.util.logging.Logger
 
 
 /** this is necessary to turn of printing
@@ -28,7 +34,7 @@ fun updateLogger() {
 		SimpleFormatter(if(getConfig(Configs.Debug)) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
 	fileHandler.formatter = consoleHandler.formatter
 
-	if(!getConfig<Boolean>(Configs.PrintLogs)) {
+	if(!getConfig<Boolean>(Configs.PrintLogs) && !DEV) {
 		logger.removeHandler(consoleHandler)
 	}
 
@@ -47,11 +53,10 @@ fun initLogger() {
 		consoleHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		addHandler(consoleHandler)
 		log("added console Handler")
-		
+
 		fileHandler = FileHandler(Files.logfile)
 		fileHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
 		fileHandler.level = Level.ALL
-
 		log("added file Handler")
 	}
 }

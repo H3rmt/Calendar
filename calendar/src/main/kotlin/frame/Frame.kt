@@ -7,26 +7,32 @@ import calendar.Types
 import frame.TabManager.Secure
 import frame.popup.AppointmentPopup
 import frame.popup.ReminderPopup
-import frame.styles.*
+import frame.styles.GlobalStyles
+import frame.styles.MenubarStyles
+import frame.styles.NoteStyles
+import frame.styles.OverviewStyles
+import frame.styles.ReminderStyles
+import frame.styles.TabStyles
+import frame.styles.WeekStyles
 import frame.tabs.createOverviewTab
 import frame.tabs.createReminderTab
 import init
-import javafx.application.Platform
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.Property
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.value.ObservableValue
-import javafx.event.EventTarget
-import javafx.geometry.Orientation
+import javafx.application.*
+import javafx.beans.property.*
+import javafx.beans.value.*
+import javafx.event.*
+import javafx.geometry.*
 import javafx.scene.control.*
-import javafx.scene.image.Image
-import javafx.scene.image.WritableImage
-import javafx.scene.layout.BorderPane
-import javafx.scene.layout.GridPane
-import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
-import javafx.stage.Stage
-import logic.*
+import javafx.scene.image.*
+import javafx.scene.layout.*
+import javafx.stage.*
+import logic.Configs
+import logic.Language
+import logic.LogType
+import logic.getConfig
+import logic.listen
+import logic.log
+import logic.translate
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
 import java.awt.Desktop
@@ -44,7 +50,7 @@ import kotlin.reflect.KFunction
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
 fun frameInit() {
 	createLoading()
-	log("created loading", LogType.NORMAL)
+	log("created loading")
 
 	/**
 	 * this looks pretty weird, but it essentially
@@ -55,8 +61,6 @@ fun frameInit() {
 	 * if it is not an Exit(custom Exception) then
 	 * Exit<errorCode> -> Exception is added at the beginning
 	 * */
-	 *
-	 * @see Exit
 	 */
 	DefaultErrorHandler.filter = {
 		val writer = StringWriter()
@@ -109,8 +113,9 @@ class Window: App(
 		stage.height = 600.0
 		stage.width = 800.0
 		super.start(stage)
-		log("started Frame", LogType.NORMAL)
+		log("started Frame", LogType.IMPORTANT)
 		removeLoading()
+		// TODO open last tabs
 //		TabManager.openTab("reminders", ::createReminderTab)
 		TabManager.openTab("calendar", ::createOverviewTab)
 	}
@@ -123,7 +128,7 @@ class MainView: View("Calendar") {
 		center = tabpane {
 			tabDragPolicy = TabPane.TabDragPolicy.REORDER
 			tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
-			TabManager.pane = this@tabpane
+			TabManager.pane = this
 		}
 		log("created pane", LogType.IMPORTANT)
 	}
@@ -142,22 +147,17 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 					Timing.getNow().plusHours(1)
 				)
 			}, createMenuItem(this@menu, "Reminder", "Strg + R") {
-				ReminderPopup.open(
-					"new reminder".translate(Language.TranslationTypes.ReminderPopup),
-					"create".translate(Language.TranslationTypes.ReminderPopup),
-					false,
-					null,
-					Timing.getNow()
-				)
+				ReminderPopup.openNew(Timing.getNow(), null)
 			})
 		}
 		menu("options".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(createMenuItem(this@menu, "Reload", "F5") {
+				log("reload triggered")
 				init()
 			}, createMenuItem(this@menu, "Preferences", "Strg + ,") {
 				log("Preferences")
 			}, run { separator(); return@run null }, createMenuItem(this@menu, "Quit", "Strg + Q") {
-				log("exiting Program via quit", LogType.IMPORTANT)
+				log("exiting Program via quit")
 				Platform.exit()
 			})
 		}
@@ -172,7 +172,7 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 		}
 		menu("help".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(createMenuItem(this@menu, "Github", "") {
-				log("Open Github", LogType.IMPORTANT)
+				log("Open Github")
 				try {
 					runAsync {
 						Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
@@ -212,7 +212,6 @@ fun createMenuGroup(vararg panes: GridPane?) {
 }
 
 fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Unit): GridPane? {
-	log("creating menuItem: $name $shortcut", LogType.LOW)
 	var grid: GridPane? = null
 	menu.customitem {
 		grid = gridpane {
@@ -295,8 +294,15 @@ object TabManager {
 	 *                       > data
 	 */
 	fun openTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
-		val newTab = tabs.getOrElse(identifier) { createFunction.call(pane, *methodArgs).also { tabs[identifier] = it } }
-		newTab.setOnClosed { tabs.remove(identifier) }
+		log("tab $identifier opened")
+		val newTab = tabs.getOrElse(identifier) {
+			createFunction.call(pane, *methodArgs)
+		}
+		tabs[identifier] = newTab
+		newTab.setOnClosed {
+			log("tab $identifier closed")
+			tabs.remove(identifier)
+		}
 
 		pane.selectionModel.select(newTab)
 	}
@@ -309,22 +315,19 @@ object TabManager {
 	object Secure {
 		@Suppress("unused")
 		fun closeTab(identifier: String) {
+			log("tab $identifier closed")
 			tabs[identifier]?.close()
 			tabs.remove(identifier)
 		}
 
 		fun overrideTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
-			tabs[identifier]?.close()
-
-			val tab = createFunction.call(pane, *methodArgs).also { tabs[identifier] = it }
-			tab.setOnClosed { tabs.remove(identifier) }
-
-			pane.selectionModel.select(tab)
+			log("tab $identifier overridden")
+			closeTab(identifier)
+			openTab(identifier, createFunction, methodArgs)
 		}
 	}
 
 	override fun toString(): String = tabs.keys.toString()
-
 }
 
 
@@ -333,17 +336,18 @@ object TabManager {
  */
 val cache = mutableMapOf<String, Image>()
 
-fun createFXImage(name: String): Image {
-	val path = "img/$name"
+fun createFXImage(name: String, path: String = ""): Image {
+	val path = "img/$path/$name"
 	cache[path]?.let { return it }
 
+	@Suppress("SwallowedException")
 	val image = try {
 		ImageIO.read({}::class.java.classLoader.getResource(path))
 	} catch(e: IllegalArgumentException) {
-		Warning("imageError", e, "file not found:$path")
+		log("file not found:$path", LogType.WARNING)
 		getImageMissing()
 	} catch(e: IIOException) {
-		Warning("imageError", e, "can't read file:$path")
+		log("can't read file:$path", LogType.WARNING)
 		getImageMissing()
 	}
 	val wr = WritableImage(image.width, image.height)
@@ -399,7 +403,7 @@ class TranslatingSimpleStringProperty(
 		super.set(newValue)
 	}
 
-	override fun get(): String = super.get().translate(type, args)
+	override fun get(): String = super.get().takeIf { it == "" }?.translate(type, args) ?: "" // dont try to translate if empty
 
 }
 
