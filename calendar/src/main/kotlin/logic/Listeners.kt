@@ -1,9 +1,7 @@
 package logic
 
-import javafx.beans.value.ChangeListener
-import javafx.beans.value.ObservableValue
-import javafx.collections.ListChangeListener
-import javafx.collections.ObservableList
+import javafx.beans.value.*
+import javafx.collections.*
 
 // -------------------------- listeners --------------------------
 
@@ -82,32 +80,32 @@ fun <F, T: ObservableList<F>> T.listen(
 // -------------------------- logging --------------------------
 
 fun <T> T.log(): T {
-	println(this)
+	log(this, LogType.NORMAL)
 	return this
 }
 
 fun <T: ObservableValue<*>> T.log(name: String = ""): T {
 	listen2 { old, new ->
-		println("change ${name.ifEmpty { "ObservableValue" }} ($this): $old -> $new")
+		log("change ${name.ifEmpty { "ObservableValue" }} ($this): $old -> $new", LogType.NORMAL)
 	}
 	return this
 }
 
 fun <F, T: ObservableList<F>> T.log(name: String = ""): T {
 	listenUpdates { change ->
-		println("change ${name.ifEmpty { "ObservableValue" }} [$size] ($this): ")
+		log("change ${name.ifEmpty { "ObservableValue" }} [$size] ($this): ", LogType.NORMAL)
 		while(change.next()) {
 			if(change.wasAdded()) {
-				println("\tadded:")
-				change.addedSubList.forEach { println("\t\t$it") }
+				log("\tadded:", LogType.LOW)
+				change.addedSubList.forEach { log("\t\t$it", LogType.LOW) }
 			}
 			if(change.wasRemoved()) {
-				println("\tremoved:")
-				change.removed.forEach { println("\t\t$it") }
+				log("\tremoved:", LogType.LOW)
+				change.removed.forEach { log("\t\t$it", LogType.LOW) }
 			}
 			if(change.wasUpdated()) {
 				println("\tupdated:")
-				change.list.forEach { println("\t\t$it") }
+				change.list.forEach { log("\t\t$it") }
 			}
 		}
 
