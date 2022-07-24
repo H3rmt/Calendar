@@ -28,20 +28,20 @@ lateinit var consoleHandler: ConsoleHandler
 lateinit var fileHandler: FileHandler
 
 fun updateLogger() {
-	logger.level = if(getConfig(Configs.Debug)) Level.ALL else Level.CONFIG
+	logger.level = if(DEV) Level.CONFIG else Level.INFO
 
-	consoleHandler.formatter =
-		SimpleFormatter(if(getConfig(Configs.Debug)) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
+	consoleHandler.formatter = SimpleFormatter(if(DEV) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
 	fileHandler.formatter = consoleHandler.formatter
 
 	if(!getConfig<Boolean>(Configs.PrintLogs) && !DEV) {
 		logger.removeHandler(consoleHandler)
 	}
 
-	if(getConfig(Configs.StoreLogs)) {
+	if(getConfig(Configs.StoreLogs) || DEV) {
 		logger.addHandler(fileHandler)
 	}
 }
+
 
 fun initLogger() {
 	logger.apply {

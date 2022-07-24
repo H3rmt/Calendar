@@ -3,6 +3,8 @@ plugins {
 	id 'org.openjfx.javafxplugin' version '0.0.10'
 
 	id 'application'
+
+	id 'org.jetbrains.dokka' version "1.7.10"
 }
 
 repositories {
@@ -50,4 +52,6 @@ javafx {
 	modules('javafx.web') // , 'javafx.media'
 }
 
-//https://bell-sw.com/pages/downloads/#/java-18-current
+dokkaHtml {
+	outputDirectory.set(file("${buildDir}/dokka"))
+}

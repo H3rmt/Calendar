@@ -6,9 +6,25 @@ import calendar.Types
 import calendar.initDb
 import frame.frameInit
 import javafx.beans.property.*
-import logic.*
+import logic.LogType
+import logic.configs
+import logic.initConfigs
+import logic.initLogger
+import logic.log
+import logic.updateLogger
 import kotlin.system.exitProcess
 
+/**
+ *  set via *commandline args*
+ *
+ * should be used in development
+ * - switches config, db and logfiles into current folder
+ * - forces file and console logging
+ * - sets logging level lower
+ *
+ * @see logic.Files
+ * @see logic.updateLogger
+ */
 var DEV = false
 
 fun main(args: Array<String>) {

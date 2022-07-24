@@ -148,7 +148,7 @@ var stacktrace = true
  * only Configs in this Config enum are loaded from config.json
  */
 enum class Configs {
-	Language, Debug, PrintLogs, LogFormat, DebugLogFormat, StoreLogs, PrintStacktrace,
+	Language, PrintLogs, LogFormat, DebugLogFormat, StoreLogs, PrintStacktrace,
 	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen, IgnoreCaseForSearch
 }
 

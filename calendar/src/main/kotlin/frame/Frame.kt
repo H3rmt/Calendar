@@ -1,6 +1,7 @@
 package frame
 
 
+import DEV
 import calendar.Timing
 import calendar.Type
 import calendar.Types
@@ -90,7 +91,7 @@ fun errorMessage(error: Throwable, writer: String) = Alert(Alert.AlertType.ERROR
 	dialogPane.content = VBox().apply {
 		label(writer.substringBefore('\n').replace("->", "\n"))
 
-		if(getConfig(Configs.Debug)) textarea {
+		if(DEV) textarea {
 			prefRowCount = 10
 			text = writer
 		}

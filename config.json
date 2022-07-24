@@ -1,6 +1,5 @@
 {
 	"Language": "EN",
-	"Debug": false,
 	"PrintStacktrace": true,
 	"PrintLogs": true,
 	"StoreLogs": true,
