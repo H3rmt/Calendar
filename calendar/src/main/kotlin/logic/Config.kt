@@ -16,14 +16,14 @@ import kotlin.reflect.typeOf
 
 private val gson: Gson = GsonBuilder().setLenient().setFieldNamingStrategy(FieldNamingStrategy { return@FieldNamingStrategy it.name }).create()
 
-/**
- * general JSON reader and writer
- */
+/** Get json */
 fun getJson() = gson
 
 /**
- * returns configured JSON reader
- * accepts " " in Strings
+ * Get json reader
+ *
+ * @param reader
+ * @return
  */
 fun getJsonReader(reader: Reader): JsonReader = JsonReader(reader).apply { isLenient = true }
 
@@ -35,12 +35,7 @@ fun getJsonReader(reader: Reader): JsonReader = JsonReader(reader).apply { isLen
  */
 var configs: MutableMap<Configs, Any> = mutableMapOf()
 
-/**
- * must be the first method called to read from data files
- * like fonts or language
- *
- * @see Files.configFile
- */
+/** Init configs */
 fun initConfigs() {
 	val file = File(Files.configFile)
 	if(!file.exists()) {
@@ -80,20 +75,11 @@ fun initConfigs() {
 }
 
 /**
- * returns a configuration in Config enum specified in config.json
- * cast to given type
+ * Get config
  *
- * getConfig<ConfigType>(Configs.<config>)
- *
- * ConfigType = Int / String / Boolean / Enum element
- *
- * enums get cast automatically from String,
- * other types throw errors if type doesn't match
- *
- * config = Enum Element
- *
- * @see Configs
- * @see configs
+ * @param conf
+ * @param T
+ * @return
  */
 @Suppress("NestedBlockDepth", "ThrowsCount", "TooGenericExceptionCaught")
 inline fun <reified T: Any> getConfig(conf: Configs): T {
@@ -145,11 +131,87 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 var stacktrace = true
 
 /**
- * only Configs in this Config enum are loaded from config.json
+ * Configs
+ *
+ * @constructor Create empty Configs
  */
 enum class Configs {
-	Language, PrintLogs, LogFormat, DebugLogFormat, StoreLogs, PrintStacktrace,
-	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen, IgnoreCaseForSearch
+	/**
+	 * Language
+	 *
+	 * @constructor Create empty Language
+	 */
+	Language,
+
+	/**
+	 * Print logs
+	 *
+	 * @constructor Create empty Print logs
+	 */
+	PrintLogs,
+
+	/**
+	 * Log format
+	 *
+	 * @constructor Create empty Log format
+	 */
+	LogFormat,
+
+	/**
+	 * Debug log format
+	 *
+	 * @constructor Create empty Debug log format
+	 */
+	DebugLogFormat,
+
+	/**
+	 * Store logs
+	 *
+	 * @constructor Create empty Store logs
+	 */
+	StoreLogs,
+
+	/**
+	 * Print stacktrace
+	 *
+	 * @constructor Create empty Print stacktrace
+	 */
+	PrintStacktrace,
+
+	/**
+	 * Animation speed
+	 *
+	 * @constructor Create empty Animation speed
+	 */
+	AnimationSpeed,
+
+	/**
+	 * Animation delay
+	 *
+	 * @constructor Create empty Animation delay
+	 */
+	AnimationDelay,
+
+	/**
+	 * Max day appointments
+	 *
+	 * @constructor Create empty Max day appointments
+	 */
+	MaxDayAppointments,
+
+	/**
+	 * Expand notes on open
+	 *
+	 * @constructor Create empty Expand notes on open
+	 */
+	ExpandNotesOnOpen,
+
+	/**
+	 * Ignore case for search
+	 *
+	 * @constructor Create empty Ignore case for search
+	 */
+	IgnoreCaseForSearch
 }
 
 object Files {

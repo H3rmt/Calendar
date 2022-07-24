@@ -3,6 +3,12 @@ package logic
 import java.io.File
 import java.io.FileReader
 
+/**
+ * Language
+ *
+ * @constructor Create empty Language
+ * @property language
+ */
 class Language(private val language: AvailableLanguages) {
 
 	/**
@@ -15,8 +21,7 @@ class Language(private val language: AvailableLanguages) {
 	/**
 	 * creates json file if it didn't exist
 	 *
-	 * reads JSON from file and stores different Strings
-	 * in translations Map
+	 * reads JSON from file and stores different Strings in translations Map
 	 */
 	init {
 		val file = File({}::class.java.classLoader.getResource("lang/$language.json")!!.toURI())
@@ -28,14 +33,11 @@ class Language(private val language: AvailableLanguages) {
 
 
 	/**
-	 * finds the corresponding translated String to a
-	 * String
+	 * Get translation
 	 *
-	 * @param tr String to translate
-	 *
-	 * @return translated String
-	 *
-	 * @see translations
+	 * @param tr
+	 * @param type
+	 * @return
 	 */
 	fun getTranslation(tr: String, type: TranslationTypes): String {
 		@Suppress("SwallowedException")
@@ -54,32 +56,111 @@ class Language(private val language: AvailableLanguages) {
 		}
 	}
 
+	/**
+	 * Info
+	 *
+	 * @return
+	 */
 	fun info(): String = "Language: $language loaded ${translations.values.sumOf { it.size }} Translations"
 
 	/**
-	 * all different types of available Languages
+	 * Available languages
 	 *
-	 * for a log.getLanguage to get loaded from JSON
-	 * it must be specified here
+	 * @constructor Create empty Available languages
 	 */
 	@Suppress("Unused")
 	enum class AvailableLanguages {
+		/**
+		 * En
+		 *
+		 * @constructor Create empty En
+		 */
 		EN,
+
+		/**
+		 * De
+		 *
+		 * @constructor Create empty De
+		 */
 		DE,
+
+		/**
+		 * Fr
+		 *
+		 * @constructor Create empty Fr
+		 */
 		FR,
 	}
 
+	/**
+	 * Translation types
+	 *
+	 * @constructor Create empty Translation types
+	 */
 	enum class TranslationTypes {
+		/**
+		 * Global
+		 *
+		 * @constructor Create empty Global
+		 */
 		Global,
+
+		/**
+		 * Menubar
+		 *
+		 * @constructor Create empty Menubar
+		 */
 		Menubar,
+
+		/**
+		 * Note
+		 *
+		 * @constructor Create empty Note
+		 */
 		Note,
+
+		/**
+		 * Overview
+		 *
+		 * @constructor Create empty Overview
+		 */
 		Overview,
+
+		/**
+		 * Reminder
+		 *
+		 * @constructor Create empty Reminder
+		 */
 		Reminder,
+
+		/**
+		 * Week
+		 *
+		 * @constructor Create empty Week
+		 */
 		Week,
+
+		/**
+		 * Appointment popup
+		 *
+		 * @constructor Create empty Appointment popup
+		 */
 		AppointmentPopup,
+
+		/**
+		 * Reminder popup
+		 *
+		 * @constructor Create empty Reminder popup
+		 */
 		ReminderPopup,
 	}
 }
 
+/**
+ * Translate
+ *
+ * @param type
+ * @param args
+ */
 fun String.translate(type: Language.TranslationTypes, vararg args: Any?) =
 	language.getTranslation(this, type).format(*args)

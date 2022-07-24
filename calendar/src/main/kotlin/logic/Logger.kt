@@ -11,14 +11,13 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 
 
-/** this is necessary to turn of printing
- * of webkit performance by com.sun.webkit.perf.PerfLogger
- * as this can't be turned off, the default logLevel
- * is overridden to Off so the PerfLogger created
- * will be disabled and doesn't print performance because the
- * PlatformLogger used for its creation has a higher level
- * than fine because they use the global logging level
- * as their logLevel on creation.
+/**
+ * this is necessary to turn of printing of webkit performance by
+ * com.sun.webkit.perf.PerfLogger as this can't be turned off, the default
+ * logLevel is overridden to Off so the PerfLogger created will be disabled
+ * and doesn't print performance because the PlatformLogger used for its
+ * creation has a higher level than fine because they use the global
+ * logging level as their logLevel on creation.
  */
 //var logger: Logger = Logger.getGlobal()
 
@@ -27,6 +26,8 @@ var logger: Logger = Logger.getLogger("")
 lateinit var consoleHandler: ConsoleHandler
 lateinit var fileHandler: FileHandler
 
+
+/** Update logger */
 fun updateLogger() {
 	logger.level = if(DEV) Level.CONFIG else Level.INFO
 
@@ -42,7 +43,7 @@ fun updateLogger() {
 	}
 }
 
-
+/** Init logger */
 fun initLogger() {
 	logger.apply {
 		handlers.forEach { removeHandler(it) }
@@ -62,12 +63,10 @@ fun initLogger() {
 }
 
 /**
- * adds a log message with a LogType to the java Logger
+ * Log
  *
- * @param message gets send to the logger; doesn't have to be a string
- * @param type gets translated to java logLevels
- *
- * @see LogType
+ * @param message
+ * @param type
  */
 fun log(message: Any?, type: LogType = LogType.NORMAL) {
 	logger.apply {
@@ -89,30 +88,73 @@ fun log(message: Any?, type: LogType = LogType.NORMAL) {
 	}
 }
 
+/**
+ * Log
+ *
+ * @param level
+ * @param msg
+ * @constructor
+ * @property caller
+ */
 class Log(level: Level, msg: String, private val caller: String): LogRecord(level, msg) {
 	override fun getSourceClassName(): String = caller
 }
 
 
 /**
- * different types of logs
+ * Log type
+ *
+ * @constructor Create empty Log type
  */
 enum class LogType {
+	/**
+	 * Low
+	 *
+	 * @constructor Create empty Low
+	 */
 	LOW,
+
+	/**
+	 * Normal
+	 *
+	 * @constructor Create empty Normal
+	 */
 	NORMAL,
+
+	/**
+	 * Important
+	 *
+	 * @constructor Create empty Important
+	 */
 	IMPORTANT,
+
+	/**
+	 * Warning
+	 *
+	 * @constructor Create empty Warning
+	 */
 	WARNING,
+
+	/**
+	 * Error
+	 *
+	 * @constructor Create empty Error
+	 */
 	ERROR,
 }
 
+/**
+ * Important
+ *
+ * @constructor Create empty Important
+ */
 class Important: Level("IMPORTANT", 850)
 
 /**
- * full copy of the log.SimpleFormatter
+ * Simple formatter
  *
- * format of original log.SimpleFormatter was final and read of System props
- *
- * @see Formatter
+ * @constructor Create empty Simple formatter
+ * @property format
  */
 class SimpleFormatter(private val format: String): Formatter() {
 	override fun format(record: LogRecord): String {

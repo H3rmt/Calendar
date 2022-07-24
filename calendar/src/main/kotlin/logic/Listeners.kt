@@ -10,7 +10,13 @@ import javafx.collections.ObservableList
 // ---------------- ObservableValues ----------------
 
 /**
- * this allows having named arguments without having to name listener
+ * Listen
+ *
+ * @param listener
+ * @param runOnce
+ * @param removeAfterRun
+ * @param T
+ * @receiver
  */
 fun <T> ObservableValue<T>.listen(
 	listener: (value: T) -> Unit, runOnce: Boolean = false, removeAfterRun: Boolean = false
@@ -18,7 +24,13 @@ fun <T> ObservableValue<T>.listen(
 
 
 /**
- * this allows the listener to be written in {} outside the function call
+ * Listen
+ *
+ * @param runOnce
+ * @param removeAfterRun
+ * @param listener
+ * @param T
+ * @receiver
  */
 fun <T> ObservableValue<T>.listen(
 	runOnce: Boolean = false, removeAfterRun: Boolean = false, listener: (value: T) -> Unit
@@ -35,6 +47,15 @@ fun <T> ObservableValue<T>.listen(
 		listener(this.value)
 }
 
+/**
+ * Listen2
+ *
+ * @param runOnce
+ * @param removeAfterRun
+ * @param listener
+ * @param T
+ * @receiver
+ */
 fun <T> ObservableValue<T>.listen2(
 	runOnce: Boolean = false, removeAfterRun: Boolean = false, listener: (value: T, old: T) -> Unit
 ) {
@@ -51,6 +72,14 @@ fun <T> ObservableValue<T>.listen2(
 
 // ---------------- ObservableLists ----------------
 
+/**
+ * Listen updates
+ *
+ * @param listener
+ * @param F
+ * @param T
+ * @receiver
+ */
 fun <F, T: ObservableList<F>> T.listenUpdates(
 	listener: (new: ListChangeListener.Change<out F>) -> Unit
 ) {
@@ -60,14 +89,26 @@ fun <F, T: ObservableList<F>> T.listenUpdates(
 }
 
 /**
- * this allows having named arguments without having to name listener
+ * Listen
+ *
+ * @param listener
+ * @param runOnce
+ * @param F
+ * @param T
+ * @receiver
  */
 fun <F, T: ObservableList<F>> T.listen(
 	listener: (new: List<F>) -> Unit, runOnce: Boolean = false
 ) = listen(runOnce, listener)
 
 /**
- * this allows the listener to be written in {} outside the function call
+ * Listen
+ *
+ * @param runOnce
+ * @param listener
+ * @param F
+ * @param T
+ * @receiver
  */
 fun <F, T: ObservableList<F>> T.listen(
 	runOnce: Boolean = false, listener: (new: List<F>) -> Unit
@@ -81,11 +122,24 @@ fun <F, T: ObservableList<F>> T.listen(
 
 // -------------------------- logging --------------------------
 
+/**
+ * Log
+ *
+ * @param T
+ * @return
+ */
 fun <T> T.log(): T {
 	println(this)
 	return this
 }
 
+/**
+ * Log
+ *
+ * @param name
+ * @param T
+ * @return
+ */
 fun <T: ObservableValue<*>> T.log(name: String = ""): T {
 	listen2 { old, new ->
 		println("change ${name.ifEmpty { "ObservableValue" }} ($this): $old -> $new")
@@ -93,6 +147,14 @@ fun <T: ObservableValue<*>> T.log(name: String = ""): T {
 	return this
 }
 
+/**
+ * Log
+ *
+ * @param name
+ * @param F
+ * @param T
+ * @return
+ */
 fun <F, T: ObservableList<F>> T.log(name: String = ""): T {
 	listenUpdates { change ->
 		println("change ${name.ifEmpty { "ObservableValue" }} [$size] ($this): ")

@@ -15,7 +15,7 @@ import logic.updateLogger
 import kotlin.system.exitProcess
 
 /**
- *  set via *commandline args*
+ * set via *commandline args*
  *
  * should be used in development
  * - switches config, db and logfiles into current folder
