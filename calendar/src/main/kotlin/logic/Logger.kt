@@ -6,6 +6,7 @@ import logic.LogType.IMPORTANT
 import logic.LogType.LOW
 import logic.LogType.NORMAL
 import logic.LogType.WARNING
+import replaceNewline
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.logging.ConsoleHandler
@@ -15,7 +16,7 @@ import java.util.logging.Level
 import java.util.logging.LogRecord
 import java.util.logging.Logger
 
-
+/** logger used for logging with [log] */
 var logger: Logger = Logger.getLogger("")
 
 lateinit var consoleHandler: ConsoleHandler
@@ -27,7 +28,7 @@ lateinit var fileHandler: FileHandler
  * - removes default Handlers
  * - adds default console and file Handler with hardcoded format
  *
- * is called before [configs] can be loaded with [initConfigs]
+ * is called before [configs] can be loaded with [loadConfigs]
  *
  * @see logger
  * @see Files.logfile
@@ -95,7 +96,7 @@ fun log(message: Any?, type: LogType = NORMAL) {
 		val caller = callerList.filter { it.declaringClass.simpleName != "LoggerKt" }[0]
 		val callerStr = "(" + caller.fileName + ":" + caller.lineNumber + ")" + caller.methodName
 		val mess = message.toString()
-		val messstrip = message.toString().replace("\n", "\\n")
+		val messstrip = message.toString().replaceNewline()
 
 		when(type) {
 			LOW -> log(Log(Level.CONFIG, messstrip, callerStr))

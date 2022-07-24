@@ -28,15 +28,15 @@ fun getJson() = gson
 fun getJsonReader(reader: Reader): JsonReader = JsonReader(reader).apply { isLenient = true }
 
 /**
- * map that links A config with a JSON string
- * of (Int / String / Boolean / Enum element)
+ * map that links A config with a JSON string of (Int / String / Boolean /
+ * Enum element)
  *
  * @see Configs
  */
 var configs: MutableMap<Configs, Any> = mutableMapOf()
 
 /** Init configs */
-fun initConfigs() {
+fun loadConfigs() {
 	val file = File(Files.configFile)
 	if(!file.exists()) {
 		if(!File(OSFolders.getConfigFolder()).exists()) {
@@ -124,9 +124,8 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 }
 
 /**
- * is set to true at beginning of programm to prevent
- * stackoverflow if error produced before loading configuration
- * checks for stacktrace
+ * is set to true at beginning of programm to prevent stackoverflow if
+ * error produced before loading configuration checks for stacktrace
  */
 var stacktrace = true
 

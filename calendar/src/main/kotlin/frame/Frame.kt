@@ -49,7 +49,7 @@ import kotlin.reflect.KFunction
 
 
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
-fun frameInit() {
+fun initFrame() {
 	createLoading()
 	log("created loading")
 
@@ -195,7 +195,6 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 
 // TODO rework
 fun createMenuGroup(vararg panes: GridPane?) {
-	log("creating MenuGroup with ${panes.size} elements", LogType.LOW)
 	var currentWidth = 10.0
 	val items = panes.filterNotNull()
 	val changed = mutableListOf<GridPane>()
