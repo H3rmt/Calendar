@@ -10,7 +10,7 @@ object OSFolders {
 		return if(os.startsWith("mac os x")) {
 			System.getProperty("user.home") + "/Library/Preferences" + "/calendar/"
 		} else if(os.startsWith("windows")) {
-			System.getenv("APPDATA") + "\\calendar\\"
+			System.getenv("APPDATA") + "\\calendar\\" + "configs\\"
 		} else {
 			System.getProperty("user.home") + "/.config" + "/calendar/"
 		}.also { // create Folder if it doesn't exist
@@ -25,7 +25,7 @@ object OSFolders {
 		return if(os.startsWith("mac os x")) {
 			System.getProperty("user.home") + "/Library/Application Support" + "/calendar/"
 		} else if(os.startsWith("windows")) {
-			System.getenv("APPDATA") + "\\calendar\\"
+			System.getenv("APPDATA") + "\\calendar\\" + "data\\"
 		} else {
 			System.getProperty("user.home") + "/.local/share" + "/calendar/"
 		}.also {// create Folder if it doesn't exist
