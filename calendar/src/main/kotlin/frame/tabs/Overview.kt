@@ -18,9 +18,10 @@ import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.image.*
+import javafx.scene.paint.*
 import logic.Language
-import logic.LogType
-import logic.listen
+import logic.ObservableListListeners.listen
+import logic.ObservableValueListeners.listen
 import logic.log
 import logic.translate
 import tornadofx.*
@@ -52,7 +53,7 @@ fun createOverviewTab(pane: TabPane): Tab {
 					addClass(TabStyles.title_)
 					minWidth = 200.0
 					alignment = Pos.CENTER
-					overviewTime.listen(runOnce = true) {
+					overviewTime.listen(runOnce = true) { it: LocalDate ->
 						this.text = it.month.name.translate(Language.TranslationTypes.Global)
 					}
 				}
@@ -189,10 +190,10 @@ fun createOverviewTab(pane: TabPane): Tab {
 
 												for((index, typeCount) in list.entries.withIndex()) {
 													label {
-														typeCount.key.name.listen(runOnce = true) {
+														typeCount.key.name.listen(runOnce = true) { it: String ->
 															text = "$it: ${typeCount.value}"
 														}
-														typeCount.key.color.listen(runOnce = true) {
+														typeCount.key.color.listen(runOnce = true) { it: Color ->
 															textFill = it
 														}
 
@@ -303,10 +304,10 @@ fun createOverviewTab(pane: TabPane): Tab {
 
 													for((index, appointment) in appointments.withIndex()) {
 														label {
-															appointment.title.listen(runOnce = true) {
+															appointment.title.listen(runOnce = true) { it: String ->
 																text = it
 															}
-															appointment.type.value.color.listen(runOnce = true) {
+															appointment.type.value.color.listen(runOnce = true) { it: Color ->
 																textFill = it
 															}
 

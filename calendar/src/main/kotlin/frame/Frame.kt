@@ -30,8 +30,8 @@ import javafx.stage.*
 import logic.Configs
 import logic.Language
 import logic.LogType
+import logic.ObservableValueListeners.listen
 import logic.getConfig
-import logic.listen
 import logic.log
 import logic.translate
 import org.controlsfx.control.ToggleSwitch
@@ -54,14 +54,11 @@ fun initFrame() {
 	log("created loading")
 
 	/**
-	 * this looks pretty weird, but it essentially
-	 * creates a stacktrace with the head of an Exit
-	 * and the StackTrace of the actual exception
+	 * this looks pretty weird, but it essentially creates a stacktrace with
+	 * the head of an Exit and the StackTrace of the actual exception
 	 *
-	 * /*
-	 * if it is not an Exit(custom Exception) then
-	 * Exit<errorCode> -> Exception is added at the beginning
-	 * */
+	 * /* if it is not an Exit(custom Exception) then Exit<errorCode> ->
+	 * Exception is added at the beginning */
 	 */
 	DefaultErrorHandler.filter = {
 		val writer = StringWriter()
@@ -243,11 +240,9 @@ fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Uni
 }
 
 /**
- * Manges tabs for the frame and is used to
- * create, override and close tabs
+ * Manges tabs for the frame and is used to create, override and close tabs
  *
- * it contains another object with
- * methods that must be handled with care
+ * it contains another object with methods that must be handled with care
  *
  * @see Secure
  */
@@ -255,43 +250,35 @@ object TabManager {
 
 	lateinit var pane: TabPane
 
-	/**
-	 * <identifier, Tab>
-	 */
+	/** <identifier, Tab> */
 	private val tabs: MutableMap<String, Tab> = mutableMapOf()
 
 	/**
 	 * creates a new tab, or focuses the tab if it already exists
 	 *
-	 * takes an identifier, a function to create the tab and arguments for that function
-	 * as arguments
+	 * takes an identifier, a function to create the tab and arguments for that
+	 * function as arguments
 	 *
 	 * adds the tab to the pane if new created and sets focus on that tab
 	 *
-	 * @param identifier this should be a unique identifier for the tab
-	 *                   like the title but with some extra information
-	 *                   so that it doesn't prevent another tab from getting
-	 *                   created and instead joinks focus
+	 * Examples:
+	 * > > "DayNotes2020/6/12" > "Week2012/43" > "Settings"
 	 *
-	 *                   Examples:
-	 *                   > "DayNotes2020/6/12"
-	 *                   > "Week2012/43"
-	 *                   > "Settings"
+	 * must take a pane as its first parameter and return ab Tab
 	 *
+	 * Examples:
+	 * > > ::createWeekTab(fun createWeekTab(pane: TabPane, week: Week, day:
+	 * > frame.Day?): Tab) > ::createNoteTab(fun createNoteTab(pane: TabPane,
+	 * > cell: Celldisplay): Tab)
+	 *
+	 * Examples:
+	 * > > week,day > data
+	 *
+	 * @param identifier this should be a unique identifier for the tab like
+	 *     the title but with some extra information so that it doesn't
+	 *     prevent another tab from getting created and instead joinks focus
 	 * @param createFunction the function to create the tab
-	 *
-	 *                       must take a pane as its first parameter
-	 *                       and return ab Tab
-	 *
-	 *                       Examples:
-	 *                       > ::createWeekTab(fun createWeekTab(pane: TabPane, week: Week, day: frame.Day?): Tab)
-	 *                       > ::createNoteTab(fun createNoteTab(pane: TabPane, cell: Celldisplay): Tab)
-	 *
 	 * @param methodArgs add all extra parameters apart from the pane here
-	 *
-	 *                       Examples:
-	 *                       > week,day
-	 *                       > data
 	 */
 	fun openTab(identifier: String, createFunction: KFunction<Tab>, vararg methodArgs: Any?) {
 		log("tab $identifier opened")
@@ -308,9 +295,8 @@ object TabManager {
 	}
 
 	/**
-	 * this part contains methods
-	 * for the Tabmanager that should
-	 * be handled carefully.
+	 * this part contains methods for the Tabmanager that should be handled
+	 * carefully.
 	 */
 	object Secure {
 		@Suppress("unused")
@@ -331,9 +317,7 @@ object TabManager {
 }
 
 
-/**
- * <path,image>
- */
+/** <path,image> */
 val cache = mutableMapOf<String, Image>()
 
 fun createFXImage(name: String, path: String = ""): Image {
@@ -437,7 +421,7 @@ fun EventTarget.typeCombobox(type: Property<Type>? = null): ComboBox<Type> {
 }
 
 fun ScrollPane.adjustWidth(scrollbarWidth: DoubleProperty) {
-	widthProperty().listen(removeAfterRun = true) {
+	widthProperty().listen(removeAfterRun = true) { ->
 		lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
 			.filter { it.orientation == Orientation.VERTICAL }[0].let { bar ->
 			bar.visibleProperty().listen(runOnce = true) { visible ->

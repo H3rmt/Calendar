@@ -7,15 +7,16 @@ import calendar.initDb
 import frame.initFrame
 import javafx.beans.property.*
 import logic.LogType
+import logic.ObservableListListeners.listenLog
 import logic.configs
+import logic.initConfigs
 import logic.initLogger
-import logic.loadConfigs
 import logic.log
 import logic.updateLogger
 import kotlin.system.exitProcess
 
 /**
- * set via *commandline args*
+ * Variable used during development, set via *commandline args*
  *
  * should be used in development
  * - switches config, db and logfiles into current folder
@@ -61,13 +62,13 @@ fun main(args: Array<String>) {
  * - initialises DB
  * - syncs inMemoryCache with dbData
  *
- * @see loadConfigs
+ * @see initConfigs
  * @see updateLogger
  * @see initDb
  * @see calendar.DBObservableList.reload
  */
 fun init() {
-	loadConfigs()
+	initConfigs()
 	log("read Configs:$configs", LogType.IMPORTANT)
 
 	log("Updating Logger with config data", LogType.IMPORTANT)
@@ -77,11 +78,11 @@ fun init() {
 	initDb()
 
 	log("preparing Data", LogType.IMPORTANT)
-	Types.log("Types").reload()
-	Appointments.log("Appointments").reload()
-	Notes.log("Notes").reload()
-	Files.log("Files").reload()
-	Reminders.log("Reminders").reload()
+	Types.listenLog("Types").reload()
+	Appointments.listenLog("Appointments").reload()
+	Notes.listenLog("Notes").reload()
+	Files.listenLog("Files").reload()
+	Reminders.listenLog("Reminders").reload()
 	log("loaded Data", LogType.IMPORTANT)
 }
 

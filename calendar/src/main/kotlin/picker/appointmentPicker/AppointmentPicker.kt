@@ -2,15 +2,16 @@ package picker.appointmentPicker
 
 import calendar.Appointment
 import frame.createFXImage
-import javafx.beans.property.Property
-import javafx.beans.property.SimpleObjectProperty
-import javafx.collections.ObservableList
-import javafx.event.EventTarget
+import javafx.beans.property.*
+import javafx.collections.*
+import javafx.event.*
 import javafx.scene.control.*
-import javafx.scene.paint.Color
-import logic.listen
+import javafx.scene.paint.*
+import logic.ObservableValueListeners.listen
 import tornadofx.*
 
+
+//TODO this needs rework
 
 fun EventTarget.appointmentPicker(
 	appointments: ObservableList<Appointment>,
@@ -80,13 +81,14 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 		}
 
 		appointmentProperty.listen(runOnce = true) { app: Appointment? ->
-			val update = { appointment: Appointment ->
-				textField.text = "${appointment.title.value} ${appointment.description.value}"
+			val update = {
+				textField.text = "${app?.title?.value} ${app?.description?.value}"
 			}
-			app?.title?.listen { update(app) }
-			app?.description?.listen { update(app) }
+			app?.title?.listen(update)
+			app?.title?.listen(update)
+			app?.description?.listen(update)
 			if(app != null)
-				update(app)
+				update()
 		}
 
 		popup.autoHideProperty().set(true)

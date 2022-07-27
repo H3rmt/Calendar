@@ -13,7 +13,7 @@ import javafx.scene.paint.*
 import javafx.scene.text.*
 import javafx.stage.*
 import logic.Language
-import logic.listen
+import logic.ObservableValueListeners.listen
 import logic.log
 import logic.translate
 import nullIfValueNull
@@ -179,7 +179,7 @@ class ReminderPopup: Fragment() {
 
 	init {
 		// switch between control for AppointmentPicker and DatePicker
-		deadlineOrAppointment.listen(runOnce = true) {
+		deadlineOrAppointment.listen(runOnce = true) { it ->
 			if(it) {
 				finishName.value = "Date"
 				control.left = DateTimePicker(dateTime = deadline, formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
@@ -189,7 +189,7 @@ class ReminderPopup: Fragment() {
 			}
 		}
 		// disable deadline pickers of no Deadline selected
-		noDeadline.listen(runOnce = true) {
+		noDeadline.listen(runOnce = true) { it ->
 			deadlineFiled.isVisible = !it
 			deadlineFiled.isManaged = !it
 		}

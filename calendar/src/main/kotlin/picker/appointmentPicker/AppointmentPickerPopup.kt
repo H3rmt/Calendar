@@ -14,7 +14,8 @@ import javafx.scene.text.*
 import javafx.stage.*
 import logic.Configs
 import logic.getConfig
-import logic.listen
+import logic.ObservableListListeners.listen
+import logic.ObservableValueListeners.listen
 import picker.dropdownTogglePicker.DropdownToggle
 import picker.dropdownTogglePicker.dropdownTogglePicker
 import tornadofx.*

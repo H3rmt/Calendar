@@ -7,15 +7,15 @@ import frame.adjustWidth
 import frame.styles.GlobalStyles
 import frame.styles.TabStyles
 import frame.styles.WeekStyles
-import javafx.beans.property.DoubleProperty
-import javafx.event.EventHandler
-import javafx.geometry.Pos
-import javafx.scene.control.ScrollPane
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
-import javafx.scene.layout.BorderStrokeStyle
-import javafx.scene.paint.Color
-import logic.*
+import javafx.beans.property.*
+import javafx.event.*
+import javafx.geometry.*
+import javafx.scene.control.*
+import javafx.scene.layout.*
+import logic.Language
+import logic.ObservableListListeners.listen
+import logic.log
+import logic.translate
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -45,7 +45,6 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 				}
 			}
 
-			log("creating table_ view", LogType.LOW)
 			// Table view
 			vbox(spacing = 1.0, alignment = Pos.TOP_CENTER) {
 				addClass(GlobalStyles.disableFocusDraw_)

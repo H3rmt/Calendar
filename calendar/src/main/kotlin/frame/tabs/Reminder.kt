@@ -13,8 +13,7 @@ import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import logic.Language
-import logic.LogType
-import logic.listenUpdates
+import logic.ObservableListListeners.listenChanges
 import logic.log
 import logic.translate
 import tornadofx.*
@@ -71,7 +70,7 @@ fun createReminderTab(pane: TabPane): Tab {
 
 						var reminderRows = mutableMapOf<Reminder, HBox>()
 
-						Reminders.listenUpdates { change ->
+						Reminders.listenChanges { change ->
 							while(change.next()) {
 								if(change.wasAdded()) {
 									for(reminder in change.addedSubList) {

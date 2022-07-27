@@ -1,10 +1,11 @@
 package picker.dropdownTogglePicker
 
-import javafx.collections.ObservableList
-import javafx.geometry.Pos
-import javafx.scene.paint.Color
-import javafx.stage.Popup
-import logic.listen
+import javafx.collections.*
+import javafx.geometry.*
+import javafx.scene.paint.*
+import javafx.stage.*
+import logic.ObservableListListeners.listen
+import logic.ObservableValueListeners.listen
 import tornadofx.*
 
 class DropdownTogglePickerPopup(toggles: ObservableList<DropdownToggle>, change: (DropdownToggle) -> Unit): Popup() {
@@ -30,7 +31,7 @@ class DropdownTogglePickerPopup(toggles: ObservableList<DropdownToggle>, change:
 							}
 							for(toggle in toggles) {
 								checkbox(toggle.name, toggle.selected)
-								toggle.selected.listen {
+								toggle.selected.listen { ->
 									change(toggle)
 								}
 							}

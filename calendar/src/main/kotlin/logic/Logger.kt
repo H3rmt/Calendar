@@ -28,7 +28,7 @@ lateinit var fileHandler: FileHandler
  * - removes default Handlers
  * - adds default console and file Handler with hardcoded format
  *
- * is called before [configs] can be loaded with [loadConfigs]
+ * is called before [configs] can be loaded with [initsConfigs]
  *
  * @see logger
  * @see Files.logfile

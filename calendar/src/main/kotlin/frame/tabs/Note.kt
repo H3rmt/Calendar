@@ -15,9 +15,9 @@ import javafx.scene.layout.*
 import javafx.scene.web.*
 import logic.Configs
 import logic.Language
+import logic.ObservableListListeners.listenChanges
+import logic.ObservableValueListeners.listen
 import logic.getConfig
-import logic.listen
-import logic.listenUpdates
 import logic.log
 import logic.translate
 import tornadofx.*
@@ -77,7 +77,7 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 					}
 
 					val notes = Notes.getNotesAt(time)
-					notes.listenUpdates { change ->
+					notes.listenChanges { change ->
 						while(change.next()) {
 							if(change.wasAdded()) {
 								for(note in change.addedSubList) {

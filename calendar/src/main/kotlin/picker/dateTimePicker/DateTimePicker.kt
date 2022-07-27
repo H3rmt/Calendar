@@ -5,7 +5,8 @@ import javafx.beans.property.*
 import javafx.event.*
 import javafx.scene.control.*
 import javafx.scene.paint.*
-import logic.listen
+import logic.ObservableListListeners.listen
+import logic.ObservableValueListeners.listen
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
