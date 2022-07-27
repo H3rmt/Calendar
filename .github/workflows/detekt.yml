@@ -2,6 +2,7 @@ name: Scan with Detekt
 
 on:
   push:
+    branches: [ main, release, next ]
   pull_request:
     branches: [ main, release, next ]
 
