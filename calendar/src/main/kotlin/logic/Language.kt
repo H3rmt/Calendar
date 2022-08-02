@@ -3,6 +3,8 @@ package logic
 import java.io.File
 import java.io.FileReader
 
+// TODO rework (this is a class instantiated once)
+
 /**
  * Language
  *
@@ -25,7 +27,7 @@ class Language(private val language: AvailableLanguages) {
 	 */
 	init {
 		val file = File({}::class.java.classLoader.getResource("lang/$language.json")!!.toURI())
-		translations = (getJson().fromJson<Map<String, Map<String, String>>>(
+		translations = (gson.fromJson<Map<String, Map<String, String>>>(
 			getJsonReader(FileReader(file)),
 			Map::class.java
 		)).mapKeys { TranslationTypes.valueOf(it.key) }

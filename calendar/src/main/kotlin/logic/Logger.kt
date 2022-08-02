@@ -78,11 +78,11 @@ fun updateLogger() {
  * Log a message with specified LogType ([LogType.NORMAL] if not specified)
  *
  * [LogType]s are translated like:
- * - LogType.LOW -> Level.CONFIG
- * - LogType.NORMAL -> Level.INFO
- * - LogType.IMPORTANT -> Level.IMPORTANT
- * - LogType.WARNING -> Level.WARNING
- * - LogType.ERROR -> Level.SEVERE
+ * - [LogType.LOW] -> Level.CONFIG
+ * - [LogType.NORMAL] -> Level.INFO
+ * - [LogType.IMPORTANT] -> Level.IMPORTANT
+ * - [LogType.WARNING] -> Level.WARNING
+ * - [LogType.ERROR] -> Level.SEVERE
  *
  * generates functionNames and fileNumbers for each log and passes it into
  * logger
