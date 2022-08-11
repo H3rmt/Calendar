@@ -35,7 +35,7 @@ class Language(private val language: AvailableLanguages) {
 
 
 	/**
-	 * Get translation
+	 * Get translation or return non-translated string
 	 *
 	 * @param tr
 	 * @param type
@@ -59,110 +59,64 @@ class Language(private val language: AvailableLanguages) {
 	}
 
 	/**
-	 * Info
+	 * returns info about loaded language
 	 *
 	 * @return
 	 */
 	fun info(): String = "Language: $language loaded ${translations.values.sumOf { it.size }} Translations"
 
-	/**
-	 * Available languages
-	 *
-	 * @constructor Create empty Available languages
-	 */
+	/** Available languages with translations */
 	@Suppress("Unused")
 	enum class AvailableLanguages {
-		/**
-		 * En
-		 *
-		 * @constructor Create empty En
-		 */
+		/** English language */
 		EN,
 
-		/**
-		 * De
-		 *
-		 * @constructor Create empty De
-		 */
+		/** German language */
 		DE,
 
-		/**
-		 * Fr
-		 *
-		 * @constructor Create empty Fr
-		 */
+		/** French language */
 		FR,
 	}
 
 	/**
-	 * Translation types
-	 *
-	 * @constructor Create empty Translation types
+	 * Translations are divided into categories to better distinguish between
+	 * different places where translations are used
 	 */
 	enum class TranslationTypes {
-		/**
-		 * Global
-		 *
-		 * @constructor Create empty Global
-		 */
+		/** Translation used everywhere (Month or Day translations) */
 		Global,
 
-		/**
-		 * Menubar
-		 *
-		 * @constructor Create empty Menubar
-		 */
+		/** Translations used in the Menubar */
 		Menubar,
 
-		/**
-		 * Note
-		 *
-		 * @constructor Create empty Note
-		 */
+		/** Translations used in the Note Tab */
 		Note,
 
-		/**
-		 * Overview
-		 *
-		 * @constructor Create empty Overview
-		 */
+		/** Translations used in the Overview Tab */
 		Overview,
 
-		/**
-		 * Reminder
-		 *
-		 * @constructor Create empty Reminder
-		 */
+		/** Translations used in the Reminder Tab */
 		Reminder,
 
-		/**
-		 * Week
-		 *
-		 * @constructor Create empty Week
-		 */
+		/** Translations used in the Week Tab */
 		Week,
 
-		/**
-		 * Appointment popup
-		 *
-		 * @constructor Create empty Appointment popup
-		 */
+		/** Translations used in the AppointmentPopup */
 		AppointmentPopup,
 
-		/**
-		 * Reminder popup
-		 *
-		 * @constructor Create empty Reminder popup
-		 */
+		/** Translations used in the ReminderPopup */
 		ReminderPopup,
 	}
 }
 
 /**
- * Translate
+ * Extension function to translate a string into the global language with
+ * some vararg which are formatted into the string (%s, %t)
  *
- * @param type
+ * @param type [Language.TranslationTypes] type where translation is used
  * @param args
+ *
+ * @see String.format
  */
 fun String.translate(type: Language.TranslationTypes, vararg args: Any?) =
 	language.getTranslation(this, type).format(*args)
