@@ -28,18 +28,21 @@ lateinit var consoleHandler: ConsoleHandler
 lateinit var fileHandler: FileHandler
 
 fun updateLogger() {
-	logger.level = if(getConfig(Configs.Debug)) Level.ALL else Level.CONFIG
+	logger.apply {
+		level = if(getConfig(Configs.Debug) || DEV) Level.CONFIG else Level.INFO
 
-	consoleHandler.formatter =
-		SimpleFormatter(if(getConfig(Configs.Debug)) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
-	fileHandler.formatter = consoleHandler.formatter
+		consoleHandler.formatter =
+			SimpleFormatter(if(getConfig(Configs.Debug) || DEV) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
+		fileHandler.formatter = consoleHandler.formatter
 
-	if(!getConfig<Boolean>(Configs.PrintLogs) && !DEV) {
-		logger.removeHandler(consoleHandler)
-	}
+		if(!(getConfig(Configs.PrintLogs) || DEV)) {
+			removeHandler(consoleHandler)
+		}
 
-	if(getConfig(Configs.StoreLogs)) {
-		logger.addHandler(fileHandler)
+		if(getConfig(Configs.StoreLogs) || DEV) {
+			if(!handlers.contains(fileHandler))
+				addHandler(fileHandler)
+		}
 	}
 }
 
@@ -55,7 +58,7 @@ fun initLogger() {
 		log("added console Handler")
 
 		fileHandler = FileHandler(Files.logfile)
-		fileHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
+		fileHandler.formatter = consoleHandler.formatter
 		fileHandler.level = Level.ALL
 		log("added file Handler")
 	}
