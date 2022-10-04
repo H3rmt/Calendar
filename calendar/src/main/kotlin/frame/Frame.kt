@@ -337,12 +337,12 @@ object TabManager {
 val cache = mutableMapOf<String, Image>()
 
 fun createFXImage(name: String, path: String = ""): Image {
-	val path = "img/$path/$name"
+	val path = "img$path/$name"
 	cache[path]?.let { return it }
 
 	@Suppress("SwallowedException")
 	val image = try {
-		ImageIO.read({}::class.java.classLoader.getResource(path))
+		ImageIO.read({}.javaClass.classLoader.getResourceAsStream(path))
 	} catch(e: IllegalArgumentException) {
 		log("file not found:$path", LogType.WARNING)
 		getImageMissing()

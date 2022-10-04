@@ -90,7 +90,7 @@ class AppointmentPickerPopup(
 					style {
 						padding = box(2.px)
 					}
-					imageview(createFXImage("search.svg", "picker/appointmentPicker")) {
+					imageview(createFXImage("search.svg", "/picker/appointmentPicker")) {
 						fitHeight = 14.0
 						fitWidth = 14.0
 					}

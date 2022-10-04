@@ -2,12 +2,11 @@ package picker.appointmentPicker
 
 import calendar.Appointment
 import frame.createFXImage
-import javafx.beans.property.Property
-import javafx.beans.property.SimpleObjectProperty
-import javafx.collections.ObservableList
-import javafx.event.EventTarget
+import javafx.beans.property.*
+import javafx.collections.*
+import javafx.event.*
 import javafx.scene.control.*
-import javafx.scene.paint.Color
+import javafx.scene.paint.*
 import logic.listen
 import tornadofx.*
 
@@ -62,7 +61,7 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 			}
 
 			button = button {
-				imageview(createFXImage("openPicker.svg", "picker/appointmentPicker")) {
+				imageview(createFXImage("openPicker.svg", "/picker/appointmentPicker")) {
 					fitHeight = 18.0
 					fitWidth = 17.0
 				}

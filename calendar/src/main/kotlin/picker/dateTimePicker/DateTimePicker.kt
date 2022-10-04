@@ -80,7 +80,7 @@ class DateTimePicker(private val dateTime: Property<LocalDateTime>, private val 
 			}
 
 			button = button {
-				imageview(createFXImage("openPicker.svg", "picker/dateTimePicker")) {
+				imageview(createFXImage("openPicker.svg", "/picker/dateTimePicker")) {
 					fitHeight = 18.0
 					fitWidth = 17.0
 				}
