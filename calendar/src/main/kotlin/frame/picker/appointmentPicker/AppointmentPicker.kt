@@ -1,4 +1,4 @@
-package picker.appointmentPicker
+package frame.picker.appointmentPicker
 
 import calendar.Appointment
 import frame.createFXImage
@@ -11,22 +11,35 @@ import logic.ObservableValueListeners.listen
 import tornadofx.*
 
 
-//TODO this needs rework
-
+/**
+ * Extension function for creating an [AppointmentPicker] with observable
+ * list of appointments to let the user choose from
+ *
+ * @param appointments possible appointments
+ * @param appointment property to contain currently selected element
+ * @see AppointmentPicker
+ * @see Appointment
+ */
 fun EventTarget.appointmentPicker(
 	appointments: ObservableList<Appointment>,
-	appointment: Property<Appointment?> = SimpleObjectProperty<Appointment?>(null), op: AppointmentPicker.() -> Unit = {}
+	appointment: Property<Appointment?>,
+	op: AppointmentPicker.() -> Unit = {}
 ): AppointmentPicker {
 	val picker = AppointmentPicker(appointment, appointments)
 	return opcr(this, picker, op)
 }
 
-class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointments: ObservableList<Appointment>):
-	Control() {
 
-	private val popup: AppointmentPickerPopup = AppointmentPickerPopup(appointmentProperty, appointments) {
-		button.fire()
-	}
+/**
+ * class representing the Appointment picker deriving from the Control Node
+ *
+ * @param appointment property to contain currently selected element
+ * @param appointments possible appointments
+ * @see appointmentPicker
+ */
+class AppointmentPicker(appointment: Property<Appointment?>, appointments: ObservableList<Appointment>): Control() {
+	// Popup containing the picker
+	private val popup: AppointmentPickerPopup = AppointmentPickerPopup(appointment, appointments)
 
 	private lateinit var textField: TextField
 	private lateinit var button: Button
@@ -56,6 +69,7 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 				prefHeight = 25.0
 				isEditable = false
 				isFocusTraversable = false
+				// transfer focus to the button
 				focusedProperty().listen { focus ->
 					if(focus)
 						button.requestFocus()
@@ -63,11 +77,12 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 			}
 
 			button = button {
-				imageview(createFXImage("openPicker.svg", "picker/appointmentPicker")) {
+				imageview(createFXImage("openPicker.svg", "/picker/appointmentPicker")) {
 					fitHeight = 18.0
 					fitWidth = 17.0
 				}
-				prefHeight = 24.5  // -1 because else border shadows outer border
+				prefHeight = 22.0
+				// open popup on button press
 				action {
 					if(popup.isShowing) {
 						popup.hide()
@@ -80,8 +95,11 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 			}
 		}
 
-		appointmentProperty.listen(runOnce = true) { app: Appointment? ->
+		// update textfield content when appointmentProperty is updated and add listeners
+		// to net app to update if appointment changes
+		appointment.listen(runOnce = true) { app: Appointment? ->
 			val update = {
+//				log("UPDATE ! $app", LogType.WARNING)
 				textField.text = "${app?.title?.value} ${app?.description?.value}"
 			}
 			app?.title?.listen(update)
@@ -91,6 +109,7 @@ class AppointmentPicker(appointmentProperty: Property<Appointment?>, appointment
 				update()
 		}
 
+        // hide popup if focus is lost
 		popup.autoHideProperty().set(true)
 	}
 
