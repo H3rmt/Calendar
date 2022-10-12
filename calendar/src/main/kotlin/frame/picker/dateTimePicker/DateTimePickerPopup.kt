@@ -1,20 +1,31 @@
-package picker.dateTimePicker
+package frame.picker.dateTimePicker
 
-import javafx.beans.property.IntegerProperty
-import javafx.beans.property.Property
-import javafx.geometry.Orientation
-import javafx.geometry.Pos
-import javafx.scene.paint.Color
-import javafx.stage.Popup
+import javafx.beans.property.*
+import javafx.geometry.*
+import javafx.scene.paint.*
+import javafx.stage.*
 import tornadofx.*
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
+/**
+ * DateTime picker popup
+ *
+ * @param dateTime property containing currently selected dateTime
+ */
 class DateTimePickerPopup(
-	dateProperty: Property<LocalDate>,
-	hourProperty: IntegerProperty,
-	minuteProperty: IntegerProperty,
-	save: () -> Unit
+	private val dateTime: Property<LocalDateTime>
 ): Popup() {
+	// property containing the selected date
+	private val dateProperty: Property<LocalDate> = dateTime.value.toLocalDate().toProperty()
+
+	// property containing the selected minute
+	private val minuteProperty: IntegerProperty = dateTime.value.minute.toProperty()
+
+	// property containing the selected hour
+	private val hourProperty: IntegerProperty = dateTime.value.hour.toProperty()
+
 	init {
 		content.add(vbox(spacing = 5.0) {
 			style {
@@ -31,6 +42,7 @@ class DateTimePickerPopup(
 					padding = box(0.px, 3.px, 3.px, 3.px)
 				}
 
+				// spinners
 				hbox(spacing = 3.0, alignment = Pos.CENTER) {
 					spinner(min = 0, max = 23, amountToStepBy = 1, enableScroll = true, property = hourProperty) {
 						prefWidth = 65.0
@@ -42,6 +54,8 @@ class DateTimePickerPopup(
 						isEditable = true
 					}
 				}
+
+				// sliders + OK button
 				hbox(spacing = 1.0, alignment = Pos.CENTER) {
 					slider(min = 0, max = 23, orientation = Orientation.HORIZONTAL) {
 						prefWidth = 55.0
@@ -49,7 +63,12 @@ class DateTimePickerPopup(
 					}
 					button("OK") {
 						action {
-							save()
+							dateTime.setValue(
+								LocalDateTime.of(
+									dateProperty.value,
+									LocalTime.of(hourProperty.value, minuteProperty.value)
+								)
+							)
 						}
 					}
 					slider(min = 0, max = 59, orientation = Orientation.HORIZONTAL) {

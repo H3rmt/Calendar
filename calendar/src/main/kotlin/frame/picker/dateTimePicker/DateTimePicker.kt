@@ -1,20 +1,25 @@
-package picker.dateTimePicker
+package frame.picker.dateTimePicker
 
 import frame.createFXImage
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.scene.control.*
 import javafx.scene.paint.*
-import logic.ObservableListListeners.listen
 import logic.ObservableValueListeners.listen
 import tornadofx.*
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-
+/**
+ * Extension function for creating an [DateTimePicker] with observable list
+ * of appointments to let the user choose from
+ *
+ * @param dateTime property to contain currently selected dateTime
+ * @param formatter formatter to format text to the textfield
+ * @see DateTimePicker
+ * @see LocalDateTime
+ */
 fun EventTarget.dateTimePicker(
 	dateTime: Property<LocalDateTime> = LocalDateTime.now().toProperty(),
 	formatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT),
@@ -24,16 +29,17 @@ fun EventTarget.dateTimePicker(
 	return opcr(this, picker, op)
 }
 
-class DateTimePicker(private val dateTime: Property<LocalDateTime>, private val formatter: DateTimeFormatter): Control() {
-	private val dateProperty: Property<LocalDate> = dateTime.value.toLocalDate().toProperty()
-	private val minuteProperty: IntegerProperty = dateTime.value.minute.toProperty()
-	private val hourProperty: IntegerProperty = dateTime.value.hour.toProperty()
-
-
-	private val popup: DateTimePickerPopup = DateTimePickerPopup(dateProperty, hourProperty, minuteProperty) {
-		dateTime.value = LocalDateTime.of(dateProperty.value, LocalTime.of(hourProperty.value, minuteProperty.value))
-		button.fire()
-	}
+/**
+ * class representing the DateTime picker deriving from the Control Node
+ *
+ * @param formatter formatter to format text to the textfield
+ * @param dateTime property to contain currently selected dateTime
+ * @see dateTimePicker
+ */
+class DateTimePicker(private val dateTime: Property<LocalDateTime>, private val formatter: DateTimeFormatter):
+	Control() {
+	// Popup containing the picker
+	private val popup: DateTimePickerPopup = DateTimePickerPopup(dateTime)
 
 	private lateinit var textField: TextField
 	private lateinit var button: Button
@@ -41,22 +47,12 @@ class DateTimePicker(private val dateTime: Property<LocalDateTime>, private val 
 	override fun createDefaultSkin(): Skin<*> {
 		return object: SkinBase<DateTimePicker>(this) {
 			override fun computeMaxWidth(
-				height: Double,
-				topInset: Double,
-				rightInset: Double,
-				bottomInset: Double,
-				leftInset: Double
-			): Double =
-				super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset)
+				height: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double
+			): Double = super.computePrefWidth(height, topInset, rightInset, bottomInset, leftInset)
 
 			override fun computeMaxHeight(
-				width: Double,
-				topInset: Double,
-				rightInset: Double,
-				bottomInset: Double,
-				leftInset: Double
-			): Double =
-				super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset)
+				width: Double, topInset: Double, rightInset: Double, bottomInset: Double, leftInset: Double
+			): Double = super.computePrefHeight(width, topInset, rightInset, bottomInset, leftInset)
 		}
 	}
 
@@ -74,6 +70,7 @@ class DateTimePicker(private val dateTime: Property<LocalDateTime>, private val 
 				isEditable = false
 				isFocusTraversable = false
 				text = formatter.format(dateTime.value)
+				// transfer focus to the button
 				focusedProperty().listen { focus ->
 					if(focus)
 						button.requestFocus()
@@ -81,11 +78,12 @@ class DateTimePicker(private val dateTime: Property<LocalDateTime>, private val 
 			}
 
 			button = button {
-				imageview(createFXImage("openPicker.svg", "picker/dateTimePicker")) {
+				imageview(createFXImage("openPicker.svg", "/picker/dateTimePicker")) {
 					fitHeight = 18.0
 					fitWidth = 17.0
 				}
-				prefHeight = 24.5  // -1 because else border shadows outer border
+				prefHeight = 24.5  // -1 because else border shadows outer border TODO check this
+				// open popup on button press
 				action {
 					if(popup.isShowing) {
 						popup.hide()
@@ -100,10 +98,12 @@ class DateTimePicker(private val dateTime: Property<LocalDateTime>, private val 
 			}
 		}
 
+		// update textField if dateTime changes
 		dateTime.listen(runOnce = true) { new ->
 			textField.text = formatter.format(new)
 		}
 
+		// hide popup if focus is lost
 		popup.autoHideProperty().set(true)
 	}
 
