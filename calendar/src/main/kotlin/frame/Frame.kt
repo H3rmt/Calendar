@@ -2,12 +2,9 @@ package frame
 
 
 import DEV
-import calendar.Timing
 import calendar.Type
 import calendar.Types
 import frame.TabManager.Secure
-import frame.popup.AppointmentPopup
-import frame.popup.ReminderPopup
 import frame.styles.GlobalStyles
 import frame.styles.MenubarStyles
 import frame.styles.NoteStyles
@@ -17,8 +14,6 @@ import frame.styles.TabStyles
 import frame.styles.WeekStyles
 import frame.tabs.createOverviewTab
 import frame.tabs.createReminderTab
-import init
-import javafx.application.*
 import javafx.beans.property.*
 import javafx.beans.value.*
 import javafx.event.*
@@ -36,12 +31,9 @@ import logic.log
 import logic.translate
 import org.controlsfx.control.ToggleSwitch
 import tornadofx.*
-import java.awt.Desktop
 import java.awt.image.BufferedImage
-import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.net.URI
 import javax.imageio.IIOException
 import javax.imageio.ImageIO
 import kotlin.random.Random
@@ -49,17 +41,14 @@ import kotlin.reflect.KFunction
 
 
 //https://edvin.gitbooks.io/tornadofx-guide/content/part1/7_Layouts_and_Menus.html
+
+/** initialise JavaFx window */
 fun initFrame() {
 	createLoading()
 	log("created loading")
 
-	/**
-	 * this looks pretty weird, but it essentially creates a stacktrace with
-	 * the head of an Exit and the StackTrace of the actual exception
-	 *
-	 * /* if it is not an Exit(custom Exception) then Exit<errorCode> ->
-	 * Exception is added at the beginning */
-	 */
+	// replace default error handler with custom one that adds extra info to logging
+	// suppresses default window and shows custom dialog
 	DefaultErrorHandler.filter = {
 		val writer = StringWriter()
 		writer.append("Exit <ErrorCode: Frame Exception> -> ")
@@ -69,7 +58,7 @@ fun initFrame() {
 		log(writer, LogType.ERROR)
 
 		// switch to true to use custom error  (do in Release)
-		if(true) {
+		if(!getConfig<Boolean>(Configs.Debug)) {
 			it.consume()
 			errorMessage(it.error, writer.toString())
 		}
@@ -80,6 +69,7 @@ fun initFrame() {
 	//LauncherImpl.launchApplication(Window::class.java, PreloaderWindow::class.java, emptyArray())
 }
 
+/** custom error window */
 fun errorMessage(error: Throwable, writer: String) = Alert(Alert.AlertType.ERROR).apply {
 	val err: Throwable = error.cause ?: error
 	headerText = err.message ?: "An error occurred"
@@ -96,6 +86,9 @@ fun errorMessage(error: Throwable, writer: String) = Alert(Alert.AlertType.ERROR
 	showAndWait()
 }
 
+const val DEFAULTHEIGHT = 600.0
+const val DEFAULTWIDTH = 800.0
+
 class Window: App(
 	MainView::class,
 	GlobalStyles::class,
@@ -106,15 +99,17 @@ class Window: App(
 	OverviewStyles::class,
 	WeekStyles::class
 ) {
-
 	override fun start(stage: Stage) {
-		stage.height = 600.0
-		stage.width = 800.0
+		stage.height = DEFAULTHEIGHT
+		stage.width = DEFAULTWIDTH
 		super.start(stage)
 		log("started Frame", LogType.IMPORTANT)
+
+		// switch loading off
 		removeLoading()
+
 		// TODO open last tabs
-//		TabManager.openTab("reminders", ::createReminderTab)
+		TabManager.openTab("reminders", ::createReminderTab)
 		TabManager.openTab("calendar", ::createOverviewTab)
 	}
 }
@@ -132,113 +127,6 @@ class MainView: View("Calendar") {
 	}
 }
 
-fun createMenuBar(pane: BorderPane): MenuBar {
-	return pane.menubar {
-		menu("create".translate(Language.TranslationTypes.Menubar)) {
-			createMenuGroup(createMenuItem(this@menu, "Appointment", "Strg + N") {
-				AppointmentPopup.open(
-					"new appointment".translate(Language.TranslationTypes.AppointmentPopup),
-					"create".translate(Language.TranslationTypes.AppointmentPopup),
-					false,
-					null,
-					Timing.getNow(),
-					Timing.getNow().plusHours(1)
-				)
-			}, createMenuItem(this@menu, "Reminder", "Strg + R") {
-				ReminderPopup.openNew(Timing.getNow(), null)
-			})
-		}
-		menu("options".translate(Language.TranslationTypes.Menubar)) {
-			createMenuGroup(createMenuItem(this@menu, "Reload", "F5") {
-				log("reload triggered")
-				init()
-			}, createMenuItem(this@menu, "Preferences", "Strg + ,") {
-				log("Preferences")
-			}, run { separator(); return@run null }, createMenuItem(this@menu, "Quit", "Strg + Q") {
-				log("exiting Program via quit")
-				Platform.exit()
-			})
-		}
-		menu("view".translate(Language.TranslationTypes.Menubar)) {
-			createMenuGroup(createMenuItem(this@menu, "Show Reminder", "Strg + Shift + R") {
-				log("Show Reminder")
-				Secure.overrideTab("reminders", ::createReminderTab)
-			}, createMenuItem(this@menu, "Show Calendar", "Strg + Shift + C") {
-				log("Show Calendar")
-				Secure.overrideTab("calendar", ::createOverviewTab)
-			})
-		}
-		menu("help".translate(Language.TranslationTypes.Menubar)) {
-			createMenuGroup(createMenuItem(this@menu, "Github", "") {
-				log("Open Github")
-				try {
-					runAsync {
-						Desktop.getDesktop().browse(URI("https://github.com/Buldugmaster99/Calendar"))
-					}
-				} catch(e: IOException) {
-					log("failed to open browser $e", LogType.WARNING)
-				}
-			}, createMenuItem(this@menu, "Memory Usage", "") {
-				//System.gc()
-				val rt = Runtime.getRuntime()
-				val usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024 / 1024
-				log("used memory: $usedMB  | max memory: ${rt.maxMemory() / 1024 / 1024}  | total memory ${rt.totalMemory() / 1024 / 1024}  | free memory ${rt.freeMemory() / 1024 / 1024}")
-			}, run { separator(); return@run null }, createMenuItem(this@menu, "Help", "") {
-				log("Help")
-			})
-		}
-	}
-}
-
-// TODO rework
-fun createMenuGroup(vararg panes: GridPane?) {
-	var currentWidth = 10.0
-	val items = panes.filterNotNull()
-	val changed = mutableListOf<GridPane>()
-	items.forEach { item ->
-		item.apply {
-			widthProperty().listen { width ->
-				if(!changed.contains(this)) changed.add(this)
-				if(width.toDouble() > currentWidth) currentWidth = width.toDouble()
-				if(changed.size == items.size) items.forEach {
-					it.prefWidth = currentWidth
-				}
-			}
-		}
-	}
-}
-
-fun createMenuItem(menu: Menu, name: String, shortcut: String, action: () -> Unit): GridPane? {
-	var grid: GridPane? = null
-	menu.customitem {
-		grid = gridpane {
-			addClass(MenubarStyles.gridPane_)
-
-			label(name.translate(Language.TranslationTypes.Menubar)) {
-				addClass(MenubarStyles.itemName_)
-				gridpaneConstraints {
-					columnRowIndex(0, 0)
-				}
-			}
-			label {
-				addClass(MenubarStyles.spacing_)
-				gridpaneConstraints {
-					columnRowIndex(1, 0)
-					hGrow = Priority.ALWAYS
-				}
-			}
-			label(shortcut) {
-				addClass(MenubarStyles.shortcut_)
-				gridpaneConstraints {
-					columnRowIndex(2, 0)
-				}
-			}
-		}
-		action(action)
-	}
-	return grid
-}
-
 /**
  * Manges tabs for the frame and is used to create, override and close tabs
  *
@@ -250,7 +138,7 @@ object TabManager {
 
 	lateinit var pane: TabPane
 
-	/** <identifier, Tab> */
+	// list of all currently open tabs
 	private val tabs: MutableMap<String, Tab> = mutableMapOf()
 
 	/**
@@ -275,8 +163,8 @@ object TabManager {
 	 * > > week,day > data
 	 *
 	 * @param identifier this should be a unique identifier for the tab like
-	 *     the title but with some extra information so that it doesn't
-	 *     prevent another tab from getting created and instead joinks focus
+	 *     the title but with some extra information so that it doesn't prevent
+	 *     another tab from getting created and instead joinks focus
 	 * @param createFunction the function to create the tab
 	 * @param methodArgs add all extra parameters apart from the pane here
 	 */
@@ -316,12 +204,18 @@ object TabManager {
 	override fun toString(): String = tabs.keys.toString()
 }
 
-
-/** <path,image> */
+// maps already loaded images to their path
 val cache = mutableMapOf<String, Image>()
 
+/**
+ * Create fx image from path
+ *
+ * @param name name of the image
+ * @param path path to the image
+ */
 fun createFXImage(name: String, path: String = ""): Image {
 	val path = "img/$path/$name"
+	// return cached result
 	cache[path]?.let { return it }
 
 	@Suppress("SwallowedException")
@@ -334,6 +228,8 @@ fun createFXImage(name: String, path: String = ""): Image {
 		log("can't read file:$path", LogType.WARNING)
 		getImageMissing()
 	}
+
+	// convert to Image
 	val wr = WritableImage(image.width, image.height)
 	val pw = wr.pixelWriter
 	for(x in 0 until image.width) {
@@ -345,53 +241,58 @@ fun createFXImage(name: String, path: String = ""): Image {
 	return wr
 }
 
+/** create BufferedImage with random colors to replace missing image */
 fun getImageMissing(): BufferedImage {
 	val im = BufferedImage(30, 30, BufferedImage.TYPE_3BYTE_BGR)
 	val g2 = im.graphics
-	for(i in 0 until 15) for(j in 0 until 15) {
-		g2.color = java.awt.Color(Random.nextInt(255), Random.nextInt(155), Random.nextInt(155))
-		g2.fillRect(1 + i * 2, 1 + j * 2, 3, 3)
-	}
-	for(i in 0 until 30) {
-		g2.color = java.awt.Color(200, 10, 50)
-		g2.fillRect(i, 0, 1, 1)
-		g2.fillRect(0, i, 1, 1)
-		g2.fillRect(29, i, 1, 1)
-		g2.fillRect(i, 29, 1, 1)
-		g2.color = java.awt.Color(200, 180, 200)
-		g2.fillRect(i, 1, 1, 1)
-		g2.fillRect(1, i, 1, 1)
-		g2.fillRect(28, i, 1, 1)
-		g2.fillRect(i, 28, 1, 1)
-	}
+	for(i in 0 until 6)
+		for(j in 0 until 10) {
+			g2.color = java.awt.Color(Random.nextInt(255), Random.nextInt(155), Random.nextInt(155))
+			g2.fillRect(1 + i * 5, 1 + j * 3, 5, 3)
+		}
 
 	g2.dispose()
 	return im
 }
 
-
+/** extension function to create ToggleSwitch from FXcontrolls */
 fun EventTarget.toggleSwitch(
 	text: ObservableValue<String>? = null,
 	selected: Property<Boolean> = true.toProperty(),
 	op: ToggleSwitch.() -> Unit = {}
 ) = ToggleSwitch().attachTo(this, op) {
 	it.selectedProperty().bindBidirectional(selected)
-	if(text != null) it.textProperty().bind(text)
+	if(text != null)
+		it.textProperty().bind(text)
 }
 
-
+/**
+ * property containing a string that gets translated if requested
+ *
+ * @param initialValue initialValue
+ * @param type Type of Translation
+ * @param args args to forward to format
+ */
 class TranslatingSimpleStringProperty(
-	initialValue: String = "", private val type: Language.TranslationTypes, private vararg val args: Any
+	initialValue: String = "",
+	private val type: Language.TranslationTypes,
+	private vararg val args: Any
 ): SimpleStringProperty(initialValue) {
 	override fun set(newValue: String?) {
 		super.set(newValue)
 	}
 
-	override fun get(): String = super.get().takeIf { it == "" }?.translate(type, args) ?: "" // dont try to translate if empty
+	override fun get(): String = super.get().takeIf { it != "" }?.translate(type, args) ?: "" // don't try to translate if empty
 
 }
 
-fun EventTarget.typeCombobox(type: Property<Type>? = null): ComboBox<Type> {
+/**
+ * extension function to create a Combobox with a Property for the selected
+ * Type
+ *
+ * @param type Property to bind with the combobox
+ */
+fun EventTarget.typeCombobox(type: Property<Type>): ComboBox<Type> {
 	return combobox(values = Types, property = type) {
 		buttonCell = object: ListCell<Type>() {
 			override fun updateItem(item: Type?, empty: Boolean) {
@@ -420,6 +321,11 @@ fun EventTarget.typeCombobox(type: Property<Type>? = null): ComboBox<Type> {
 	}
 }
 
+/**
+ * adjusts width of the scrollbar Property to the width ot scrollbar
+ *
+ * @param scrollbarWidth Property to update if width updates
+ */
 fun ScrollPane.adjustWidth(scrollbarWidth: DoubleProperty) {
 	widthProperty().listen(removeAfterRun = true) { ->
 		lookupAll(".scroll-bar").filterIsInstance<ScrollBar>()
