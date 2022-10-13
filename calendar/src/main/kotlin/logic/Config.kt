@@ -6,6 +6,9 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import com.google.gson.stream.JsonReader
+import logic.Files.DBfile
+import logic.Files.configFile
+import logic.Files.logfile
 import java.io.File
 import java.io.FileReader
 import java.io.Reader
@@ -14,35 +17,30 @@ import kotlin.collections.set
 import kotlin.reflect.typeOf
 
 
-private val gson: Gson = GsonBuilder().setLenient().setFieldNamingStrategy(FieldNamingStrategy { return@FieldNamingStrategy it.name }).create()
+val gson: Gson = GsonBuilder().setLenient().setFieldNamingStrategy(FieldNamingStrategy { return@FieldNamingStrategy it.name }).create()
 
-/**
- * general JSON reader and writer
- */
-fun getJson() = gson
-
-/**
- * returns configured JSON reader
- * accepts " " in Strings
- */
+/** returns configured JSON reader for [reader] that accepts " " in Strings */
 fun getJsonReader(reader: Reader): JsonReader = JsonReader(reader).apply { isLenient = true }
 
 /**
- * map that links A config with a JSON string
- * of (Int / String / Boolean / Enum element)
+ * map that links A config with a JSON string of (Int / String / Boolean /
+ * Enum element)
  *
  * @see Configs
  */
 var configs: MutableMap<Configs, Any> = mutableMapOf()
 
 /**
- * must be the first method called to read from data files
- * like fonts or language
+ * must get called before logging or any frame or app data can be loaded,
+ * is called after activating basic login, in case config loading fails
+ *
+ * also creates Language
  *
  * @see Files.configFile
+ * @see Language
  */
 fun initConfigs() {
-	val file = File(Files.configFile)
+	val file = File(configFile)
 	if(!file.exists()) {
 		if(!File(OSFolders.getConfigFolder()).exists()) {
 			val dir = File(OSFolders.getConfigFolder())
@@ -50,15 +48,15 @@ fun initConfigs() {
 		}
 		file.createNewFile()
 		file.writeText(CONFIG_DEFAULT)
-		log("created default config:${Files.configFile} in ${File(OSFolders.getConfigFolder())}", LogType.WARNING)
+		log("created default config:$configFile in ${File(OSFolders.getConfigFolder())}", LogType.WARNING)
 	}
 
 	try {
-		val load: Map<String, Any> = getJson().fromJson(getJsonReader(FileReader(Files.configFile)), Map::class.java)
+		val load: Map<String, Any> = gson.fromJson(getJsonReader(FileReader(configFile)), Map::class.java)
 		load.forEach {
 			@Suppress("SwallowedException")
 			try {
-				configs[getJson().fromJson(
+				configs[gson.fromJson(
 					getJsonReader(StringReader(it.key.trim().replaceFirstChar { c -> c.titlecaseChar() })),
 					Configs::class.java
 				)] = it.value
@@ -72,6 +70,8 @@ fun initConfigs() {
 		throw e
 	}
 
+	getConfig<Int>(Configs.AnimationDelay)
+
 	language = Language(getConfig(Configs.Language))
 	log("loaded language ${language.info()}")
 
@@ -79,16 +79,18 @@ fun initConfigs() {
 	log("set stacktrace $stacktrace")
 }
 
+// TODO rework getConfig
+
 /**
- * returns a configuration in Config enum specified in config.json
- * cast to given type
+ * returns a configuration in Config enum specified in config.json cast to
+ * given type
  *
  * getConfig<ConfigType>(Configs.<config>)
  *
  * ConfigType = Int / String / Boolean / Enum element
  *
- * enums get cast automatically from String,
- * other types throw errors if type doesn't match
+ * enums get cast automatically from String, other types throw errors if
+ * type doesn't match
  *
  * config = Enum Element
  *
@@ -96,14 +98,14 @@ fun initConfigs() {
  * @see configs
  */
 @Suppress("NestedBlockDepth", "ThrowsCount", "TooGenericExceptionCaught")
-inline fun <reified T: Any> getConfig(conf: Configs): T {
+inline fun <reified T> getConfig(conf: Configs): T where T: Any {
 	try {
 		configs[conf]?.let {
 			@Suppress("SwallowedException")
 			try {
 				return if(T::class.java.isEnum) {
 					try {
-						getJson().fromJson<T>(getJsonReader(StringReader(it as String)), T::class.java)
+						gson.fromJson<T>(getJsonReader(StringReader(it as String)), T::class.java)
 					} catch(e: NullPointerException) {
 						log("Unable to cast $it into element of ${T::class}", LogType.WARNING)
 						throw e
@@ -117,7 +119,7 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 					LogType.WARNING
 				)
 				if(T::class.supertypes.contains(typeOf<Number>()) && it::class.supertypes.contains(typeOf<Number>())) {
-					return getJson().fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
+					return gson.fromJson(getJsonReader(StringReader(it.toString())), T::class.java)
 				} else {
 					throw ClassCastException()
 				}
@@ -138,26 +140,41 @@ inline fun <reified T: Any> getConfig(conf: Configs): T {
 }
 
 /**
- * is set to true at beginning of programm to prevent
- * stackoverflow if error produced before loading configuration
- * checks for stacktrace
+ * is set to true at beginning of programm to print stacktrace in case of
+ * error loading Configs
+ *
+ * is set to specified Value in [initConfigs]
  */
 var stacktrace = true
 
-/**
- * only Configs in this Config enum are loaded from config.json
- */
+/** TODO rework */
 enum class Configs {
 	Language, Debug, PrintLogs, LogFormat, DebugLogFormat, StoreLogs, PrintStacktrace,
 	AnimationSpeed, AnimationDelay, MaxDayAppointments, ExpandNotesOnOpen, IgnoreCaseForSearch
 }
 
+
+/**
+ * object containing paths to some files like
+ * - [logfile]
+ * - [DBfile]
+ * - [configFile]
+ *
+ * depending on [DEV] variable files in current Dir/devFiles or the real
+ * user specific files are used
+ */
 object Files {
-	val logfile = if(DEV) "./calendar.log" else OSFolders.getDataFolder() + "calendar.log"
-	val DBfile = if(DEV) "./data.sqlite" else OSFolders.getDataFolder() + "data.sqlite"
-	val configFile = if(DEV) "./config.json" else OSFolders.getConfigFolder() + "config.json"
+	/** file to put logs from [logger] */
+	val logfile = if(DEV) "./devFiles/calendar.log" else OSFolders.getDataFolder() + "calendar.log"
+
+	/** file where DB with appointments, reminders, notes etc. is located */
+	val DBfile = if(DEV) "./devFiles/data.sqlite" else OSFolders.getDataFolder() + "data.sqlite"
+
+	/** file where some configs for application are stored */
+	val configFile = if(DEV) "./devFiles/config.json" else OSFolders.getConfigFolder() + "config.json"
 }
 
+/** language Class for translation */
 lateinit var language: Language
 
 // TODO update this before release

@@ -1,6 +1,12 @@
 package logic
 
 import DEV
+import logic.LogType.ERROR
+import logic.LogType.IMPORTANT
+import logic.LogType.LOW
+import logic.LogType.NORMAL
+import logic.LogType.WARNING
+import replaceNewline
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.logging.ConsoleHandler
@@ -10,44 +16,28 @@ import java.util.logging.Level
 import java.util.logging.LogRecord
 import java.util.logging.Logger
 
-
-/** this is necessary to turn of printing
- * of webkit performance by com.sun.webkit.perf.PerfLogger
- * as this can't be turned off, the default logLevel
- * is overridden to Off so the PerfLogger created
- * will be disabled and doesn't print performance because the
- * PlatformLogger used for its creation has a higher level
- * than fine because they use the global logging level
- * as their logLevel on creation.
- */
-//var logger: Logger = Logger.getGlobal()
-
+/** logger used for logging with [log] */
 var logger: Logger = Logger.getLogger("")
 
 lateinit var consoleHandler: ConsoleHandler
 lateinit var fileHandler: FileHandler
 
-fun updateLogger() {
-	logger.level = if(getConfig(Configs.Debug)) Level.ALL else Level.CONFIG
 
-	consoleHandler.formatter =
-		SimpleFormatter(if(getConfig(Configs.Debug)) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
-	fileHandler.formatter = consoleHandler.formatter
-
-	if(!getConfig<Boolean>(Configs.PrintLogs) && !DEV) {
-		logger.removeHandler(consoleHandler)
-	}
-
-	if(getConfig(Configs.StoreLogs)) {
-		logger.addHandler(fileHandler)
-	}
-}
-
+/**
+ * Initialises Logger with `default` data
+ * - removes default Handlers
+ * - adds default console and file Handler with hardcoded format
+ *
+ * is called before [configs] can be loaded with [initsConfigs]
+ *
+ * @see logger
+ * @see Files.logfile
+ */
 fun initLogger() {
 	logger.apply {
 		handlers.forEach { removeHandler(it) }
 
-		level = Level.ALL
+		level = if(DEV) Level.CONFIG else Level.INFO
 
 		consoleHandler = ConsoleHandler()
 		consoleHandler.formatter = SimpleFormatter("[%1\$tT] |%3\$-10s %4\$s %n")
@@ -62,57 +52,143 @@ fun initLogger() {
 }
 
 /**
- * adds a log message with a LogType to the java Logger
+ * Updates logger with values loaded from [configs] using formatting rules
+ * [Configs.LogFormat] [Configs.DebugLogFormat]
  *
- * @param message gets send to the logger; doesn't have to be a string
- * @param type gets translated to java logLevels
+ * Removes file and console Handlers if specified in [Configs.PrintLogs]
+ * and [Configs.StoreLogs] (unless [DEV] is enabled)
  *
- * @see LogType
+ * @see logger
  */
-fun log(message: Any?, type: LogType = LogType.NORMAL) {
+fun updateLogger() {
+	consoleHandler.formatter = SimpleFormatter(if(DEV) getConfig(Configs.DebugLogFormat) else getConfig(Configs.LogFormat))
+	fileHandler.formatter = consoleHandler.formatter
+
+	if(!getConfig<Boolean>(Configs.PrintLogs) && !DEV) {
+		logger.removeHandler(consoleHandler)
+	}
+
+	if(getConfig(Configs.StoreLogs) || DEV) {
+		logger.addHandler(fileHandler)
+	}
+}
+
+
+/**
+ * Log a message with specified LogType ([LogType.NORMAL] if not specified)
+ *
+ * [LogType]s are translated like:
+ * - [LogType.LOW] -> Level.CONFIG
+ * - [LogType.NORMAL] -> Level.INFO
+ * - [LogType.IMPORTANT] -> Level.IMPORTANT
+ * - [LogType.WARNING] -> Level.WARNING
+ * - [LogType.ERROR] -> Level.SEVERE
+ *
+ * generates functionNames and fileNumbers for each log and passes it into
+ * logger
+ *
+ * @param message
+ * @param type
+ */
+fun log(message: Any?, type: LogType = NORMAL) {
 	logger.apply {
 		val callerList = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }
 		val caller = callerList.filter { it.declaringClass.simpleName != "LoggerKt" }[0]
-		var callerStr = "(" + caller.fileName + ":" + caller.lineNumber + ")"
-		callerStr += " " + caller.methodName
-
+		val callerStr = "(" + caller.fileName + ":" + caller.lineNumber + ") " + caller.methodName
 		val mess = message.toString()
-		val messstrip = message.toString().replace("\n", "\\n")
+		val messstrip = message.toString().replaceNewline()
 
 		when(type) {
-			LogType.LOW -> log(Log(Level.CONFIG, messstrip, callerStr))
-			LogType.NORMAL -> log(Log(Level.INFO, messstrip, callerStr))
-			LogType.IMPORTANT -> log(Log(Important(), messstrip, callerStr))
-			LogType.WARNING -> log(Log(Level.WARNING, messstrip, callerStr))
-			LogType.ERROR -> log(Log(Level.SEVERE, mess, callerStr))
+			LOW -> log(Log(Level.CONFIG, messstrip, callerStr))
+			NORMAL -> log(Log(Level.INFO, messstrip, callerStr))
+			IMPORTANT -> log(Log(Important(), messstrip, callerStr))
+			WARNING -> log(Log(Level.WARNING, messstrip, callerStr))
+			ERROR -> log(Log(Level.SEVERE, mess, callerStr))
 		}
 	}
 }
 
+/**
+ * custom Log to be passed into standard log method to override
+ * getSourceClassName to use custom callString
+ *
+ * @param level loglevel, passed into LogRecord
+ * @param msg message to be logged
+ * @param caller caller (consisting of
+ *     ({fileName}:{lineNumber}){methodName} )
+ */
 class Log(level: Level, msg: String, private val caller: String): LogRecord(level, msg) {
 	override fun getSourceClassName(): String = caller
 }
 
 
 /**
- * different types of logs
+ * Type of log to be logged
+ *
+ * types in descending order:
+ * - [LOW] (lowest value)
+ * - [NORMAL]
+ * - [IMPORTANT]
+ * - [WARNING]
+ * - [ERROR] (highest value)
  */
 enum class LogType {
+	/**
+	 * Messages only used for debugging (observable Lists, etc)
+	 *
+	 * = [Level.CONFIG] (700)
+	 */
 	LOW,
+
+	/**
+	 * Messages to provide basic Information about which state programm is
+	 * currently executing, used for debugging purposes (opened Windows,
+	 * popups, etc)
+	 *
+	 * = [Level.INFO] (800)
+	 */
 	NORMAL,
+
+	/**
+	 * Messages to provide important Information about which state programm
+	 * is currently executing, or important modifications to Data (loading of
+	 * configs, creation/deletion of Appointments/Notes)
+	 *
+	 * = [Important] (850)
+	 */
 	IMPORTANT,
+
+	/**
+	 * Messages providing information about problems, which don't cause the
+	 * program to crash, but cause some parts to not function correctly
+	 * (unknown Config Key, Image missing)
+	 *
+	 * = [Level.WARNING] (900)
+	 */
 	WARNING,
+
+	/**
+	 * Messages providing information about a serious Error, causing the
+	 * Program to crash or exit (invalid Config File, missing Config value)
+	 *
+	 * = [Level.SEVERE] (1000)
+	 */
 	ERROR,
 }
 
+/**
+ * Custom Level between [Level.INFO] and [Level.WARNING], to act as a more
+ * relevant info
+ *
+ * @see LogType.IMPORTANT
+ * @see Level
+ */
 class Important: Level("IMPORTANT", 850)
 
 /**
- * full copy of the log.SimpleFormatter
+ * Simple formatter used for extended formatting of LogRecords
  *
- * format of original log.SimpleFormatter was final and read of System props
- *
- * @see Formatter
+ * @param format format to format provided [LogRecord]s
  */
 class SimpleFormatter(private val format: String): Formatter() {
 	override fun format(record: LogRecord): String {
