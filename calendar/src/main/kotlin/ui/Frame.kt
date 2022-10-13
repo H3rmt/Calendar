@@ -1,18 +1,18 @@
-package frame
+package ui
 
 
 import calendar.Type
 import calendar.Types
-import frame.TabManager.Secure
-import frame.styles.GlobalStyles
-import frame.styles.MenubarStyles
-import frame.styles.NoteStyles
-import frame.styles.OverviewStyles
-import frame.styles.ReminderStyles
-import frame.styles.TabStyles
-import frame.styles.WeekStyles
-import frame.tabs.createOverviewTab
-import frame.tabs.createReminderTab
+import ui.TabManager.Secure
+import ui.styles.GlobalStyles
+import ui.styles.MenubarStyles
+import ui.styles.NoteStyles
+import ui.styles.OverviewStyles
+import ui.styles.ReminderStyles
+import ui.styles.TabStyles
+import ui.styles.WeekStyles
+import ui.tabs.createOverviewTab
+import ui.tabs.createReminderTab
 import javafx.beans.property.*
 import javafx.beans.value.*
 import javafx.event.*

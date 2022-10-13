@@ -1,10 +1,10 @@
-package frame.picker.appointmentPicker
+package ui.picker.appointmentPicker
 
 import calendar.Appointment
 import calendar.DBObservable
-import frame.createFXImage
-import frame.picker.dropdownTogglePicker.DropdownToggle
-import frame.picker.dropdownTogglePicker.dropdownTogglePicker
+import ui.createFXImage
+import ui.picker.dropdownTogglePicker.DropdownToggle
+import ui.picker.dropdownTogglePicker.dropdownTogglePicker
 import javafx.beans.property.*
 import javafx.collections.*
 import javafx.collections.FXCollections.*

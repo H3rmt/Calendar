@@ -1,14 +1,14 @@
-package frame.popup
+package ui.popup
 
 import calendar.Appointment
 import calendar.Appointments
 import calendar.Reminder
 import calendar.Timing
-import frame.TranslatingSimpleStringProperty
-import frame.picker.appointmentPicker.AppointmentPicker
-import frame.picker.dateTimePicker.DateTimePicker
-import frame.styles.GlobalStyles
-import frame.toggleSwitch
+import ui.TranslatingSimpleStringProperty
+import ui.picker.appointmentPicker.AppointmentPicker
+import ui.picker.dateTimePicker.DateTimePicker
+import ui.styles.GlobalStyles
+import ui.toggleSwitch
 import javafx.beans.property.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*

@@ -1,4 +1,4 @@
-package frame.styles
+package ui.styles
 
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight

@@ -1,7 +1,7 @@
-package frame.styles
+package ui.styles
 
-import frame.styles.GlobalStyles.Mixins.BGColor
-import frame.styles.GlobalStyles.Mixins.SecColor
+import ui.styles.GlobalStyles.Mixins.BGColor
+import ui.styles.GlobalStyles.Mixins.SecColor
 import javafx.geometry.Pos
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight

@@ -144,7 +144,7 @@ class Appointment(id: EntityID<Long>): LongEntity(id), DBClass {
 
 	// [{7} 2022-05-16T00:00 - 2022-05-16T23:59  [{1} test 0x008000ff] frame.Day | test_1_title: test_1_desc]
 	override fun toString(): String = ("[{${id.value}} ${start.value} - ${end.value}  ${type.value} " +
-			"${if(week.value) "Week" else "frame.Day"} | " +
+			"${if(week.value) "Week" else "Day"} | " +
 			"${title.value}: ${description.value}]").replaceNewline()
 
 	override fun equals(other: Any?): Boolean {

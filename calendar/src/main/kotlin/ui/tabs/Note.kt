@@ -1,13 +1,13 @@
-package frame.tabs
+package ui.tabs
 
 import calendar.Note
 import calendar.Notes
 import calendar.Type
 import calendar.Types
-import frame.styles.GlobalStyles
-import frame.styles.NoteStyles
-import frame.styles.TabStyles
-import frame.typeCombobox
+import ui.styles.GlobalStyles
+import ui.styles.NoteStyles
+import ui.styles.TabStyles
+import ui.typeCombobox
 import javafx.beans.property.*
 import javafx.geometry.*
 import javafx.scene.control.*

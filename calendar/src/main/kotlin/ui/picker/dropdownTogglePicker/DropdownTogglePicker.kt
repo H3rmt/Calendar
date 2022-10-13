@@ -1,4 +1,4 @@
-package frame.picker.dropdownTogglePicker
+package ui.picker.dropdownTogglePicker
 
 import javafx.beans.property.*
 import javafx.collections.*

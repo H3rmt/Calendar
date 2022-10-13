@@ -1,12 +1,12 @@
-package frame.tabs
+package ui.tabs
 
 import calendar.Reminder
 import calendar.Reminders
-import frame.adjustWidth
-import frame.popup.ReminderPopup
-import frame.styles.GlobalStyles
-import frame.styles.ReminderStyles
-import frame.styles.TabStyles
+import ui.adjustWidth
+import ui.popup.ReminderPopup
+import ui.styles.GlobalStyles
+import ui.styles.ReminderStyles
+import ui.styles.TabStyles
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*

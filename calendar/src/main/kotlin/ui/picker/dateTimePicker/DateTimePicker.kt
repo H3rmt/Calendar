@@ -1,6 +1,6 @@
-package frame.picker.dateTimePicker
+package ui.picker.dateTimePicker
 
-import frame.createFXImage
+import ui.createFXImage
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.scene.control.*

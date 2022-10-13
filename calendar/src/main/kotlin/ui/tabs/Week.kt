@@ -1,12 +1,12 @@
-package frame.tabs
+package ui.tabs
 
 import calendar.Appointment
 import calendar.Appointments
 import calendar.Timing
-import frame.adjustWidth
-import frame.styles.GlobalStyles
-import frame.styles.TabStyles
-import frame.styles.WeekStyles
+import ui.adjustWidth
+import ui.styles.GlobalStyles
+import ui.styles.TabStyles
+import ui.styles.WeekStyles
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*

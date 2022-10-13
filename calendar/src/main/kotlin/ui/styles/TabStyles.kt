@@ -1,6 +1,6 @@
-package frame.styles
+package ui.styles
 
-import frame.styles.GlobalStyles.Mixins.SecColor
+import ui.styles.GlobalStyles.Mixins.SecColor
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import tornadofx.Stylesheet

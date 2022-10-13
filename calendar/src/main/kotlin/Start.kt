@@ -4,7 +4,7 @@ import calendar.Notes
 import calendar.Reminders
 import calendar.Types
 import calendar.initDb
-import frame.initFrame
+import ui.initFrame
 import javafx.beans.property.*
 import logic.LogType
 import logic.ObservableListListeners.listenLog
@@ -113,7 +113,7 @@ fun String.replaceNewline(): String = this.replace("\n", "\\n")
  * @param T nullable TypeParameter of Property
  * @param TNotNull same parameter, but nullable
  * @return Property or null (Property`<TNotNull`>?)
- * @see frame.popup.ReminderPopup
+ * @see ui.popup.ReminderPopup
  */
 @Suppress("UNCHECKED_CAST")
 fun <T, TNotNull> Property<T>.nullIfValueNull(): Property<TNotNull>? = if(this.value == null) null else this as Property<TNotNull>

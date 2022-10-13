@@ -1,11 +1,11 @@
-package frame
+package ui
 
 import calendar.Timing
-import frame.popup.AppointmentPopup
-import frame.popup.ReminderPopup
-import frame.styles.MenubarStyles
-import frame.tabs.createOverviewTab
-import frame.tabs.createReminderTab
+import ui.popup.AppointmentPopup
+import ui.popup.ReminderPopup
+import ui.styles.MenubarStyles
+import ui.tabs.createOverviewTab
+import ui.tabs.createReminderTab
 import init
 import javafx.application.*
 import javafx.scene.control.*

@@ -1,7 +1,7 @@
-package frame.picker.appointmentPicker
+package ui.picker.appointmentPicker
 
 import calendar.Appointment
-import frame.createFXImage
+import ui.createFXImage
 import javafx.beans.property.*
 import javafx.collections.*
 import javafx.event.*

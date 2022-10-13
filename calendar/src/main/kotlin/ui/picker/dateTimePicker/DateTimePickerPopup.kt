@@ -1,4 +1,4 @@
-package frame.picker.dateTimePicker
+package ui.picker.dateTimePicker
 
 import javafx.beans.property.*
 import javafx.geometry.*

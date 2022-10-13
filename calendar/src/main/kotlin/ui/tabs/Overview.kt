@@ -1,4 +1,4 @@
-package frame.tabs
+package ui.tabs
 
 import calendar.Appointment
 import calendar.Appointments
@@ -6,13 +6,13 @@ import calendar.Note
 import calendar.Notes
 import calendar.Timing
 import calendar.Type
-import frame.TabManager
-import frame.adjustWidth
-import frame.createFXImage
-import frame.popup.ReminderPopup
-import frame.styles.GlobalStyles
-import frame.styles.OverviewStyles
-import frame.styles.TabStyles
+import ui.TabManager
+import ui.adjustWidth
+import ui.createFXImage
+import ui.popup.ReminderPopup
+import ui.styles.GlobalStyles
+import ui.styles.OverviewStyles
+import ui.styles.TabStyles
 import javafx.beans.property.*
 import javafx.event.*
 import javafx.geometry.*

@@ -1,12 +1,12 @@
-package frame.popup
+package ui.popup
 
 import calendar.Appointment
 import calendar.Timing
 import calendar.Type
 import calendar.Types
-import frame.picker.dateTimePicker.dateTimePicker
-import frame.styles.GlobalStyles
-import frame.typeCombobox
+import ui.picker.dateTimePicker.dateTimePicker
+import ui.styles.GlobalStyles
+import ui.typeCombobox
 import javafx.beans.property.*
 import javafx.scene.layout.*
 import javafx.scene.paint.*

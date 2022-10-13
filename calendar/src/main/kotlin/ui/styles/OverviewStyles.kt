@@ -1,4 +1,4 @@
-package frame.styles
+package ui.styles
 
 import javafx.geometry.Pos
 import javafx.scene.paint.Color
