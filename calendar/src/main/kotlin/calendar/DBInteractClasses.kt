@@ -118,7 +118,7 @@ abstract class DBObservable<T>: DBObservableBase<T, T>() {
  */
 abstract class DBDateObservable: DBObservableBase<LocalDate, Long>() {
 	override fun convertFrom(value: LocalDate): Long = value.toUTCEpochMinute()
-	override fun convertTo(value: Long): LocalDate = Timing.fromUTCEpochMinuteToLocalDateTime(value).toLocalDate()
+	override fun convertTo(value: Long): LocalDate = Timing.fromUTCEpochMinuteToLocalDate(value)
 }
 
 /**
@@ -137,7 +137,7 @@ abstract class DBDateTimeObservable: DBObservableBase<LocalDateTime, Long>() {
 }
 
 /**
- * List that wraps an ObservableList and can get subscribed to to get
+ * List that wraps an ObservableList and can get subscribed to, to get
  * updates if Items change
  *
  * @param T Type of Entity
