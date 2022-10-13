@@ -160,18 +160,18 @@ enum class Configs {
  * - [DBfile]
  * - [configFile]
  *
- * depending on [DEV] variable files in current Dir/DevFiles or the real
+ * depending on [DEV] variable files in current Dir/devFiles or the real
  * user specific files are used
  */
 object Files {
 	/** file to put logs from [logger] */
-	val logfile = if(DEV) "./DevFiles/calendar.log" else OSFolders.getDataFolder() + "calendar.log"
+	val logfile = if(DEV) "./devFiles/calendar.log" else OSFolders.getDataFolder() + "calendar.log"
 
 	/** file where DB with appointments, reminders, notes etc. is located */
-	val DBfile = if(DEV) "./DevFiles/data.sqlite" else OSFolders.getDataFolder() + "data.sqlite"
+	val DBfile = if(DEV) "./devFiles/data.sqlite" else OSFolders.getDataFolder() + "data.sqlite"
 
 	/** file where some configs for application are stored */
-	val configFile = if(DEV) "./DevFiles/config.json" else OSFolders.getConfigFolder() + "config.json"
+	val configFile = if(DEV) "./devFiles/config.json" else OSFolders.getConfigFolder() + "config.json"
 }
 
 /** language Class for translation */

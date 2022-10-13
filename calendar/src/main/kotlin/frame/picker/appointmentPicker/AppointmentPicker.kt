@@ -109,7 +109,7 @@ class AppointmentPicker(appointment: Property<Appointment?>, appointments: Obser
 				update()
 		}
 
-        // hide popup if focus is lost
+		// hide popup if focus is lost
 		popup.autoHideProperty().set(true)
 	}
 

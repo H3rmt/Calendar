@@ -166,7 +166,7 @@ class AppointmentPickerPopup(
 
 				padding = box(2.px, 0.px)
 			}
-            // title cell
+			// title cell
 			textflow {
 				textfieldContent(app.title, this, titleSearchSelect.selected)
 				style {
@@ -176,7 +176,7 @@ class AppointmentPickerPopup(
 					padding = box(2.px)
 				}
 			}
-            // description cell
+			// description cell
 			textflow {
 				textfieldContent(app.description, this, descriptionSearchSelect.selected)
 				style {
@@ -186,7 +186,7 @@ class AppointmentPickerPopup(
 					padding = box(2.px)
 				}
 			}
-            // type cell
+			// type cell
 			textflow {
 				textfieldContent(app.type.value.name, this, typeSearchSelect.selected)
 				style {
@@ -215,7 +215,7 @@ class AppointmentPickerPopup(
 	private fun textfieldContent(str: DBObservable<String>, textFlow: TextFlow, selected: BooleanProperty) {
 		if(replace != null && selected.value) {
 			val strings = str.value.split(replace!!.toRegex(RegexOption.IGNORE_CASE))
-			// returns list of strings arround replace
+			// returns list of strings around replace
 			// replace = foo;  str.value = "Te foo test t f foogeometry"
 			// strings = ["Te ", " test t f ", "geometry"]
 			for((index, text) in strings.withIndex()) {

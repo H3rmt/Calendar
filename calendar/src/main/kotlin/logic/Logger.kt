@@ -94,7 +94,7 @@ fun log(message: Any?, type: LogType = NORMAL) {
 	logger.apply {
 		val callerList = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { it.toList() }
 		val caller = callerList.filter { it.declaringClass.simpleName != "LoggerKt" }[0]
-		val callerStr = "(" + caller.fileName + ":" + caller.lineNumber + ")" + caller.methodName
+		val callerStr = "(" + caller.fileName + ":" + caller.lineNumber + ") " + caller.methodName
 		val mess = message.toString()
 		val messstrip = message.toString().replaceNewline()
 

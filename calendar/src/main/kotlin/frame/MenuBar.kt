@@ -30,13 +30,10 @@ fun createMenuBar(pane: BorderPane): MenuBar {
 	return pane.menubar {
 		menu("create".translate(Language.TranslationTypes.Menubar)) {
 			createMenuGroup(createMenuItem(this@menu, "Appointment", "Strg + N") {
-				AppointmentPopup.open(
-					"new appointment".translate(Language.TranslationTypes.AppointmentPopup),
-					"create".translate(Language.TranslationTypes.AppointmentPopup),
-					false,
-					null,
+				AppointmentPopup.openNew(
 					Timing.getNow(),
-					Timing.getNow().plusHours(1)
+					Timing.getNow().plusHours(1),
+					false
 				)
 			}, createMenuItem(this@menu, "Reminder", "Strg + R") {
 				ReminderPopup.openNew(Timing.getNow(), null)

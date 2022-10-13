@@ -13,6 +13,7 @@ import logic.initConfigs
 import logic.initLogger
 import logic.log
 import logic.updateLogger
+import java.io.File
 import kotlin.system.exitProcess
 
 /**
@@ -40,7 +41,7 @@ var DEV = false
  * @see initFrame
  */
 fun main(args: Array<String>) {
-	println("\nStarting Calendar... ${args.contentToString()} \n")
+	println("\nStarting Calendar... ${args.contentToString()} ${File("").absolutePath} \n")
 	DEV = args.contains("dev")
 
 	initLogger()
@@ -102,7 +103,7 @@ fun String.replaceNewline(): String = this.replace("\n", "\\n")
  *
  * deadline is Property<T?>, so if the value contained inside deadline is
  * null it returns null, jumping to the next ?:
- * ```
+ * ```kt
  * pr: Property<T> = deadline?.nullIfValueNull() ?: time?.toProperty()
  * ```
  *
