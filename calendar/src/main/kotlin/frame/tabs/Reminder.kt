@@ -19,6 +19,14 @@ import logic.translate
 import tornadofx.*
 
 
+/**
+ * Create Reminder tab
+ *
+ * Never called directly (called by
+ * TabManager.openTab(...,::createReminderTab, ... ) )
+ *
+ * @param pane ref to main pane
+ */
 fun createReminderTab(pane: TabPane): Tab {
 	log("creating reminder tab")
 	return pane.tab("reminders".translate(Language.TranslationTypes.Reminder)) {
@@ -97,7 +105,13 @@ fun createReminderTab(pane: TabPane): Tab {
 	}
 }
 
-fun reminderRow(tabs: VBox, reminder: Reminder): HBox {
+/**
+ * creates a reminder row
+ *
+ * @param tabs ref to parent
+ * @param reminder reminder to display
+ */
+private fun reminderRow(tabs: VBox, reminder: Reminder): HBox {
 	return tabs.hbox(spacing = 5.0, alignment = Pos.CENTER) {
 		addClass(ReminderStyles.reminderRow_)
 		label(reminder.title) {
