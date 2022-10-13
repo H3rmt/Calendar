@@ -23,7 +23,16 @@ import logic.translate
 import tornadofx.*
 import java.time.LocalDate
 
-
+/**
+ * Create note tab
+ *
+ * Never called directly (called by TabManager.openTab(...,::createNoteTab,
+ * ... ) )
+ *
+ * @param pane ref to main pane
+ * @param time date on which notes should get displayed
+ * @param isWeek bool to show week notes
+ */
 fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 	log("creating note tab")
 	return pane.tab("") {
@@ -46,6 +55,7 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 			val type: Property<Type> = Types.getRandom("Note").toProperty()
 			var notePanes = mutableMapOf<Note, TitledPane>()
 
+			// heaader bar
 			hbox(spacing = 20.0, alignment = Pos.CENTER_LEFT) {
 				addClass(TabStyles.topbar_)
 
@@ -61,6 +71,7 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 				}
 			}
 
+			// pane containing note display
 			scrollpane(fitToWidth = true, fitToHeight = true) {
 				addClass(GlobalStyles.disableFocusDraw_)
 				addClass(GlobalStyles.maxHeight_)
@@ -77,6 +88,8 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 					}
 
 					val notes = Notes.getNotesAt(time)
+
+					// listen for updates on notes list on this day
 					notes.listenChanges { change ->
 						while(change.next()) {
 							if(change.wasAdded()) {
@@ -106,7 +119,13 @@ fun createNoteTab(pane: TabPane, time: LocalDate, isWeek: Boolean): Tab {
 	}
 }
 
-fun notePane(tabs: VBox, note: Note): TitledPane {
+/**
+ * creates a note display
+ *
+ * @param tabs ref to parent
+ * @param note note to show
+ */
+private fun notePane(tabs: VBox, note: Note): TitledPane {
 	// cannot use the EventTarget Functions because they automatically add the
 	// pane to the end of the vbox
 	val pane = TitledPane()
@@ -132,16 +151,13 @@ fun notePane(tabs: VBox, note: Note): TitledPane {
 
 				button("delete".translate(Language.TranslationTypes.Note)) {
 					action {
-						note.remove()
+						note.remove() // TODO add confirm dialog
 					}
 				}
 			}
 		}
 		expandedProperty().listen(runOnce = true) { new ->
-			contentDisplay = if(new)
-				ContentDisplay.RIGHT
-			else
-				ContentDisplay.TEXT_ONLY
+			contentDisplay = if(new) ContentDisplay.RIGHT else ContentDisplay.TEXT_ONLY
 		}
 
 		editor = htmleditor(note.text.value) {
