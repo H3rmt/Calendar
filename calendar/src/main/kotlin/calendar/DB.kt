@@ -20,6 +20,11 @@ import java.time.LocalDateTime
 import kotlin.random.Random
 
 
+/**
+ * Initializes DB connection
+ *
+ * @see Database
+ */
 fun initDb() {
 	Database.connect("jdbc:sqlite:${Files.DBfile}")
 	// user = "myself", password = "secret")
@@ -29,6 +34,11 @@ fun initDb() {
 }
 
 
+/**
+ * Table in DB containing Appointments
+ *
+ * @see Appointment
+ */
 object AppointmentTable: LongIdTable() {
 	val start = long("start")
 	val end = long("end")
@@ -41,6 +51,13 @@ object AppointmentTable: LongIdTable() {
 	val type = reference("type", TypeTable)
 }
 
+/**
+ * List containing all appointments stored in db, that automatically
+ * updates db and all observable lists containing subsections of this list
+ *
+ * @see Appointment
+ * @see DBObservableList
+ */
 object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 
 	/**
@@ -164,6 +181,11 @@ object Appointments: DBObservableList<Appointment>(Appointment.Appointments) {
 	}
 }
 
+/**
+ * Table in DB containing Notes
+ *
+ * @see Note
+ */
 object NoteTable: LongIdTable() {
 	val time = long("time")
 	val text = text("text")
@@ -171,6 +193,13 @@ object NoteTable: LongIdTable() {
 	val week = bool("week")
 }
 
+/**
+ * List containing all notes stored in db, that automatically updates db
+ * and all observable lists containing subsections of this list
+ *
+ * @see Note
+ * @see DBObservableList
+ */
 object Notes: DBObservableList<Note>(Note.Notes) {
 
 
@@ -287,6 +316,11 @@ object Notes: DBObservableList<Note>(Note.Notes) {
 	}
 }
 
+/**
+ * Table in DB containing Files
+ *
+ * @see File
+ */
 object FileTable: LongIdTable() {
 	val data = text("data")
 	val name = text("text")
@@ -294,9 +328,22 @@ object FileTable: LongIdTable() {
 	val note = reference("note", NoteTable)
 }
 
-@Suppress("EmptyClassBlock")
-object Files: DBObservableList<File>(File.Files)
+/**
+ * List containing all files stored in db, that automatically updates db
+ * and all observable lists containing subsections of this list
+ *
+ * @see File
+ * @see DBObservableList
+ */
+object Files: DBObservableList<File>(File.Files) {
 
+}
+
+/**
+ * Table in DB containing Reminders
+ *
+ * @see Reminder
+ */
 object ReminderTable: LongIdTable() {
 	val deadline = long("deadline").nullable()
 	val appointment = reference("appointment", AppointmentTable).nullable()
@@ -304,15 +351,40 @@ object ReminderTable: LongIdTable() {
 	val description = text("description")
 }
 
-@Suppress("EmptyClassBlock")
-object Reminders: DBObservableList<Reminder>(Reminder.Reminders)
+/**
+ * List containing all reminders stored in db, that automatically updates
+ * db and all observable lists containing subsections of this list
+ *
+ * @see Reminder
+ * @see DBObservableList
+ */
+object Reminders: DBObservableList<Reminder>(Reminder.Reminders) {
 
+}
+
+/**
+ * Table in DB containing Types
+ *
+ * @see Type
+ */
 object TypeTable: IntIdTable() {
 	val name = text("name")
 	val color = varchar("color", 20)
 }
 
+/**
+ * List containing all types stored in db, that automatically updates db
+ * and all observable lists containing subsections of this list
+ *
+ * @see Type
+ * @see DBObservableList
+ */
 object Types: DBObservableList<Type>(Type.Types) {
+	/**
+	 * Returns a random Element from list and raises an Exception if empty
+	 *
+	 * @param exceptionName name to show where it was called
+	 */
 	fun getRandom(exceptionName: String): Type {
 		log("(Types) getting Random", LogType.LOW)
 		require(isNotEmpty()) { throw NoTypeFound(exceptionName) }
