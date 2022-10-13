@@ -1,7 +1,6 @@
 package frame
 
 
-import DEV
 import calendar.Type
 import calendar.Types
 import frame.TabManager.Secure
@@ -78,7 +77,7 @@ fun errorMessage(error: Throwable, writer: String) = Alert(Alert.AlertType.ERROR
 	dialogPane.content = VBox().apply {
 		label(writer.substringBefore('\n').replace("->", "\n"))
 
-		if(DEV) textarea {
+		if(getConfig<Boolean>(Configs.Debug)) textarea {
 			prefRowCount = 10
 			text = writer
 		}
