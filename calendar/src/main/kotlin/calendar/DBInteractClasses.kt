@@ -1,8 +1,8 @@
 package calendar
 
 import calendar.Timing.toUTCEpochMinute
-import com.sun.javafx.collections.ObservableListWrapper
 import javafx.beans.property.*
+import javafx.collections.*
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -51,9 +51,7 @@ abstract class DBObservableBase<T, DB>: ObjectPropertyBase<T>(), IDBObservableD<
 
 	override fun hashCode(): Int = value.hashCode()
 
-	/**
-	 * used for equals methods of DB Classes
-	 */
+	/** used for equals methods of DB Classes */
 	override fun equals(other: Any?): Boolean {
 		if(this === other)
 			return true
@@ -87,14 +85,22 @@ abstract class DBDateTimeObservable: DBObservableBase<LocalDateTime, Long>() {
 }
 
 open class DBObservableList<T: Entity<*>>(private val table: EntityClass<*, T>):
-	ObservableListWrapper<T>(mutableListOf()) {
+	ModifiableObservableListBase<T>() {
 	private var loaded = false
-
 	fun reload() {
 		transaction {
 			super.setAll(table.all().toList())
 		}
 	}
 
+	private val backingList: MutableList<T> = mutableListOf()
+
 	override fun toString(): String = "[DBObservableList value: ${super.toString()}]"
+	override fun get(index: Int): T = backingList[index]
+	override fun doRemove(index: Int): T = backingList.removeAt(index)
+	override val size: Int
+		get() = backingList.size
+
+	override fun doSet(index: Int, element: T): T = backingList.set(index, element)
+	override fun doAdd(index: Int, element: T) = backingList.add(index, element)
 }
