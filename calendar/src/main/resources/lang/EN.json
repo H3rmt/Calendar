@@ -61,6 +61,7 @@
 	},
 	"AppointmentPopup": {
 		"new appointment": "new appointment",
+		"edit appointment": "edit appointment",
 		"create": "create",
 		"type": "type",
 		"whole day": "whole day",
@@ -73,7 +74,7 @@
 		"start to end": "start to end"
 	},
 	"ReminderPopup": {
-		"edit reminder":  "Edit Reminder",
+		"edit reminder": "Edit Reminder",
 		"new reminder": "New Reminder",
 		"save": "Save",
 		"create": "Create",
