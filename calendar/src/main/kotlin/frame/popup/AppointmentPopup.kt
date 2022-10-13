@@ -120,21 +120,21 @@ class AppointmentPopup: Fragment() {
 	private fun createAppointment() {
 		if(wholeDay.value) {
 			appointment = Appointment.new(
-				start = day.value.atStartOfDay(),
-				end = day.value.plusDays(1).atStartOfDay(),
-				title = appointmentTitle.value,
-				description = description.value,
-				type = type.value,
-				allDay = true
+				_start = day.value.atStartOfDay(),
+				_end = day.value.plusDays(1).atStartOfDay(),
+				_title = appointmentTitle.value,
+				_description = description.value,
+				_type = type.value,
+				_allDay = true
 			)
 		} else {
 			appointment = Appointment.new(
-				start = start.value,
-				end = end.value,
-				title = appointmentTitle.value,
-				description = description.value,
-				type = type.value,
-				allDay = false
+				_start = start.value,
+				_end = end.value,
+				_title = appointmentTitle.value,
+				_description = description.value,
+				_type = type.value,
+				_allDay = false
 			)
 		}
 	}

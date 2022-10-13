@@ -30,7 +30,7 @@ class AppointmentPickerPopup(
 	private val appointment: Property<Appointment?>,
 	private val appointments: ObservableList<Appointment>,
 ): Popup() {
-	// null if all elements should get displayed, else all selected colums get filtered
+	// null if all elements should get displayed, else all selected columns get filtered
 	private var replace: String? = null
 
 	// checkbox in filter dropdown to toggle filtering by titles
