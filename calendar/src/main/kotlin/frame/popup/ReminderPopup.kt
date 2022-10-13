@@ -5,6 +5,8 @@ import calendar.Appointments
 import calendar.Reminder
 import calendar.Timing
 import frame.TranslatingSimpleStringProperty
+import frame.picker.appointmentPicker.AppointmentPicker
+import frame.picker.dateTimePicker.DateTimePicker
 import frame.styles.GlobalStyles
 import frame.toggleSwitch
 import javafx.beans.property.*
@@ -17,70 +19,94 @@ import logic.ObservableValueListeners.listen
 import logic.log
 import logic.translate
 import nullIfValueNull
-import picker.appointmentPicker.AppointmentPicker
-import picker.dateTimePicker.DateTimePicker
 import tornadofx.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-
+/**
+* AppointmentPopup class deriving from Fragment
+*
+* opened with AppointmentPopup.open(...)
+*/
 class ReminderPopup: Fragment() {
+    // scope to get parameter from
 	override val scope = when(super.scope) {
 		is NewScope -> {
 			super.scope as NewScope
 		}
+
 		is EditScope -> {
 			super.scope as EditScope
 		}
+
 		else -> super.scope
 	}
 
-	private val new: NewScope? = (scope as? NewScope)
-	private val edit: EditScope? = (scope as? EditScope)
+    // set if AppointmentPopup is a new Appointment Popup
+    private val new: NewScope? = (scope as? NewScope)
 
+    // set if AppointmentPopup is a edit Appointment Popup
+    private val edit: EditScope? = (scope as? EditScope)
+
+    // get reminder to edit (if null create new Popup, else edit Popup)
 	private var reminder: Reminder? = edit?.reminder
 
-	private val appointment: Property<Appointment?> = edit?.reminder?.appointment?.cloneProp()
-		?: new?.appointment?.toProperty() as? Property<Appointment?>
-		?: SimpleObjectProperty()
-	private val deadline: Property<LocalDateTime> = edit?.reminder?.deadline?.cloneProp()?.nullIfValueNull()
-		?: new?.time?.toProperty()
-		?: new?.appointment?.start?.cloneProp()
-		?: SimpleObjectProperty(Timing.getNow())
-	private val reminderTitle: Property<String> = edit?.reminder?.title?.cloneProp()
-		?: SimpleObjectProperty("")
-	private val description: Property<String> = edit?.reminder?.description?.cloneProp()
-		?: SimpleObjectProperty("")
-	private var noDeadline: Property<Boolean> = (edit?.reminder != null && edit.reminder.deadline.value == null && edit.reminder.appointment.value == null).toProperty()
+    private val appointment: Property<Appointment?>    = edit?.reminder?.appointment?.nullIfValueNull()?.cloneProp() // get appointment from reminder
+            ?: new?.appointment?.toProperty()   // get appointment from scope
+            ?: SimpleObjectProperty()
+    private val deadline: Property<LocalDateTime>      = edit?.reminder?.deadline?.nullIfValueNull()?.cloneProp() // get deadline from reminder
+            ?: new?.deadline?.toProperty()      // get deadline from scope
+		    ?: new?.appointment?.start?.cloneProp()
+		    ?: SimpleObjectProperty(Timing.getNow())
+	private val reminderTitle: Property<String>        = edit?.reminder?.title?.cloneProp()
+		    ?: SimpleObjectProperty("")
+	private val description: Property<String>          = edit?.reminder?.description?.cloneProp()
+     		?: SimpleObjectProperty("")
 
-	private val windowTitle: String = edit?.run { "edit Reminder".translate(Language.TranslationTypes.ReminderPopup) }
-		?: "new Reminder".translate(Language.TranslationTypes.ReminderPopup)
-	private val saveTitle: String = edit?.run { "save".translate(Language.TranslationTypes.ReminderPopup) }
-		?: "create".translate(Language.TranslationTypes.ReminderPopup)
+    // sets to no deadline if no deadline and appointment is set in reminder
+    private var noDeadline: Property<Boolean> = (edit?.reminder != null && edit.reminder.deadline.value == null && edit.reminder.appointment.value == null).toProperty()
 
+    // toggle to switch between deadline and appointment
 	private val deadlineOrAppointment: Property<Boolean> = (appointment.value == null).toProperty()
+    // name of toggle switch for deadline and appointment
 	private val finishName: TranslatingSimpleStringProperty = TranslatingSimpleStringProperty("", Language.TranslationTypes.ReminderPopup)
 
-	private lateinit var control: BorderPane
-	private lateinit var deadlineFiled: Field
-	private val error: Property<String> = "".toProperty()
+    private val error: Property<String> = "".toProperty()
 
+    lateinit private var control: BorderPane
+    lateinit private var deadlineFiled: Field
+
+    private var windowTitle: String =  (if (reminder == null) "new reminder"  else "edit reminder").translate(Language.TranslationTypes.ReminderPopup)
+    private var saveTitle: String =    (if (reminder == null) "create"  else "edit").translate(Language.TranslationTypes.ReminderPopup)
+
+
+    /**
+    * updates Reminder
+    */
 	private fun updateReminder() {
 		reminder?.let { rem ->
 			if(noDeadline.value) {
 				rem.deadline.set(null)
 				rem.appointment.set(null)
 			} else {
-				rem.deadline.set(deadline.value)
-				rem.appointment.set(appointment)
+                // only set currently visible value
+                if (deadlineOrAppointment.value) {
+                    rem.deadline.set(deadline.value)
+                    rem.appointment.set(null)
+                } else {
+                    rem.deadline.set(null)
+                    rem.appointment.set(appointment)
+                }
 			}
 			rem.title.set(reminderTitle)
 			rem.description.set(description)
-			rem.appointment.set(appointment)
 		}
 	}
 
+    /**
+    * creates Reminder
+    */
 	private fun createReminder(): Reminder = if(noDeadline.value) {
 		Reminder.new(
 			_deadline = null,
@@ -97,6 +123,9 @@ class ReminderPopup: Fragment() {
 		)
 	}
 
+    /**
+    * check inputs bevore saving
+    */
 	private fun checkReminder(): String? {
 		if(reminderTitle.value.isEmpty()) {
 			return "missing title".translate(Language.TranslationTypes.ReminderPopup)
@@ -119,12 +148,13 @@ class ReminderPopup: Fragment() {
 			field("no deadline".translate(Language.TranslationTypes.ReminderPopup)) {
 				toggleSwitch(selected = noDeadline)
 			}
-			field("finish".translate(Language.TranslationTypes.ReminderPopup)) {
-				borderpane {
+            deadlineFiled = field("finish".translate(Language.TranslationTypes.ReminderPopup)) {
+                // shows DateTimePicker or AppointmentPicker
+                control = borderpane {
 					right = toggleSwitch(text = finishName, selected = deadlineOrAppointment) {
 					}
-				}.also { control = it }
-			}.also { deadlineFiled = it }
+				}
+			}
 			field("title".translate(Language.TranslationTypes.ReminderPopup)) {
 				textfield(reminderTitle)
 			}
@@ -157,6 +187,7 @@ class ReminderPopup: Fragment() {
 						close()
 					}
 				}
+                // save or create Reminder
 				button(saveTitle) {
 					isDefaultButton = true
 					action {
@@ -185,7 +216,7 @@ class ReminderPopup: Fragment() {
 				control.left = DateTimePicker(dateTime = deadline, formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
 			} else {
 				finishName.value = "Appointment"
-				control.left = AppointmentPicker(appointments = Appointments, appointmentProperty = appointment)
+				control.left = AppointmentPicker(appointments = Appointments, appointment = appointment)
 			}
 		}
 		// disable deadline pickers of no Deadline selected
@@ -201,18 +232,32 @@ class ReminderPopup: Fragment() {
 		): Scope()
 
 		class NewScope(
-			val time: LocalDateTime?,
+            val deadline: LocalDateTime?,
 			val appointment: Appointment?
 		): Scope()
 
-		fun openNew(time: LocalDateTime?, appointment: Appointment?, block: Boolean = false): Stage? {
-			val scope = NewScope(time, appointment)
+
+        /**
+        * opens a new ReminderPopup
+        *
+        * @param block blocks doesn't allow the main window to get focused again
+        * @param deadline deadline for new reminder
+        * @param appointment appointment as deadline for reminder
+        */
+        fun openNew(deadline: LocalDateTime?, appointment: Appointment?, block: Boolean = false): Stage? {
+            val scope = NewScope(deadline, appointment)
 			return find<ReminderPopup>(scope).openModal(
 				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE,
 				escapeClosesWindow = false
 			)
 		}
 
+        /**
+        * opens a edit ReminderPopup
+        *
+        * @param block blocks doesn't allow the main window to get focused again
+        * @param reminder reminder to edit
+        */
 		fun openEdit(reminder: Reminder, block: Boolean = false): Stage? {
 			val scope = EditScope(reminder)
 			return find<ReminderPopup>(scope).openModal(
