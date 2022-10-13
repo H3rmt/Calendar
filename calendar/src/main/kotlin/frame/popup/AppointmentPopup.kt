@@ -1,8 +1,10 @@
 package frame.popup
 
 import calendar.Appointment
+import calendar.Timing
 import calendar.Type
 import calendar.Types
+import frame.picker.dateTimePicker.dateTimePicker
 import frame.styles.GlobalStyles
 import frame.typeCombobox
 import javafx.beans.property.*
@@ -14,34 +16,72 @@ import logic.Language
 import logic.ObservableValueListeners.listen
 import logic.log
 import logic.translate
-import picker.dateTimePicker.dateTimePicker
 import tornadofx.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-
+/**
+ * AppointmentPopup class deriving from Fragment
+ *
+ * opened with AppointmentPopup.open(...)
+ */
 class AppointmentPopup: Fragment() {
-	override val scope = super.scope as ItemsScope
+	// scope to get parameter from
+	override val scope = when(super.scope) {
+		is NewScope -> {
+			super.scope as NewScope
+		}
 
-	private var appointment: Appointment? = scope.appointment
+		is EditScope -> {
+			super.scope as EditScope
+		}
 
-	// do not bind directly, instead copy values into new Observables, to only save an updateAppointment()
-	private var start: Property<LocalDateTime> = appointment?.start?.cloneProp() ?: scope.start.toProperty()
-	private var end: Property<LocalDateTime> = appointment?.end?.cloneProp() ?: scope.end.toProperty()
-	private var appointmentTitle: Property<String> = appointment?.title?.cloneProp() ?: "".toProperty()
-	private var description: Property<String> = appointment?.description?.cloneProp() ?: "".toProperty()
-	private var type: Property<Type> = appointment?.type?.cloneProp() ?: Types.getRandom("Appointment").toProperty()
-	private var wholeDay: Property<Boolean> = appointment?.allDay?.cloneProp() ?: false.toProperty()
+		else -> super.scope
+	}
+
+	// set if AppointmentPopup is a new Appointment Popup
+	private val new: NewScope? = (scope as? NewScope)
+
+	// set if AppointmentPopup is an edit Appointment Popup
+	private val edit: EditScope? = (scope as? EditScope)
+
+
+	// get appointment to edit (if null create new Popup, else edit Popup)
+	private var appointment: Appointment? = edit?.appointment
+
+	// do not bind directly, instead copy values into new Observables, to only update original on updateAppointment()
+	private var start: Property<LocalDateTime> = appointment?.start?.cloneProp()
+		?: new?.start?.toProperty()
+		?: Timing.getNow().toProperty()  // this is not possible, as eater appointment or scope has a start
+	private var end: Property<LocalDateTime> = appointment?.end?.cloneProp()
+		?: new?.end?.toProperty()
+		?: Timing.getNow().plusHours(1).toProperty()  // this is not possible, as eater appointment or scope has an end
+	private var appointmentTitle: Property<String> = appointment?.title?.cloneProp()
+		?: "".toProperty()
+	private var description: Property<String> = appointment?.description?.cloneProp()
+		?: "".toProperty()
+	private var type: Property<Type> = appointment?.type?.cloneProp()
+		?: Types.getRandom("Appointment").toProperty()
+	private var wholeDay: Property<Boolean> = appointment?.allDay?.cloneProp()
+		?: false.toProperty()
+
+	// gets used if wholeDay = true
+	private var day: Property<LocalDate> = start.value.toLocalDate().toProperty()
 
 	private var error: Property<String> = "".toProperty()
-	private var control: BorderPane? = null
-	private var day: Property<LocalDate> = (appointment?.start?.value ?: scope.start).toLocalDate().toProperty()
 
-	private var windowTitle: String = scope.title
-	private var saveTitle: String = scope.saveTitle
+	private lateinit var control: BorderPane
 
+	private var windowTitle: String = (if(appointment == null) "new appointment" else "edit appointment").translate(Language.TranslationTypes.AppointmentPopup)
+	private var saveTitle: String = (if(appointment == null) "create" else "edit").translate(Language.TranslationTypes.AppointmentPopup)
+
+
+	/**
+	 * updates the display to show either datepicker or 2 dateTimePicker
+	 * depending on wholeDay
+	 */
 	private fun updateDisplay(toggle: Boolean) {
-		control?.left = if(toggle) {
+		control.left = if(toggle) {
 			field("day".translate(Language.TranslationTypes.AppointmentPopup)) {
 				datepicker(property = day)
 			}
@@ -53,11 +93,12 @@ class AppointmentPopup: Fragment() {
 		}
 	}
 
+	/** updates Appointment */
 	private fun updateAppointment() {
 		if(wholeDay.value) {
 			appointment?.let { app ->
 				app.start.set(day.value.atStartOfDay())
-				app.end.set(day.value.plusDays(1).atStartOfDay().minusMinutes(1))
+				app.end.set(day.value.plusDays(1).atStartOfDay())
 				app.title.set(appointmentTitle)
 				app.description.set(description)
 				app.type.set(type)
@@ -75,26 +116,30 @@ class AppointmentPopup: Fragment() {
 		}
 	}
 
-	private fun createAppointment(): Appointment = if(wholeDay.value) {
-		Appointment.new(
-			start = day.value.atStartOfDay(),
-			end = day.value.plusDays(1).atStartOfDay().minusMinutes(1),
-			title = appointmentTitle.value,
-			description = description.value,
-			type = type.value,
-			allDay = true
-		)
-	} else {
-		Appointment.new(
-			start = start.value,
-			end = end.value,
-			title = appointmentTitle.value,
-			description = description.value,
-			type = type.value,
-			allDay = false
-		)
+	/** creates Appointment */
+	private fun createAppointment() {
+		if(wholeDay.value) {
+			appointment = Appointment.new(
+				start = day.value.atStartOfDay(),
+				end = day.value.plusDays(1).atStartOfDay(),
+				title = appointmentTitle.value,
+				description = description.value,
+				type = type.value,
+				allDay = true
+			)
+		} else {
+			appointment = Appointment.new(
+				start = start.value,
+				end = end.value,
+				title = appointmentTitle.value,
+				description = description.value,
+				type = type.value,
+				allDay = false
+			)
+		}
 	}
 
+	/** check inputs before saving */
 	private fun checkAppointment(): String? {
 		return if(appointmentTitle.value.isEmpty()) {
 			"missing title".translate(Language.TranslationTypes.AppointmentPopup)
@@ -108,6 +153,7 @@ class AppointmentPopup: Fragment() {
 	override fun onBeforeShow() {
 		modalStage?.height = 320.0
 		modalStage?.width = 500.0
+		// TODO minHeight, minWidth
 	}
 
 	override val root = form {
@@ -123,6 +169,7 @@ class AppointmentPopup: Fragment() {
 					}
 				}
 			}
+			// shows datePicker or dateTimePicker
 			control = borderpane()
 			field("title".translate(Language.TranslationTypes.AppointmentPopup)) {
 				textfield(appointmentTitle)
@@ -153,14 +200,16 @@ class AppointmentPopup: Fragment() {
 						close()
 					}
 				}
+				// save or create Appointment
 				button(saveTitle) {
 					isDefaultButton = true
 					action {
 						val check = checkAppointment()
 						if(check == null) {
 							if(appointment == null)
-								appointment = createAppointment()
-							updateAppointment()
+								createAppointment()
+							else
+								updateAppointment()
 							close()
 						} else {
 							error.value = check
@@ -176,27 +225,42 @@ class AppointmentPopup: Fragment() {
 		wholeDay.listen(::updateDisplay, runOnce = true)
 	}
 
-	class ItemsScope(
-		val title: String,
-		val saveTitle: String,
-		val appointment: Appointment?,
-		val start: LocalDateTime,
-		val end: LocalDateTime
-	): Scope()
-
 	companion object {
-		@Suppress("LongParameterList")
-		fun open(
-			title: String,
-			saveTitle: String,
-			block: Boolean,
-			appointment: Appointment?,
-			start: LocalDateTime,
-			end: LocalDateTime
-		): Stage? {
-			val scope = ItemsScope(title, saveTitle, appointment, start, end)
+		class EditScope(
+			val appointment: Appointment
+		): Scope()
+
+		class NewScope(
+			val start: LocalDateTime,
+			val end: LocalDateTime,
+		): Scope()
+
+		/**
+		 * opens a new AppointmentPopup
+		 *
+		 * @param start start time for new created appointment
+		 * @param end end time for new created appointment
+		 * @param block blocks doesn't allow the main window to get focused again
+		 */
+		fun openNew(start: LocalDateTime, end: LocalDateTime, block: Boolean = false): Stage? {
+			val scope = NewScope(start, end)
 			return find<AppointmentPopup>(scope).openModal(
-				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE, escapeClosesWindow = false
+				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE,
+				escapeClosesWindow = false
+			)
+		}
+
+		/**
+		 * opens an edit AppointmentPopup
+		 *
+		 * @param appointment appointment to edit
+		 * @param block blocks doesn't allow the main window to get focused again
+		 */
+		fun openEdit(appointment: Appointment, block: Boolean = false): Stage? {
+			val scope = EditScope(appointment)
+			return find<AppointmentPopup>(scope).openModal(
+				modality = if(block) Modality.APPLICATION_MODAL else Modality.NONE,
+				escapeClosesWindow = false
 			)
 		}
 	}
