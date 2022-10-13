@@ -12,8 +12,10 @@ import javafx.event.*
 import javafx.geometry.*
 import javafx.scene.control.*
 import javafx.scene.layout.*
+import javafx.scene.paint.*
 import logic.Language
 import logic.ObservableListListeners.listen
+import logic.ObservableValueListeners.listen
 import logic.log
 import logic.translate
 import tornadofx.*
@@ -23,6 +25,15 @@ import java.time.LocalTime
 import java.time.temporal.IsoFields
 
 
+/**
+ * Create Week tab
+ *
+ * Never called directly (called by TabManager.openTab(...,::createWeekTab,
+ * ... ) )
+ *
+ * @param pane ref to main pane
+ * @param time time when week starts
+ */
 fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 	log("creating week tab")
 	return pane.tab("") {
@@ -99,9 +110,7 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 									}
 
 									if(Timing.getNow().hour == hour && time.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) == Timing.getNow()
-											.get(
-												IsoFields.WEEK_OF_WEEK_BASED_YEAR
-											) && time.year == Timing.getNow().year
+											.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) && time.year == Timing.getNow().year
 									) addClass(
 										WeekStyles.ActiveTimeCell_
 									)
@@ -137,7 +146,7 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 													removeClass(WeekStyles.HoveredInnerTimeCell_)
 												}
 
-												// TODO Week appointments
+												// TODO display Week appointments
 												// do some filtering if appointment is at this day
 												val f = list.filter {
 													(!it.week.value && (it.start.value <= cctime.plusHours(1) && it.end.value >= cctime))
@@ -153,9 +162,12 @@ fun createWeekTab(pane: TabPane, time: LocalDate): Tab {
 														label(app.title)
 														style {
 															prefWidth = Int.MAX_VALUE.px
-
 															padding = box(2.px)
-															backgroundColor += app.type.value.color.value // TODO bind
+
+															val update = { color: Paint ->
+																backgroundColor += color
+															}
+															app.type.value.color.listen(update, runOnce = true)
 														}
 													}
 												}
