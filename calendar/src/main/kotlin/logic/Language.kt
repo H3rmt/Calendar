@@ -1,7 +1,6 @@
 package logic
 
-import java.io.File
-import java.io.FileReader
+import java.io.InputStreamReader
 
 // TODO rework (this is a class instantiated once)
 
@@ -26,11 +25,18 @@ class Language(private val language: AvailableLanguages) {
 	 * reads JSON from file and stores different Strings in translations Map
 	 */
 	init {
-		val file = File({}::class.java.classLoader.getResource("lang/$language.json")!!.toURI())
-		translations = (gson.fromJson<Map<String, Map<String, String>>>(
-			getJsonReader(FileReader(file)),
-			Map::class.java
-		)).mapKeys { TranslationTypes.valueOf(it.key) }
+		log("loading language: lang/$language.json")
+
+		val file = {}::class.java.classLoader.getResourceAsStream("lang/$language.json")
+		translations = if(file == null) {
+			log("Language File not found", LogType.ERROR)
+			mapOf()
+		} else {
+			(gson.fromJson<Map<String, Map<String, String>>>(
+				getJsonReader(InputStreamReader(file)),
+				Map::class.java
+			)).mapKeys { TranslationTypes.valueOf(it.key) }
+		}
 	}
 
 
