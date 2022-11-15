@@ -44,13 +44,9 @@ var configs: MutableMap<Configs, Any> = mutableMapOf()
 fun initConfigs() {
 	val file = File(Files.configFile)
 	if(!file.exists()) {
-		if(!File(OSFolders.getConfigFolder()).exists()) {
-			val dir = File(OSFolders.getConfigFolder())
-			dir.mkdirs()
-		}
 		file.createNewFile()
 		file.writeText(CONFIG_DEFAULT)
-		log("created default config:${Files.configFile} in ${File(OSFolders.getConfigFolder())}", LogType.WARNING)
+		log("created default config:${Files.configFile}", LogType.WARNING)
 	}
 
 	try {
@@ -153,7 +149,7 @@ enum class Configs {
 }
 
 object Files {
-	val logfile = if(DEV) "./calendar.log" else OSFolders.getDataFolder() + "calendar.log"
+	val logfile = if(DEV) "./calendar.log" else OSFolders.getLogFolder() + "calendar.log"
 	val DBfile = if(DEV) "./data.sqlite" else OSFolders.getDataFolder() + "data.sqlite"
 	val configFile = if(DEV) "./config.json" else OSFolders.getConfigFolder() + "config.json"
 }

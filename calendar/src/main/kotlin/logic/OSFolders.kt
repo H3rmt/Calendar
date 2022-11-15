@@ -35,4 +35,19 @@ object OSFolders {
 			}
 		}
 	}
+
+	fun getLogFolder(): String {
+		return if(os.startsWith("mac os x")) {
+			System.getProperty("user.home") + "/Library/Application Support" + "/calendar/"
+		} else if(os.startsWith("windows")) {
+			System.getenv("APPDATA") + "\\calendar\\"
+		} else {
+			System.getProperty("user.home") + "/.local/share" + "/calendar/"
+		}.also {// create Folder if it doesn't exist
+			if(!File(it).exists()) {
+				val dir = File(it)
+				dir.mkdirs()
+			}
+		}
+	}
 }
