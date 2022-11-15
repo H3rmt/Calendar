@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+          "type": "command",
+          "name": "run",
+          "args": ["run", "--build-cache", "--daemon", "--parallel", "--args", "dev"],
+          "program": "gradlew.bat",
+        },
+
+    ]
+}
