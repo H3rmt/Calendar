@@ -1,0 +1,21 @@
+name: Release Scan with Detekt
+
+on:
+  push:
+    branches: [ release ]
+  pull_request:
+    branches: [ release ]
+
+jobs:
+  scanRelease:
+    name: ScanRelease
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "checkout"
+        uses: actions/checkout@v3
+
+      - name: "detekt"
+        uses: natiginfo/action-detekt-all@1.20.0
+        with:
+          args: --build-upon-default-config --config detekt-release.yml

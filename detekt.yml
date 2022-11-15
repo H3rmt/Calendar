@@ -1,0 +1,36 @@
+build:
+  maxIssues: 15
+
+complexity:
+  LongParameterList:
+    functionThreshold: 7
+    constructorThreshold: 9
+  LongMethod:
+    threshold: 100
+  ComplexCondition:
+    threshold: 6
+
+style:
+  MaxLineLength:
+    active: false
+  MagicNumber:
+    active: false
+  WildcardImport:
+    active: false
+  ExplicitItLambdaParameter:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - 'Error'
+      - 'Exception'
+      - 'RuntimeException'
+      - 'Throwable'
+
+naming:
+  FunctionParameterNaming:
+    active: false
+  ConstructorParameterNaming:
+    active: false

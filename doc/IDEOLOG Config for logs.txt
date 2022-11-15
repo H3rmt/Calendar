@@ -1,0 +1,47 @@
+IDEOLOG Config for logs
+
+Log format in config.json: "[%1$tF %1$tT] |%3$-10s %2$-40s > %4$s %n"
+
+Name: Calendar Log
+Message pattern:  ^\[[^\]]*\] \|[A-Z]+ *.*
+Message start pattern:  ^\[
+Time format:  yyyy-MM-dd HH:mm:ss
+Time capture group:  1
+Severity capture group:  1
+Category capture group:  1
+Apply message pattern to all message lines:  false
+
+
+Pattern:  ^\[[^\]]*\] \|SEVERE *.*
+             Highlight line
+             Bold
+Foreground:  FF0C05
+Background:  2D0008
+Show on stripe:  true
+
+
+Pattern:  ^\[[^\]]*\] \|WARNING *.*
+             Highlight line
+             Bold
+Foreground:  FF7410
+Show on stripe:  true
+
+
+Pattern:  ^\[[^\]]*\] \|IMPORTANT *.*
+             Highlight line
+Foreground:  1BFF18
+Show on stripe:  true
+
+
+Pattern:  ^\[[^\]]*\] \|INFO *.*
+             Highlight line
+Foreground:  A3F8FF
+Show on stripe:  true
+
+
+Pattern:  ^\[[^\]]*\] \|CONFIG *.*
+             Highlight line
+Foreground:  7C8385
+Show on stripe:  true
+
+Fine / Finer / Finest are omitted
