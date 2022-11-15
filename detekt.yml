@@ -2,16 +2,12 @@ build:
   maxIssues: 15
 
 complexity:
-  active: true
   LongParameterList:
-    active: true
     functionThreshold: 7
     constructorThreshold: 9
   LongMethod:
-    active: true
     threshold: 100
   ComplexCondition:
-    active: true
     threshold: 6
 
 style:
@@ -20,6 +16,8 @@ style:
   MagicNumber:
     active: false
   WildcardImport:
+    active: false
+  ExplicitItLambdaParameter:
     active: false
 
 exceptions:

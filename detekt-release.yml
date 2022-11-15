@@ -2,12 +2,9 @@ build:
   maxIssues: 0
 
 complexity:
-  active: true
   LongMethod:
-    active: true
     threshold: 100
   ComplexCondition:
-    active: true
     threshold: 4
 
 style:
@@ -16,4 +13,6 @@ style:
   MagicNumber:
     active: false
   WildcardImport:
+    active: false
+  ExplicitItLambdaParameter:
     active: false

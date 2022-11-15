@@ -1,92 +1,93 @@
 {
-  "Global": {
-    "monday": "",
-    "tuesday": "",
-    "wednesday": "",
-    "thursday": "",
-    "friday": "",
-    "saturday": "",
-    "sunday": "",
+	"Global": {
+		"monday": "",
+		"tuesday": "",
+		"wednesday": "",
+		"thursday": "",
+		"friday": "",
+		"saturday": "",
+		"sunday": "",
 
-    "january": "",
-    "february": "",
-    "march": "",
-    "april": "",
-    "may": "",
-    "june": "",
-    "july": "",
-    "august": "",
-    "september": "",
-    "october": "",
-    "november": "",
-    "december": "",
+		"january": "",
+		"february": "",
+		"march": "",
+		"april": "",
+		"may": "",
+		"june": "",
+		"july": "",
+		"august": "",
+		"september": "",
+		"october": "",
+		"november": "",
+		"december": "",
 
-    "no types for %s found (add some types in settings)": "",
-    "missing %s": ""
-  },
-  "Menubar": {
-    "create": "",
-    "appointment": "",
-    "reminder": "",
-    "options": "",
-    "reload": "",
-    "preferences": "",
-    "quit": "",
-    "view": "",
-    "show reminder": "",
-    "show calendar": "",
-    "help": "",
-    "github": "",
-    "memory usage": ""
-  },
-  "Note": {
-    "notes on %s": "",
-    "week notes for %s to %s": "",
-    "save": "",
-    "delete": ""
-  },
-  "Overview": {
-    "calender": ""
-  },
-  "Reminder": {
-    "reminders": "",
-    "reminder": "",
-    "title": "",
-    "deadline": "",
-    "description": ""
-  },
-  "Week": {
-    "week %s - %s": "",
-    "week": ""
-  },
-  "AppointmentPopup": {
-    "new appointment": "",
-    "create": "",
-    "type": "",
-    "whole day": "",
-    "title": "",
-    "description": "",
-    "cancel": "",
-    "end is after start": "",
-    "missing title": "",
-    "day": "",
-    "start to end": ""
-  },
-  "ReminderPopup": {
-    "edit reminder": "",
-    "new reminder": "",
-    "save": "",
-    "create": "",
+		"no types for %s found (add some types in settings)": "",
+		"missing %s": ""
+	},
+	"Menubar": {
+		"create": "",
+		"appointment": "",
+		"reminder": "",
+		"options": "",
+		"reload": "",
+		"preferences": "",
+		"quit": "",
+		"view": "",
+		"show reminder": "",
+		"show calendar": "",
+		"help": "",
+		"github": "",
+		"memory usage": ""
+	},
+	"Note": {
+		"notes on %s": "",
+		"week notes for %s to %s": "",
+		"save": "",
+		"delete": ""
+	},
+	"Overview": {
+		"calender": ""
+	},
+	"Reminder": {
+		"reminders": "",
+		"reminder": "",
+		"title": "",
+		"deadline": "",
+		"description": ""
+	},
+	"Week": {
+		"week %s - %s": "",
+		"week": ""
+	},
+	"AppointmentPopup": {
+		"new appointment": "",
+		"edit appointment": "",
+		"create": "",
+		"type": "",
+		"whole day": "",
+		"title": "",
+		"description": "",
+		"cancel": "",
+		"end is after start": "",
+		"missing title": "",
+		"day": "",
+		"start to end": ""
+	},
+	"ReminderPopup": {
+		"edit reminder": "",
+		"new reminder": "",
+		"save": "",
+		"create": "",
 
-    "missing title": "",
-    "no deadline": "",
-    "finish": "",
-    "title": "",
-    "description": "",
-    "notify": "",
-    "cancel": "",
+		"missing title": "",
+		"no deadline": "",
+		"finish": "",
+		"title": "",
+		"description": "",
+		"notify": "",
+		"cancel": "",
 
-    "Date": "",
-    "Appointment": ""
-  }
+		"Date": "",
+		"Appointment": ""
+	}
 }

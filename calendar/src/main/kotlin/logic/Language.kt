@@ -1,8 +1,15 @@
 package logic
 
-import java.io.File
-import java.io.FileReader
+import java.io.InputStreamReader
 
+// TODO rework (this is a class instantiated once)
+
+/**
+ * Language
+ *
+ * @constructor Create empty Language
+ * @property language
+ */
 class Language(private val language: AvailableLanguages) {
 
 	/**
@@ -15,27 +22,30 @@ class Language(private val language: AvailableLanguages) {
 	/**
 	 * creates json file if it didn't exist
 	 *
-	 * reads JSON from file and stores different Strings
-	 * in translations Map
+	 * reads JSON from file and stores different Strings in translations Map
 	 */
 	init {
-		val file = File({}::class.java.classLoader.getResource("lang/$language.json")!!.toURI())
-		translations = (getJson().fromJson<Map<String, Map<String, String>>>(
-			getJsonReader(FileReader(file)),
-			Map::class.java
-		)).mapKeys { TranslationTypes.valueOf(it.key) }
+		log("loading language: lang/$language.json")
+
+		val file = {}::class.java.classLoader.getResourceAsStream("lang/$language.json")
+		translations = if(file == null) {
+			log("Language File not found", LogType.ERROR)
+			mapOf()
+		} else {
+			(gson.fromJson<Map<String, Map<String, String>>>(
+				getJsonReader(InputStreamReader(file)),
+				Map::class.java
+			)).mapKeys { TranslationTypes.valueOf(it.key) }
+		}
 	}
 
 
 	/**
-	 * finds the corresponding translated String to a
-	 * String
+	 * Get translation or return non-translated string
 	 *
-	 * @param tr String to translate
-	 *
-	 * @return translated String
-	 *
-	 * @see translations
+	 * @param tr
+	 * @param type
+	 * @return
 	 */
 	fun getTranslation(tr: String, type: TranslationTypes): String {
 		@Suppress("SwallowedException")
@@ -54,32 +64,65 @@ class Language(private val language: AvailableLanguages) {
 		}
 	}
 
+	/**
+	 * returns info about loaded language
+	 *
+	 * @return
+	 */
 	fun info(): String = "Language: $language loaded ${translations.values.sumOf { it.size }} Translations"
 
-	/**
-	 * all different types of available Languages
-	 *
-	 * for a log.getLanguage to get loaded from JSON
-	 * it must be specified here
-	 */
+	/** Available languages with translations */
 	@Suppress("Unused")
 	enum class AvailableLanguages {
+		/** English language */
 		EN,
+
+		/** German language */
 		DE,
+
+		/** French language */
 		FR,
 	}
 
+	/**
+	 * Translations are divided into categories to better distinguish between
+	 * different places where translations are used
+	 */
 	enum class TranslationTypes {
+		/** Translation used everywhere (Month or Day translations) */
 		Global,
+
+		/** Translations used in the Menubar */
 		Menubar,
+
+		/** Translations used in the Note Tab */
 		Note,
+
+		/** Translations used in the Overview Tab */
 		Overview,
+
+		/** Translations used in the Reminder Tab */
 		Reminder,
+
+		/** Translations used in the Week Tab */
 		Week,
+
+		/** Translations used in the AppointmentPopup */
 		AppointmentPopup,
+
+		/** Translations used in the ReminderPopup */
 		ReminderPopup,
 	}
 }
 
+/**
+ * Extension function to translate a string into the global language with
+ * some vararg which are formatted into the string (%s, %t)
+ *
+ * @param type [Language.TranslationTypes] type where translation is used
+ * @param args
+ *
+ * @see String.format
+ */
 fun String.translate(type: Language.TranslationTypes, vararg args: Any?) =
 	language.getTranslation(this, type).format(*args)

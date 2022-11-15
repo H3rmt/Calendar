@@ -23,8 +23,7 @@
 - Mention Issue with in every commit `#{id} Commit Description`
 - Create Pull request from Branch into next with name equal to issue's name and add `Fixes #{id}` to close issue on
   merge [IDE]  (GitHub breaks link to branch)
-- Link Pull request to issue (done automatically by mention)
-- Merge into `next` with top comment as Merge message [IDE]
+- Merge into `next` with default message [IDE]
 - Link `next` Pull request to issue
 - Delete issue branch
 
