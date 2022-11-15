@@ -29,7 +29,7 @@ object OSFolders {
 		return if(os.startsWith("mac os x")) {
 			System.getProperty("user.home") + "/Library/Preferences" + "/$name/"
 		} else if(os.startsWith("windows")) {
-			System.getenv("APPDATA") + "\\$name\\"
+			System.getenv("APPDATA") + "\\$name\\" + "configs\\"
 		} else {
 			System.getProperty("user.home") + "/.config" + "/$name/"
 		}.also { // create Folder if it doesn't exist
@@ -47,6 +47,28 @@ object OSFolders {
 	 * @return path to folder to store data
 	 */
 	fun getDataFolder(): String {
+		return if(os.startsWith("mac os x")) {
+			System.getProperty("user.home") + "/Library/Application Support" + "/$name/"
+		} else if(os.startsWith("windows")) {
+			System.getenv("APPDATA") + "\\$name\\" + "data\\"
+		} else {
+			System.getProperty("user.home") + "/.local/share" + "/$name/"
+		}.also {// create Folder if it doesn't exist
+			if(!File(it).exists()) {
+				val dir = File(it)
+				dir.mkdirs()
+			}
+		}
+	}
+
+	/**
+	 * Get logs folder, depending on user platform
+	 *
+	 * also creates folder if its missing
+	 *
+	 * @return path to folder to store logs
+	 */
+	fun getLogFolder(): String {
 		return if(os.startsWith("mac os x")) {
 			System.getProperty("user.home") + "/Library/Application Support" + "/$name/"
 		} else if(os.startsWith("windows")) {
