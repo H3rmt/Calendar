@@ -3,6 +3,8 @@ name: Release Scan with Detekt
 on:
   push:
     branches: [ release ]
+  pull_request:
+    branches: [ release ]
 
 jobs:
   scanRelease:
