@@ -161,7 +161,7 @@ enum class Configs {
  */
 object Files {
 	/** file to put logs from [logger] */
-	val logfile = if(DEV) "./devFiles/calendar.log" else OSFolders.getDataFolder() + "calendar.log"
+	val logfile = if(DEV) "./devFiles/calendar.log" else OSFolders.getLogFolder() + "calendar.log"
 
 	/** file where DB with appointments, reminders, notes etc. is located */
 	val DBfile = if(DEV) "./devFiles/data.sqlite" else OSFolders.getDataFolder() + "data.sqlite"
